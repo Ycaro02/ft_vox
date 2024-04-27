@@ -2,13 +2,19 @@ OBJ_DIR			=	obj
 
 SRC_DIR 		=	src
 
-SUB_SRC_DIR		=	parser\
+SUB_SRC_DIR		=	window\
+					win_event\
+					glad\
+
 
 ALL_SRC_DIR		=	$(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_SRC_DIR))
 
 MAIN_MANDATORY 	=	main.c
 
-SRCS			=	
+SRCS			=	window/openGL_glw_init.c\
+					win_event/key_callback.c\
+					glad/gl.c\
+
 
 # SRCS_BONUS		=	main_bonus.c
 

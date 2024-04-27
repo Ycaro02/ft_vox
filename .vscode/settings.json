@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.def": "source.def",
+        "gl.h": "c",
+        "glfw3.h": "c",
+        "parse_flag.h": "c",
+        "math.h": "c"
+    }
+}
