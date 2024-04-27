@@ -59,7 +59,7 @@ ifeq ($(shell [ -d ${OBJ_DIR} ] && echo 0 || echo 1), 0)
 	@$(RM) ${TESTER_OUT_FILES}
 endif
 
-fclean:		clean
+fclean:		clean clean_lib
 	@printf "$(RED)Clean $(NAME)/lib$(RESET)\n"
 	@$(RM) $(NAME) ${TESTER_OUT_FILES} ${DISPLAY_NAME}
 
