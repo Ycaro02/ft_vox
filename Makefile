@@ -64,8 +64,8 @@ fclean:		clean clean_lib
 	@$(RM) $(NAME) ${TESTER_OUT_FILES} ${DISPLAY_NAME}
 
 clean_lib:
-	@$(MAKE_LIBFT) fclean
 	@$(MAKE_LIST) fclean
+	@$(MAKE_LIBFT) fclean
 
 test: $(NAME)
 	@./$(NAME)

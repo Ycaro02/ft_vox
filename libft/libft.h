@@ -6,7 +6,7 @@
 /*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 15:43:41 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/27 13:07:25 by ycaro            ###   ########.fr       */
+/*   Updated: 2024/04/27 13:43:58 by ycaro            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,5 +190,8 @@ uint32_t min_uint32(uint32_t a, uint32_t b);
 
 /* Use ft_memcpy in mat4 */
 #include "math/ft_math.h"
+
+/* Use some libft function */
+#include "stack_string/stack_string.h"
 
 #endif
