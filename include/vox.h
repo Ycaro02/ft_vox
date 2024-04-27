@@ -8,6 +8,8 @@
 #include "../libft/parse_flag/parse_flag.h"    /* Parse flag functions */
 #include "window.h"					            /* Window related functions */
 #include "win_event.h"				            /* Window event handling functions */
+#include "camera.h"                             /* Camera handling function */
+#include "render.h"
 
 #define SCREEN_WIDTH 800			/* Screen width */
 #define SCREEN_HEIGHT 600			/* Screen height */
@@ -36,7 +38,7 @@ typedef struct s_block {
 
 typedef struct s_chunks {
     t_block blocks[CHUNKS_HEIGHT][CHUNKS_WIDTH][CHUNKS_DEPTH];   /* Blocks array */
-    u32 id; /* Chunk Id */
+    u32 id;     /* Chunk Id */
 } t_chunks;
 
 /* Context structure */
@@ -44,6 +46,21 @@ typedef struct s_context {
     GLFWwindow *win_ptr;			/* Window pointer */
 } t_context;
 
+/* Model structure */
+typedef struct s_dataCube {
+	vec3_f32		*vertex;		/* vertex array, give to openGL context */
+	u32				v_size;			/* vertex size */
+	vec3_u32		*tri_face;		/* face array, give to openGL context, each vector is a triangle, each point represent index of vertex to link */
+	u32				tri_size;		/* face size */
+	vec2_f32		*texture_coord;	/* texture coordinates associated with a vertex */
+}	t_dataCube;
 
+typedef struct s_render {
+	t_camera		cam;			/* camera structure */
+    GLuint			vao;			/* vertex array object */
+	GLuint			vbo;			/* vertex buffer object */
+	GLuint			ebo;			/* element buffer object */
+	GLuint			shader_id;		/* shader program id */
+} t_render;
 
 #endif /* VOX_HEADER_H */

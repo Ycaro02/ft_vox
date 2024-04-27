@@ -2,10 +2,11 @@ OBJ_DIR			=	obj
 
 SRC_DIR 		=	src
 
-SUB_SRC_DIR		=	window\
+SUB_SRC_DIR		=	glad\
+					window\
 					win_event\
-					glad\
-
+					camera\
+					render\
 
 ALL_SRC_DIR		=	$(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_SRC_DIR))
 
@@ -13,6 +14,8 @@ MAIN_MANDATORY 	=	main.c
 
 SRCS			=	window/openGL_glw_init.c\
 					win_event/key_callback.c\
+					camera/camera.c\
+					render/shader_utils.c\
 					glad/gl.c\
 
 
