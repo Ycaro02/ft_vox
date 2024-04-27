@@ -13,7 +13,7 @@ void act_escape(t_context *c) {
  * @param action action receive from glfw	
  * @param mode unused
 */
-void handle_input(t_context *c)
+void handle_input(void *context)
 {
 	/* To store in context structure */
 	static u8		previous_state[GLFW_KEY_LAST] = {0};
@@ -22,7 +22,8 @@ void handle_input(t_context *c)
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(t_key_action));
 	s32				state = GLFW_RELEASE;
- 	
+ 	t_context 		*c = context;
+
 	for (u32 i = 0; i < max; i++) {
         state = glfwGetKey(c->win_ptr, key_actions[i].key);
 

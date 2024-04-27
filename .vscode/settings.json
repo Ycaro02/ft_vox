@@ -4,6 +4,9 @@
         "gl.h": "c",
         "glfw3.h": "c",
         "parse_flag.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "stack_string.h": "c",
+        "window.h": "c",
+        "libft.h": "c"
     }
 }
