@@ -1,16 +1,17 @@
 #include "../../include/vox.h"
 
-void drawFace(GLuint VAO, u32 count) {
-    glBindVertexArray(VAO);
-    // glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, face_count);
-	glDrawElementsInstanced(GL_TRIANGLE_FAN, count, GL_UNSIGNED_INT, 0, 1);
-    glBindVertexArray(0);
+void drawFace(GLuint VAO, u32 count, u32 cubeId) {
+	glBindVertexArray(VAO);
+	glDrawElementsInstanced(GL_TRIANGLE_FAN, count, GL_UNSIGNED_INT, 0, cubeId);
+	glBindVertexArray(0);
 }
 
 void drawCube(GLuint VAO) {
-    for (u32 i = 0; i < 6; ++i) {
-        drawFace(VAO, i*4);
-    }
+	for (u32 cubeId = 1; cubeId <= 5; ++cubeId) {
+		for (u32 i = 0; i < 6; ++i) {
+			drawFace(VAO, i*4, cubeId);
+		}
+	}
 }
 
 GLuint setupCubeVAO(t_dataCube *cube) {
@@ -124,6 +125,29 @@ GLuint setupCubeVAO(t_dataCube *cube) {
     /* Specify vertex attribute pointers */
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
+
+
+	u32 instanceCount = 5;
+	vec3_f32 instancePositions[5] = {
+		{0.0f, 0.0f, 0.0f},
+		{0.0f, 0.0f, 1.0f},
+		{0.0f, 0.0f, 2.0f},
+		{0.0f, 0.0f, 3.0f},
+		{0.0f, 0.0f, 4.0f}
+	};
+	GLuint instanceVBO;
+	glGenBuffers(1, &instanceVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferData(GL_ARRAY_BUFFER, instanceCount * sizeof(vec3_f32), &instancePositions[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribDivisor(1, 1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
 
     /* Unbind VBO and VAO */
     glBindBuffer(GL_ARRAY_BUFFER, 0);
