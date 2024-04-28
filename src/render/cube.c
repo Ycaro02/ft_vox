@@ -66,7 +66,7 @@ GLuint setupCubeVAO(t_dataCube *cube)
 	u32 v_size = sizeof(vertices) / sizeof(GLfloat);
 	cube->vertex = malloc(sizeof(GLfloat) * v_size);
 	ft_memcpy(cube->vertex, vertices, sizeof(GLfloat) * v_size);
-	cube->v_size = v_size;
+	cube->v_size = v_size / 3;
 
 
     GLuint VAO, VBO;
