@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 12:15:06 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/26 09:57:12 by nfour            ###   ########.fr       */
+/*   Updated: 2024/04/28 11:25:25 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,12 @@ FT_INLINE s8 float_less_equal(float a, float b) {
 
 /* Convert degres to radian  */
 FT_INLINE float deg_to_rad(float deg) {
-	return (float)(deg * (float)M_PI / 180.0f);
+	return (float)(deg * (float)FT_PI / 180.0f);
 }
 
 /* Convert radian to degres */
 FT_INLINE float rad_to_deg(float rad) {
-	return (float)(rad * 180.0f / (float)M_PI);
+	return (float)(rad * 180.0f / (float)FT_PI);
 }
 
 #endif /* FT_FLOAT_HEADER_H */

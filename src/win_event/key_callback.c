@@ -5,6 +5,46 @@ void act_escape(t_context *c) {
     glfwSetWindowShouldClose(c->win_ptr, GL_TRUE);
 }
 
+/* Zoom : W */
+void act_zoom(t_context *c) {
+    move_camera_forward(&c->cam, CAM_ZOOM);
+}
+
+/* Unzoom : S */
+void act_unzoom(t_context *c) {
+    move_camera_backward(&c->cam, CAM_ZOOM);
+}
+
+/* Rotate camera left : A */
+void act_rotate_camera_left(t_context *c) {
+	rotate_camera(&c->cam, CAM_MOVE_HORIZONTAL, VEC3_ROTATEY);
+}
+
+/* Rotate camera right D */
+void act_rotate_camera_right(t_context *c) {
+    rotate_camera(&c->cam, -CAM_MOVE_HORIZONTAL, VEC3_ROTATEY);
+}
+
+/* Up camera : E */
+void act_up_camera(t_context *c) {
+    move_camera_up(&c->cam, CAM_UP_DOWN);
+}
+
+/* Down camera : Q */
+void act_down_camera(t_context *c) {
+    move_camera_up(&c->cam, -CAM_UP_DOWN);
+}
+
+/* Reset cam : ENTER */
+void act_reset_camera(t_context *c) {
+    reset_camera(c);
+}
+
+/* Display cam data : SPACE */
+void act_display_camera_value(t_context *c) {
+    display_camera_value(&c->cam);
+}
+
 /* Change polygon mode : P */
 void act_change_polygon_mode(t_context *c) {
 	/* To store in context structure */
@@ -14,6 +54,32 @@ void act_change_polygon_mode(t_context *c) {
     fill_mode = !fill_mode;
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE + fill_mode);
 }
+
+/* Rotate object left : LEFT */
+void act_rotate_object_left(t_context *c) {
+	rotate_object_around_center(&c->cube, VEC3_ROTATEX, ROTATE_ANGLE, c->shader_id);
+}
+
+/* Rotate object right : RIGHT */
+void act_rotate_object_right(t_context *c) {
+	rotate_object_around_center(&c->cube, VEC3_ROTATEX, -ROTATE_ANGLE, c->shader_id);
+}
+
+/* Rotate object up : UP */
+void act_rotate_object_up(t_context *c) {
+	rotate_object_around_center(&c->cube, VEC3_ROTATEY, ROTATE_ANGLE, c->shader_id);
+}
+
+/* Rotate object down : DOWN */
+void act_rotate_object_down(t_context *c) {
+	rotate_object_around_center(&c->cube, VEC3_ROTATEY, -ROTATE_ANGLE, c->shader_id);
+}
+
+/* Rotate object Z up : PAGE UP*/
+void act_rotate_object_z_up(t_context *c) {
+	rotate_object_around_center(&c->cube, VEC3_ROTATEZ, ROTATE_ANGLE, c->shader_id);
+}
+
 
 /**
  * @brief Set key callback for the window
@@ -29,7 +95,20 @@ void handle_input(void *context)
 	static u8		previous_state[GLFW_KEY_LAST] = {0};
 	t_key_action	key_actions[] = {
 		{GLFW_KEY_ESCAPE, act_escape, SINGLE_PRESS},
-		{GLFW_KEY_P, act_change_polygon_mode, SINGLE_PRESS}
+		{GLFW_KEY_P, act_change_polygon_mode, SINGLE_PRESS},
+		{GLFW_KEY_W, act_zoom, REPEAT},
+		{GLFW_KEY_S, act_unzoom, REPEAT},
+		{GLFW_KEY_A, act_rotate_camera_left, REPEAT},
+		{GLFW_KEY_D, act_rotate_camera_right, REPEAT},
+		{GLFW_KEY_E, act_up_camera, REPEAT},
+		{GLFW_KEY_Q, act_down_camera, REPEAT},
+		{GLFW_KEY_SPACE, act_display_camera_value, SINGLE_PRESS},
+		{GLFW_KEY_ENTER, act_reset_camera, SINGLE_PRESS},
+		{GLFW_KEY_LEFT, act_rotate_object_left, REPEAT},
+		{GLFW_KEY_RIGHT, act_rotate_object_right, REPEAT},
+		{GLFW_KEY_UP, act_rotate_object_up, REPEAT},
+		{GLFW_KEY_DOWN, act_rotate_object_down, REPEAT},
+		{GLFW_KEY_PAGE_UP, act_rotate_object_z_up, REPEAT}
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(t_key_action));
 	s32				state = GLFW_RELEASE;

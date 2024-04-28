@@ -21,4 +21,13 @@ typedef struct t_camera {
     mat4_f32		projection;			/* projection matrix */
 } t_camera;
 
+t_camera create_camera(float fov, float aspect_ratio, float near, float far);
+void move_camera_forward(t_camera* camera, float distance);
+void move_camera_backward(t_camera* camera, float distance);
+void move_camera_up(t_camera* camera, float distance);
+void rotate_camera(t_camera* camera, float angle, vec3_f32 axis);
+void display_camera_value(void *context);
+void reset_camera(void *context);
+void update_camera(void *context, GLuint shader_id);
+
 #endif /* HEADER_CAMERA_H */

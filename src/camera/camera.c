@@ -4,20 +4,26 @@
  * @brief Display camera value
  * @param cam camera structure
 */
-void display_camera_value(t_camera *cam)
+void display_camera_value(void *context)
 {
-	ft_printf_fd(1, CYAN"Camera position: %f %f %f\n", cam->position[0], cam->position[1], cam->position[2]);
-	ft_printf_fd(1, "Camera target: %f %f %f\n", cam->target[0], cam->target[1], cam->target[2]);
-	ft_printf_fd(1, "Camera up: %f %f %f\n", cam->up[0], cam->up[1], cam->up[2]);
+	t_context *c = context;
+	ft_printf_fd(1, CYAN"Camera position: %f %f %f\n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
+	ft_printf_fd(1, "Camera target: %f %f %f\n", c->cam.target[0], c->cam.target[1], c->cam.target[2]);
+	ft_printf_fd(1, "Camera up: %f %f %f\n", c->cam.up[0], c->cam.up[1], c->cam.up[2]);
 	ft_printf_fd(1, "Camera view: \n");
 	for (u32 i = 0; i < 4; i++) {
-		ft_printf_fd(1, "%f %f %f %f\n", cam->view[i][0], cam->view[i][1], cam->view[i][2], cam->view[i][3]);
+		ft_printf_fd(1, "%f %f %f %f\n", c->cam.view[i][0], c->cam.view[i][1], c->cam.view[i][2], c->cam.view[i][3]);
 	}
 	ft_printf_fd(1, "Camera projection: \n");
 	for (u32 i = 0; i < 4; i++) {
-		ft_printf_fd(1, "%f %f %f %f\n", cam->projection[i][0], cam->projection[i][1], cam->projection[i][2], cam->projection[i][3]);
+		ft_printf_fd(1, "%f %f %f %f\n", c->cam.projection[i][0], c->cam.projection[i][1], c->cam.projection[i][2], c->cam.projection[i][3]);
 	}
 	ft_printf_fd(1, RESET);
+
+	ft_printf_fd(1, "Model matrix: \n");
+	for (u32 i = 0; i < 4; i++) {
+		ft_printf_fd(1, "%f %f %f %f\n", c->cube.rotation[i][0], c->cube.rotation[i][1], c->cube.rotation[i][2], c->cube.rotation[i][3]);
+	}
 }
 
 /**
@@ -28,7 +34,7 @@ void display_camera_value(t_camera *cam)
  * @param far far plane
  * @return new camera
 */
-t_camera create_camera(float fov, float aspect_ratio, float near, float far) 
+t_camera create_camera(float fov, float aspect_ratio, float near, float far)
 {
     t_camera camera;
 
@@ -53,13 +59,15 @@ t_camera create_camera(float fov, float aspect_ratio, float near, float far)
  * @param camera camera to update
  * @param shader_id shader id
 */
-void update_camera(t_camera* camera, GLuint shader_id) 
+void update_camera(void *context, GLuint shader_id) 
 {
+	t_context *c = context;
+
     /* Look at view */
-	update_view_mat4(camera->position, camera->target, camera->up, camera->view);
-    set_shader_var_mat4(shader_id, "view", camera->view);
-    // set_shader_var_mat4(shader_id, "model", camera->model); /* need to be updated */
-    set_shader_var_mat4(shader_id, "projection", camera->projection);
+	update_view_mat4(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
+    set_shader_var_mat4(shader_id, "view", c->cam.view);
+    set_shader_var_mat4(shader_id, "projection", c->cam.projection);
+	set_shader_var_mat4(shader_id, "model", c->cube.rotation);
 }
 
 /**
@@ -134,15 +142,18 @@ void move_camera_up(t_camera* camera, float distance)
 }
 
 /* Hard code camera postition */
-void reset_camera(t_camera *camera) 
+void reset_camera(void *context)
 {
+	t_context *c = context;
     /* init camera position */
-    CREATE_VEC3(23.756206f, 0.00000f, 2.155274f, camera->position);
+    CREATE_VEC3(23.756206f, 0.00000f, 2.155274f, c->cam.position);
     /* init camera target */
-    CREATE_VEC3(14.963508f, 0.00000f, 1.405361f, camera->target);
+    CREATE_VEC3(14.963508f, 0.00000f, 1.405361f, c->cam.target);
     /* init up vector */
-    CREATE_VEC3(0.00000f, 1.00000f, 0.00000f, camera->up);
+    CREATE_VEC3(0.00000f, 1.00000f, 0.00000f, c->cam.up);
 
 	/* Look at view */
-	update_view_mat4(camera->position, camera->target, camera->up, camera->view);
+	update_view_mat4(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
+
+	mat4_identity(c->cube.rotation);
 }

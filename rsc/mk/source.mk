@@ -16,6 +16,8 @@ SRCS			=	window/openGL_glw_init.c\
 					win_event/key_callback.c\
 					camera/camera.c\
 					render/shader_utils.c\
+					render/cube.c\
+					render/obj_rotate.c\
 					glad/gl.c\
 
 
