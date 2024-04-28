@@ -21,6 +21,22 @@ typedef struct s_dataCube {
 }	t_dataCube;
 
 
+struct compact_cube {
+	u32 shape_texture;
+	/*
+		u16 shape;
+		u16 texture;
+	*/
+	u32 y_light;
+	/*
+		u8 flag;
+		u8 torch_sun_light;  4 bits for torch light and 4 bits for sun light
+		u16 y;
+	*/
+	u32 x;		/* x position */
+	u32 z;		/* z position */
+};
+
 /* shader_utils.c */
 void set_shader_var_vec4(GLuint shader_id, char *var_name, vec4_f32 vec);
 void set_shader_var_mat4(GLuint shader_id, char *var_name, mat4_f32 data);
