@@ -1,14 +1,16 @@
 {
     "files.associations": {
-        "*.def": "source.def",
-        "gl.h": "c",
-        "glfw3.h": "c",
-        "parse_flag.h": "c",
-        "math.h": "c",
-        "stack_string.h": "c",
-        "window.h": "c",
-        "libft.h": "c",
-        "basic_define.h": "c",
-        "linked_list.h": "c"
-    }
+		"*.def": "source.def",
+		"gl.h": "c",
+		"glfw3.h": "c",
+		"parse_flag.h": "c",
+		"math.h": "c",
+		"stack_string.h": "c",
+		"window.h": "c",
+		"libft.h": "c",
+		"basic_define.h": "c",
+		"linked_list.h": "c",
+		"dlfcn.h": "c",
+		"vox.h": "c"
+	}
 }

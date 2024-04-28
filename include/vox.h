@@ -36,6 +36,9 @@ typedef struct s_block {
 #define CHUNKS_WIDTH    32
 #define CHUNKS_DEPTH    32
 
+#define VERTEX_SHADER_PATH		"rsc/shaders/vertex_shader.glsl"
+#define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
+
 typedef struct s_chunks {
     t_block blocks[CHUNKS_HEIGHT][CHUNKS_WIDTH][CHUNKS_DEPTH];   /* Blocks array */
     u32 id;     /* Chunk Id */
@@ -55,12 +58,5 @@ typedef struct s_dataCube {
 	vec2_f32		*texture_coord;	/* texture coordinates associated with a vertex */
 }	t_dataCube;
 
-typedef struct s_render {
-	t_camera		cam;			/* camera structure */
-    GLuint			vao;			/* vertex array object */
-	GLuint			vbo;			/* vertex buffer object */
-	GLuint			ebo;			/* element buffer object */
-	GLuint			shader_id;		/* shader program id */
-} t_render;
 
 #endif /* VOX_HEADER_H */

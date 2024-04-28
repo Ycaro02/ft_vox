@@ -5,6 +5,16 @@ void act_escape(t_context *c) {
     glfwSetWindowShouldClose(c->win_ptr, GL_TRUE);
 }
 
+/* Change polygon mode : P */
+void act_change_polygon_mode(t_context *c) {
+	/* To store in context structure */
+    static u8 fill_mode = 1;
+	
+	(void)c;
+    fill_mode = !fill_mode;
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE + fill_mode);
+}
+
 /**
  * @brief Set key callback for the window
  * @param window 
@@ -19,6 +29,7 @@ void handle_input(void *context)
 	static u8		previous_state[GLFW_KEY_LAST] = {0};
 	t_key_action	key_actions[] = {
 		{GLFW_KEY_ESCAPE, act_escape, SINGLE_PRESS},
+		{GLFW_KEY_P, act_change_polygon_mode, SINGLE_PRESS}
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(t_key_action));
 	s32				state = GLFW_RELEASE;

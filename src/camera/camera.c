@@ -40,7 +40,8 @@ t_camera create_camera(float fov, float aspect_ratio, float near, float far)
     CREATE_VEC3(0.00000f, 1.00000f, 0.00000f, camera.up);
 
     /* Compute view martice */
-    update_view_mat4(camera.position, camera.target, camera.up, camera.view);
+    /* Look at view */
+	update_view_mat4(camera.position, camera.target, camera.up, camera.view);
 
     /* Compute projection matrice */
     mat4_perspective(deg_to_rad(fov), aspect_ratio, near, far, camera.projection);
@@ -54,7 +55,8 @@ t_camera create_camera(float fov, float aspect_ratio, float near, float far)
 */
 void update_camera(t_camera* camera, GLuint shader_id) 
 {
-    update_view_mat4(camera->position, camera->target, camera->up, camera->view);
+    /* Look at view */
+	update_view_mat4(camera->position, camera->target, camera->up, camera->view);
     set_shader_var_mat4(shader_id, "view", camera->view);
     // set_shader_var_mat4(shader_id, "model", camera->model); /* need to be updated */
     set_shader_var_mat4(shader_id, "projection", camera->projection);
@@ -141,5 +143,6 @@ void reset_camera(t_camera *camera)
     /* init up vector */
     CREATE_VEC3(0.00000f, 1.00000f, 0.00000f, camera->up);
 
+	/* Look at view */
 	update_view_mat4(camera->position, camera->target, camera->up, camera->view);
 }

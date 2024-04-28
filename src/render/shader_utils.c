@@ -39,49 +39,49 @@ char *load_shader_file(char *path)
 	return (shader_src);
 }
 
-// GLuint load_shader(t_obj_model *model)
-// {
-// 	char *vertex_shader = load_shader_file(VERTEX_SHADER_PATH);
-// 	char *fragment_shader = load_shader_file(FRAGMENT_SHADER_PATH);
+GLuint load_shader(t_render *c)
+{
+	char *vertex_shader = load_shader_file(VERTEX_SHADER_PATH);
+	char *fragment_shader = load_shader_file(FRAGMENT_SHADER_PATH);
 	
-// 	/* create shader */
-// 	GLuint frag_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-// 	GLuint frag_pixel_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	/* create shader */
+	GLuint frag_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint frag_pixel_shader = glCreateShader(GL_FRAGMENT_SHADER);
 
-// 	/* compile shader */
-// 	glShaderSource(frag_vertex_shader, 1, (const char **)&vertex_shader, NULL);
-// 	glCompileShader(frag_vertex_shader);
+	/* compile shader */
+	glShaderSource(frag_vertex_shader, 1, (const char **)&vertex_shader, NULL);
+	glCompileShader(frag_vertex_shader);
 
-// 	glShaderSource(frag_pixel_shader, 1, (const char **)&fragment_shader, NULL);
-// 	glCompileShader(frag_pixel_shader);
+	glShaderSource(frag_pixel_shader, 1, (const char **)&fragment_shader, NULL);
+	glCompileShader(frag_pixel_shader);
 
-// 	model->shader_id = glCreateProgram();
+	c->shader_id = glCreateProgram();
 	
-// 	/* Attach and link shader program  */
-// 	glAttachShader(model->shader_id , frag_vertex_shader);
-// 	glAttachShader(model->shader_id , frag_pixel_shader);
+	/* Attach and link shader program  */
+	glAttachShader(c->shader_id , frag_vertex_shader);
+	glAttachShader(c->shader_id , frag_pixel_shader);
 	
-// 	glLinkProgram(model->shader_id);
+	glLinkProgram(c->shader_id);
 
-// 	GLint succes = 0;
-// 	glGetProgramiv(model->shader_id , GL_LINK_STATUS, &succes);
-// 	if (!succes) {
-// 		GLchar data[1024];
-// 		ft_bzero(data, 1024);
-// 		glGetProgramInfoLog(model->shader_id , 512, NULL, data);
-// 		ft_printf_fd(2, "Shader program log: %s\n", data);
-// 	} else {
-// 		ft_printf_fd(1, "Shader program linked\n");
-// 	}
+	GLint succes = 0;
+	glGetProgramiv(c->shader_id , GL_LINK_STATUS, &succes);
+	if (!succes) {
+		GLchar data[1024];
+		ft_bzero(data, 1024);
+		glGetProgramInfoLog(c->shader_id , 512, NULL, data);
+		ft_printf_fd(2, "Shader program log: %s\n", data);
+	} else {
+		ft_printf_fd(1, "Shader program linked\n");
+	}
 
-// 	glUseProgram(model->shader_id);
+	glUseProgram(c->shader_id);
 
-// 	/* delete shader tocheck */
-// 	glDeleteShader(frag_vertex_shader);
-// 	glDeleteShader(frag_pixel_shader);
+	/* delete shader tocheck */
+	glDeleteShader(frag_vertex_shader);
+	glDeleteShader(frag_pixel_shader);
 
-// 	/* delete ressource */
-// 	free(vertex_shader);
-// 	free(fragment_shader);
-// 	return (model->shader_id);
-// }
+	/* delete ressource */
+	free(vertex_shader);
+	free(fragment_shader);
+	return (c->shader_id);
+}
