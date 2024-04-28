@@ -1,20 +1,22 @@
 #include "../../include/vox.h"
 
+#define NB_CUBE 10
+
 void drawFace(GLuint VAO, u32 count, u32 cubeId) {
 	glBindVertexArray(VAO);
 	glDrawElementsInstanced(GL_TRIANGLE_FAN, count, GL_UNSIGNED_INT, 0, cubeId);
 	glBindVertexArray(0);
 }
 
-void drawCube(GLuint VAO) {
-	for (u32 cubeId = 1; cubeId <= 5; ++cubeId) {
+void drawCube(GLuint VAO, u32 nb_cube) {
+	for (u32 cubeId = 1; cubeId <= nb_cube; ++cubeId) {
 		for (u32 i = 0; i < 6; ++i) {
 			drawFace(VAO, i*4, cubeId);
 		}
 	}
 }
 
-GLuint setupCubeVAO(t_dataCube *cube) {
+GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	static const GLfloat vertices[] = {
 		/* Front face */
 		-0.5f, -0.5f, 0.5f,
@@ -127,18 +129,29 @@ GLuint setupCubeVAO(t_dataCube *cube) {
     glEnableVertexAttribArray(0);
 
 
-	u32 instanceCount = 5;
-	vec3_f32 instancePositions[5] = {
-		{0.0f, 0.0f, 0.0f},
-		{0.0f, 0.0f, 1.0f},
-		{0.0f, 0.0f, 2.0f},
-		{0.0f, 0.0f, 3.0f},
-		{0.0f, 0.0f, 4.0f}
-	};
+	// u32 instanceCount = NB_CUBE;
+	// vec3_f32 instancePositions[NB_CUBE] = {
+	// 	{0.0f, 0.0f, 0.0f},
+	// 	{0.0f, 0.0f, 1.0f},
+	// 	{0.0f, 0.0f, 2.0f},
+	// 	{0.0f, 0.0f, 3.0f},
+	// 	{0.0f, 0.0f, 4.0f},
+	// 	{0.0f, 1.0f, 0.0f},
+	// 	{0.0f, 1.0f, 1.0f},
+	// 	{0.0f, 1.0f, 2.0f},
+	// 	{0.0f, 1.0f, 3.0f},
+	// 	{0.0f, 1.0f, 4.0f},
+	// };
+
+    vec3_f32 *block_array = ft_calloc(sizeof(vec3_f32), c->chunks->nb_block);
+
+	u32 instanceCount = chunks_cube_get(c->chunks, block_array);
+
+
 	GLuint instanceVBO;
 	glGenBuffers(1, &instanceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glBufferData(GL_ARRAY_BUFFER, instanceCount * sizeof(vec3_f32), &instancePositions[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, instanceCount * sizeof(vec3_f32), (GLfloat *)block_array[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);

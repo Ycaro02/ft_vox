@@ -70,6 +70,6 @@ clean_lib:
 test: $(NAME)
 	@./$(NAME)
 
-re:			fclean all
+re:			clean_lib fclean all
 
 .PHONY:		all clean fclean re bonus
