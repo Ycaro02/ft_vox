@@ -29,7 +29,7 @@ typedef struct PACKED_STRUCT s_block {
     // u32 chunkId;    /* Chunk ID */
 }   t_block;
 
-struct compact_cube {
+struct compact_block {
 	u32 shape_texture;
 	/*
 		u16 shape;
@@ -46,9 +46,9 @@ struct compact_cube {
 };
 
 
-#define WORLD_MAX_HEIGHT 256
-#define WORLD_MAX_WIDTH (16384 * 2)
-#define WORLD_MAX_DEPTH (16384 * 2)
+#define WORLD_MAX_HEIGHT 256U
+#define WORLD_MAX_WIDTH (16384U * 2U)
+#define WORLD_MAX_DEPTH (16384U * 2U)
 
 #define CHUNKS_HEIGHT   16U
 #define CHUNKS_WIDTH    16U
@@ -59,11 +59,32 @@ struct compact_cube {
 #define VERTEX_SHADER_PATH		"rsc/shaders/vertex_shader.glsl"
 #define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
 
+
+#define SUB_CHUNKS_HEIGHT   16U
+#define SUB_CHUNKS_WIDTH    16U
+#define SUB_CHUNKS_DEPTH    16U
+
+#define NB_SUB_CHUNK (WORLD_MAX_HEIGHT / SUB_CHUNKS_HEIGHT)
+
+typedef struct s_sub_chunks {
+	hashMap *block_map;		/* Blocks map, use hashMap API to set/get block */
+	u32		flag;			/* Sub Chunk Id and flag */
+	u32		metadata;		/* Sub Chunk metadata */
+} t_sub_chunks;
+
 typedef struct s_chunks {
+	/* Block arry to remove, need to read sub_chunks block map instead */
     t_block blocks[CHUNKS_WIDTH][CHUNKS_HEIGHT][CHUNKS_DEPTH];   /* Blocks array */
-    u32     id;     		/* Chunk Id */
 	u32		nb_block;		/* nb block to give to render context */
+    u32     id;     		/* Chunk Id */
+	t_sub_chunks sub_chunks[NB_SUB_CHUNK]; /* array of sub_chunks */
 } t_chunks;
+
+typedef struct s_world {
+	u64			seed;			/* World seed */
+	t_chunks	*chunks;		/* Chunks array */
+	u32			nb_chunks;		/* Number of chunks loaded */
+} t_world;
 
 /* Context structure */
 typedef struct s_context {
@@ -74,10 +95,10 @@ typedef struct s_context {
 	GLuint		shader_id;		/* shader program id */
 } t_context;
 
-u32 chunks_cube_get(t_chunks *chunks, vec3_f32 *block_array);
+u32		chunks_cube_get(t_chunks *chunks, vec3_f32 *block_array);
 
 /* render/cube.c */
-GLuint setupCubeVAO(t_context *c, t_modelCube *cube);
+GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);
 void	drawCube(GLuint vao, u32 nb_cube);
 
 
