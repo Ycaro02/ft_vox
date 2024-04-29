@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "hashmap.h"
+#include "hashMap.h"
 #include "../libft.h"
 
 // Function to compare block positions
-int compare_block_pos(t_block_pos pos1, t_block_pos pos2) {
+int compare_t_block_pos(t_block_pos pos1, t_block_pos pos2) {
     return (pos1.x == pos2.x && pos1.y == pos2.y && pos1.z == pos2.z);
 }
 
@@ -19,7 +19,7 @@ int compare_values(void *value1, void *value2) {
 // Test function for the hashmap
 void hashmap_test() {
     // Initialize the hashmap
-    t_hashmap *map = hashmap_init(8);
+    hashMap *map = hashmap_init(8, hashmap_entry_free);
     assert(map != NULL);
 
     // Add entries
@@ -58,7 +58,7 @@ void hashmap_test() {
 
 void hashmap_colision_test() {
     // Initialize the hashmap with a small capacity to force collisions
-    t_hashmap *map = hashmap_init(4);
+    hashMap *map = hashmap_init(4, hashmap_entry_free);
     assert(map != NULL);
 
     // Add entries with keys that collide
@@ -77,8 +77,12 @@ void hashmap_colision_test() {
     assert(hashmap_set_entry(map, (t_block_pos){100, 108, 109}, ft_strdup("Value6")) == HASHMAP_ADD_ENTRY);
     assert(hashmap_set_entry(map, (t_block_pos){117, 128, 129}, ft_strdup("Value7")) == HASHMAP_ADD_ENTRY);
 
-    // Retrieve values from the hashmap after adding more entries and verify
+    // Retrieve ALL values from the hashmap after adding more entries and verify
+	assert(compare_values(hashmap_get(map, (t_block_pos){1, 2, 3}), "Value1"));
+    assert(compare_values(hashmap_get(map, (t_block_pos){5, 6, 7}), "Value2"));
+    assert(compare_values(hashmap_get(map, (t_block_pos){9, 10, 11}), "Value3"));
     assert(compare_values(hashmap_get(map, (t_block_pos){13, 14, 15}), "Value4"));
+	assert(compare_values(hashmap_get(map, (t_block_pos){1, 2, 3}), "Value1")); /* try this to time */
     assert(compare_values(hashmap_get(map, (t_block_pos){17, 18, 19}), "Value5"));
 	assert(compare_values(hashmap_get(map, (t_block_pos){100, 108, 109}), "Value6"));
 	assert(compare_values(hashmap_get(map, (t_block_pos){117, 128, 129}), "Value7"));
@@ -89,7 +93,7 @@ void hashmap_colision_test() {
 
 void hashmap_expand_test() {
     // Initialize the hashmap
-    t_hashmap *map = hashmap_init(3); // Small initial capacity
+    hashMap *map = hashmap_init(3, hashmap_entry_free); // Small initial capacity
     assert(map != NULL);
 
     // Add entries
@@ -120,6 +124,10 @@ void hashmap_expand_test() {
     // Retrieve values from the hashmap after adding more entries and verify
     assert(compare_values(hashmap_get(map, pos4), "Value4"));
     assert(compare_values(hashmap_get(map, pos5), "Value5"));
+    assert(compare_values(hashmap_get(map, pos1), "Value1"));
+    assert(compare_values(hashmap_get(map, pos2), "Value2"));
+    assert(compare_values(hashmap_get(map, pos3), "Value3"));
+    assert(compare_values(hashmap_get(map, pos5), "Value5"));
 
 
     // Destroy the hashmap
@@ -129,7 +137,7 @@ void hashmap_expand_test() {
 
 // Test function for hashmap_length
 void hashmap_length_test() {
-    t_hashmap *map = hashmap_init(8);
+    hashMap *map = hashmap_init(8, hashmap_entry_free);
     assert(map != NULL);
 
     assert(hashmap_length(map) == 0); // Initially, the length should be 0
@@ -146,7 +154,7 @@ void hashmap_length_test() {
 
 // Test function for hashmap_iterator and hashmap_next
 void hashmap_iterator_test() {
-    t_hashmap *map = hashmap_init(8);
+    hashMap *map = hashmap_init(8, hashmap_entry_free);
     assert(map != NULL);
 
     hashmap_set_entry(map, (t_block_pos){1, 2, 3}, ft_strdup("Value1"));
@@ -154,7 +162,7 @@ void hashmap_iterator_test() {
     hashmap_set_entry(map, (t_block_pos){7, 8, 9}, ft_strdup("Value3"));
 
     // Initialize the iterator
-    t_hm_it it = hashmap_iterator(map);
+    hashMap_it it = hashmap_iterator(map);
     assert(it._map == map);
     assert(it._idx == 0);
     assert(it._current == NULL);
@@ -180,14 +188,14 @@ void hashmap_iterator_test() {
 
 int main() {
     hashmap_test();
-    printf("hashmap_test passed successfully!\n");
+    printf(GREEN"hashmap_test passed successfully!\n"RESET);
 	hashmap_colision_test();
-    printf("hashmap_colision_test successfully!\n");
+    printf(GREEN"hashmap_colision_test successfully!\n"RESET);
 	hashmap_expand_test();
-	printf("hashmap_expand_test successfully!\n");
+	printf(GREEN"hashmap_expand_test successfully!\n"RESET);
 	hashmap_length_test();
-	printf("test_hashmap_length passed successfully!\n");
+	printf(GREEN"hashmap_length_test passed successfully!\n"RESET);
 	hashmap_iterator_test();
-	printf("test_hashmap_iterator passed successfully!\n");
+	printf(GREEN"hashmap_iterator_test passed successfully!\n"RESET);
     return 0;
 }

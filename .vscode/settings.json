@@ -11,6 +11,10 @@
 		"basic_define.h": "c",
 		"linked_list.h": "c",
 		"dlfcn.h": "c",
-		"vox.h": "c"
+		"vox.h": "c",
+		"compare": "cpp",
+		"cstdint": "cpp",
+		"vector": "c",
+		"hashmap.h": "c"
 	}
 }
