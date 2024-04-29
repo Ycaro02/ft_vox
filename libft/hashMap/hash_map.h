@@ -176,7 +176,7 @@ FT_INLINE u8 hash_map_set_entry(t_hash_map *map, u32 x, u32 y, u32 z, void *valu
 	/* Get linked list entry head */
     t_hm_entry *entry = map->entries + index;
     t_hm_entry *prev_entry = NULL;
-    while (entry != NULL) {
+    while (entry->next != NULL) {
         if (HASH_MAP_SAME_ENTRY(entry, key, x, y, z) == 1) {
             /* If same node update it and return */
             entry->value = value;
