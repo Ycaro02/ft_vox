@@ -1,5 +1,5 @@
-#ifndef HEADER_HASH_MAP_H
-#define HEADER_HASH_MAP_H
+#ifndef HEADER_HASHMAP_H
+#define HEADER_HASHMAP_H
 
 #include "../libft.h"
 
@@ -10,40 +10,40 @@ typedef struct s_block_pos {
 } t_block_pos;
 
 /* HashMap entry key + value */
-typedef struct s_hash_map_entry {
+typedef struct s_hashmap_entry {
 	t_block_pos 	origin_data;	/* Original data (block pos) */
 	u64				key;			/* Key of the entry */
 	void 			*value;			/* Value linked */
 } t_hm_entry;
 
 /* HashMap structure */
-typedef struct s_hash_map {
+typedef struct s_hashmap {
 	t_list 		**entries;		/* array of t_list double ptr, head of each t_hm_entry list*/
 	size_t		capacity;		/* Capacity of the array ( entry size, number of list ptr )*/
 	size_t		size;			/* Number of current item stored  */
-} t_hash_map;
+} t_hashmap;
 
 /* HashMap iterator struct */
-typedef struct s_hash_map_it {
+typedef struct s_hashmap_it {
 	u64			key;			/* Key of the current node */
 	void 		*value;			/* Value of the current node */
 	
 	/* Fields get with hashMap iterator/next don't use these directly */
-	t_hash_map	*_map;			/* HashMap head in this iterator */
+	t_hashmap	*_map;			/* HashMap head in this iterator */
 	size_t		_idx;			/* Current index in the array */
 	t_list		*_current;		/* Current node in the list */
 } t_hm_it;
 
 
-#define HASH_MAP_UPT_ENTRY		0U	/* Update hashmap entry */
-#define HASH_MAP_ADD_ENTRY		1U	/* Add new entry */
-#define HASH_MAP_MALLOC_ERROR	2U	/* Malloc error */
+#define HASHMAP_UPT_ENTRY		0U	/* Update hashmap entry */
+#define HASHMAP_ADD_ENTRY		1U	/* Add new entry */
+#define HASHMAP_MALLOC_ERROR	2U	/* Malloc error */
 
 /* Hash Map entry.value is valid (not null) */
-#define HASH_MAP_VALID_ENTRY(entry)	(entry->value != NULL)
+#define HASHMAP_VALID_ENTRY(entry)	(entry->value != NULL)
 
 /* Hash Map entry.key is the same as the key_cmp, same for x,y,z */
-#define HASH_MAP_SAME_ENTRY(entry, key_cmp, x_cmp, y_cmp, z_cmp) (\
+#define HASHMAP_SAME_ENTRY(entry, key_cmp, x_cmp, y_cmp, z_cmp) (\
 		entry->key == key_cmp &&\
         entry->origin_data.x == x_cmp &&\
         entry->origin_data.y == y_cmp &&\
@@ -51,10 +51,10 @@ typedef struct s_hash_map_it {
 )
 
 /* Hash Map entry.key is the same as the key_cmp */
-#define HASH_MAP_SAME_KEY(entry, key_cmp) (entry.key == key_cmp)
+#define HASHMAP_SAME_KEY(entry, key_cmp) (entry.key == key_cmp)
 
-/* Get hash_map index by key and capacity */
-#define HASH_MAP_INDEX(key, capacity) (size_t)(key & (u64)(capacity - 1))
+/* Get hashmap index by key and capacity */
+#define HASHMAP_INDEX(key, capacity) (size_t)(key & (u64)(capacity - 1))
 
 /**
  * @brief hash block coordinate to a unique key
@@ -69,10 +69,10 @@ FT_INLINE u64 hash_block_position(u32 x, u32 y, u32 z) {
 /**
  * @brief HashMap init, create a new HashMap
  * @param capacity initial capacity of the HashMap
- * @return t_hash_map* new HashMap (NULL if failed)
+ * @return t_hashmap* new HashMap (NULL if failed)
 */
-FT_INLINE t_hash_map *hash_map_init(size_t capacity) {
-	t_hash_map *map = ft_calloc(sizeof(t_hash_map), 1);
+FT_INLINE t_hashmap *hashmap_init(size_t capacity) {
+	t_hashmap *map = ft_calloc(sizeof(t_hashmap), 1);
 	if (!map) {
 		return (NULL);
 	}
@@ -104,7 +104,7 @@ FT_INLINE void hashmap_entry_free(void *entry) {
  * @brief HashMap destroy the map and free all the memory
  * @param map HashMap to destroy
 */
-FT_INLINE void hash_map_destroy(t_hash_map *map) {
+FT_INLINE void hashmap_destroy(t_hashmap *map) {
 	if (!map) {
 		return ;
 	}
@@ -121,14 +121,14 @@ FT_INLINE void hash_map_destroy(t_hash_map *map) {
  * @param x,y,z key to search
  * @return void* value associated with the key (NULL if not found)
 */
-FT_INLINE void *hash_map_get(t_hash_map *map, t_block_pos p) {
+FT_INLINE void *hashmap_get(t_hashmap *map, t_block_pos p) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
-	size_t	index = HASH_MAP_INDEX(key, map->capacity);
+	size_t	index = HASHMAP_INDEX(key, map->capacity);
 
 	t_list *entry = map->entries[index];
 	while (entry) {
 		t_hm_entry *e = (t_hm_entry *)entry->content;
-		if (HASH_MAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
+		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
 			return (e->value);
 		}
 		entry = entry->next;
@@ -142,23 +142,23 @@ FT_INLINE void *hash_map_get(t_hash_map *map, t_block_pos p) {
  * @param map HashMap to set in
  * @param x,y,z key to set
  * @param value value to set
- * @return u8 HASH_MAP_UPT_ENTRY if update, HASH_MAP_ADD_ENTRY if add, HASH_MAP_MALLOC_ERROR if malloc failed
+ * @return u8 HASHMAP_UPT_ENTRY if update, HASHMAP_ADD_ENTRY if add, HASHMAP_MALLOC_ERROR if malloc failed
 */
-FT_INLINE u8 hash_map_set_entry(t_hash_map *map, t_block_pos p, void *value) 
+FT_INLINE u8 hashmap_set_entry(t_hashmap *map, t_block_pos p, void *value) 
 {
 	u64		key = hash_block_position(p.x, p.y, p.z);
-	size_t	index = HASH_MAP_INDEX(key, map->capacity);
+	size_t	index = HASHMAP_INDEX(key, map->capacity);
 
 	/* Check if the entry already exist */
 	t_list *current = map->entries[index];
 	while (current) {
 		t_hm_entry *e = (t_hm_entry *)current->content;
-		if (HASH_MAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
+		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
 			if (e->value) {
 				free(e->value);
 			}
 			e->value = value;
-			return (HASH_MAP_UPT_ENTRY);
+			return (HASHMAP_UPT_ENTRY);
 		}
 		current = current->next;
 	}
@@ -166,7 +166,7 @@ FT_INLINE u8 hash_map_set_entry(t_hash_map *map, t_block_pos p, void *value)
 
 	t_list *entry = ft_lstnew(ft_calloc(sizeof(t_hm_entry), 1));
 	if (!entry) {
-		return (HASH_MAP_MALLOC_ERROR);
+		return (HASHMAP_MALLOC_ERROR);
 	}
 	t_hm_entry *e = (t_hm_entry *)entry->content;
 	e->origin_data.x = p.x;
@@ -176,11 +176,11 @@ FT_INLINE u8 hash_map_set_entry(t_hash_map *map, t_block_pos p, void *value)
 	e->value = value;
 	ft_lstadd_back(&map->entries[index], entry);
 	(map->size)++;
-	return (HASH_MAP_ADD_ENTRY);
+	return (HASHMAP_ADD_ENTRY);
 }
 
 
-FT_INLINE int hash_map_expand(t_hash_map *map) {
+FT_INLINE int hashmap_expand(t_hashmap *map) {
     size_t new_capacity = (map->capacity * 2); /* need to implement prime number check */
     t_list **new_entries = ft_calloc(sizeof(t_list *), new_capacity);
     if (!new_entries) {
@@ -192,7 +192,7 @@ FT_INLINE int hash_map_expand(t_hash_map *map) {
         t_list *current = map->entries[i];
         while (current) {
             t_hm_entry *entry = (t_hm_entry *)current->content;
-            size_t new_index = HASH_MAP_INDEX(entry->key, new_capacity); /* Calculate new index */
+            size_t new_index = HASHMAP_INDEX(entry->key, new_capacity); /* Calculate new index */
             t_list *new_entry = ft_lstnew(entry);
             if (!new_entry) {
                 /* Handle memory allocation failure Free memory and return (FALSE) */
@@ -219,12 +219,12 @@ FT_INLINE int hash_map_expand(t_hash_map *map) {
 }
 
 /* Function to get the length of the hash map */
-FT_INLINE size_t hashmap_length(t_hash_map *map) {
+FT_INLINE size_t hashmap_length(t_hashmap *map) {
     return (map->size);
 }
 
 /* Function to create and initialize an iterator for the hash map */
-FT_INLINE t_hm_it hashmap_iterator(t_hash_map *map) {
+FT_INLINE t_hm_it hashmap_iterator(t_hashmap *map) {
     t_hm_it it;
 
     it._map = map;
@@ -235,7 +235,7 @@ FT_INLINE t_hm_it hashmap_iterator(t_hash_map *map) {
 
 /* Function to move to the next entry in the hash map */
 FT_INLINE u8 hashmap_next(t_hm_it *it) {
-    t_hash_map *map = it->_map;
+    t_hashmap *map = it->_map;
 
     /* Loop through the entries array */
     while (it->_idx < map->capacity) {
@@ -262,4 +262,4 @@ FT_INLINE u8 hashmap_next(t_hm_it *it) {
     return (FALSE);
 }
 
-#endif /* HEADER_HASH_MAP_H */
+#endif /* HEADER_HASHMAP_H */
