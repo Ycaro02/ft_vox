@@ -18,7 +18,7 @@ typedef struct s_hash_map_entry {
 
 /* HashMap structure */
 typedef struct s_hash_map {
-	t_list 		**entries;		/* array of t_list ptr head of each t_hm_entry list*/
+	t_list 		**entries;		/* array of t_list double ptr, head of each t_hm_entry list*/
 	size_t		capacity;		/* Capacity of the array ( entry size )*/
 	size_t		size;			/* Number of current item stored  */
 } t_hash_map;
@@ -53,6 +53,8 @@ typedef struct s_hash_map_it {
 #define HASH_MAP_SAME_KEY(entry, key_cmp) (entry.key == key_cmp)
 
 
+#define HASH_MAP_INDEX(key, capacity) (size_t)(key & (u64)(capacity - 1))
+
 /**
  * @brief hash block coordinate to a unique key
  * @param x,y,z block coordinate
@@ -85,6 +87,10 @@ FT_INLINE t_hash_map *hash_map_init(size_t capacity) {
 	return (map);
 }
 
+/**
+ * @brief HashMap entry free, free the entry
+ * @param entry entry to free
+*/
 FT_INLINE void hashmap_entry_free(void *entry) {
 	t_hm_entry *e = (t_hm_entry *)entry;
 	if (e->value) {
@@ -104,8 +110,8 @@ FT_INLINE void hash_map_destroy(t_hash_map *map) {
     for (size_t i = 0; i < map->capacity; i++) {
         ft_lstclear(&map->entries[i], hashmap_entry_free);
     }
-	free(map->entries); /* free entry array */
-	free(map); /* free map */
+	free(map->entries); /* free entry t_list ** array */
+	free(map);			/* free map */
 }
 
 /**
@@ -116,7 +122,8 @@ FT_INLINE void hash_map_destroy(t_hash_map *map) {
 */
 FT_INLINE void *hash_map_get(t_hash_map *map, t_block_pos p) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
-	size_t	index = (size_t)(key & (u64)(map->capacity - 1));
+	// size_t	index = (size_t)(key & (u64)(map->capacity - 1));
+	size_t	index = HASH_MAP_INDEX(key, map->capacity);
 
 	t_list *entry = map->entries[index];
 	while (entry) {
@@ -140,7 +147,23 @@ FT_INLINE void *hash_map_get(t_hash_map *map, t_block_pos p) {
 FT_INLINE u8 hash_map_set_entry(t_hash_map *map, t_block_pos p, void *value) 
 {
 	u64		key = hash_block_position(p.x, p.y, p.z);
-	size_t	index = (size_t)(key & (u64)(map->capacity - 1));
+	// size_t	index = (size_t)(key & (u64)(map->capacity - 1));
+	size_t	index = HASH_MAP_INDEX(key, map->capacity);
+
+	/* Check if the entry already exist */
+	t_list *current = map->entries[index];
+	while (current) {
+		t_hm_entry *e = (t_hm_entry *)current->content;
+		if (HASH_MAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
+			if (e->value) {
+				free(e->value);
+			}
+			e->value = value;
+			return (HASH_MAP_UPT_ENTRY);
+		}
+		current = current->next;
+	}
+
 
 	t_list *entry = ft_lstnew(ft_calloc(sizeof(t_hm_entry), 1));
 	if (!entry) {
@@ -156,5 +179,44 @@ FT_INLINE u8 hash_map_set_entry(t_hash_map *map, t_block_pos p, void *value)
 	return (HASH_MAP_ADD_ENTRY);
 }
 
+
+FT_INLINE int hash_map_expand(t_hash_map *map) {
+    size_t new_capacity = (map->capacity * 2); /* need to implement prime number check */
+    t_list **new_entries = ft_calloc(sizeof(t_list *), new_capacity);
+    if (!new_entries) {
+        return (FALSE);
+    }
+
+    /* Rehash and move existing entries to the new array */
+    for (size_t i = 0; i < map->capacity; i++) {
+        t_list *current = map->entries[i];
+        while (current) {
+            t_hm_entry *entry = (t_hm_entry *)current->content;
+            // size_t new_index = entry->key & (new_capacity - 1); // Calculate new index
+            size_t new_index = HASH_MAP_INDEX(entry->key, new_capacity); // Calculate new index
+            t_list *new_entry = ft_lstnew(entry);
+            if (!new_entry) {
+                // Handle memory allocation failure Free memory and return (FALSE)
+                ft_lstclear(&new_entries[i], free);
+                free(new_entries);
+                return (FALSE);
+            }
+            ft_lstadd_back(&new_entries[new_index], new_entry);
+            current = current->next;
+        }
+    }
+
+    for (size_t i = 0; i < map->capacity; i++) {
+		ft_lstclear_nodeptr(map->entries + i);
+	}
+    // Free old entries
+    free(map->entries);
+    
+    // Update hashmap with new capacity and entries
+    map->entries = new_entries;
+    map->capacity = new_capacity;
+
+    return (TRUE); // Expansion successful
+}
 
 #endif /* HEADER_HASH_MAP_H */
