@@ -19,18 +19,19 @@ typedef struct s_hash_map_entry {
 /* HashMap structure */
 typedef struct s_hash_map {
 	t_list 		**entries;		/* array of t_list double ptr, head of each t_hm_entry list*/
-	size_t		capacity;		/* Capacity of the array ( entry size )*/
+	size_t		capacity;		/* Capacity of the array ( entry size, number of list ptr )*/
 	size_t		size;			/* Number of current item stored  */
 } t_hash_map;
 
 /* HashMap iterator struct */
 typedef struct s_hash_map_it {
-	u64			key;		/* Key of the current node */
-	void 		*value;		/* Value of the current node */
+	u64			key;			/* Key of the current node */
+	void 		*value;			/* Value of the current node */
 	
 	/* Fields get with hashMap iterator/next don't use these directly */
-	t_hash_map	*_map;		/* HashMap head in this iterator */
-	size_t		_idx;		/* Current index in the array */
+	t_hash_map	*_map;			/* HashMap head in this iterator */
+	size_t		_idx;			/* Current index in the array */
+	t_list		*_current;		/* Current node in the list */
 } t_hm_it;
 
 
@@ -52,13 +53,13 @@ typedef struct s_hash_map_it {
 /* Hash Map entry.key is the same as the key_cmp */
 #define HASH_MAP_SAME_KEY(entry, key_cmp) (entry.key == key_cmp)
 
-
+/* Get hash_map index by key and capacity */
 #define HASH_MAP_INDEX(key, capacity) (size_t)(key & (u64)(capacity - 1))
 
 /**
  * @brief hash block coordinate to a unique key
  * @param x,y,z block coordinate
- * @return u64 key used to store the block in hashMap
+ * @return u64 KEY used to store the block in hashMap
 */
 FT_INLINE u64 hash_block_position(u32 x, u32 y, u32 z) {
     u64 key = ((u64)x << 42) | ((u64)y << 21) | (u64)z;
@@ -122,7 +123,6 @@ FT_INLINE void hash_map_destroy(t_hash_map *map) {
 */
 FT_INLINE void *hash_map_get(t_hash_map *map, t_block_pos p) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
-	// size_t	index = (size_t)(key & (u64)(map->capacity - 1));
 	size_t	index = HASH_MAP_INDEX(key, map->capacity);
 
 	t_list *entry = map->entries[index];
@@ -147,7 +147,6 @@ FT_INLINE void *hash_map_get(t_hash_map *map, t_block_pos p) {
 FT_INLINE u8 hash_map_set_entry(t_hash_map *map, t_block_pos p, void *value) 
 {
 	u64		key = hash_block_position(p.x, p.y, p.z);
-	// size_t	index = (size_t)(key & (u64)(map->capacity - 1));
 	size_t	index = HASH_MAP_INDEX(key, map->capacity);
 
 	/* Check if the entry already exist */
@@ -176,6 +175,7 @@ FT_INLINE u8 hash_map_set_entry(t_hash_map *map, t_block_pos p, void *value)
 	e->key = key;
 	e->value = value;
 	ft_lstadd_back(&map->entries[index], entry);
+	(map->size)++;
 	return (HASH_MAP_ADD_ENTRY);
 }
 
@@ -192,11 +192,10 @@ FT_INLINE int hash_map_expand(t_hash_map *map) {
         t_list *current = map->entries[i];
         while (current) {
             t_hm_entry *entry = (t_hm_entry *)current->content;
-            // size_t new_index = entry->key & (new_capacity - 1); // Calculate new index
-            size_t new_index = HASH_MAP_INDEX(entry->key, new_capacity); // Calculate new index
+            size_t new_index = HASH_MAP_INDEX(entry->key, new_capacity); /* Calculate new index */
             t_list *new_entry = ft_lstnew(entry);
             if (!new_entry) {
-                // Handle memory allocation failure Free memory and return (FALSE)
+                /* Handle memory allocation failure Free memory and return (FALSE) */
                 ft_lstclear(&new_entries[i], free);
                 free(new_entries);
                 return (FALSE);
@@ -209,14 +208,58 @@ FT_INLINE int hash_map_expand(t_hash_map *map) {
     for (size_t i = 0; i < map->capacity; i++) {
 		ft_lstclear_nodeptr(map->entries + i);
 	}
-    // Free old entries
+    /* Free old entries */
     free(map->entries);
     
-    // Update hashmap with new capacity and entries
+    /* Update hashmap with new capacity and entries */
     map->entries = new_entries;
     map->capacity = new_capacity;
 
-    return (TRUE); // Expansion successful
+    return (TRUE); /* Expansion successful */
+}
+
+/* Function to get the length of the hash map */
+FT_INLINE size_t hashmap_length(t_hash_map *map) {
+    return (map->size);
+}
+
+/* Function to create and initialize an iterator for the hash map */
+FT_INLINE t_hm_it hashmap_iterator(t_hash_map *map) {
+    t_hm_it it;
+
+    it._map = map;
+    it._idx = 0;
+	it._current = NULL;
+    return (it);
+}
+
+/* Function to move to the next entry in the hash map */
+FT_INLINE u8 hashmap_next(t_hm_it *it) {
+    t_hash_map *map = it->_map;
+
+    /* Loop through the entries array */
+    while (it->_idx < map->capacity) {
+        t_list *entry = map->entries[it->_idx];
+        if (entry != NULL) {
+            /* Found a non-empty list */
+            if (it->_current == NULL) { /*  If it's the first node in the list, set it as the current node */
+                it->_current = entry;
+            } else { /* Otherwise, move to the next node in the list */
+                it->_current = it->_current->next;
+            }
+            if (it->_current != NULL) {
+                /* Found the next node in the list */
+                t_hm_entry *hm_entry = (t_hm_entry *)it->_current->content;
+                it->key = hm_entry->key;
+                it->value = hm_entry->value;
+                return (TRUE);
+            }
+        }
+        (it->_idx)++;
+        it->_current = NULL; /* Reset the list node pointer for the next iteration */
+    }
+    /* No more non-empty entries found */
+    return (FALSE);
 }
 
 #endif /* HEADER_HASH_MAP_H */
