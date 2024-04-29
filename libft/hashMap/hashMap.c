@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   hashMap.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
+/*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/29 19:35:31 by nfour            ###   ########.fr       */
+/*   Updated: 2024/04/29 15:19:25 by ycaro            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "hashMap.h"
+#include "primeNumber.h"
 
 /* Basic function you can provide to hashmap_init */
 void hashmap_entry_free(void *entry) {
@@ -40,13 +41,15 @@ hashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj)) {
 		return (NULL);
 	}
 
-	map->entries = ft_calloc(sizeof(hashMap_entry), capacity);
+	size_t prime_capacity = GET_NEXT_PRIME(capacity);
+
+	map->entries = ft_calloc(sizeof(hashMap_entry), prime_capacity);
 	if (!map->entries) {
 		free(map);
 		return (NULL);
 	}
 
-	map->capacity = capacity;
+	map->capacity = prime_capacity;
 	map->size = 0;
 	map->free_obj = free_obj;
 	return (map);
@@ -112,8 +115,13 @@ u8 hashmap_set_entry(hashMap *map, t_block_pos p, void *value) {
 }
 
 
-s8 hashmap_expand(hashMap *map) {
-    size_t new_capacity = (map->capacity * 2); /* need to implement prime number check */
+s8 hashmap_expand(hashMap *map) 
+{
+	/* Compute new size */
+    size_t new_capacity = (map->capacity * 2);
+	new_capacity = GET_NEXT_PRIME(new_capacity);
+
+	/* Allocate new entries array */
     t_list **new_entries = ft_calloc(sizeof(t_list *), new_capacity);
     if (!new_entries) {
         return (FALSE);
@@ -150,8 +158,12 @@ s8 hashmap_expand(hashMap *map) {
     return (TRUE); /* Expansion successful */
 }
 
-size_t hashmap_length(hashMap *map) {
+size_t hashmap_size(hashMap *map) {
     return (map->size);
+}
+
+size_t hashmap_capacity(hashMap *map) {
+    return (map->capacity);
 }
 
 hashMap_it hashmap_iterator(hashMap *map) {

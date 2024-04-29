@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include "hashMap.h"
+#include "primeNumber.h"
 #include "../libft.h"
 
 // Function to compare block positions
@@ -21,6 +22,8 @@ void hashmap_test() {
     // Initialize the hashmap
     hashMap *map = hashmap_init(8, hashmap_entry_free);
     assert(map != NULL);
+
+    assert(hashmap_capacity(map) == find_next_prime(8));
 
     // Add entries
     t_block_pos pos1 = {1, 2, 3};
@@ -113,7 +116,7 @@ void hashmap_expand_test() {
     // Expand the hashmap
     assert(hashmap_expand(map));
 	
-	assert(map->capacity == 6);
+	assert(map->capacity == find_next_prime(3 * 2));
 
     // Add more entries after expansion
     t_block_pos pos4 = {13, 14, 15}; // No collision with existing entries after expansion
@@ -135,19 +138,19 @@ void hashmap_expand_test() {
 }
 
 
-// Test function for hashmap_length
-void hashmap_length_test() {
-    hashMap *map = hashmap_init(8, hashmap_entry_free);
+// Test function for hashmap_size
+void hashmap_size_test() {
+    hashMap *map = hashmap_init(11, hashmap_entry_free);
     assert(map != NULL);
 
-    assert(hashmap_length(map) == 0); // Initially, the length should be 0
+    assert(hashmap_size(map) == 0); // Initially, the length should be 0
 
     hashmap_set_entry(map, (t_block_pos){1, 2, 3}, ft_strdup("Value1"));
-    assert(hashmap_length(map) == 1); // After adding one entry, the length should be 1
+    assert(hashmap_size(map) == 1); // After adding one entry, the length should be 1
 
     hashmap_set_entry(map, (t_block_pos){4, 5, 6}, ft_strdup("Value2"));
     hashmap_set_entry(map, (t_block_pos){7, 8, 9}, ft_strdup("Value3"));
-    assert(hashmap_length(map) == 3); // After adding two more entries, the length should be 3
+    assert(hashmap_size(map) == 3); // After adding two more entries, the length should be 3
 
     hashmap_destroy(map);
 }
@@ -169,17 +172,16 @@ void hashmap_iterator_test() {
 
     // Test iterating through entries
     assert(hashmap_next(&it)); // Move to the first entry
-	assert(it.key == hash_block_position(7, 8, 9));
-    assert(strcmp((char *)it.value, "Value3") == 0);
-
-	
-    assert(hashmap_next(&it)); // Move to the first entry
     assert(it.key == hash_block_position(1, 2, 3));
     assert(strcmp((char *)it.value, "Value1") == 0);
 
-    assert(hashmap_next(&it)); // Move to the third entry
+    assert(hashmap_next(&it)); // Move to the first entry
     assert(it.key == hash_block_position(4, 5, 6));
     assert(strcmp((char *)it.value, "Value2") == 0);
+
+    assert(hashmap_next(&it)); // Move to the third entry
+	assert(it.key == hash_block_position(7, 8, 9));
+    assert(strcmp((char *)it.value, "Value3") == 0);
 
     assert(!hashmap_next(&it)); // No more entries
 
@@ -193,8 +195,8 @@ int main() {
     printf(GREEN"hashmap_colision_test successfully!\n"RESET);
 	hashmap_expand_test();
 	printf(GREEN"hashmap_expand_test successfully!\n"RESET);
-	hashmap_length_test();
-	printf(GREEN"hashmap_length_test passed successfully!\n"RESET);
+	hashmap_size_test();
+	printf(GREEN"hashmap_size_test passed successfully!\n"RESET);
 	hashmap_iterator_test();
 	printf(GREEN"hashmap_iterator_test passed successfully!\n"RESET);
     return 0;

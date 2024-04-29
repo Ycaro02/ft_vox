@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hashMap.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
+/*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/29 19:46:14 by nfour            ###   ########.fr       */
+/*   Updated: 2024/04/29 15:09:15 by ycaro            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +110,10 @@ typedef struct s_hashmap_it {
 u64 hash_block_position(u32 x, u32 y, u32 z);
 
 /**
- * @brief HashMap init, create a new HashMap
+ * @brief HashMap init, create a new HashMap 
  * @param capacity initial capacity of the HashMap
+ * If the capacity is not a prime number, the capacity will be set to the next (grather) prime number 
+ * @param free_obj function to free the object
  * @return hashMap* new HashMap (NULL if failed)
 */
 hashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj));
@@ -150,7 +152,15 @@ u8 hashmap_set_entry(hashMap *map, t_block_pos p, void *value);
  * @param map HashMap to get the length
  * @return size_t length of the map
 */
-size_t hashmap_length(hashMap *map);
+size_t hashmap_size(hashMap *map);
+
+
+/**
+ * @brief Function to get the capacity of the hash map
+ * @param map HashMap to get the capacity
+ * @return size_t capacity of the map
+*/
+size_t hashmap_capacity(hashMap *map);
 
 /**
  * @brief Function to create and initialize an iterator for the hash map 
