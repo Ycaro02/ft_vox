@@ -11,13 +11,11 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
 void fill_chunks(t_chunks *chunks)
 {
     u32 count = 0;
-    for (u32 i = 0; i < CHUNKS_WIDTH / 8; ++i) {
-        for (u32 j = 0; j < CHUNKS_HEIGHT / 8; ++j) {
-            for (u32 k = 0; k < CHUNKS_DEPTH / 8; ++k) {
-                // ft_printf_fd(1, "B [%u][%u][%u]", i, j, k);
+    for (u32 i = 0; i < CHUNKS_WIDTH / 4; ++i) {
+        for (u32 j = 0; j < CHUNKS_HEIGHT / 4; ++j) {
+            for (u32 k = 0; k < CHUNKS_DEPTH / 4; ++k) {
                 /* chunks->block[i][0][k]*/
-                t_block *block = &chunks->blocks[i][0][k];
-                // ft_printf_fd(1, "D [%u][%u][%u] type: %u", block->x, block->y, block->z, block->type);
+                t_block *block = &chunks->blocks[i][j][k];
                 block->x = i;
                 block->y = j;
                 block->z = k;
@@ -37,7 +35,7 @@ u32 chunks_cube_get(t_chunks *chunks, vec3_f32 *block_array)
         for (u32 j = 0; j < CHUNKS_HEIGHT; ++j) {
             for (u32 k = 0; k < CHUNKS_HEIGHT; ++k) {
                 /* chunks->block[i][0][k]*/
-                t_block *block = &chunks->blocks[i][0][k];
+                t_block *block = &chunks->blocks[i][j][k];
                 if (block->type != 0) {
                     block_array[idx][0] = i; 
                     block_array[idx][1] = j; 
