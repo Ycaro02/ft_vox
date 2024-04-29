@@ -1,6 +1,5 @@
 #include "../../include/vox.h"
-
-#define NB_CUBE 10
+#include "../../cube.h"
 
 void drawFace(GLuint VAO, u32 count, u32 cubeId) {
 	glBindVertexArray(VAO);
@@ -15,8 +14,6 @@ void drawCube(GLuint VAO, u32 nb_cube) {
 		}
 	}
 }
-
-#include "../../cube.h"
 
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	static const vec3_f32 vertices[] = {
@@ -37,44 +34,7 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 		20, 21, 22, 23, 20  // Right face
 	};
 
-	// static const GLfloat texCoords[] = {
-	// 	/* Front face */
-	// 	0.0f, 0.0f,
-	// 	1.0f, 0.0f,
-	// 	1.0f, 1.0f,
-	// 	0.0f, 1.0f,
-
-	// 	/* Back face */
-	// 	0.0f, 0.0f,
-	// 	1.0f, 0.0f,
-	// 	1.0f, 1.0f,
-	// 	0.0f, 1.0f,
-
-	// 	/* Top face */
-	// 	0.0f, 1.0f,
-	// 	1.0f, 1.0f,
-	// 	1.0f, 0.0f,
-	// 	0.0f, 0.0f,
-
-	// 	/* Bottom face */
-	// 	0.0f, 0.0f,
-	// 	1.0f, 0.0f,
-	// 	1.0f, 1.0f,
-	// 	0.0f, 1.0f,
-
-	// 	/* Left face */
-	// 	0.0f, 0.0f,
-	// 	1.0f, 0.0f,
-	// 	1.0f, 1.0f,
-	// 	0.0f, 1.0f,
-
-	// 	/* Right face */
-	// 	0.0f, 0.0f,
-	// 	1.0f, 0.0f,
-	// 	1.0f, 1.0f,
-	// 	0.0f, 1.0f
-	// };
-
+	// static const GLfloat texCoords[] = {}
 
     u32 v_size = sizeof(vertices) / sizeof(vec3_f32);
     cube->vertex = malloc(sizeof(vec3_f32) * v_size);
@@ -102,22 +62,7 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
     glEnableVertexAttribArray(0);
 
 
-	// u32 instanceCount = NB_CUBE;
-	// vec3_f32 instancePositions[NB_CUBE] = {
-	// 	{0.0f, 0.0f, 0.0f},
-	// 	{0.0f, 0.0f, 1.0f},
-	// 	{0.0f, 0.0f, 2.0f},
-	// 	{0.0f, 0.0f, 3.0f},
-	// 	{0.0f, 0.0f, 4.0f},
-	// 	{0.0f, 1.0f, 0.0f},
-	// 	{0.0f, 1.0f, 1.0f},
-	// 	{0.0f, 1.0f, 2.0f},
-	// 	{0.0f, 1.0f, 3.0f},
-	// 	{0.0f, 1.0f, 4.0f},
-	// };
-
     vec3_f32 *block_array = ft_calloc(sizeof(vec3_f32), c->chunks->nb_block);
-
 	u32 instanceCount = chunks_cube_get(c->chunks, block_array);
 
 
