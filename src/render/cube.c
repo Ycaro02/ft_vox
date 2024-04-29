@@ -16,43 +16,16 @@ void drawCube(GLuint VAO, u32 nb_cube) {
 	}
 }
 
+#include "../../cube.h"
+
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
-	static const GLfloat vertices[] = {
-		/* Front face */
-		-0.5f, -0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, 0.5f,
-
-		/* Back face */
-		-0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, 0.5f, -0.5f,
-		-0.5f, 0.5f, -0.5f,
-
-		/* Top face */
-		-0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, -0.5f,
-		-0.5f, 0.5f, -0.5f,
-
-		/* Bottom face */
-		-0.5f, -0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		/* Left face */
-		-0.5f, -0.5f, 0.5f,
-		-0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		/* Right face */
-		0.5f, -0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f
+	static const vec3_f32 vertices[] = {
+		CUBE_FRONT_FACE_VERTEX,
+		CUBE_BACK_FACE_VERTEX,
+		CUBE_TOP_FACE_VERTEX,
+		CUBE_BOTTOM_FACE_VERTEX,
+		CUBE_LEFT_FACE_VERTEX,
+		CUBE_RIGHT_FACE_VERTEX
 	};
 
 	static const GLuint indices[] = {
@@ -103,10 +76,10 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	// };
 
 
-    u32 v_size = sizeof(vertices) / sizeof(GLfloat);
-    cube->vertex = malloc(sizeof(GLfloat) * v_size);
-    ft_memcpy(cube->vertex, vertices, sizeof(GLfloat) * v_size);
-    cube->v_size = v_size / 3;
+    u32 v_size = sizeof(vertices) / sizeof(vec3_f32);
+    cube->vertex = malloc(sizeof(vec3_f32) * v_size);
+    ft_memcpy(cube->vertex, vertices, sizeof(vec3_f32) * v_size);
+    cube->v_size = v_size;
 
     GLuint VAO, VBO, EBO;
 

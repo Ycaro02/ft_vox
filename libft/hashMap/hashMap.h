@@ -6,7 +6,7 @@
 /*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/29 15:09:15 by ycaro            ###   ########.fr       */
+/*   Updated: 2024/04/29 15:21:07 by ycaro            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,7 +170,7 @@ size_t hashmap_capacity(hashMap *map);
 hashMap_it hashmap_iterator(hashMap *map);
 
 /**
- *  @brief Function to move to the next entry in the hash map
+ *  @brief Function to move to the next item in the hash map
  *	@param it Iterator to move
  *	@return int TRUE if move successful, FALSE otherwise (end of the map)
 */

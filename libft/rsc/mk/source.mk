@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    source.mk                                          :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+         #
+#    By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/11 16:54:20 by nfour             #+#    #+#              #
-#    Updated: 2024/04/20 15:16:17 by nfour            ###   ########.fr        #
+#    Updated: 2024/04/29 15:26:25 by ycaro            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -88,12 +88,22 @@ MATH_DIR			=	math
 MATH_SRC			=	basic_math.c
 
 
+HASHMAP_DIR			=	hashMap
+
+HASHMAP_SRC			=	hashMap.c\
+
 SRCS =	$(addprefix ${LIBFT_DIR}, $(LIBFT_SRC)) \
 		$(addprefix $(PRINTF_FD_DIR)/, $(PRINTF_FD_SRC)) \
 		$(addprefix $(PARSE_FLAG_DIR)/, $(PARSE_FLAG_STR)) \
 		$(addprefix $(STACK_STRING_DIR)/, $(STACK_STRING_SRC)) \
 		$(addprefix $(MATH_DIR)/, $(MATH_SRC)) \
+		$(addprefix $(HASHMAP_DIR)/, $(HASHMAP_SRC)) \
 
-ALL_OBJ_DIR = $(OBJ_DIR)/libft $(OBJ_DIR)/$(PRINTF_FD_DIR) $(OBJ_DIR)/$(PARSE_FLAG_DIR) $(OBJ_DIR)/$(STACK_STRING_DIR) $(OBJ_DIR)/$(MATH_DIR)
+ALL_OBJ_DIR = 	$(OBJ_DIR)/libft\
+				$(OBJ_DIR)/$(PRINTF_FD_DIR)\
+				$(OBJ_DIR)/$(PARSE_FLAG_DIR)\
+				$(OBJ_DIR)/$(STACK_STRING_DIR)\
+				$(OBJ_DIR)/$(MATH_DIR)\
+				$(OBJ_DIR)/$(HASHMAP_DIR)
 
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
