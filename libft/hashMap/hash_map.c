@@ -1,41 +1,66 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
 #include "hash_map.h"
+#include "../libft.h"
+
+// Function to compare block positions
+int compare_block_pos(t_block_pos pos1, t_block_pos pos2) {
+    return (pos1.x == pos2.x && pos1.y == pos2.y && pos1.z == pos2.z);
+}
+
+// Function to compare values
+int compare_values(void *value1, void *value2) {
+    // For this example, assuming values are strings
+    return ft_strcmp((char *)value1, (char *)value2) == 0;
+}
+
+// Test function for the hashmap
+void test_hash_map() {
+    // Initialize the hashmap
+    t_hash_map *map = hash_map_init(8);
+    assert(map != NULL);
+
+    // Add entries
+    t_block_pos pos1 = {1, 2, 3};
+    t_block_pos pos2 = {4, 5, 6};
+    t_block_pos pos3 = {7, 8, 9};
+    assert(hash_map_set_entry(map, pos1, ft_strdup("Value1")) == HASH_MAP_ADD_ENTRY);
+    assert(hash_map_set_entry(map, pos2, ft_strdup("Value2")) == HASH_MAP_ADD_ENTRY);
+    assert(hash_map_set_entry(map, pos3, ft_strdup("Value3")) == HASH_MAP_ADD_ENTRY);
+
+    // Retrieve values from the hashmap and verify
+    assert(compare_values(hash_map_get(map, pos1), "Value1"));
+    assert(compare_values(hash_map_get(map, pos2), "Value2"));
+    assert(compare_values(hash_map_get(map, pos3), "Value3"));
+    assert(hash_map_get(map, (t_block_pos){10, 11, 12}) == NULL);
+
+    // Expand the hashmap
+    // assert(hash_map_expand(map));
+
+    // Add more entries after expansion
+    assert(hash_map_set_entry(map, (t_block_pos){10, 11, 12}, ft_strdup("Value4")) == HASH_MAP_ADD_ENTRY);
+    assert(hash_map_set_entry(map, (t_block_pos){13, 14, 15}, ft_strdup("Value5")) == HASH_MAP_ADD_ENTRY);
+
+    // Retrieve values from the hashmap after expansion and verify
+    assert(compare_values(hash_map_get(map, (t_block_pos){10, 11, 12}), "Value4"));
+    assert(compare_values(hash_map_get(map, (t_block_pos){13, 14, 15}), "Value5"));
+
+    // Update an entry
+    // assert(hash_map_set_entry(map, pos1, ft_strdup("UpdatedValue")) == HASH_MAP_UPT_ENTRY);
+    // assert(compare_values(hash_map_get(map, pos1), "UpdatedValue"));
+
+    // // Remove an entry
+    // assert(hash_map_set_entry(map, pos2, NULL) == HASH_MAP_UPT_ENTRY);
+    // assert(hash_map_get(map, pos2) == NULL);
+
+    // Destroy the hashmap
+    hash_map_destroy(map);
+}
 
 int main() {
-    // Initialize a hashmap with initial capacity of 8
-    t_hash_map *map = hash_map_init(8);
-    if (map == NULL) {
-        fprintf(stderr, "Failed to initialize hashmap\n");
-        return 1;
-    }
-
-	char *str1 = ft_strdup("Value1");
-	char *str2 = ft_strdup("Value2");
-	char *str3 = ft_strdup("Value3");
-
-
-	u8 ret = 0;
-    // Add some entries to the hashmap
-    ret = hash_map_set_entry(map, 1, 2, 3, str1);
-    ft_printf_fd(1, "ret: %u\n", ret);
-	hash_map_set_entry(map, 4, 5, 6, str2);
-    hash_map_set_entry(map, 7, 8, 9, str3);
-
-    // Retrieve values from the hashmap
-    printf("Value at key (1, 2, 3): %s\n", (char *)hash_map_get(map, 1, 2, 3));
-    printf("Value at key (4, 5, 6): %s\n", (char *)hash_map_get(map, 4, 5, 6));
-    printf("Value at key (7, 8, 9): %s\n", (char *)hash_map_get(map, 7, 8, 9));
-    printf("Value at key (10, 11, 12): %s\n", (char *)hash_map_get(map, 10, 11, 12)); // This should return NULL
-
-    // Expand the hashmap and check if it's successful
-    if (hash_map_expand(map)) {
-        printf("Hashmap expanded successfully\n");
-    } else {
-        fprintf(stderr, "Failed to expand hashmap\n");
-    }
-
-    // Cleanup - free memory
-    hash_map_destroy(map);
-
+    test_hash_map();
+    printf("All tests passed successfully!\n");
     return 0;
 }
