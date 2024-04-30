@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hashMap.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/29 15:19:25 by ycaro            ###   ########.fr       */
+/*   Updated: 2024/04/30 09:39:18 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,10 +177,11 @@ hashMap_it hashmap_iterator(hashMap *map) {
 
 s8 hashmap_next(hashMap_it *it) {
     hashMap *map = it->_map;
+	t_list *entry = NULL;
 
     /* Loop through the entries array */
     while (it->_idx < map->capacity) {
-        t_list *entry = map->entries[it->_idx];
+        entry = map->entries[it->_idx];
         if (entry != NULL) {
             /* Found a non-empty list */
             if (it->_current == NULL) { /*  If it's the first node in the list, set it as the current node */
@@ -189,8 +190,8 @@ s8 hashmap_next(hashMap_it *it) {
                 it->_current = it->_current->next;
             }
             if (it->_current != NULL) {
-                /* Found the next node in the list */
-                hashMap_entry *hm_entry = (hashMap_entry *)it->_current->content;
+                /* Go to the nest entry list */
+                hashMap_entry *hm_entry = it->_current->content;
                 it->key = hm_entry->key;
                 it->value = hm_entry->value;
                 return (TRUE);

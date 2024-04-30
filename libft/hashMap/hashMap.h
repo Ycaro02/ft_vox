@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hashMap.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/29 15:21:07 by ycaro            ###   ########.fr       */
+/*   Updated: 2024/04/30 09:35:54 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ typedef struct s_hashmap {
 	size_t		capacity;				/* Capacity of the array ( entry size, number of list ptr )*/
 	size_t		size;					/* Number of current item stored  */
 	void		(*free_obj)(void *obj); /* Free function to free the given obj */
+	// u64			(*hash)(); /* Hash function to hash the given obj/data to a key */
+	// s8			(*obj_cmp)(void *a, void *b); /* Scmp obj function  */
 } hashMap;
 
 /* HashMap iterator struct */

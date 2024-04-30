@@ -7,9 +7,7 @@ CFLAGS			=	-Wall -Wextra -Werror -O3 -g
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
 
-
-OPENGL_LIB		= -lglfw -lGL -lm -L//usr/lib/x86_64-linux-gnu/
-
+OPENGL_LIB		= -lglfw -lGL -lm -Lrsc/lib_deps/
 VALGRIND_TEST	= valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
 
 all:		$(NAME)

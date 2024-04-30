@@ -50,7 +50,7 @@ struct compact_block {
 #define WORLD_MAX_WIDTH (16384U * 2U)
 #define WORLD_MAX_DEPTH (16384U * 2U)
 
-#define CHUNKS_HEIGHT   16U
+#define CHUNKS_HEIGHT   16U	/* that will be 256 */
 #define CHUNKS_WIDTH    16U
 #define CHUNKS_DEPTH    16U
 
@@ -64,7 +64,7 @@ struct compact_block {
 #define SUB_CHUNKS_WIDTH    16U
 #define SUB_CHUNKS_DEPTH    16U
 
-#define NB_SUB_CHUNK (WORLD_MAX_HEIGHT / SUB_CHUNKS_HEIGHT)
+#define SUB_CHUNKS_MAX (WORLD_MAX_HEIGHT / SUB_CHUNKS_HEIGHT)
 
 typedef struct s_sub_chunks {
 	hashMap *block_map;		/* Blocks map, use hashMap API to set/get block */
@@ -77,7 +77,7 @@ typedef struct s_chunks {
     t_block blocks[CHUNKS_WIDTH][CHUNKS_HEIGHT][CHUNKS_DEPTH];   /* Blocks array */
 	u32		nb_block;		/* nb block to give to render context */
     u32     id;     		/* Chunk Id */
-	t_sub_chunks sub_chunks[NB_SUB_CHUNK]; /* array of sub_chunks */
+	t_sub_chunks sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 } t_chunks;
 
 typedef struct s_world {
