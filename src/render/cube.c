@@ -3,42 +3,51 @@
 
 void drawFace(GLuint VAO, u32 count, u32 cubeId) {
 	glBindVertexArray(VAO);
-	glDrawElementsInstanced(GL_TRIANGLE_FAN, count, GL_UNSIGNED_INT, 0, cubeId);
+	glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0, cubeId);
 	glBindVertexArray(0);
 }
 
 void drawCube(GLuint VAO, u32 nb_cube) {
 	for (u32 cubeId = 1; cubeId <= nb_cube; ++cubeId) {
 		for (u32 i = 0; i < 6; ++i) {
-			drawFace(VAO, i*4, cubeId);
+			drawFace(VAO, i*6, cubeId);
 		}
 	}
 }
 
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
-	static const vec3 vertices[] = {
-		CUBE_FRONT_FACE_VERTEX,
+	static const vec3 vertex[] = {
 		CUBE_BACK_FACE_VERTEX,
-		CUBE_TOP_FACE_VERTEX,
-		CUBE_BOTTOM_FACE_VERTEX,
+		CUBE_FRONT_FACE_VERTEX,
 		CUBE_LEFT_FACE_VERTEX,
-		CUBE_RIGHT_FACE_VERTEX
+		CUBE_RIGHT_FACE_VERTEX,
+		CUBE_BOTTOM_FACE_VERTEX,
+		CUBE_TOP_FACE_VERTEX,
 	};
 
-	static const GLuint indices[] = {
-		0, 1, 2, 3, 0,   /* Front face */
-		4, 5, 6, 7, 4,   /* Back face */
-		8, 9, 10, 11, 8, /* Top face */
-		12, 13, 14, 15, 12, /* Bottom face */
-		16, 17, 18, 19, 16, /* Left face */
-		20, 21, 22, 23, 20  /* Right face */
+	static const vec3_u32 indices[] = {
+		CUBE_BACK_FACE(0, 1, 2, 3),
+		CUBE_FRONT_FACE(4, 5, 6, 7),
+		CUBE_LEFT_FACE(8, 9, 10, 11),
+		CUBE_RIGHT_FACE(12, 13, 14, 15),
+		CUBE_BOTTOM_FACE(16, 17, 18, 19),
+		CUBE_TOP_FACE(20, 21, 22, 23),
 	};
+
+	// static const GLuint indices[] = {
+	// 	0, 1, 2, 3, 0,   /* Front face */
+	// 	4, 5, 6, 7, 4,   /* Back face */
+	// 	8, 9, 10, 11, 8, /* Top face */
+	// 	12, 13, 14, 15, 12, /* Bottom face */
+	// 	16, 17, 18, 19, 16, /* Left face */
+	// 	20, 21, 22, 23, 20  /* Right face */
+	// };
 
 	// static const GLfloat texCoords[] = {}
 
-    u32 v_size = sizeof(vertices) / sizeof(vec3);
+    u32 v_size = sizeof(vertex) / sizeof(vec3);
     cube->vertex = malloc(sizeof(vec3) * v_size);
-    ft_memcpy(cube->vertex, vertices, sizeof(vec3) * v_size);
+    ft_memcpy(cube->vertex, vertex, sizeof(vec3) * v_size);
     cube->v_size = v_size;
 
     GLuint VAO, VBO, EBO;
@@ -50,7 +59,7 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
     /* Generate vertex buffer object (VBO) */
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
 
     /* Generate element buffer object (EBO) */
     glGenBuffers(1, &EBO);

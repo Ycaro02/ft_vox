@@ -10,9 +10,9 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
 
 size_t fill_sub_chunks(t_sub_chunks *sub_chunk)
 {
-    for (u32 i = 0; i < SUB_CHUNKS_WIDTH; ++i) {
+    for (u32 i = 0; i < SUB_CHUNKS_WIDTH / 2; ++i) {
         for (u32 j = 0; j < 1; ++j) {
-            for (u32 k = 0; k < SUB_CHUNKS_DEPTH; ++k) {
+            for (u32 k = 0; k < SUB_CHUNKS_DEPTH / 2; ++k) {
                 t_block *block = ft_calloc(sizeof(t_block), 1);
 				if (!block) {
 					ft_printf_fd(2, "Failed to allocate block\n");

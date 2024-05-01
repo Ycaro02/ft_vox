@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
+/*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 15:43:41 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/01 17:27:11 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/01 13:05:35 by ycaro            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,7 @@ uint32_t min_uint32(uint32_t a, uint32_t b);
 
 
 /* Use ft_memcpy in mat4 */
-// #include "math/ft_math.h"
+#include "math/ft_math.h"
 
 /* Use some libft function */
 #include "stack_string/stack_string.h"
