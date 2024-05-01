@@ -55,8 +55,8 @@ u8 *parse_bmp_file(char* path, int *width, int *height, int *type);
  * @param width The width of the squares
  * @param height The height of the squares
  * @param type The number of bytes per pixel (3 for RGB, 4 for RGBA)
- * @return double u8 pointer to the squares strings data
+ * @return t_list pointer to the list of squares, each content node is a texture square
 */
-u8 **cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int width, int height, int type);
+t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int width, int height, int type);
 
 #endif /* PARSE_BPM_HEADER */

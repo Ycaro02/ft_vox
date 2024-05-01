@@ -57,13 +57,13 @@ void load_texture(){
     u8 *texture = parse_bmp_file(TEXTURE_ATLAS_PATH, &w, &h, &type);
     if (!texture) {
         ft_printf_fd(2, "Failed to load texture\n");
-        return (1);
+        return ;
     }
     ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n",w,h,type);
-    u8 **squate_texture = cut_texture_into_squares(texture, w, h, 32, 32, type);
-    if (!squate_texture) {
+    t_list *square_lst = cut_texture_into_squares(texture, w, h, 16, 16, type);
+    if (!square_lst) {
         ft_printf_fd(2, "Failed to cut texture\n");
-        return (1);
+        return;
     }
     ft_printf_fd(1, "Texture cuted\n");
 }
@@ -94,7 +94,7 @@ int main() {
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-    // load_texture();
+    load_texture();
 
     while (!glfwWindowShouldClose(window)) {
 		update_camera(&context, render.shader_id);
