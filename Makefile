@@ -10,15 +10,20 @@ ASCII_NAME		=	${NAME}
 OPENGL_LIB		= -lglfw -lGL -lm -Lrsc/lib_deps/
 VALGRIND_TEST	= valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
 
+INSTALL_DEPS	=	./install/install_deps.sh
+
 all:		$(NAME)
 
 %.o : %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-$(NAME):	$(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS) $(DISPLAY_NAME)
+$(NAME):	deps_install $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS) $(DISPLAY_NAME)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) ${OPENGL_LIB}
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
+
+deps_install:
+	@${INSTALL_DEPS}
 
 $(LIST):
 ifeq ($(shell [ -f ${LIST} ] && echo 0 || echo 1), 1)
