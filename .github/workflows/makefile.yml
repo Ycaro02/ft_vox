@@ -13,8 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install valgrind
-      run: sudo apt update && sudo apt install libwayland-dev libxkbcommon-dev xorg-dev make cmake -y
+    - name: Get dependencies
+      run: sudo apt update && sudo apt install libwayland-dev libxkbcommon-dev xorg-dev make -y
     
     - name: Run make
       run: make
