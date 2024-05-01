@@ -75,7 +75,7 @@ int main() {
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 
 
-    mat4_identity(context.cube.rotation);
+    glm_mat4_identity(context.cube.rotation);
 
     while (!glfwWindowShouldClose(window)) {
 		update_camera(&context, render.shader_id);

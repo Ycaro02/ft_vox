@@ -18,6 +18,11 @@
 		"hashmap.h": "c",
 		"cglm.h": "c",
 		"ivec4.h": "c",
-		"ivec3.h": "c"
+		"ivec3.h": "c",
+		"mat4.h": "c",
+		"common.h": "c",
+		"affine.h": "c",
+		"ft_math.h": "c",
+		"float.h": "c"
 	}
 }

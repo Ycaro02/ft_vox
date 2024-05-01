@@ -19,6 +19,13 @@ void get_obj_center(t_modelCube *cube, vec3 center)
     center[2] = total[2] / cube->v_size;
 }
 
+FT_INLINE void mat_mult_translation(mat4 mat, vec3 translation) {
+	mat4 translation_mat = {0};
+
+	glm_translate_make(translation_mat, translation);
+	glm_mat4_mul(mat, translation_mat, mat);
+}
+
 /**
  * @brief Rotate object around center
  * @param m object model
@@ -28,23 +35,36 @@ void get_obj_center(t_modelCube *cube, vec3 center)
 */
 void rotate_object_around_center(t_modelCube* cube, vec3 rotate_vec, float angle, GLuint shader_id) 
 {
-    vec3 obj_center, obj_center_neg;
-    mat4 translation_to_origin, rotation;
+    vec3 obj_center = {0}, obj_center_neg = {0};
+    mat4 translation_to_origin = {0}, rotation = {0};
     
 	/* Find model center */
 	get_obj_center(cube, obj_center);
-    vec3_negate(obj_center_neg, obj_center);
+    
+
+
+	glm_vec3_negate_to(obj_center_neg, obj_center);
 
 	/* Translate position, place computed center at the origin */
-    mat4_translattion(translation_to_origin, obj_center_neg);
+    // mat4_translattion(translation_to_origin, obj_center_neg);
+	glm_translate_make(translation_to_origin, obj_center_neg);
 
     /* Apply rotate */
-    mat4_rotate(rotation, deg_to_rad(angle), rotate_vec);
+    // mat4_rotate(rotation, glm_rad(angle), rotate_vec);
+	glm_rotate_make(rotation, glm_rad(angle), rotate_vec);
+	// glm_rotate(translation_to_origin, glm_rad(angle), rotate_vec);
 
     /* Update obj model */
-    mat4_mult(translation_to_origin, cube->rotation, cube->rotation);		/* Origin translate */
-    mat4_mult(rotation, cube->rotation, cube->rotation);					/* Apply rotate */
-    mat4_mult_translation(cube->rotation, obj_center);					/* Translate back */
+
+	glm_mat4_mul(translation_to_origin, cube->rotation, cube->rotation);
+
+	glm_mat4_mul(rotation, cube->rotation, cube->rotation);
+	glm_mat4_mul(translation_to_origin, cube->rotation, cube->rotation);
+
+    // mat4_mult(translation_to_origin, cube->rotation, cube->rotation);		/* Origin translate */
+    // mat4_mult(rotation, cube->rotation, cube->rotation);					/* Apply rotate */
+    
+	mat_mult_translation(cube->rotation, obj_center);					/* Translate back */
 
     /* Update model matrix in shader */
     set_shader_var_mat4(shader_id, "model", cube->rotation);
