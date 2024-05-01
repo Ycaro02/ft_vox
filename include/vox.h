@@ -111,6 +111,6 @@ GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);
 void	drawCube(GLuint vao, u32 nb_cube);
 
 /* texture load_texture */
-t_list *load_texture_atlas();
+GLuint *load_texture_atlas();
 
 #endif /* VOX_HEADER_H */

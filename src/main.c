@@ -8,7 +8,7 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
     glFlush();
 }
 
-size_t fill_sub_chunks(t_sub_chunks *sub_chunk)
+size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 {
     for (u32 i = 0; i < SUB_CHUNKS_WIDTH / 2; ++i) {
         for (u32 j = 0; j < 1; ++j) {
@@ -49,10 +49,10 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
     return (chunks->nb_block);
 }
 
-void vox_destroy(t_context *c, t_list **texture_atlas)
+void vox_destroy(t_context *c, GLuint *atlas)
 {
     hashmap_destroy(c->chunks->sub_chunks[0].block_map);
-    lst_clear(texture_atlas, free);
+    free(atlas);
     free(c->chunks);
     glfwTerminate();
 
@@ -75,7 +75,7 @@ int main() {
     ft_printf_fd(1, "%u byte allocated\n", sizeof(t_chunks));
 	context.chunks->sub_chunks[0].block_map = hashmap_init(50, hashmap_entry_free);
     
-	context.chunks->nb_block = fill_sub_chunks(&context.chunks->sub_chunks[0]);
+	context.chunks->nb_block = BRUT_fill_subchunks(&context.chunks->sub_chunks[0]);
 
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 	render.shader_id = load_shader(&render);
@@ -83,8 +83,7 @@ int main() {
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-    t_list *texture_atlas = load_texture_atlas();
-
+    GLuint *texture_atlas = load_texture_atlas();
 
 
     while (!glfwWindowShouldClose(window)) {
@@ -97,6 +96,6 @@ int main() {
         handle_input(&context);
     }
 
-    vox_destroy(&context, &texture_atlas);
+    vox_destroy(&context, texture_atlas);
     return 0;
 }
