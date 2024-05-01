@@ -49,25 +49,14 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
     return (chunks->nb_block);
 }
 
+void vox_destroy(t_context *c, t_list **texture_atlas)
+{
+    hashmap_destroy(c->chunks->sub_chunks[0].block_map);
+    lst_clear(texture_atlas, free);
+    free(c->chunks);
+    glfwTerminate();
 
-void load_texture(){
-
-    int w,h,type;
-
-    u8 *texture = parse_bmp_file(TEXTURE_ATLAS_PATH, &w, &h, &type);
-    if (!texture) {
-        ft_printf_fd(2, "Failed to load texture\n");
-        return ;
-    }
-    ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n",w,h,type);
-    t_list *square_lst = cut_texture_into_squares(texture, w, h, 16, 16, type);
-    if (!square_lst) {
-        ft_printf_fd(2, "Failed to cut texture\n");
-        return;
-    }
-    ft_printf_fd(1, "Texture cuted\n");
 }
-
 
 int main() {
     t_context context;
@@ -94,7 +83,9 @@ int main() {
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-    load_texture();
+    t_list *texture_atlas = load_texture_atlas();
+
+
 
     while (!glfwWindowShouldClose(window)) {
 		update_camera(&context, render.shader_id);
@@ -106,9 +97,6 @@ int main() {
         handle_input(&context);
     }
 
-	hashmap_destroy(context.chunks->sub_chunks[0].block_map);
-
-    free(context.chunks);
-    glfwTerminate();
+    vox_destroy(&context, &texture_atlas);
     return 0;
 }

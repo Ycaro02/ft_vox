@@ -10,6 +10,7 @@
 #include "../libft/libft.h"		                /* Libft functions */
 #include "../libft/parse_flag/parse_flag.h"		/* Parse flag functions */
 #include "../libft/hashMap/hashMap.h"			/* Hashmap functions */
+#include "../libft/BMP_parser/parse_bmp.h"		/* BMP parser functions */
 #include "window.h"					            /* Window related functions */
 #include "win_event.h"				            /* Window event handling functions */
 #include "camera.h"                             /* Camera handling function */
@@ -109,5 +110,7 @@ u32		chunks_cube_get(t_chunks *chunks, vec3 *block_array);
 GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);
 void	drawCube(GLuint vao, u32 nb_cube);
 
+/* texture load_texture */
+t_list *load_texture_atlas();
 
 #endif /* VOX_HEADER_H */

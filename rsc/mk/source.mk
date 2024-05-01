@@ -7,6 +7,7 @@ SUB_SRC_DIR		=	glad\
 					win_event\
 					camera\
 					render\
+					texture\
 
 ALL_SRC_DIR		=	$(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_SRC_DIR))
 
@@ -14,12 +15,12 @@ MAIN_MANDATORY 	=	main.c
 
 SRCS			=	window/openGL_glw_init.c\
 					win_event/key_callback.c\
+					glad/gl.c\
 					camera/camera.c\
 					render/shader_utils.c\
 					render/cube.c\
 					render/obj_rotate.c\
-					glad/gl.c\
-
+					texture/load_texture.c\
 
 # SRCS_BONUS		=	main_bonus.c
 
