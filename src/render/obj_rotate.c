@@ -40,30 +40,18 @@ void rotate_object_around_center(t_modelCube* cube, vec3 rotate_vec, float angle
     
 	/* Find model center */
 	get_obj_center(cube, obj_center);
-    
-
-
 	glm_vec3_negate_to(obj_center_neg, obj_center);
 
 	/* Translate position, place computed center at the origin */
-    // mat4_translattion(translation_to_origin, obj_center_neg);
 	glm_translate_make(translation_to_origin, obj_center_neg);
 
     /* Apply rotate */
-    // mat4_rotate(rotation, glm_rad(angle), rotate_vec);
 	glm_rotate_make(rotation, glm_rad(angle), rotate_vec);
-	// glm_rotate(translation_to_origin, glm_rad(angle), rotate_vec);
 
     /* Update obj model */
-
 	glm_mat4_mul(translation_to_origin, cube->rotation, cube->rotation);
-
 	glm_mat4_mul(rotation, cube->rotation, cube->rotation);
 	glm_mat4_mul(translation_to_origin, cube->rotation, cube->rotation);
-
-    // mat4_mult(translation_to_origin, cube->rotation, cube->rotation);		/* Origin translate */
-    // mat4_mult(rotation, cube->rotation, cube->rotation);					/* Apply rotate */
-    
 	mat_mult_translation(cube->rotation, obj_center);					/* Translate back */
 
     /* Update model matrix in shader */

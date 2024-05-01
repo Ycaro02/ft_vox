@@ -84,9 +84,7 @@ void move_camera_forward(t_camera* camera, float distance)
     glm_vec3_sub(camera->target, camera->position, direction); /* tocheck */
     glm_vec3_normalize(direction);
     glm_vec3_scale(direction, distance, direction);
-    // VECTOR_ADD(float, 3, camera->position, direction);
 	glm_vec3_add(camera->position, direction, camera->position);
-    // VECTOR_ADD(float, 3, camera->target, direction);
 	glm_vec3_add(camera->target, direction, camera->target);
 }
 
