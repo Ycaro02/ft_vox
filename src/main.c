@@ -50,6 +50,25 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
 }
 
 
+void load_texture(){
+
+    int w,h,type;
+
+    u8 *texture = parse_bmp_file(TEXTURE_ATLAS_PATH, &w, &h, &type);
+    if (!texture) {
+        ft_printf_fd(2, "Failed to load texture\n");
+        return (1);
+    }
+    ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n",w,h,type);
+    u8 **squate_texture = cut_texture_into_squares(texture, w, h, 32, 32, type);
+    if (!squate_texture) {
+        ft_printf_fd(2, "Failed to cut texture\n");
+        return (1);
+    }
+    ft_printf_fd(1, "Texture cuted\n");
+}
+
+
 int main() {
     t_context context;
     GLFWwindow* window;
@@ -73,9 +92,9 @@ int main() {
 	render.shader_id = load_shader(&render);
 	context.shader_id = render.shader_id;
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-
-
     glm_mat4_identity(context.cube.rotation);
+
+    // load_texture();
 
     while (!glfwWindowShouldClose(window)) {
 		update_camera(&context, render.shader_id);

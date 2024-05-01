@@ -47,4 +47,16 @@ typedef struct s_bmp_info_hdr {
 */
 u8 *parse_bmp_file(char* path, int *width, int *height, int *type);
 
+/**
+ * @brief Cut a texture into squares of a given width and height
+ * @param texture The texture to cut
+ * @param tex_width The width of the texture
+ * @param tex_height The height of the texture
+ * @param width The width of the squares
+ * @param height The height of the squares
+ * @param type The number of bytes per pixel (3 for RGB, 4 for RGBA)
+ * @return double u8 pointer to the squares strings data
+*/
+u8 **cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int width, int height, int type);
+
 #endif /* PARSE_BPM_HEADER */

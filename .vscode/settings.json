@@ -23,6 +23,7 @@
 		"common.h": "c",
 		"affine.h": "c",
 		"ft_math.h": "c",
-		"float.h": "c"
+		"float.h": "c",
+		"parse_bmp.h": "c"
 	}
 }

@@ -6,7 +6,7 @@
 #    By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/11 16:54:20 by nfour             #+#    #+#              #
-#    Updated: 2024/05/01 14:11:43 by ycaro            ###   ########.fr        #
+#    Updated: 2024/05/01 14:38:06 by ycaro            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -95,6 +95,7 @@ HASHMAP_SRC			=	hashMap.c\
 BMP_PARSER_DIR		=	BMP_parser
 
 BMP_PARSER_SRC		=	parse_bmp.c\
+						image_cut.c\
 
 
 ALL_OBJ_DIR = 	$(OBJ_DIR)/libft\
