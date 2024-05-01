@@ -18,6 +18,8 @@
 #define SCREEN_WIDTH 800			/* Screen width */
 #define SCREEN_HEIGHT 600			/* Screen height */
 
+#define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
+
 enum block_type {
     AIR=0U,      /* Air block (Empty) */
     DIRT=1U,     /* Dirt block (Exposed to light) */

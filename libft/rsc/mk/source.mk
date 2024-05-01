@@ -6,7 +6,7 @@
 #    By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/11 16:54:20 by nfour             #+#    #+#              #
-#    Updated: 2024/04/29 15:26:25 by ycaro            ###   ########.fr        #
+#    Updated: 2024/05/01 14:11:43 by ycaro            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -92,18 +92,27 @@ HASHMAP_DIR			=	hashMap
 
 HASHMAP_SRC			=	hashMap.c\
 
-SRCS =	$(addprefix ${LIBFT_DIR}, $(LIBFT_SRC)) \
-		$(addprefix $(PRINTF_FD_DIR)/, $(PRINTF_FD_SRC)) \
-		$(addprefix $(PARSE_FLAG_DIR)/, $(PARSE_FLAG_STR)) \
-		$(addprefix $(STACK_STRING_DIR)/, $(STACK_STRING_SRC)) \
-		$(addprefix $(MATH_DIR)/, $(MATH_SRC)) \
-		$(addprefix $(HASHMAP_DIR)/, $(HASHMAP_SRC)) \
+BMP_PARSER_DIR		=	BMP_parser
+
+BMP_PARSER_SRC		=	parse_bmp.c\
+
 
 ALL_OBJ_DIR = 	$(OBJ_DIR)/libft\
 				$(OBJ_DIR)/$(PRINTF_FD_DIR)\
 				$(OBJ_DIR)/$(PARSE_FLAG_DIR)\
 				$(OBJ_DIR)/$(STACK_STRING_DIR)\
 				$(OBJ_DIR)/$(MATH_DIR)\
-				$(OBJ_DIR)/$(HASHMAP_DIR)
+				$(OBJ_DIR)/$(HASHMAP_DIR)\
+				$(OBJ_DIR)/$(BMP_PARSER_DIR)\
+
+				
+SRCS =	$(addprefix ${LIBFT_DIR}, $(LIBFT_SRC)) \
+		$(addprefix $(PRINTF_FD_DIR)/, $(PRINTF_FD_SRC)) \
+		$(addprefix $(PARSE_FLAG_DIR)/, $(PARSE_FLAG_STR)) \
+		$(addprefix $(STACK_STRING_DIR)/, $(STACK_STRING_SRC)) \
+		$(addprefix $(MATH_DIR)/, $(MATH_SRC)) \
+		$(addprefix $(HASHMAP_DIR)/, $(HASHMAP_SRC)) \
+		$(addprefix $(BMP_PARSER_DIR)/, $(BMP_PARSER_SRC)) \
+
 
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
