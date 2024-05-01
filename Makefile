@@ -7,7 +7,7 @@ CFLAGS			=	-Wall -Wextra -Werror -O3 -g
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
 
-OPENGL_LIB		= -lglfw -lGL -lm -Lrsc/lib_deps/
+OPENGL_LIB		= -lglfw3 -lGL -lm -Lrsc/lib_deps/
 VALGRIND_TEST	= valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
 
 INSTALL_DEPS	=	./install/install_deps.sh

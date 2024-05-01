@@ -1,2 +1,3 @@
 *.o
 rsc/deps
+rsc/lib_deps
