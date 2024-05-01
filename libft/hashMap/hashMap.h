@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/30 09:35:54 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/01 11:31:22 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,22 +25,24 @@
  *	- Many hash table designs also allow arbitrary insertions and deletions of key-value pairs, at (amortized) constant average cost per operation.
  *	- In many situations, hash tables turn out to be more efficient than search trees or any other table lookup structure.
  *	- For this implementation, we will use a simple hash function to hash the block position (x,y,z) to a unique key.
- *	- The hash map will be implemented with a simple array of linked list (chaining) to handle hash collisions.
- *	- The hash map will be able to store any type of data (void*), the user will have to handle the data type and give a free function to free the data.
- *	- The hash map will be able to get the length of the map.
- *	- The hash map will be able to set the value associated with the key (x,y,z).
- *	- The hash map will be able to get the value associated with the key (x,y,z).
- *	- The hash map will be able to destroy the map and free all the memory.
- *	- The hash map will be able to create and initialize an iterator for the hash map.
- *	- The hash map will be able to move to the next entry in the hash map.
- *	- The hash map will be able to expand the given hashmap capacity when needed.
- *	- The hash map will be able to update the entry if the key already exists.
- *  - API design from https://benhoyt.com/writings/hash-table-in-c/
+ *	- The hash map is implemented with a list of t_list pointers, each t_list pointer is the head of a list of hashMap_entry
+ **	- Main features:
+ *		- store any type of data (void*), the user will have to handle the data type and give a free function to free the data.
+ *		- get the length of the map.
+ *		- set the value associated with the key (x,y,z).
+ *		- get the value associated with the key (x,y,z).
+ *		- destroy the map and free all the memory.
+ *		- create and initialize an iterator for the hash map.
+ *		- move to the next entry in the hash map.
+ *		- expand the given hashmap capacity when needed.
+ *		- update the entry if the key already exists.
+ **	- Note:
+ * 	- API design from https://benhoyt.com/writings/hash-table-in-c/
  *  - t_list structure definition from ../libft.h
- *	typedef struct s_list {
- *		void			*content;
- *		struct s_list	*next;
- *	} t_list;
+ *		typedef struct s_list {
+ *			void			*content;
+ *			struct s_list	*next;
+ *		} t_list;
  *  - Content must be an allocated pointer on the heap, free will be called on each node with the free_obj function
 */
 

@@ -74,10 +74,9 @@ typedef struct s_sub_chunks {
 
 typedef struct s_chunks {
 	/* Block arry to remove, need to read sub_chunks block map instead */
-    t_block blocks[CHUNKS_WIDTH][CHUNKS_HEIGHT][CHUNKS_DEPTH];   /* Blocks array */
-	u32		nb_block;		/* nb block to give to render context */
-    u32     id;     		/* Chunk Id */
-	t_sub_chunks sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
+	u32				nb_block;		/* nb block to give to render context */
+    u32				id;     		/* Chunk Id */
+	t_sub_chunks	sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 } t_chunks;
 
 typedef struct s_world {

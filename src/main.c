@@ -11,15 +11,19 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
 void fill_chunks(t_chunks *chunks)
 {
     u32 count = 0;
-    for (u32 i = 0; i < CHUNKS_WIDTH / 4; ++i) {
-        for (u32 j = 0; j < CHUNKS_HEIGHT / 4; ++j) {
-            for (u32 k = 0; k < CHUNKS_DEPTH / 4; ++k) {
-                /* chunks->block[i][0][k]*/
-                t_block *block = &chunks->blocks[i][j][k];
+    for (u32 i = 0; i < CHUNKS_WIDTH; ++i) {
+        for (u32 j = 0; j < 1; ++j) {
+            for (u32 k = 0; k < CHUNKS_DEPTH; ++k) {
+                t_block *block = ft_calloc(sizeof(t_block), 1);
+				if (!block) {
+					ft_printf_fd(2, "Failed to allocate block\n");
+					return ;
+				}
                 block->x = i;
                 block->y = j;
                 block->z = k;
                 block->type = STONE;
+				hashmap_set_entry(chunks->sub_chunks[0].block_map, (t_block_pos){i, j, k}, block);
                 ++count;
             }
         }
@@ -29,22 +33,20 @@ void fill_chunks(t_chunks *chunks)
 
 u32 chunks_cube_get(t_chunks *chunks, vec3_f32 *block_array)
 {
-    u32 idx = 0;
+    s8 next = TRUE;
+	u32 idx = 0;
 
-    for (u32 i = 0; i < CHUNKS_WIDTH; ++i) {
-        for (u32 j = 0; j < CHUNKS_HEIGHT; ++j) {
-            for (u32 k = 0; k < CHUNKS_HEIGHT; ++k) {
-                /* chunks->block[i][0][k]*/
-                t_block *block = &chunks->blocks[i][j][k];
-                if (block->type != 0) {
-                    block_array[idx][0] = i; 
-                    block_array[idx][1] = j; 
-                    block_array[idx][2] = k; 
-                    ++idx;
-                }
-            }   
-        }
-    }
+	hashMap_it it = hashmap_iterator(chunks->sub_chunks[0].block_map);
+	next = hashmap_next(&it);
+	while (next) {
+		t_block *block = (t_block *)it.value;
+		block_array[idx][0] = block->x;
+		block_array[idx][1] = block->y;
+		block_array[idx][2] = block->z;
+		++idx;
+		next = hashmap_next(&it);
+	}
+
     ft_printf_fd(1, "nb cube %u\n", chunks->nb_block);
     return (chunks->nb_block);
 }
@@ -65,12 +67,15 @@ int main() {
         return (1);
     }
     ft_printf_fd(1, "%u byte allocated\n", sizeof(t_chunks));
-    fill_chunks(context.chunks);
+	context.chunks->sub_chunks[0].block_map = hashmap_init(50, hashmap_entry_free);
+    
+	fill_chunks(context.chunks);
 
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 	render.shader_id = load_shader(&render);
 	context.shader_id = render.shader_id;
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+
 
     mat4_identity(context.cube.rotation);
 
@@ -84,8 +89,9 @@ int main() {
         handle_input(&context);
     }
 
-    free(context.chunks);
+	hashmap_destroy(context.chunks->sub_chunks[0].block_map);
 
+    free(context.chunks);
     glfwTerminate();
     return 0;
 }

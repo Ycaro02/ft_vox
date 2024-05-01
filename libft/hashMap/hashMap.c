@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/30 09:39:18 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/01 11:27:38 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,15 +182,14 @@ s8 hashmap_next(hashMap_it *it) {
     /* Loop through the entries array */
     while (it->_idx < map->capacity) {
         entry = map->entries[it->_idx];
-        if (entry != NULL) {
-            /* Found a non-empty list */
+        if (entry != NULL) { /* Found a non-empty list */
             if (it->_current == NULL) { /*  If it's the first node in the list, set it as the current node */
                 it->_current = entry;
             } else { /* Otherwise, move to the next node in the list */
                 it->_current = it->_current->next;
             }
             if (it->_current != NULL) {
-                /* Go to the nest entry list */
+                /* Go to the next entry list */
                 hashMap_entry *hm_entry = it->_current->content;
                 it->key = hm_entry->key;
                 it->value = hm_entry->value;
