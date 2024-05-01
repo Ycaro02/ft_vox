@@ -8,27 +8,25 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
     glFlush();
 }
 
-void fill_chunks(t_chunks *chunks)
+size_t fill_sub_chunks(t_sub_chunks *sub_chunk)
 {
-    u32 count = 0;
-    for (u32 i = 0; i < CHUNKS_WIDTH; ++i) {
+    for (u32 i = 0; i < SUB_CHUNKS_WIDTH; ++i) {
         for (u32 j = 0; j < 1; ++j) {
-            for (u32 k = 0; k < CHUNKS_DEPTH; ++k) {
+            for (u32 k = 0; k < SUB_CHUNKS_DEPTH; ++k) {
                 t_block *block = ft_calloc(sizeof(t_block), 1);
 				if (!block) {
 					ft_printf_fd(2, "Failed to allocate block\n");
-					return ;
+					return (0);
 				}
                 block->x = i;
                 block->y = j;
                 block->z = k;
                 block->type = STONE;
-				hashmap_set_entry(chunks->sub_chunks[0].block_map, (t_block_pos){i, j, k}, block);
-                ++count;
+				hashmap_set_entry(sub_chunk->block_map, (t_block_pos){i, j, k}, block);
             }
         }
     }
-    chunks->nb_block = count;
+	return (hashmap_size(sub_chunk->block_map));
 }
 
 u32 chunks_cube_get(t_chunks *chunks, vec3_f32 *block_array)
@@ -69,7 +67,7 @@ int main() {
     ft_printf_fd(1, "%u byte allocated\n", sizeof(t_chunks));
 	context.chunks->sub_chunks[0].block_map = hashmap_init(50, hashmap_entry_free);
     
-	fill_chunks(context.chunks);
+	context.chunks->nb_block = fill_sub_chunks(&context.chunks->sub_chunks[0]);
 
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 	render.shader_id = load_shader(&render);

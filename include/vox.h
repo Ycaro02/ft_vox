@@ -50,33 +50,37 @@ struct compact_block {
 #define WORLD_MAX_WIDTH (16384U * 2U)
 #define WORLD_MAX_DEPTH (16384U * 2U)
 
-#define CHUNKS_HEIGHT   16U	/* that will be 256 */
+#define CHUNKS_HEIGHT   256U	/* that will be 256 */
 #define CHUNKS_WIDTH    16U
 #define CHUNKS_DEPTH    16U
 
-#define BLOCK_PER_CHUNKS (CHUNKS_HEIGHT * CHUNKS_WIDTH * CHUNKS_DEPTH) 
-
-#define VERTEX_SHADER_PATH		"rsc/shaders/vertex_shader.glsl"
-#define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
-
+/* Number of maximum block in chunks */
+#define MAX_CHUNKS_BLOCK (CHUNKS_HEIGHT * CHUNKS_WIDTH * CHUNKS_DEPTH) 
 
 #define SUB_CHUNKS_HEIGHT   16U
 #define SUB_CHUNKS_WIDTH    16U
 #define SUB_CHUNKS_DEPTH    16U
 
-#define SUB_CHUNKS_MAX (WORLD_MAX_HEIGHT / SUB_CHUNKS_HEIGHT)
+/* Number of maximum block in sub chunks */
+#define MAX_SUB_CHUNKS_BLOCK (SUB_CHUNKS_HEIGHT * SUB_CHUNKS_WIDTH * SUB_CHUNKS_DEPTH)
+
+/* Number of maximum cub chunks in chunks */
+#define SUB_CHUNKS_MAX (CHUNKS_HEIGHT / SUB_CHUNKS_HEIGHT)
+
+#define VERTEX_SHADER_PATH		"rsc/shaders/vertex_shader.glsl"
+#define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
+
 
 typedef struct s_sub_chunks {
-	hashMap *block_map;		/* Blocks map, use hashMap API to set/get block */
-	u32		flag;			/* Sub Chunk Id and flag */
-	u32		metadata;		/* Sub Chunk metadata */
+	hashMap 		*block_map;		/* Blocks map, use hashMap API to set/get block */
+	u32				flag;			/* Sub Chunk Id and flag */
+	u32				metadata;		/* Sub Chunk metadata */
 } t_sub_chunks;
 
 typedef struct s_chunks {
-	/* Block arry to remove, need to read sub_chunks block map instead */
+	t_sub_chunks	sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 	u32				nb_block;		/* nb block to give to render context */
     u32				id;     		/* Chunk Id */
-	t_sub_chunks	sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 } t_chunks;
 
 typedef struct s_world {
