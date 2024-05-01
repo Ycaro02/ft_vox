@@ -15,6 +15,9 @@
 		"compare": "cpp",
 		"cstdint": "cpp",
 		"vector": "c",
-		"hashmap.h": "c"
+		"hashmap.h": "c",
+		"cglm.h": "c",
+		"ivec4.h": "c",
+		"ivec3.h": "c"
 	}
 }

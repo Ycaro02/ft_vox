@@ -16,7 +16,7 @@ void drawCube(GLuint VAO, u32 nb_cube) {
 }
 
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
-	static const vec3_f32 vertices[] = {
+	static const vec3 vertices[] = {
 		CUBE_FRONT_FACE_VERTEX,
 		CUBE_BACK_FACE_VERTEX,
 		CUBE_TOP_FACE_VERTEX,
@@ -36,9 +36,9 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 
 	// static const GLfloat texCoords[] = {}
 
-    u32 v_size = sizeof(vertices) / sizeof(vec3_f32);
-    cube->vertex = malloc(sizeof(vec3_f32) * v_size);
-    ft_memcpy(cube->vertex, vertices, sizeof(vec3_f32) * v_size);
+    u32 v_size = sizeof(vertices) / sizeof(vec3);
+    cube->vertex = malloc(sizeof(vec3) * v_size);
+    ft_memcpy(cube->vertex, vertices, sizeof(vec3) * v_size);
     cube->v_size = v_size;
 
     GLuint VAO, VBO, EBO;
@@ -62,14 +62,14 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
     glEnableVertexAttribArray(0);
 
 
-    vec3_f32 *block_array = ft_calloc(sizeof(vec3_f32), c->chunks->nb_block);
+    vec3 *block_array = ft_calloc(sizeof(vec3), c->chunks->nb_block);
 	u32 instanceCount = chunks_cube_get(c->chunks, block_array);
 
 
 	GLuint instanceVBO;
 	glGenBuffers(1, &instanceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glBufferData(GL_ARRAY_BUFFER, instanceCount * sizeof(vec3_f32), (GLfloat *)block_array[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, instanceCount * sizeof(vec3), (GLfloat *)block_array[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);

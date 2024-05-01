@@ -4,6 +4,9 @@
 #include <math.h>					            /* LIBC Math functions */
 #include "glad/gl.h"				            /* Glad functions (Include glad header BEFORE glfw3) */
 #include "glfw3/glfw3.h"			            /* GLFW functions */
+
+#include "../rsc/deps/cglm/include/cglm/cglm.h" 
+
 #include "../libft/libft.h"		                /* Libft functions */
 #include "../libft/parse_flag/parse_flag.h"		/* Parse flag functions */
 #include "../libft/hashMap/hashMap.h"			/* Hashmap functions */
@@ -98,7 +101,7 @@ typedef struct s_context {
 	GLuint		shader_id;		/* shader program id */
 } t_context;
 
-u32		chunks_cube_get(t_chunks *chunks, vec3_f32 *block_array);
+u32		chunks_cube_get(t_chunks *chunks, vec3 *block_array);
 
 /* render/cube.c */
 GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);

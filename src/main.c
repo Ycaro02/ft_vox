@@ -29,7 +29,7 @@ size_t fill_sub_chunks(t_sub_chunks *sub_chunk)
 	return (hashmap_size(sub_chunk->block_map));
 }
 
-u32 chunks_cube_get(t_chunks *chunks, vec3_f32 *block_array)
+u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
 {
     s8 next = TRUE;
 	u32 idx = 0;

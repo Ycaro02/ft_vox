@@ -77,7 +77,7 @@ void update_camera(void *context, GLuint shader_id)
 */
 void move_camera_forward(t_camera* camera, float distance) 
 {
-    vec3_f32 direction;
+    vec3 direction;
 
     vec3_sub(camera->target, camera->position, direction); /* tocheck */
     vec3_normalize(direction);
@@ -101,14 +101,14 @@ void move_camera_backward(t_camera* camera, float distance) {
  * @param distance distance to move
  * @param axis axis to move
 */
-void rotate_camera(t_camera* camera, float angle, vec3_f32 axis) {
-    mat4_f32 rotation;
+void rotate_camera(t_camera* camera, float angle, vec3 axis) {
+    mat4 rotation;
 
     /* Create rotation matrix */
 	mat4_rotate(rotation, deg_to_rad(angle), axis);
 
     /* Rotate the direction vector from the position to the target */
-    vec3_f32 direction;
+    vec3 direction;
 	vec3_sub(camera->target, camera->position, direction);
 	mat4_mult_vec3(rotation, direction, 1.0f, direction);
 
@@ -123,7 +123,7 @@ void rotate_camera(t_camera* camera, float angle, vec3_f32 axis) {
 */
 void move_camera_up(t_camera* camera, float distance) 
 {
-    vec3_f32 direction, right, up_movement, up = {0.0f, 1.0f, 0.0f};
+    vec3 direction, right, up_movement, up = {0.0f, 1.0f, 0.0f};
     
 	/* Compute direction vector */
 	vec3_sub(camera->target, camera->position, direction);
