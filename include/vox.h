@@ -16,8 +16,8 @@
 #include "camera.h"                             /* Camera handling function */
 #include "render.h"								/* Render functions */
 
-#define SCREEN_WIDTH 800			/* Screen width */
-#define SCREEN_HEIGHT 600			/* Screen height */
+#define SCREEN_WIDTH 1920			/* Screen width */
+#define SCREEN_HEIGHT 1080			/* Screen height */
 
 #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
 
@@ -108,7 +108,7 @@ u32		chunks_cube_get(t_chunks *chunks, vec3 *block_array);
 
 /* render/cube.c */
 GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);
-void	drawCube(GLuint vao, u32 nb_cube);
+void	drawAllCube(GLuint vao, u32 nb_cube);
 
 /* texture load_texture */
 GLuint *load_texture_atlas();

@@ -4,15 +4,15 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 	glUseProgram(shader_id);
-    drawCube(vao, c->chunks->nb_block);
+    drawAllCube(vao, c->chunks->nb_block);
     glFlush();
 }
 
 size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 {
-    for (u32 i = 0; i < SUB_CHUNKS_WIDTH / SUB_CHUNKS_WIDTH; ++i) {
-        for (u32 j = 0; j < 1; ++j) {
-            for (u32 k = 0; k < SUB_CHUNKS_DEPTH / SUB_CHUNKS_DEPTH; ++k) {
+    for (u32 i = 0; i < SUB_CHUNKS_WIDTH / 2; ++i) {
+        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT / 2; ++j) {
+            for (u32 k = 0; k < SUB_CHUNKS_DEPTH / 2; ++k) {
                 t_block *block = ft_calloc(sizeof(t_block), 1);
 				if (!block) {
 					ft_printf_fd(2, "Failed to allocate block\n");
@@ -59,20 +59,52 @@ void vox_destroy(t_context *c, GLuint *atlas)
 }
 
 enum AtlasId {
-	ATLAS_DIRT_PINK=0,
+	ATLAS_DIRT_PINK=0, /* Pink to remove */
 	ATLAS_SAND=1,
 	ATLAS_STONE_CUT=2,
 	ATLAS_BRICK=3,
 	ATLAS_WOOD=4,
 	ATLAS_STONE=5,
 	ATLAS_DIRT=6,
-	ATLAS_WOOD_PLANK=7,
+	ATLAS_WOOD_PLANK=7, /* same here */
 	ATLAS_DIRT2=8,
 	ATLAS_GLASS=9,
 	ATLAS_COBBLESTONE=10,
 	ATLAS_FULL_GREY=11,
 	ATLAS_STONE_CLEAN=12,
 };
+
+FT_INLINE void display_fps() {
+	static double lastTime = 0.0f; 
+	static int nbFrames = 0;
+
+	if (lastTime == 0.0f) {
+		lastTime = glfwGetTime();
+	}
+
+	double currentTime = glfwGetTime();
+	nbFrames++;
+	if (currentTime - lastTime >= 1.0) { // Si plus d'une seconde s'est écoulée
+		ft_printf_fd(1, YELLOW"%f ms/frame, %d FPS\n"RESET, (1000.0 / (double)nbFrames), nbFrames);
+		nbFrames = 0;
+		lastTime += 1.0;
+	}
+}
+
+FT_INLINE void main_loop(t_context *context, GLuint vao, t_render *render) {
+
+    while (!glfwWindowShouldClose(context->win_ptr)) {
+		update_camera(context, render->shader_id);
+        renderScene(context, vao, render->shader_id);
+
+        glfwSwapBuffers(context->win_ptr);
+
+        glfwPollEvents();
+        handle_input(context);
+		display_fps();
+    }
+
+}
 
 int main() {
     t_context context;
@@ -102,16 +134,10 @@ int main() {
     GLuint *texture_atlas = load_texture_atlas();
 	set_shader_texture(&context, texture_atlas, ATLAS_STONE);
 
+	/* Disable VSync to avoid fps locking */
+	glfwSwapInterval(0);
 
-    while (!glfwWindowShouldClose(window)) {
-		update_camera(&context, render.shader_id);
-        renderScene(&context, vao, render.shader_id);
-
-        glfwSwapBuffers(window);
-
-        glfwPollEvents();
-        handle_input(&context);
-    }
+	main_loop(&context, vao, &render);
 
     vox_destroy(&context, texture_atlas);
     return 0;

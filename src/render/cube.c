@@ -1,37 +1,20 @@
 #include "../../include/vox.h"
 #include "../../cube.h"
 
-void drawFace(GLuint VAO, u32 count, u32 cubeId) {
+void drawCube(GLuint VAO, u32 vertex_nb, u32 cubeId) {
 	glBindVertexArray(VAO);
-	glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0, cubeId);
+	glDrawElementsInstanced(GL_TRIANGLES, vertex_nb, GL_UNSIGNED_INT, 0, cubeId);
 	glBindVertexArray(0);
 }
 
-void drawCube(GLuint VAO, u32 nb_cube) {
+void drawAllCube(GLuint VAO, u32 nb_cube) {
 	for (u32 cubeId = 1; cubeId <= nb_cube; ++cubeId) {
-		for (u32 i = 0; i <= 6; ++i) {
-			drawFace(VAO, i*6, cubeId);
-		}
+		drawCube(VAO, 6*6, cubeId);
 	}
 }
 
-// void drawFace(GLuint VAO, u32 count, u32 cubeId, void* offset) {
-//     glBindVertexArray(VAO);
-//     glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, offset, cubeId);
-//     glBindVertexArray(0);
-// }
-
-// void drawCube(GLuint VAO, u32 nb_cube) {
-//     for (u32 cubeId = 1; cubeId <= nb_cube; ++cubeId) {
-//         for (u32 i = 0; i < 6; ++i) {
-//             // Pass the offset when drawing each face
-//             drawFace(VAO, 6, cubeId, (void*)(cubeId * 6 * sizeof(GLuint)));
-//         }
-//     }
-// }
-
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
-	static const Vertex vertex[] = {
+	static const VertexTexture vertex[] = {
 		CUBE_BACK_FACE_VERTEX,
 		CUBE_FRONT_FACE_VERTEX,
 		CUBE_LEFT_FACE_VERTEX,
@@ -49,9 +32,9 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 		CUBE_TOP_FACE(20, 21, 22, 23),
 	};
 
-    u32 v_size = sizeof(vertex) / sizeof(Vertex);
-    cube->vertex = malloc(sizeof(Vertex) * v_size);
-    ft_memcpy(cube->vertex, vertex, sizeof(Vertex) * v_size);
+    u32 v_size = sizeof(vertex) / sizeof(VertexTexture);
+    cube->vertex = malloc(sizeof(VertexTexture) * v_size);
+    ft_memcpy(cube->vertex, vertex, sizeof(VertexTexture) * v_size);
     cube->v_size = v_size;
 
     GLuint VAO, VBO, EBO;
@@ -71,11 +54,11 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	/* Position attribute */
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
 	/* Texture Coordinate attribute */
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)sizeof(vec3));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)sizeof(vec3));
 	glEnableVertexAttribArray(2);
 
 

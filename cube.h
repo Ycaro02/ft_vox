@@ -11,48 +11,10 @@
     tl: Top Left
 */
 
-typedef struct PACKED_STRUCT s_vertex {
+typedef struct PACKED_STRUCT s_vertex_texture {
     vec3 position;
     vec2 texCoord;
-} Vertex;
-
-/* Define texture by cube face */
-#define CUBE_FRONT_FACE_TEXTURE \
-    {0.0f, 0.0f},\
-    {1.0f, 0.0f},\
-    {1.0f, 1.0f},\
-    {0.0f, 1.0f}\
-
-#define CUBE_BACK_FACE_TEXTURE \
-    {0.0f, 0.0f},\
-    {1.0f, 0.0f},\
-    {1.0f, 1.0f},\
-    {0.0f, 1.0f}\
-
-#define CUBE_TOP_FACE_TEXTURE \
-    {0.0f, 1.0f},\
-    {1.0f, 1.0f},\
-    {1.0f, 0.0f},\
-    {0.0f, 0.0f}\
-
-#define CUBE_BOTTOM_FACE_TEXTURE \
-    {0.0f, 0.0f},\
-    {1.0f, 0.0f},\
-    {1.0f, 1.0f},\
-    {0.0f, 1.0f}\
-
-#define CUBE_LEFT_FACE_TEXTURE \
-    {0.0f, 0.0f},\
-    {1.0f, 0.0f},\
-    {1.0f, 1.0f},\
-    {0.0f, 1.0f}\
-
-#define CUBE_RIGHT_FACE_TEXTURE \
-    {0.0f, 0.0f},\
-    {1.0f, 0.0f},\
-    {1.0f, 1.0f},\
-    {0.0f, 1.0f}\
-
+} VertexTexture;
 
 /* Define cube face vertex */
 /* bl-> tr -> br -> tl */
