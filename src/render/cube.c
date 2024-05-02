@@ -15,6 +15,14 @@ void drawAllCube(GLuint VAO, u32 nb_cube) {
 	// }
 }
 
+u32 get_block_arr_offset(u32 *visible_block_array, u32 chunk_id) {
+	u32 offset = 0;
+	for (u32 i = 0; i < chunk_id; ++i) {
+		offset += visible_block_array[i];
+	}
+	return (offset);
+}
+
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	static const VertexTexture vertex[] = {
 		CUBE_BACK_FACE_VERTEX,
@@ -64,8 +72,28 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	glEnableVertexAttribArray(2);
 
 
-    vec3 *block_array = ft_calloc(sizeof(vec3), c->chunks->visible_block);
-	u32 instanceCount = chunks_cube_get(c->chunks, block_array);
+	u32 total_visible_block = 0;
+	u32 visible_block_array[TEST_CHUNK_MAX] = {0};
+
+	for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
+		visible_block_array[i] = c->chunks[i].visible_block;
+		total_visible_block += c->chunks[i].visible_block;
+	}
+
+    vec3 *block_array = ft_calloc(sizeof(vec3), total_visible_block);
+    // vec3 *block_array = ft_calloc(sizeof(vec3), c->chunks->visible_block);
+	u32 instanceCount = 0;
+	for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
+		u32 offset = get_block_arr_offset(visible_block_array, i); 
+		instanceCount += chunks_cube_get(&c->chunks[i], &block_array[offset], i);
+	}
+	
+	ft_printf_fd(1, "instanceCount: %d\n", instanceCount);
+
+	/* UGGGLYYYY TOREMOVE */
+	c->chunks[0].visible_block = instanceCount;
+	/* ssda */
+	// chunks_cube_get(c->chunks, block_array);
 
 
 	GLuint instanceVBO;

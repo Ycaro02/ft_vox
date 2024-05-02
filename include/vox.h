@@ -80,6 +80,11 @@ struct compact_block {
 #define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
 
 
+
+#define HASHMAP_SIZE_100 151U
+#define HASHMAP_SIZE_1000 1009U
+#define TEST_CHUNK_MAX 4U
+
 typedef struct s_sub_chunks {
 	hashMap 		*block_map;		/* Blocks map, use hashMap API to set/get block */
 	u32				flag;			/* Sub Chunk Id and flag */
@@ -108,7 +113,8 @@ typedef struct s_context {
 	GLuint		shader_id;		/* shader program id */
 } t_context;
 
-u32		chunks_cube_get(t_chunks *chunks, vec3 *block_array);
+
+u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID);
 
 /* render/cube.c */
 GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);

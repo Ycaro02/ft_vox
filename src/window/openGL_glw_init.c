@@ -64,8 +64,8 @@ GLFWwindow *init_openGL_context()
 	glEnable(GL_CULL_FACE);
 
 	/* Enable blending */
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Set the viewport */
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -74,7 +74,7 @@ GLFWwindow *init_openGL_context()
 	ft_printf_fd(1, CYAN"Renderer device: %s\n"RESET, renderer);
 
 	/* Set the clear color */
-	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.8f, 1.0f);
     return (win);
 }
 

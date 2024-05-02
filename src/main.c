@@ -4,14 +4,14 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 	glUseProgram(shader_id);
-    drawAllCube(vao, c->chunks->visible_block);
+    drawAllCube(vao, c->chunks[0].visible_block);
     glFlush();
 }
 
 size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 {
     for (u32 i = 0; i < SUB_CHUNKS_WIDTH; ++i) {
-        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT; ++j) {
+        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT / 4; ++j) {
             for (u32 k = 0; k < SUB_CHUNKS_DEPTH; ++k) {
                 t_block *block = ft_calloc(sizeof(t_block), 1);
 				if (!block) {
@@ -29,7 +29,7 @@ size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 	return (hashmap_size(sub_chunk->block_map));
 }
 
-#define SUBCHUNKS_DISPLAY 2U
+#define SUBCHUNKS_DISPLAY 1U /* Just need to change it to display/fill  more subchunks */
 
 void BRUT_FillChunks(t_chunks *chunks) {
 	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
@@ -38,11 +38,20 @@ void BRUT_FillChunks(t_chunks *chunks) {
 	}
 }
 
-u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
+u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
 {
     s8 next = TRUE;
 	u32 idx = 0;
 
+	u32 x_offset = 0, z_offset = 0;
+	if (chunkID == 1) {
+		x_offset = SUB_CHUNKS_WIDTH;
+	} else if (chunkID == 2) {
+		z_offset = SUB_CHUNKS_DEPTH;
+	} else if (chunkID == 3) {
+		x_offset = SUB_CHUNKS_WIDTH;
+		z_offset = SUB_CHUNKS_DEPTH;
+	}
 
 	for (u32 subID = 0; subID < SUBCHUNKS_DISPLAY; ++subID) {
 		hashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
@@ -51,9 +60,9 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
 			t_block *block = (t_block *)it.value;
 			
 			if (block->flag != BLOCK_HIDDEN) {
-				block_array[idx][0] = block->x;
+				block_array[idx][0] = block->x + x_offset;
 				block_array[idx][1] = block->y + (subID * SUB_CHUNKS_HEIGHT);
-				block_array[idx][2] = block->z;
+				block_array[idx][2] = block->z + z_offset;
 				++idx;
 			}
 			next = hashmap_next(&it);
@@ -122,8 +131,6 @@ FT_INLINE void main_loop(t_context *context, GLuint vao, t_render *render) {
 
 }
 
-#define HASHMAP_SIZE_100 151U
-#define HASHMAP_SIZE_1000 1009U
 
 int main() {
     t_context context;
@@ -135,15 +142,17 @@ int main() {
     window = init_openGL_context();
     context.win_ptr = window;
 
-    context.chunks = ft_calloc(sizeof(t_chunks), 1);
+    context.chunks = ft_calloc(sizeof(t_chunks), TEST_CHUNK_MAX);
     if (!context.chunks) {
         return (1);
     }
     ft_printf_fd(1, "%u byte allocated\n", sizeof(t_chunks));
-	context.chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-	context.chunks->sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-    
-	BRUT_FillChunks(context.chunks);
+
+	for (u32 i = 0; i < TEST_CHUNK_MAX; i++) {
+		context.chunks[i].sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+		context.chunks[i].sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+		BRUT_FillChunks(&context.chunks[i]);
+	}
 
 	// context.chunks->nb_block = BRUT_fill_subchunks(&context.chunks->sub_chunks[0]);
 	// context.chunks->visible_block = checkHiddenBlock(context.chunks, 0);
