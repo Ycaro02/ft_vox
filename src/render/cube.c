@@ -9,14 +9,29 @@ void drawFace(GLuint VAO, u32 count, u32 cubeId) {
 
 void drawCube(GLuint VAO, u32 nb_cube) {
 	for (u32 cubeId = 1; cubeId <= nb_cube; ++cubeId) {
-		for (u32 i = 0; i < 6; ++i) {
+		for (u32 i = 0; i <= 6; ++i) {
 			drawFace(VAO, i*6, cubeId);
 		}
 	}
 }
 
+// void drawFace(GLuint VAO, u32 count, u32 cubeId, void* offset) {
+//     glBindVertexArray(VAO);
+//     glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, offset, cubeId);
+//     glBindVertexArray(0);
+// }
+
+// void drawCube(GLuint VAO, u32 nb_cube) {
+//     for (u32 cubeId = 1; cubeId <= nb_cube; ++cubeId) {
+//         for (u32 i = 0; i < 6; ++i) {
+//             // Pass the offset when drawing each face
+//             drawFace(VAO, 6, cubeId, (void*)(cubeId * 6 * sizeof(GLuint)));
+//         }
+//     }
+// }
+
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
-	static const vec3 vertex[] = {
+	static const Vertex vertex[] = {
 		CUBE_BACK_FACE_VERTEX,
 		CUBE_FRONT_FACE_VERTEX,
 		CUBE_LEFT_FACE_VERTEX,
@@ -34,20 +49,9 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 		CUBE_TOP_FACE(20, 21, 22, 23),
 	};
 
-	// static const GLuint indices[] = {
-	// 	0, 1, 2, 3, 0,   /* Front face */
-	// 	4, 5, 6, 7, 4,   /* Back face */
-	// 	8, 9, 10, 11, 8, /* Top face */
-	// 	12, 13, 14, 15, 12, /* Bottom face */
-	// 	16, 17, 18, 19, 16, /* Left face */
-	// 	20, 21, 22, 23, 20  /* Right face */
-	// };
-
-	// static const GLfloat texCoords[] = {}
-
-    u32 v_size = sizeof(vertex) / sizeof(vec3);
-    cube->vertex = malloc(sizeof(vec3) * v_size);
-    ft_memcpy(cube->vertex, vertex, sizeof(vec3) * v_size);
+    u32 v_size = sizeof(vertex) / sizeof(Vertex);
+    cube->vertex = malloc(sizeof(Vertex) * v_size);
+    ft_memcpy(cube->vertex, vertex, sizeof(Vertex) * v_size);
     cube->v_size = v_size;
 
     GLuint VAO, VBO, EBO;
@@ -66,9 +70,13 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    /* Specify vertex attribute pointers */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
+	/* Position attribute */
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	/* Texture Coordinate attribute */
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)sizeof(vec3));
+	glEnableVertexAttribArray(2);
 
 
     vec3 *block_array = ft_calloc(sizeof(vec3), c->chunks->nb_block);

@@ -10,9 +10,9 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
 
 size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 {
-    for (u32 i = 0; i < SUB_CHUNKS_WIDTH / 2; ++i) {
+    for (u32 i = 0; i < SUB_CHUNKS_WIDTH / SUB_CHUNKS_WIDTH; ++i) {
         for (u32 j = 0; j < 1; ++j) {
-            for (u32 k = 0; k < SUB_CHUNKS_DEPTH / 2; ++k) {
+            for (u32 k = 0; k < SUB_CHUNKS_DEPTH / SUB_CHUNKS_DEPTH; ++k) {
                 t_block *block = ft_calloc(sizeof(t_block), 1);
 				if (!block) {
 					ft_printf_fd(2, "Failed to allocate block\n");
@@ -58,6 +58,13 @@ void vox_destroy(t_context *c, GLuint *atlas)
 
 }
 
+
+enum AtlasId {
+	ATLAS_DIRT=0,
+	ATLAS_SAND=1,
+	ATLAS_STONE=5,
+};
+
 int main() {
     t_context context;
     GLFWwindow* window;
@@ -84,6 +91,7 @@ int main() {
     glm_mat4_identity(context.cube.rotation);
 
     GLuint *texture_atlas = load_texture_atlas();
+	set_shader_texture(&context, texture_atlas, ATLAS_DIRT);
 
 
     while (!glfwWindowShouldClose(window)) {

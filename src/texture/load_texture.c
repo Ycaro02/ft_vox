@@ -1,31 +1,29 @@
 #include "../../include/vox.h"
 
-GLuint init_openGL_texture(u8 *data, u32 width, u32 height, u16 texture_type)
+void init_openGL_texture(u8 *data, u32 width, u32 height, u16 texture_type, GLuint* textures, int index)
 {
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	/* Set the texture wrapping parameters */
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	/* Set texture filtering parameters */
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);	// Set texture filtering to GL_LINEAR
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
-	/* Load the texture */
-	glTexImage2D(GL_TEXTURE_2D, 0, texture_type, width, height, 0, texture_type, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
+    glGenTextures(1, &textures[index]);
+    glBindTexture(GL_TEXTURE_2D, textures[index]);
+    /* Set the texture wrapping parameters */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    /* Set texture filtering parameters */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);    // Set texture filtering to GL_LINEAR
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    
+    /* Load the texture */
+    glTexImage2D(GL_TEXTURE_2D, 0, texture_type, width, height, 0, texture_type, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	// GLuint texture_loc = glGetUniformLocation(model->shader_id, "texture1");
-	// glUniform1i(texture_loc, 0);
-
-	return (texture);
 }
 
+void set_shader_texture(t_context *c, GLuint *atlas, u32 index)
+{
+    glActiveTexture(GL_TEXTURE0 + index);
+    glBindTexture(GL_TEXTURE_2D, atlas[index]);
+    GLuint texture_loc = glGetUniformLocation(c->shader_id, "texture1");
+    glUniform1i(texture_loc, index);
+}
 
 GLuint *load_gl_texture_atlas(t_list *atlas, int type)
 {
@@ -39,11 +37,12 @@ GLuint *load_gl_texture_atlas(t_list *atlas, int type)
 
     for (t_list *curr = atlas; curr; curr = curr->next) {
         u8 *data = curr->content;
-        texture_id[i] = init_openGL_texture(data, 16, 16, data_type);
+        init_openGL_texture(data, 16, 16, data_type, texture_id, i);
         ++i;
     }
     return (texture_id);
 }
+
 
 GLuint *load_texture_atlas() {
     int w,h,type;
@@ -64,6 +63,7 @@ GLuint *load_texture_atlas() {
     free(texture);
 
     GLuint *atlas = load_gl_texture_atlas(square_lst, type);
+
     lst_clear(&square_lst, free);
     return (atlas);
 }

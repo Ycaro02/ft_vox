@@ -112,5 +112,6 @@ void	drawCube(GLuint vao, u32 nb_cube);
 
 /* texture load_texture */
 GLuint *load_texture_atlas();
+void set_shader_texture(t_context *c, GLuint *atlas, u32 index);
 
 #endif /* VOX_HEADER_H */
