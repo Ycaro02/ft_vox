@@ -62,7 +62,7 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	glEnableVertexAttribArray(2);
 
 
-    vec3 *block_array = ft_calloc(sizeof(vec3), c->chunks->nb_block);
+    vec3 *block_array = ft_calloc(sizeof(vec3), c->chunks->visible_block);
 	u32 instanceCount = chunks_cube_get(c->chunks, block_array);
 
 

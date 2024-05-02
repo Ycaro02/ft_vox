@@ -4,15 +4,49 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 	glUseProgram(shader_id);
-    drawAllCube(vao, c->chunks->nb_block);
+    drawAllCube(vao, c->chunks->visible_block);
     glFlush();
+}
+
+s8 allNeighborsExist(hashMap *block_map, u32 x, u32 y, u32 z)
+{
+	if (hashmap_get(block_map, (t_block_pos){x + 1, y, z}) &&
+		hashmap_get(block_map, (t_block_pos){x - 1, y, z}) &&
+		hashmap_get(block_map, (t_block_pos){x, y + 1, z}) &&
+		hashmap_get(block_map, (t_block_pos){x, y - 1, z}) &&
+		hashmap_get(block_map, (t_block_pos){x, y, z + 1}) &&
+		hashmap_get(block_map, (t_block_pos){x, y, z - 1}))
+	{
+		return (TRUE);
+	}
+	return (FALSE);
+}
+
+/* Occlusion Culling Strategy */
+u32 checkHiddenBlock(t_chunks *chunks)
+{
+    s8 next = TRUE;
+	hashMap *block_map = chunks->sub_chunks[0].block_map;
+	hashMap_it it = hashmap_iterator(block_map);
+	next = hashmap_next(&it);
+	u32 nb_block = hashmap_size(block_map);
+
+	while (next) {
+		t_block *block = (t_block *)it.value;
+		if (allNeighborsExist(block_map, block->x, block->y, block->z)) {
+			block->flag = BLOCK_HIDDEN;
+			--nb_block;
+		}
+		next = hashmap_next(&it);	
+	}
+	return (nb_block);
 }
 
 size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 {
-    for (u32 i = 0; i < SUB_CHUNKS_WIDTH / 2; ++i) {
-        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT / 2; ++j) {
-            for (u32 k = 0; k < SUB_CHUNKS_DEPTH / 2; ++k) {
+    for (u32 i = 0; i < SUB_CHUNKS_WIDTH; ++i) {
+        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT; ++j) {
+            for (u32 k = 0; k < SUB_CHUNKS_DEPTH; ++k) {
                 t_block *block = ft_calloc(sizeof(t_block), 1);
 				if (!block) {
 					ft_printf_fd(2, "Failed to allocate block\n");
@@ -29,24 +63,31 @@ size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 	return (hashmap_size(sub_chunk->block_map));
 }
 
+
+
 u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
 {
     s8 next = TRUE;
 	u32 idx = 0;
 
+
 	hashMap_it it = hashmap_iterator(chunks->sub_chunks[0].block_map);
 	next = hashmap_next(&it);
 	while (next) {
 		t_block *block = (t_block *)it.value;
-		block_array[idx][0] = block->x;
-		block_array[idx][1] = block->y;
-		block_array[idx][2] = block->z;
-		++idx;
+		
+		// checkHiddenBlock(chunks, block->x, block->y, block->z);
+		
+		if (block->flag != BLOCK_HIDDEN) {
+			block_array[idx][0] = block->x;
+			block_array[idx][1] = block->y;
+			block_array[idx][2] = block->z;
+			++idx;
+		}
 		next = hashmap_next(&it);
 	}
-
-    ft_printf_fd(1, "nb cube %u\n", chunks->nb_block);
-    return (chunks->nb_block);
+    ft_printf_fd(1, GREEN"Renderer Cube %u\n"RESET, idx);
+    return (idx);
 }
 
 void vox_destroy(t_context *c, GLuint *atlas)
@@ -124,6 +165,8 @@ int main() {
 	context.chunks->sub_chunks[0].block_map = hashmap_init(50, hashmap_entry_free);
     
 	context.chunks->nb_block = BRUT_fill_subchunks(&context.chunks->sub_chunks[0]);
+
+	context.chunks->visible_block = checkHiddenBlock(context.chunks);
 
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 	render.shader_id = load_shader(&render);

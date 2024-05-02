@@ -66,6 +66,9 @@ GLFWwindow *init_openGL_context()
 	/* Set the viewport */
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	
+	const GLubyte* renderer = glGetString(GL_RENDERER);
+	ft_printf_fd(1, CYAN"Renderer device: %s\n"RESET, renderer);
+
 	/* Set the clear color */
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     return (win);

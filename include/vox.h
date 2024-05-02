@@ -21,6 +21,8 @@
 
 #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
 
+#define BLOCK_HIDDEN 1U
+
 enum block_type {
     AIR=0U,      /* Air block (Empty) */
     DIRT=1U,     /* Dirt block (Exposed to light) */
@@ -32,6 +34,7 @@ typedef struct PACKED_STRUCT s_block {
     s32 y;          /* Block y position (height) */
     s32 z;          /* Block z position */
     u32 type;       /* Block type */
+	u8  flag;       /* Block flag */
     // u32 chunkId;    /* Chunk ID */
 }   t_block;
 
@@ -87,6 +90,7 @@ typedef struct s_chunks {
 	t_sub_chunks	sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 	u32				nb_block;		/* nb block to give to render context */
     u32				id;     		/* Chunk Id */
+	u32				visible_block; /* Number of visible block */
 } t_chunks;
 
 typedef struct s_world {
