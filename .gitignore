@@ -1,3 +1,6 @@
 *.o
+*.a
+*.so
 rsc/deps
 rsc/lib_deps
+ft_vox
