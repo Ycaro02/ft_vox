@@ -1,7 +1,7 @@
 #ifndef HEADER_CUBE_H
 #define HEADER_CUBE_H
 
-#include "libft/libft.h"
+#include "../libft/libft.h"
 
 /*
     Cube model logic from https://learnopengl.com/code_viewer.php?code=advanced/faceculling_vertexdata
@@ -12,8 +12,8 @@
 */
 
 typedef struct PACKED_STRUCT s_vertex_texture {
-    vec3 position;
-    vec2 texCoord;
+    vec3_f32 position;
+    vec2_f32 texCoord;
 } VertexTexture;
 
 /* Define cube face vertex */

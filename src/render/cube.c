@@ -1,5 +1,5 @@
 #include "../../include/vox.h"
-#include "../../cube.h"
+#include "../../include/cube.h"
 
 void drawCube(GLuint VAO, u32 vertex_nb, u32 cubeId) {
 	glBindVertexArray(VAO);
