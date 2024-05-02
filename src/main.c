@@ -32,6 +32,18 @@ size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 #define SUBCHUNKS_DISPLAY 1U /* Just need to change it to display/fill  more subchunks */
 
 void BRUT_FillChunks(t_chunks *chunks) {
+	t_cardinal_offset chunk_offset[] = {
+		{0, 0, 0, 0},\
+		{16, 0, 0, 0},\
+		{0, 16, 0, 0},\
+		{0, 0, 16, 0},\
+		{0, 0, 0, 16},\
+		{16, 0, 16, 0},\
+		{16, 0, 0, 16},\
+		{0, 16, 16, 0},\
+		{0, 16, 0, 16},\
+	};
+	chunks->offset = chunk_offset[chunks->id]; 
 	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i]);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
@@ -43,15 +55,10 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
     s8 next = TRUE;
 	u32 idx = 0;
 
-	u32 x_offset = 0, z_offset = 0;
-	if (chunkID == 1) {
-		x_offset = SUB_CHUNKS_WIDTH;
-	} else if (chunkID == 2) {
-		z_offset = SUB_CHUNKS_DEPTH;
-	} else if (chunkID == 3) {
-		x_offset = SUB_CHUNKS_WIDTH;
-		z_offset = SUB_CHUNKS_DEPTH;
-	}
+	(void)chunkID;
+	s64 x_offset = 0, z_offset = 0;
+	x_offset = (s64)(chunks->offset.north) - (s64)(chunks->offset.south); 
+	z_offset = (s64)(chunks->offset.west) - (s64)(chunks->offset.east);
 
 	for (u32 subID = 0; subID < SUBCHUNKS_DISPLAY; ++subID) {
 		hashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
@@ -151,6 +158,7 @@ int main() {
 	for (u32 i = 0; i < TEST_CHUNK_MAX; i++) {
 		context.chunks[i].sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 		context.chunks[i].sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+		context.chunks[i].id = i;
 		BRUT_FillChunks(&context.chunks[i]);
 	}
 

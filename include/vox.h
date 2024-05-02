@@ -83,7 +83,8 @@ struct compact_block {
 
 #define HASHMAP_SIZE_100 151U
 #define HASHMAP_SIZE_1000 1009U
-#define TEST_CHUNK_MAX 4U
+/* HARDCOED CHUNK NUMBER */
+#define TEST_CHUNK_MAX 9U
 
 typedef struct s_sub_chunks {
 	hashMap 		*block_map;		/* Blocks map, use hashMap API to set/get block */
@@ -91,11 +92,19 @@ typedef struct s_sub_chunks {
 	u32				metadata;		/* Sub Chunk metadata */
 } t_sub_chunks;
 
+typedef struct s_cardinal_offset {
+	s32 north;
+	s32 south;
+	s32 east;
+	s32 west;
+} t_cardinal_offset;
+
 typedef struct s_chunks {
 	t_sub_chunks	sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
-	u32				nb_block;		/* nb block to give to render context */
-    u32				id;     		/* Chunk Id */
-	u32				visible_block; /* Number of visible block */
+	t_cardinal_offset offset;			/* offset to get the cardinal sub_chunks */
+	u32				nb_block;			/* nb block (outdated value total of blockmap subchunk) */
+    u32				id;     			/* Chunk Id */
+	u32				visible_block;		/* Number of visible block */
 } t_chunks;
 
 typedef struct s_world {
