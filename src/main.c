@@ -29,7 +29,14 @@ size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 	return (hashmap_size(sub_chunk->block_map));
 }
 
+#define SUBCHUNKS_DISPLAY 2U
 
+void BRUT_FillChunks(t_chunks *chunks) {
+	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
+		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i]);
+		chunks->visible_block += checkHiddenBlock(chunks, i);
+	}
+}
 
 u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
 {
@@ -37,21 +44,22 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array)
 	u32 idx = 0;
 
 
-	hashMap_it it = hashmap_iterator(chunks->sub_chunks[0].block_map);
-	next = hashmap_next(&it);
-	while (next) {
-		t_block *block = (t_block *)it.value;
-		
-		// checkHiddenBlock(chunks, block->x, block->y, block->z);
-		
-		if (block->flag != BLOCK_HIDDEN) {
-			block_array[idx][0] = block->x;
-			block_array[idx][1] = block->y;
-			block_array[idx][2] = block->z;
-			++idx;
-		}
+	for (u32 subID = 0; subID < SUBCHUNKS_DISPLAY; ++subID) {
+		hashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
 		next = hashmap_next(&it);
+		while (next) {
+			t_block *block = (t_block *)it.value;
+			
+			if (block->flag != BLOCK_HIDDEN) {
+				block_array[idx][0] = block->x;
+				block_array[idx][1] = block->y + (subID * SUB_CHUNKS_HEIGHT);
+				block_array[idx][2] = block->z;
+				++idx;
+			}
+			next = hashmap_next(&it);
+		}
 	}
+
     ft_printf_fd(1, GREEN"Renderer Cube %u\n"RESET, idx);
     return (idx);
 }
@@ -88,11 +96,12 @@ FT_INLINE void display_fps() {
 	if (lastTime == 0.0f) {
 		lastTime = glfwGetTime();
 	}
-
 	double currentTime = glfwGetTime();
 	nbFrames++;
 	if (currentTime - lastTime >= 1.0) { // Si plus d'une seconde s'est écoulée
-		ft_printf_fd(1, YELLOW"%f ms/frame, %d FPS\n"RESET, (1000.0 / (double)nbFrames), nbFrames);
+		// ft_printf_fd(1, ORANGE"%f ms/frame, %d FPS\n"RESET, (1000.0 / (double)nbFrames), nbFrames);
+		printf("\r\033[K"ORANGE"%f ms/frame, %d FPS"RESET, (1000.0 / (double)nbFrames), nbFrames);
+		fflush(stdout);
 		nbFrames = 0;
 		lastTime += 1.0;
 	}
@@ -113,6 +122,9 @@ FT_INLINE void main_loop(t_context *context, GLuint vao, t_render *render) {
 
 }
 
+#define HASHMAP_SIZE_100 151U
+#define HASHMAP_SIZE_1000 1009U
+
 int main() {
     t_context context;
     GLFWwindow* window;
@@ -128,11 +140,13 @@ int main() {
         return (1);
     }
     ft_printf_fd(1, "%u byte allocated\n", sizeof(t_chunks));
-	context.chunks->sub_chunks[0].block_map = hashmap_init(50, hashmap_entry_free);
+	context.chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+	context.chunks->sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
     
-	context.chunks->nb_block = BRUT_fill_subchunks(&context.chunks->sub_chunks[0]);
+	BRUT_FillChunks(context.chunks);
 
-	context.chunks->visible_block = checkHiddenBlock(context.chunks);
+	// context.chunks->nb_block = BRUT_fill_subchunks(&context.chunks->sub_chunks[0]);
+	// context.chunks->visible_block = checkHiddenBlock(context.chunks, 0);
 
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 	render.shader_id = load_shader(&render);

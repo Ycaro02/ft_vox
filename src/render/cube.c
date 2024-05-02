@@ -8,6 +8,7 @@ void drawCube(GLuint VAO, u32 vertex_nb, u32 cubeId) {
 }
 
 void drawAllCube(GLuint VAO, u32 nb_cube) {
+	// ft_printf_fd(1, RED"nb_cube in draw call: %d\n"RESET, nb_cube);
 	drawCube(VAO, 6*6, nb_cube);
 	// for (u32 cubeId = 1; cubeId <= nb_cube; ++cubeId) {
 	// 	drawCube(VAO, 6*6, cubeId);

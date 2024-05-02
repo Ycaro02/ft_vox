@@ -27,10 +27,10 @@ s8 allNeighborsExist(hashMap *block_map, u32 x, u32 y, u32 z)
  * @param chunks the chunks containing all blocks
  * @return the number of visible block
 */
-u32 checkHiddenBlock(t_chunks *chunks)
+u32 checkHiddenBlock(t_chunks *chunks, u32 subChunksID)
 {
     s8 next = TRUE;
-	hashMap *block_map = chunks->sub_chunks[0].block_map;
+	hashMap *block_map = chunks->sub_chunks[subChunksID].block_map;
 	hashMap_it it = hashmap_iterator(block_map);
 	next = hashmap_next(&it);
 	u32 nb_block = hashmap_size(block_map);

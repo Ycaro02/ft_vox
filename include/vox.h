@@ -119,6 +119,6 @@ GLuint *load_texture_atlas();
 void set_shader_texture(t_context *c, GLuint *atlas, u32 index);
 
 /* render/occlusion_culling */
-u32 checkHiddenBlock(t_chunks *chunks);
+u32 checkHiddenBlock(t_chunks *chunks, u32 subChunksID);
 
 #endif /* VOX_HEADER_H */
