@@ -178,7 +178,7 @@ int main() {
 	set_shader_texture(&context, texture_atlas, ATLAS_STONE);
 
 	/* Disable VSync to avoid fps locking */
-	glfwSwapInterval(0);
+	// glfwSwapInterval(0);
 
 	main_loop(&context, vao, &render);
 
