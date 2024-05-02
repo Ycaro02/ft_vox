@@ -8,40 +8,6 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
     glFlush();
 }
 
-s8 allNeighborsExist(hashMap *block_map, u32 x, u32 y, u32 z)
-{
-	if (hashmap_get(block_map, (t_block_pos){x + 1, y, z}) &&
-		hashmap_get(block_map, (t_block_pos){x - 1, y, z}) &&
-		hashmap_get(block_map, (t_block_pos){x, y + 1, z}) &&
-		hashmap_get(block_map, (t_block_pos){x, y - 1, z}) &&
-		hashmap_get(block_map, (t_block_pos){x, y, z + 1}) &&
-		hashmap_get(block_map, (t_block_pos){x, y, z - 1}))
-	{
-		return (TRUE);
-	}
-	return (FALSE);
-}
-
-/* Occlusion Culling Strategy */
-u32 checkHiddenBlock(t_chunks *chunks)
-{
-    s8 next = TRUE;
-	hashMap *block_map = chunks->sub_chunks[0].block_map;
-	hashMap_it it = hashmap_iterator(block_map);
-	next = hashmap_next(&it);
-	u32 nb_block = hashmap_size(block_map);
-
-	while (next) {
-		t_block *block = (t_block *)it.value;
-		if (allNeighborsExist(block_map, block->x, block->y, block->z)) {
-			block->flag = BLOCK_HIDDEN;
-			--nb_block;
-		}
-		next = hashmap_next(&it);	
-	}
-	return (nb_block);
-}
-
 size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 {
     for (u32 i = 0; i < SUB_CHUNKS_WIDTH; ++i) {

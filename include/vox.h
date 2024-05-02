@@ -118,4 +118,7 @@ void	drawAllCube(GLuint vao, u32 nb_cube);
 GLuint *load_texture_atlas();
 void set_shader_texture(t_context *c, GLuint *atlas, u32 index);
 
+/* render/occlusion_culling */
+u32 checkHiddenBlock(t_chunks *chunks);
+
 #endif /* VOX_HEADER_H */
