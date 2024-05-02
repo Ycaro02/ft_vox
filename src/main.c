@@ -58,11 +58,20 @@ void vox_destroy(t_context *c, GLuint *atlas)
 
 }
 
-
 enum AtlasId {
-	ATLAS_DIRT=0,
+	ATLAS_DIRT_PINK=0,
 	ATLAS_SAND=1,
+	ATLAS_STONE_CUT=2,
+	ATLAS_BRICK=3,
+	ATLAS_WOOD=4,
 	ATLAS_STONE=5,
+	ATLAS_DIRT=6,
+	ATLAS_WOOD_PLANK=7,
+	ATLAS_DIRT2=8,
+	ATLAS_GLASS=9,
+	ATLAS_COBBLESTONE=10,
+	ATLAS_FULL_GREY=11,
+	ATLAS_STONE_CLEAN=12,
 };
 
 int main() {
@@ -91,7 +100,7 @@ int main() {
     glm_mat4_identity(context.cube.rotation);
 
     GLuint *texture_atlas = load_texture_atlas();
-	set_shader_texture(&context, texture_atlas, ATLAS_DIRT);
+	set_shader_texture(&context, texture_atlas, ATLAS_STONE);
 
 
     while (!glfwWindowShouldClose(window)) {
