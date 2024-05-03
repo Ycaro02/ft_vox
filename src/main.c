@@ -4,81 +4,10 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 	glUseProgram(shader_id);
-    drawAllCube(vao, c->chunks[0].visible_block);
+    drawAllCube(vao, c->renderBlock);
     glFlush();
 }
 
-size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
-{
-    for (u32 i = 0; i < SUB_CHUNKS_WIDTH; ++i) {
-        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT / 4; ++j) {
-            for (u32 k = 0; k < SUB_CHUNKS_DEPTH; ++k) {
-                t_block *block = ft_calloc(sizeof(t_block), 1);
-				if (!block) {
-					ft_printf_fd(2, "Failed to allocate block\n");
-					return (0);
-				}
-                block->x = i;
-                block->y = j;
-                block->z = k;
-                block->type = STONE;
-				hashmap_set_entry(sub_chunk->block_map, (t_block_pos){i, j, k}, block);
-            }
-        }
-    }
-	return (hashmap_size(sub_chunk->block_map));
-}
-
-#define SUBCHUNKS_DISPLAY 1U /* Just need to change it to display/fill  more subchunks */
-
-void BRUT_FillChunks(t_chunks *chunks) {
-	t_cardinal_offset chunk_offset[] = {
-		{0, 0, 0, 0},\
-		{16, 0, 0, 0},\
-		{0, 16, 0, 0},\
-		{0, 0, 16, 0},\
-		{0, 0, 0, 16},\
-		{16, 0, 16, 0},\
-		{16, 0, 0, 16},\
-		{0, 16, 16, 0},\
-		{0, 16, 0, 16},\
-	};
-	chunks->offset = chunk_offset[chunks->id]; 
-	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
-		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i]);
-		chunks->visible_block += checkHiddenBlock(chunks, i);
-	}
-}
-
-u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
-{
-    s8 next = TRUE;
-	u32 idx = 0;
-
-	(void)chunkID;
-	s64 x_offset = 0, z_offset = 0;
-	x_offset = (s64)(chunks->offset.north) - (s64)(chunks->offset.south); 
-	z_offset = (s64)(chunks->offset.west) - (s64)(chunks->offset.east);
-
-	for (u32 subID = 0; subID < SUBCHUNKS_DISPLAY; ++subID) {
-		hashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
-		next = hashmap_next(&it);
-		while (next) {
-			t_block *block = (t_block *)it.value;
-			
-			if (block->flag != BLOCK_HIDDEN) {
-				block_array[idx][0] = block->x + x_offset;
-				block_array[idx][1] = block->y + (subID * SUB_CHUNKS_HEIGHT);
-				block_array[idx][2] = block->z + z_offset;
-				++idx;
-			}
-			next = hashmap_next(&it);
-		}
-	}
-
-    ft_printf_fd(1, GREEN"Renderer Cube %u\n"RESET, idx);
-    return (idx);
-}
 
 void vox_destroy(t_context *c, GLuint *atlas)
 {
@@ -89,22 +18,6 @@ void vox_destroy(t_context *c, GLuint *atlas)
 
 }
 
-enum AtlasId {
-	ATLAS_DIRT_PINK=0, /* Pink to remove */
-	ATLAS_SAND=1,
-	ATLAS_STONE_CUT=2,
-	ATLAS_BRICK=3,
-	ATLAS_WOOD=4,
-	ATLAS_STONE=5,
-	ATLAS_DIRT=6,
-	ATLAS_WOOD_PLANK=7, /* same here */
-	ATLAS_DIRT2=8,
-	ATLAS_GLASS=9,
-	ATLAS_COBBLESTONE=10,
-	ATLAS_FULL_GREY=11,
-	ATLAS_STONE_CLEAN=12,
-};
-
 FT_INLINE void display_fps() {
 	static double lastTime = 0.0f; 
 	static int nbFrames = 0;
@@ -114,10 +27,8 @@ FT_INLINE void display_fps() {
 	}
 	double currentTime = glfwGetTime();
 	nbFrames++;
-	if (currentTime - lastTime >= 1.0) { // Si plus d'une seconde s'est écoulée
-		// ft_printf_fd(1, ORANGE"%f ms/frame, %d FPS\n"RESET, (1000.0 / (double)nbFrames), nbFrames);
-		printf("\r\033[K"ORANGE"%f ms/frame, %d FPS"RESET, (1000.0 / (double)nbFrames), nbFrames);
-		fflush(stdout);
+	if (currentTime - lastTime >= 1.0) {
+		ft_printf_fd(1, "\r\033[K"ORANGE"%f ms/frame, %d FPS"RESET, (1000.0 / (double)nbFrames), nbFrames);
 		nbFrames = 0;
 		lastTime += 1.0;
 	}
@@ -138,7 +49,6 @@ FT_INLINE void main_loop(t_context *context, GLuint vao, t_render *render) {
 
 }
 
-
 int main() {
     t_context context;
     GLFWwindow* window;
@@ -155,15 +65,7 @@ int main() {
     }
     ft_printf_fd(1, "%u byte allocated\n", sizeof(t_chunks));
 
-	for (u32 i = 0; i < TEST_CHUNK_MAX; i++) {
-		context.chunks[i].sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-		context.chunks[i].sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-		context.chunks[i].id = i;
-		BRUT_FillChunks(&context.chunks[i]);
-	}
-
-	// context.chunks->nb_block = BRUT_fill_subchunks(&context.chunks->sub_chunks[0]);
-	// context.chunks->visible_block = checkHiddenBlock(context.chunks, 0);
+	fillChunks(&context);
 
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 	render.shader_id = load_shader(&render);

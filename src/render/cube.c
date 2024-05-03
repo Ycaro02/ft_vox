@@ -8,11 +8,7 @@ void drawCube(GLuint VAO, u32 vertex_nb, u32 cubeId) {
 }
 
 void drawAllCube(GLuint VAO, u32 nb_cube) {
-	// ft_printf_fd(1, RED"nb_cube in draw call: %d\n"RESET, nb_cube);
 	drawCube(VAO, 6*6, nb_cube);
-	// for (u32 cubeId = 1; cubeId <= nb_cube; ++cubeId) {
-	// 	drawCube(VAO, 6*6, cubeId);
-	// }
 }
 
 u32 get_block_arr_offset(u32 *visible_block_array, u32 chunk_id) {
@@ -91,10 +87,8 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	ft_printf_fd(1, "instanceCount: %d\n", instanceCount);
 
 	/* UGGGLYYYY TOREMOVE */
-	c->chunks[0].visible_block = instanceCount;
-	/* ssda */
-	// chunks_cube_get(c->chunks, block_array);
-
+	c->renderBlock = instanceCount;
+	/* TOREMOVE */
 
 	GLuint instanceVBO;
 	glGenBuffers(1, &instanceVBO);

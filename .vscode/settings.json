@@ -24,6 +24,8 @@
 		"affine.h": "c",
 		"ft_math.h": "c",
 		"float.h": "c",
-		"parse_bmp.h": "c"
+		"parse_bmp.h": "c",
+		"cube.h": "c",
+		"chunks.h": "c"
 	}
 }

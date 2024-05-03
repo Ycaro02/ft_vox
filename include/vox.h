@@ -15,13 +15,34 @@
 #include "win_event.h"				            /* Window event handling functions */
 #include "camera.h"                             /* Camera handling function */
 #include "render.h"								/* Render functions */
+#include "chunks.h"								/* Chunks functions */
 
+
+/* Screen size */
 #define SCREEN_WIDTH 1920			/* Screen width */
 #define SCREEN_HEIGHT 1080			/* Screen height */
 
+/* Texture atlas path */
 #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
 
+/* Block hiden deine */
 #define BLOCK_HIDDEN 1U
+
+/* World Max size */
+#define WORLD_MAX_HEIGHT 256U
+#define WORLD_MAX_WIDTH (16384U * 2U)
+#define WORLD_MAX_DEPTH (16384U * 2U)
+
+
+/* Shader path */
+#define VERTEX_SHADER_PATH		"rsc/shaders/vertex_shader.glsl"
+#define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
+
+
+
+
+/* HARDCOED CHUNK NUMBER */
+#define TEST_CHUNK_MAX 9U
 
 enum block_type {
     AIR=0U,      /* Air block (Empty) */
@@ -38,74 +59,6 @@ typedef struct PACKED_STRUCT s_block {
     // u32 chunkId;    /* Chunk ID */
 }   t_block;
 
-struct compact_block {
-	u32 shape_texture;
-	/*
-		u16 shape;
-		u16 texture;
-	*/
-	u32 y_light;
-	/*
-		u8 flag;
-		u8 torch_sun_light;  4 bits for torch light and 4 bits for sun light
-		u16 y;
-	*/
-	u32 x;		/* x position */
-	u32 z;		/* z position */
-};
-
-
-#define WORLD_MAX_HEIGHT 256U
-#define WORLD_MAX_WIDTH (16384U * 2U)
-#define WORLD_MAX_DEPTH (16384U * 2U)
-
-#define CHUNKS_HEIGHT   256U	/* that will be 256 */
-#define CHUNKS_WIDTH    16U
-#define CHUNKS_DEPTH    16U
-
-/* Number of maximum block in chunks */
-#define MAX_CHUNKS_BLOCK (CHUNKS_HEIGHT * CHUNKS_WIDTH * CHUNKS_DEPTH) 
-
-#define SUB_CHUNKS_HEIGHT   16U
-#define SUB_CHUNKS_WIDTH    16U
-#define SUB_CHUNKS_DEPTH    16U
-
-/* Number of maximum block in sub chunks */
-#define MAX_SUB_CHUNKS_BLOCK (SUB_CHUNKS_HEIGHT * SUB_CHUNKS_WIDTH * SUB_CHUNKS_DEPTH)
-
-/* Number of maximum cub chunks in chunks */
-#define SUB_CHUNKS_MAX (CHUNKS_HEIGHT / SUB_CHUNKS_HEIGHT)
-
-#define VERTEX_SHADER_PATH		"rsc/shaders/vertex_shader.glsl"
-#define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
-
-
-
-#define HASHMAP_SIZE_100 151U
-#define HASHMAP_SIZE_1000 1009U
-/* HARDCOED CHUNK NUMBER */
-#define TEST_CHUNK_MAX 9U
-
-typedef struct s_sub_chunks {
-	hashMap 		*block_map;		/* Blocks map, use hashMap API to set/get block */
-	u32				flag;			/* Sub Chunk Id and flag */
-	u32				metadata;		/* Sub Chunk metadata */
-} t_sub_chunks;
-
-typedef struct s_cardinal_offset {
-	s32 north;
-	s32 south;
-	s32 east;
-	s32 west;
-} t_cardinal_offset;
-
-typedef struct s_chunks {
-	t_sub_chunks	sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
-	t_cardinal_offset offset;			/* offset to get the cardinal sub_chunks */
-	u32				nb_block;			/* nb block (outdated value total of blockmap subchunk) */
-    u32				id;     			/* Chunk Id */
-	u32				visible_block;		/* Number of visible block */
-} t_chunks;
 
 typedef struct s_world {
 	u64			seed;			/* World seed */
@@ -118,12 +71,28 @@ typedef struct s_context {
 	t_camera	cam;			/* camera structure */
     GLFWwindow	*win_ptr;		/* Window pointer */
 	t_modelCube	cube;			/* Data Cube structure */
-    t_chunks    *chunks;         /* current chunk */
+    t_chunks    *chunks;        /* current chunk */
 	GLuint		shader_id;		/* shader program id */
+	u32			renderBlock;	/* Total block to render */
 } t_context;
 
+/* Atlas texture ID */
+enum AtlasId {
+	ATLAS_DIRT_PINK=0, /* Pink to remove */
+	ATLAS_SAND=1,
+	ATLAS_STONE_CUT=2,
+	ATLAS_BRICK=3,
+	ATLAS_WOOD=4,
+	ATLAS_STONE=5,
+	ATLAS_DIRT=6,
+	ATLAS_WOOD_PLANK=7, /* same here */
+	ATLAS_DIRT2=8,
+	ATLAS_GLASS=9,
+	ATLAS_COBBLESTONE=10,
+	ATLAS_FULL_GREY=11,
+	ATLAS_STONE_CLEAN=12,
+};
 
-u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID);
 
 /* render/cube.c */
 GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);
@@ -137,3 +106,20 @@ void set_shader_texture(t_context *c, GLuint *atlas, u32 index);
 u32 checkHiddenBlock(t_chunks *chunks, u32 subChunksID);
 
 #endif /* VOX_HEADER_H */
+
+
+// struct compact_block {
+// 	u32 shape_texture;
+// 	/*
+// 		u16 shape;
+// 		u16 texture;
+// 	*/
+// 	u32 y_light;
+// 	/*
+// 		u8 flag;
+// 		u8 torch_sun_light;  4 bits for torch light and 4 bits for sun light
+// 		u16 y;
+// 	*/
+// 	u32 x;		/* x position */
+// 	u32 z;		/* z position */
+// };

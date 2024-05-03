@@ -21,7 +21,9 @@ SRCS			=	window/openGL_glw_init.c\
 					render/cube.c\
 					render/obj_rotate.c\
 					render/occlusion_culling.c\
+					render/chunks.c\
 					texture/load_texture.c\
+
 
 # SRCS_BONUS		=	main_bonus.c
 

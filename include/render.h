@@ -14,7 +14,7 @@ typedef struct s_render {
 typedef struct s_modelCube {
 	vec3			*vertex;		/* vertex array, give to openGL context */
 	u32				v_size;			/* vertex size */
-	mat4		rotation;		/* rotation matrix */
+	mat4			rotation;		/* rotation matrix */
 }	t_modelCube;
 
 /* shader_utils.c */
