@@ -19,6 +19,45 @@ u32 get_block_arr_offset(u32 *visible_block_array, u32 chunk_id) {
 	return (offset);
 }
 
+/**
+ * @brief Create VBO
+ * @param size size of the buffer
+ * @param data data to fill the buffer
+ * @return vbo uint value
+*/
+GLuint bufferGlCreate(GLenum type, u32 size, void *data)
+{
+	GLuint	vbo;
+
+	/* create and fill vbo */
+	glGenBuffers(1, &vbo);
+	glBindBuffer(type, vbo);
+	glBufferData(type, size, data, GL_STATIC_DRAW);
+	return (vbo);
+}
+
+
+
+vec3 *getBlockArray(t_context *c) {
+	u32 visibleBlock = 0, instanceCount = 0;
+	u32 visible_block_array[TEST_CHUNK_MAX] = {0};
+
+	for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
+		visible_block_array[i] = c->chunks[i].visible_block;
+		visibleBlock += c->chunks[i].visible_block;
+	}
+
+    vec3 *block_array = ft_calloc(sizeof(vec3), visibleBlock);
+
+	for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
+		u32 offset = get_block_arr_offset(visible_block_array, i); 
+		instanceCount += chunks_cube_get(&c->chunks[i], &block_array[offset], i);
+	}
+	ft_printf_fd(1, CYAN"instanceCount: %d\n"RESET, instanceCount);
+	c->renderBlock = instanceCount;
+	return (block_array);
+}
+
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	static const VertexTexture vertex[] = {
 		CUBE_BACK_FACE_VERTEX,
@@ -38,26 +77,25 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 		CUBE_TOP_FACE(20, 21, 22, 23),
 	};
 
-    u32 v_size = sizeof(vertex) / sizeof(VertexTexture);
-    cube->vertex = malloc(sizeof(VertexTexture) * v_size);
-    ft_memcpy(cube->vertex, vertex, sizeof(VertexTexture) * v_size);
-    cube->v_size = v_size;
+    static u32 v_size = sizeof(vertex) / sizeof(VertexTexture);
+    
+	if (!cube->vertex) {
+		cube->vertex = malloc(sizeof(VertexTexture) * v_size);
+		ft_memcpy(cube->vertex, vertex, sizeof(VertexTexture) * v_size);
+		cube->v_size = v_size;
+	}
 
-    GLuint VAO, VBO, EBO;
+    GLuint VAO;
 
     /* Generate vertex array object (VAO) */
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
     /* Generate vertex buffer object (VBO) */
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+	bufferGlCreate(GL_ARRAY_BUFFER, sizeof(vertex), (void *)vertex);
 
     /* Generate element buffer object (EBO) */
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	bufferGlCreate(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), (void *)indices);
 
 	/* Position attribute */
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)0);
@@ -68,45 +106,25 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	glEnableVertexAttribArray(2);
 
 
-	u32 total_visible_block = 0;
-	u32 visible_block_array[TEST_CHUNK_MAX] = {0};
-
-	for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
-		visible_block_array[i] = c->chunks[i].visible_block;
-		total_visible_block += c->chunks[i].visible_block;
-	}
-
-    vec3 *block_array = ft_calloc(sizeof(vec3), total_visible_block);
-    // vec3 *block_array = ft_calloc(sizeof(vec3), c->chunks->visible_block);
-	u32 instanceCount = 0;
-	for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
-		u32 offset = get_block_arr_offset(visible_block_array, i); 
-		instanceCount += chunks_cube_get(&c->chunks[i], &block_array[offset], i);
+	vec3 *block_array = getBlockArray(c);
+	if (!block_array) {
+		ft_printf_fd(1, RED"Error: block_array is NULL\n"RESET);
+		return (0);
 	}
 	
-	ft_printf_fd(1, "instanceCount: %d\n", instanceCount);
+	/* Instance position */
+	GLuint instanceVBO = bufferGlCreate(GL_ARRAY_BUFFER, c->renderBlock * sizeof(vec3), (void *)block_array[0]);
 
-	/* UGGGLYYYY TOREMOVE */
-	c->renderBlock = instanceCount;
-	/* TOREMOVE */
-
-	GLuint instanceVBO;
-	glGenBuffers(1, &instanceVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glBufferData(GL_ARRAY_BUFFER, instanceCount * sizeof(vec3), (GLfloat *)block_array[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glVertexAttribDivisor(1, 1);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
 
     /* Unbind VBO and VAO */
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    return VAO;
+    return (VAO);
 }
