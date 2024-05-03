@@ -44,7 +44,7 @@ GLuint *load_gl_texture_atlas(t_list *atlas, int type)
 }
 
 
-GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth) {
+GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color) {
     int w,h,type;
 
     u8 *texture = parse_bmp_file(path, &w, &h, &type);
@@ -53,7 +53,7 @@ GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth) {
         return (NULL);
     }
     ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n",w,h,type);
-    t_list *square_lst = cut_texture_into_squares(texture, w, h, squareWidth, squareHeight, type);
+    t_list *square_lst = cut_texture_into_squares(texture, w, h, squareWidth, squareHeight, type, ignore_color);
     if (!square_lst) {
         free(texture);
         ft_printf_fd(2, "Failed to cut texture\n");

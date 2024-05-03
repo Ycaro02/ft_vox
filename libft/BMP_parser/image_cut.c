@@ -1,6 +1,6 @@
 #include "parse_bmp.h"
 
-#define PINK_VEC (vec3_u8){255, 0, 255})
+#define PINK_VEC (vec3_u8){255, 0, 255}
 
 s8 is_square_empty(u8* square, int width, int height, int type, vec3_u8 color) {
     for (int y = 0; y < height; y++) {
@@ -17,7 +17,7 @@ s8 is_square_empty(u8* square, int width, int height, int type, vec3_u8 color) {
     return (TRUE);
 }
 
-t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int width, int height, int type) {
+t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int width, int height, int type, vec3_u8 ignore_color) {
     int num_squares_x = tex_width / width;
     int num_squares_y = tex_height / height;
     int square_count = 0;
@@ -39,7 +39,7 @@ t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int
                     ft_memcpy(&square[square_index], &texture[tex_index], type);
 
                     /* If the square is pink (RGB: 255,0,255 or RGBA: 255,0,255,255), skip this square */
-                    if (is_square_empty(square, width, height, type, PINK_VEC) {
+                    if (is_square_empty(square, width, height, type, ignore_color)) {
                         free(square);
                         square = NULL;
                         break;

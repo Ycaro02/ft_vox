@@ -76,12 +76,12 @@ int main() {
 
 	int width_texture = 4096 / 4;
 	int height_texture = 3072 / 3;
-	GLuint *skyAtlas = load_texture_atlas(TEXTURE_SKYBOX_PATH, height_texture, width_texture);
+	GLuint *skyAtlas = load_texture_atlas(TEXTURE_SKYBOX_PATH, height_texture, width_texture, (vec3_u8){0, 0, 0}); /* black */
 	(void)skyAtlas;
 
 
-    GLuint *texture_atlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16);
-	set_shader_texture(&context, texture_atlas, ATLAS_STONE);
+    GLuint *textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
+	set_shader_texture(&context, textureAtlas, ATLAS_STONE);
 
 
 
@@ -90,6 +90,6 @@ int main() {
 
 	main_loop(&context, vao, &render);
 
-    vox_destroy(&context, texture_atlas);
+    vox_destroy(&context, textureAtlas);
     return 0;
 }

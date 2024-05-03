@@ -81,19 +81,20 @@ typedef struct s_context {
 
 /* Atlas texture ID */
 enum AtlasId {
-	ATLAS_DIRT_PINK=0, /* Pink to remove */
+	ATLAS_DIRT1=0, /* Pink to remove */
 	ATLAS_SAND=1,
 	ATLAS_STONE_CUT=2,
 	ATLAS_BRICK=3,
 	ATLAS_WOOD=4,
 	ATLAS_STONE=5,
-	ATLAS_DIRT=6,
+	ATLAS_DIRT2=6,
 	ATLAS_WOOD_PLANK=7, /* same here */
-	ATLAS_DIRT2=8,
+	ATLAS_DIRT3=8,
 	ATLAS_GLASS=9,
 	ATLAS_COBBLESTONE=10,
 	ATLAS_FULL_GREY=11,
 	ATLAS_STONE_CLEAN=12,
+	ATLAS_CRAFTING_TABLE=13,
 };
 
 
@@ -102,7 +103,7 @@ GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);
 void	drawAllCube(GLuint vao, u32 nb_cube);
 
 /* texture load_texture */
-GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth);
+GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
 void set_shader_texture(t_context *c, GLuint *atlas, u32 index);
 
 /* render/occlusion_culling */
