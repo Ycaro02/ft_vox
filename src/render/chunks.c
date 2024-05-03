@@ -9,7 +9,7 @@
 size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 {
     for (u32 i = 0; i < SUB_CHUNKS_WIDTH; ++i) {
-        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT / 4; ++j) {
+        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT; ++j) {
             for (u32 k = 0; k < SUB_CHUNKS_DEPTH; ++k) {
                 t_block *block = ft_calloc(sizeof(t_block), 1);
 				if (!block) {

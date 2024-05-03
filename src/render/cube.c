@@ -1,16 +1,34 @@
 #include "../../include/vox.h"
 #include "../../include/cube.h"
 
+
+/**
+ * @brief Draw a cube
+ * @param VAO Vertex Array Object
+ * @param vertex_nb number of vertex
+ * @param cubeId cube id
+*/
 void drawCube(GLuint VAO, u32 vertex_nb, u32 cubeId) {
 	glBindVertexArray(VAO);
 	glDrawElementsInstanced(GL_TRIANGLES, vertex_nb, GL_UNSIGNED_INT, 0, cubeId);
 	glBindVertexArray(0);
 }
 
+/**
+ * @brief Draw all cube
+ * @param VAO Vertex Array Object
+ * @param nb_cube number of cube to draw 
+*/	
 void drawAllCube(GLuint VAO, u32 nb_cube) {
 	drawCube(VAO, 6*6, nb_cube);
 }
 
+/**
+ * @brief Get the offset of the block array
+ * @param visible_block_array array of visible block
+ * @param chunk_id chunk id
+ * @return offset of the block array
+*/
 u32 get_block_arr_offset(u32 *visible_block_array, u32 chunk_id) {
 	u32 offset = 0;
 	for (u32 i = 0; i < chunk_id; ++i) {
@@ -36,8 +54,11 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
 	return (vbo);
 }
 
-
-
+/**
+ * @brief Get the block array
+ * @param c context
+ * @return block array
+*/
 vec3 *getBlockArray(t_context *c) {
 	u32 visibleBlock = 0, instanceCount = 0;
 	u32 visible_block_array[TEST_CHUNK_MAX] = {0};

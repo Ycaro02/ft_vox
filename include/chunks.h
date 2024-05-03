@@ -52,7 +52,4 @@ typedef struct s_chunks {
 void	fillChunks(t_context *c);
 u32		chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID);
 
-
-
-
 #endif /* HEADER_CHUNKS_H */
