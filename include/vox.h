@@ -25,6 +25,9 @@
 /* Texture atlas path */
 #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
 
+/* Sky path */
+#define SKYBOX_PATH "rsc/texture/skybox.bmp"
+
 /* Block hiden deine */
 #define BLOCK_HIDDEN 1U
 
