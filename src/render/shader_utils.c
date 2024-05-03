@@ -41,8 +41,8 @@ char *load_shader_file(char *path)
 
 GLuint load_shader(t_render *c)
 {
-	char *vertex_shader = load_shader_file(VERTEX_SHADER_PATH);
-	char *fragment_shader = load_shader_file(FRAGMENT_SHADER_PATH);
+	char *vertex_shader = load_shader_file(CUBE_VERTEX_SHADER);
+	char *fragment_shader = load_shader_file(CUBE_FRAGMENT_SHADER);
 	
 	/* create shader */
 	GLuint frag_vertex_shader = glCreateShader(GL_VERTEX_SHADER);

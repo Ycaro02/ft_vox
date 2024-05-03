@@ -38,8 +38,12 @@
 
 
 /* Shader path */
-#define VERTEX_SHADER_PATH		"rsc/shaders/vertex_shader.glsl"
-#define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
+#define CUBE_VERTEX_SHADER		"rsc/shaders/cube_vertex_shader.glsl"
+#define CUBE_FRAGMENT_SHADER	"rsc/shaders/cube_fragment_shader.glsl"
+
+#define SKY_FRAGMENT_SHADER	"rsc/shaders/sky_fragment_shader.glsl"
+#define SKY_FRAGMENT_SHADER	"rsc/shaders/sky_fragment_shader.glsl"
+
 
 #define DIR_RIGHT 0
 #define DIR_LEFT 1
@@ -108,6 +112,8 @@ void set_shader_texture(t_context *c, GLuint *atlas, u32 index);
 
 /* render/occlusion_culling */
 u32 checkHiddenBlock(t_chunks *chunks, u32 subChunksID);
+
+void displaySkybox(GLuint skyboxTexture, GLuint skyboxShader, mat4 projection, mat4 view);
 
 #endif /* VOX_HEADER_H */
 

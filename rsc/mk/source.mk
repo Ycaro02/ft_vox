@@ -22,6 +22,7 @@ SRCS			=	window/openGL_glw_init.c\
 					render/obj_rotate.c\
 					render/occlusion_culling.c\
 					render/chunks.c\
+					render/skybox.c\
 					texture/load_texture.c\
 
 
