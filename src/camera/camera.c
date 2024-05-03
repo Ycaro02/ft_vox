@@ -88,6 +88,28 @@ void move_camera_forward(t_camera* camera, float distance)
 	glm_vec3_add(camera->target, direction, camera->target);
 }
 
+
+void straf_camera(t_camera* camera, float distance, s8 dir) {
+	vec3 direction, right;
+
+	/* Compute direction vector */
+	glm_vec3_sub(camera->target, camera->position, direction);
+	
+	/* Compute right vector and normalise it */
+	glm_vec3_cross(direction, camera->up, right);
+	glm_vec3_normalize(right);
+
+	/* Compute up movement vector, normalise and scale it */
+	// glm_vec3_normalize(right);
+	glm_vec3_scale(right, distance, right);
+
+	if (dir == DIR_LEFT) {
+		glm_vec3_negate(right);
+	}
+	glm_vec3_add(camera->position, right, camera->position); /* move up camera */
+	glm_vec3_add(camera->target, right, camera->target); /* move up target */
+}
+
 /**
  * @brief Move camera backward
  * @param camera camera to move

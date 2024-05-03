@@ -73,8 +73,17 @@ int main() {
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-    GLuint *texture_atlas = load_texture_atlas();
+
+	int width_texture = 4096 / 4;
+	int height_texture = 3072 / 3;
+	GLuint *skyAtlas = load_texture_atlas(TEXTURE_SKYBOX_PATH, height_texture, width_texture);
+	(void)skyAtlas;
+
+
+    GLuint *texture_atlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16);
 	set_shader_texture(&context, texture_atlas, ATLAS_STONE);
+
+
 
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);

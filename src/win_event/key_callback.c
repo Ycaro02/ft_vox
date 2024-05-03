@@ -7,12 +7,22 @@ void act_escape(t_context *c) {
 
 /* Zoom : W */
 void act_zoom(t_context *c) {
-    move_camera_forward(&c->cam, CAM_ZOOM);
+    move_camera_forward(&c->cam, CAM_MOVE_HORIZONTAL);
 }
 
 /* Unzoom : S */
 void act_unzoom(t_context *c) {
-    move_camera_backward(&c->cam, CAM_ZOOM);
+    move_camera_backward(&c->cam, CAM_MOVE_HORIZONTAL);
+}
+
+/* Unzoom: C */
+void act_move_right(t_context *c) {
+	straf_camera(&c->cam, CAM_MOVE_HORIZONTAL, DIR_RIGHT);
+}
+
+/* Unzoom: Z */
+void act_move_left(t_context *c) {
+	straf_camera(&c->cam, CAM_MOVE_HORIZONTAL, DIR_LEFT);
 }
 
 /* Rotate camera left : A */
@@ -108,7 +118,9 @@ void handle_input(void *context)
 		{GLFW_KEY_RIGHT, act_rotate_object_right, REPEAT},
 		{GLFW_KEY_UP, act_rotate_object_up, REPEAT},
 		{GLFW_KEY_DOWN, act_rotate_object_down, REPEAT},
-		{GLFW_KEY_PAGE_UP, act_rotate_object_z_up, REPEAT}
+		{GLFW_KEY_PAGE_UP, act_rotate_object_z_up, REPEAT},
+		{GLFW_KEY_C, act_move_right, REPEAT},
+		{GLFW_KEY_Z, act_move_left, REPEAT},
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(t_key_action));
 	s32				state = GLFW_RELEASE;

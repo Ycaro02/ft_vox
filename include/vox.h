@@ -26,7 +26,7 @@
 #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
 
 /* Sky path */
-#define SKYBOX_PATH "rsc/texture/skybox.bmp"
+#define TEXTURE_SKYBOX_PATH "rsc/texture/skybox.bmp"
 
 /* Block hiden deine */
 #define BLOCK_HIDDEN 1U
@@ -41,8 +41,8 @@
 #define VERTEX_SHADER_PATH		"rsc/shaders/vertex_shader.glsl"
 #define FRAGMENT_SHADER_PATH	"rsc/shaders/fragment_shader.glsl"
 
-
-
+#define DIR_RIGHT 0
+#define DIR_LEFT 1
 
 /* HARDCOED CHUNK NUMBER */
 #define TEST_CHUNK_MAX 9U
@@ -102,7 +102,7 @@ GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);
 void	drawAllCube(GLuint vao, u32 nb_cube);
 
 /* texture load_texture */
-GLuint *load_texture_atlas();
+GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth);
 void set_shader_texture(t_context *c, GLuint *atlas, u32 index);
 
 /* render/occlusion_culling */

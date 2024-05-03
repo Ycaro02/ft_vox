@@ -29,5 +29,6 @@ void rotate_camera(t_camera* camera, float angle, vec3 axis);
 void display_camera_value(void *context);
 void reset_camera(void *context);
 void update_camera(void *context, GLuint shader_id);
+void straf_camera(t_camera* camera, float distance, s8 dir);
 
 #endif /* HEADER_CAMERA_H */
