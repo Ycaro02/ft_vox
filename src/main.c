@@ -69,31 +69,24 @@ int main() {
     if (!context.chunks) {
         return (1);
     }
-    ft_printf_fd(1, "%u byte allocated\n", sizeof(t_chunks));
 
-	fillChunks(&context);
-
-	GLuint vao = setupCubeVAO(&context, &context.cube);
-	context.skyboxVAO = skyboxInit();
-	context.skyboxShaderID = load_shader(SKY_VERTEX_SHADER, SKY_FRAGMENT_SHADER);
-
-	context.cubeShaderID = load_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
-	// context.shader_id = render.shader_id;
+	/* init context camera */
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
+	fillChunks(&context);
+	GLuint vao = setupCubeVAO(&context, &context.cube);
 
-	int width_texture = (4096 / 4);
-	int height_texture = (3072 / 3);
-	GLuint skyTexture = load_cubemap(TEXTURE_SKY_PATH, height_texture, width_texture, (vec3_u8){0, 0, 0}); /* black */
-	
-
-
-    GLuint *textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
-	set_shader_texture(context.cubeShaderID, textureAtlas, ATLAS_STONE, GL_TEXTURE_2D);
-
+	/* Init skybox */
+	context.skyboxVAO = skyboxInit();
+	context.skyboxShaderID = load_shader(SKY_VERTEX_SHADER, SKY_FRAGMENT_SHADER);
+	GLuint skyTexture = load_cubemap(TEXTURE_SKY_PATH, 1024, 1024, (vec3_u8){0, 0, 0}); /* black */
 	set_shader_texture(context.skyboxShaderID, &skyTexture, 0, GL_TEXTURE_CUBE_MAP);
 
+	/* Init cube */
+	context.cubeShaderID = load_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
+    GLuint *textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
+	set_shader_texture(context.cubeShaderID, textureAtlas, ATLAS_STONE, GL_TEXTURE_2D);
 
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);

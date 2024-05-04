@@ -92,15 +92,10 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
         ft_printf_fd(2, "Failed to cut fliped_text\n");
         return 0;
     }
-    ft_printf_fd(1, "Texture cuted\n");
     free(fliped_text);
 
     // t_list *current = square_lst;
-	u32 data_type = GL_RGB;
-
-	if (type == 4) {
-		data_type = GL_RGBA;
-	}
+	u32 data_type = type == 3 ? GL_RGB : GL_RGBA;
 
 	/* X face */
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 0, 0, data_type, squareWidth, squareHeight, 0,
@@ -127,5 +122,5 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    return textureID;
+    return (textureID);
 }
