@@ -112,9 +112,8 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 3, 0, data_type, squareWidth, squareHeight, 0,
 		data_type, GL_UNSIGNED_BYTE, get_lst_index_content(square_lst, 5));
     free(flip_topface);
+
 	/* Z face */
-
-
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 4, 0, data_type, squareWidth, squareHeight, 0,
 		data_type, GL_UNSIGNED_BYTE, get_lst_index_content(square_lst, 1));
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 5, 0, data_type, squareWidth, squareHeight, 0,
