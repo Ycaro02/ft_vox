@@ -39,10 +39,10 @@ char *load_shader_file(char *path)
 	return (shader_src);
 }
 
-GLuint load_shader(t_render *c)
+GLuint load_shader(char *vertexShader, char *fragmentShader)
 {
-	char *vertex_shader = load_shader_file(CUBE_VERTEX_SHADER);
-	char *fragment_shader = load_shader_file(CUBE_FRAGMENT_SHADER);
+	char *vertex_shader = load_shader_file(vertexShader);
+	char *fragment_shader = load_shader_file(fragmentShader);
 	
 	/* create shader */
 	GLuint frag_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -55,26 +55,26 @@ GLuint load_shader(t_render *c)
 	glShaderSource(frag_pixel_shader, 1, (const char **)&fragment_shader, NULL);
 	glCompileShader(frag_pixel_shader);
 
-	c->shader_id = glCreateProgram();
+	GLuint shaderID = glCreateProgram();
 	
 	/* Attach and link shader program  */
-	glAttachShader(c->shader_id , frag_vertex_shader);
-	glAttachShader(c->shader_id , frag_pixel_shader);
+	glAttachShader(shaderID , frag_vertex_shader);
+	glAttachShader(shaderID , frag_pixel_shader);
 	
-	glLinkProgram(c->shader_id);
+	glLinkProgram(shaderID);
 
 	GLint succes = 0;
-	glGetProgramiv(c->shader_id , GL_LINK_STATUS, &succes);
+	glGetProgramiv(shaderID , GL_LINK_STATUS, &succes);
 	if (!succes) {
 		GLchar data[1024];
 		ft_bzero(data, 1024);
-		glGetProgramInfoLog(c->shader_id , 512, NULL, data);
+		glGetProgramInfoLog(shaderID , 512, NULL, data);
 		ft_printf_fd(2, "Shader program log: %s\n", data);
 	} else {
 		ft_printf_fd(1, "Shader program linked\n");
 	}
 
-	glUseProgram(c->shader_id);
+	glUseProgram(shaderID);
 
 	/* delete shader tocheck */
 	glDeleteShader(frag_vertex_shader);
@@ -83,5 +83,5 @@ GLuint load_shader(t_render *c)
 	/* delete ressource */
 	free(vertex_shader);
 	free(fragment_shader);
-	return (c->shader_id);
+	return (shaderID);
 }

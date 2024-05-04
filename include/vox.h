@@ -26,7 +26,7 @@
 #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
 
 /* Sky path */
-#define TEXTURE_SKYBOX_PATH "rsc/texture/skybox.bmp"
+#define TEXTURE_SKY_PATH "rsc/texture/skybox.bmp"
 
 /* Block hiden deine */
 #define BLOCK_HIDDEN 1U
@@ -41,8 +41,8 @@
 #define CUBE_VERTEX_SHADER		"rsc/shaders/cube_vertex_shader.glsl"
 #define CUBE_FRAGMENT_SHADER	"rsc/shaders/cube_fragment_shader.glsl"
 
-#define SKY_FRAGMENT_SHADER	"rsc/shaders/sky_fragment_shader.glsl"
-#define SKY_FRAGMENT_SHADER	"rsc/shaders/sky_fragment_shader.glsl"
+#define SKY_VERTEX_SHADER		"rsc/shaders/sky_vertex_shader.glsl"
+#define SKY_FRAGMENT_SHADER		"rsc/shaders/sky_fragment_shader.glsl"
 
 
 #define DIR_RIGHT 0
@@ -75,12 +75,14 @@ typedef struct s_world {
 
 /* Context structure */
 typedef struct s_context {
-	t_camera	cam;			/* camera structure */
-    GLFWwindow	*win_ptr;		/* Window pointer */
-	t_modelCube	cube;			/* Data Cube structure */
-    t_chunks    *chunks;        /* current chunk */
-	GLuint		shader_id;		/* shader program id */
-	u32			renderBlock;	/* Total block to render */
+	t_camera	cam;				/* camera structure */
+    GLFWwindow	*win_ptr;			/* Window pointer */
+	t_modelCube	cube;				/* Data Cube structure */
+    t_chunks    *chunks;        	/* current chunk */
+	GLuint		cubeShaderID;		/* shader program id */
+	GLuint		skyboxShaderID;		/* shader program id */
+	GLuint		skyboxVAO;				/* skybox VAO */
+	u32			renderBlock;		/* Total block to render */
 } t_context;
 
 /* Atlas texture ID */
@@ -108,12 +110,10 @@ void	drawAllCube(GLuint vao, u32 nb_cube);
 
 /* texture load_texture */
 GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
-void set_shader_texture(t_context *c, GLuint *atlas, u32 index);
-
+void set_shader_texture(GLuint shaderId, GLuint *atlas, u32 index, u32 textureType);	
+GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
 /* render/occlusion_culling */
 u32 checkHiddenBlock(t_chunks *chunks, u32 subChunksID);
-
-void displaySkybox(GLuint skyboxTexture, GLuint skyboxShader, mat4 projection, mat4 view);
 
 #endif /* VOX_HEADER_H */
 

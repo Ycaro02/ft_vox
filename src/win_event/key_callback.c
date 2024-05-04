@@ -67,27 +67,27 @@ void act_change_polygon_mode(t_context *c) {
 
 /* Rotate object left : LEFT */
 void act_rotate_object_left(t_context *c) {
-	rotate_object_around_center(&c->cube, VEC3_ROTATEX, ROTATE_ANGLE, c->shader_id);
+	rotate_object_around_center(&c->cube, VEC3_ROTATEX, ROTATE_ANGLE, c->cubeShaderID);
 }
 
 /* Rotate object right : RIGHT */
 void act_rotate_object_right(t_context *c) {
-	rotate_object_around_center(&c->cube, VEC3_ROTATEX, -ROTATE_ANGLE, c->shader_id);
+	rotate_object_around_center(&c->cube, VEC3_ROTATEX, -ROTATE_ANGLE, c->cubeShaderID);
 }
 
 /* Rotate object up : UP */
 void act_rotate_object_up(t_context *c) {
-	rotate_object_around_center(&c->cube, VEC3_ROTATEY, ROTATE_ANGLE, c->shader_id);
+	rotate_object_around_center(&c->cube, VEC3_ROTATEY, ROTATE_ANGLE, c->cubeShaderID);
 }
 
 /* Rotate object down : DOWN */
 void act_rotate_object_down(t_context *c) {
-	rotate_object_around_center(&c->cube, VEC3_ROTATEY, -ROTATE_ANGLE, c->shader_id);
+	rotate_object_around_center(&c->cube, VEC3_ROTATEY, -ROTATE_ANGLE, c->cubeShaderID);
 }
 
 /* Rotate object Z up : PAGE UP*/
 void act_rotate_object_z_up(t_context *c) {
-	rotate_object_around_center(&c->cube, VEC3_ROTATEZ, ROTATE_ANGLE, c->shader_id);
+	rotate_object_around_center(&c->cube, VEC3_ROTATEZ, ROTATE_ANGLE, c->cubeShaderID);
 }
 
 

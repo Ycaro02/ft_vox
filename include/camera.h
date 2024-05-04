@@ -5,7 +5,7 @@
 
 #define CAM_ZOOM 0.3f				/* Zoom/Unzoom value */
 #define CAM_MOVE_HORIZONTAL 1.0f	/* Move camera horizontal value */
-#define CAM_UP_DOWN 0.05f			/* Move camera up/down value */
+#define CAM_UP_DOWN 0.2f			/* Move camera up/down value */
 #define ROTATE_ANGLE 2.0f			/* Rotate obj angle when arrow pressed */
 
 #define VEC3_ROTATEX (vec3){1.0f, 0.0f, 0.0f}
@@ -19,6 +19,7 @@ typedef struct t_camera {
     vec3		up;					/* up vector */
     mat4		view;				/* view matrix */
     mat4		projection;			/* projection matrix */
+	// mat4		view_no_translation;
 } t_camera;
 
 t_camera create_camera(float fov, float aspect_ratio, float near, float far);

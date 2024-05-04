@@ -80,6 +80,25 @@ FT_INLINE u8 check_file_size(u8 *file, u64 file_size, bmp_hdr header, bmp_info_h
 	return (1);
 }
 
+u8 *flip_image(u8 *image, int width, int height, int type)
+{
+    int data_size = type == 3 ? RGB_SIZE : RGBA_SIZE;
+    u8 *flipped_image = malloc(width * height * data_size);
+
+    if (!flipped_image) {
+        return (NULL);
+    }
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            u8 *pixel = image + (i * width + j) * data_size;
+            u8 *flipped_pixel = flipped_image + ((height - i - 1) * width + (width - j - 1)) * data_size;
+            ft_memcpy(flipped_pixel, pixel, data_size);
+        }
+    }
+	return (flipped_image);
+}
+
 /**
  * @brief Parse a BMP file and return the image data
  * @param path path to the BMP file

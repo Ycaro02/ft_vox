@@ -17,11 +17,13 @@ void init_openGL_texture(u8 *data, u32 width, u32 height, u16 texture_type, GLui
 
 }
 
-void set_shader_texture(t_context *c, GLuint *atlas, u32 index)
+void set_shader_texture(GLuint shaderId, GLuint *atlas, u32 index, u32 textureType)
 {
+	glUseProgram(shaderId);
     glActiveTexture(GL_TEXTURE0 + index);
-    glBindTexture(GL_TEXTURE_2D, atlas[index]);
-    GLuint texture_loc = glGetUniformLocation(c->shader_id, "texture1");
+    // glBindTexture(GL_TEXTURE_2D, atlas[index]);
+    glBindTexture(textureType, atlas[index]);
+    GLuint texture_loc = glGetUniformLocation(shaderId, "texture1");
     glUniform1i(texture_loc, index);
 }
 
@@ -66,4 +68,64 @@ GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u
 
     lst_clear(&square_lst, free);
     return (atlas);
+}
+
+GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignore_color) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int w, h, type;
+    u8 *texture = parse_bmp_file(path, &w, &h, &type);
+    if (!texture) {
+        ft_printf_fd(2, "Failed to load texture %s\n", path);
+        return 0;
+    }
+    ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n", w, h, type);
+
+	u8 *fliped_text = flip_image(texture, w, h, type);
+	free(texture);
+
+    t_list *square_lst = cut_texture_into_squares(fliped_text, w, h, squareWidth, squareHeight, type, ignore_color);
+    if (!square_lst) {
+        free(fliped_text);
+        ft_printf_fd(2, "Failed to cut fliped_text\n");
+        return 0;
+    }
+    ft_printf_fd(1, "Texture cuted\n");
+    free(fliped_text);
+
+    // t_list *current = square_lst;
+	u32 data_type = GL_RGB;
+
+	if (type == 4) {
+		data_type = GL_RGBA;
+	}
+
+	/* X face */
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 0, 0, data_type, squareWidth, squareHeight, 0,
+		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 2));
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 1, 0, data_type, squareWidth, squareHeight, 0,
+		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 4));
+
+	/* Y face */
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 2, 0, data_type, squareWidth, squareHeight, 0,
+		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 5));
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 3, 0, data_type, squareWidth, squareHeight, 0,
+		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 0));
+	
+	/* Z face */
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 4, 0, data_type, squareWidth, squareHeight, 0,
+		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 1));
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 5, 0, data_type, squareWidth, squareHeight, 0,
+		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 3));
+
+    lst_clear(&square_lst, free);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }
