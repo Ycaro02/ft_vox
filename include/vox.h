@@ -19,8 +19,8 @@
 
 
 /* Screen size */
-#define SCREEN_WIDTH 1920			/* Screen width */
-#define SCREEN_HEIGHT 1080			/* Screen height */
+#define SCREEN_WIDTH	1366			/* Screen width */
+#define SCREEN_HEIGHT	768			/* Screen height */
 
 /* Texture atlas path */
 #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
