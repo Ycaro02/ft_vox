@@ -67,7 +67,9 @@ t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int
  * @param type number of bytes per pixel (3 for RGB, 4 for RGBA)
  * @return pointer to the flipped image
 */
-u8 *flip_image(u8 *image, int width, int height, int type);
+u8 *imageFlip180(u8 *image, int width, int height, int type);
 
+
+u8 *imageFlip90(u8 *image, int width, int height, int type);
 
 #endif /* PARSE_BPM_HEADER */

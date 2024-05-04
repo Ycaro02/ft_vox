@@ -83,7 +83,7 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
     }
     ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n", w, h, type);
 
-	u8 *fliped_text = flip_image(texture, w, h, type);
+	u8 *fliped_text = imageFlip180(texture, w, h, type);
 	free(texture);
 
     t_list *square_lst = cut_texture_into_squares(fliped_text, w, h, squareWidth, squareHeight, type, ignore_color);
@@ -104,16 +104,21 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
 		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 4));
 
 	/* Y face */
+    u8 *top_face = get_lst_index_content(square_lst, 0);
+    u8 *flip_topface = imageFlip180(top_face, squareWidth, squareHeight, type);
+
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 2, 0, data_type, squareWidth, squareHeight, 0,
-		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 5));
+		data_type, GL_UNSIGNED_BYTE, flip_topface);
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 3, 0, data_type, squareWidth, squareHeight, 0,
-		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 0));
-	
+		data_type, GL_UNSIGNED_BYTE, get_lst_index_content(square_lst, 5));
+    free(flip_topface);
 	/* Z face */
+
+
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 4, 0, data_type, squareWidth, squareHeight, 0,
-		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 1));
+		data_type, GL_UNSIGNED_BYTE, get_lst_index_content(square_lst, 1));
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 5, 0, data_type, squareWidth, squareHeight, 0,
-		data_type, GL_UNSIGNED_BYTE, (u8 *)get_lst_index_content(square_lst, 3));
+		data_type, GL_UNSIGNED_BYTE, get_lst_index_content(square_lst, 3));
 
     lst_clear(&square_lst, free);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
