@@ -32,4 +32,6 @@ void reset_camera(void *context);
 void update_camera(void *context, GLuint shader_id);
 void straf_camera(t_camera* camera, float distance, s8 dir);
 
+void rotateTopBot(t_camera* camera, float angle);
+
 #endif /* HEADER_CAMERA_H */

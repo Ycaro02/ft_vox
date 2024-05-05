@@ -125,6 +125,33 @@ void move_camera_backward(t_camera* camera, float distance) {
  * @param distance distance to move
  * @param axis axis to move
 */
+void rotateTopBot(t_camera* camera, float angle) {
+    mat4 rotation = GLM_MAT4_IDENTITY_INIT;
+    vec3 axis;
+
+    /* Rotate the direction vector from the position to the target */
+    vec3 direction;
+    glm_vec3_sub(camera->target, camera->position, direction);
+
+    /* Calculate the rotation axis */
+    glm_cross(camera->up, direction, axis);
+
+    /* Create rotation matrix */
+    glm_rotate(rotation, glm_rad(angle), axis);
+
+    // mat4_mult_vec3(rotation, direction, 1.0f, direction);
+    glm_mat4_mulv3(rotation, direction, 1.0f, direction);
+
+	/* Check if the new direction is too high or too low */
+    if (direction[1] > 2.0f || direction[1] < -2.0f) {
+        return;
+    }
+
+
+    /* Update the target based on the rotated direction */
+    glm_vec3_add(camera->position, direction, camera->target);
+}
+
 void rotate_camera(t_camera* camera, float angle, vec3 axis) {
     mat4 rotation = GLM_MAT4_IDENTITY_INIT;
 

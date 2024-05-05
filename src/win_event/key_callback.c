@@ -37,12 +37,12 @@ void act_rotate_camera_right(t_context *c) {
 
 /* Rotate camera top UP */
 void act_rotate_camera_top(t_context *c) {
-	rotate_camera(&c->cam, -CAM_MOVE_HORIZONTAL, VEC3_ROTATEZ);
+	rotateTopBot(&c->cam, -CAM_MOVE_HORIZONTAL);
 }
 
 /* Rotate camera down : DOWN */
 void act_rotate_camera_down(t_context *c) {
-	rotate_camera(&c->cam, CAM_MOVE_HORIZONTAL, VEC3_ROTATEZ);
+	rotateTopBot(&c->cam, CAM_MOVE_HORIZONTAL);
 }
 
 /* Up camera : E */
