@@ -39,9 +39,9 @@ t_camera create_camera(float fov, float aspect_ratio, float near, float far)
     t_camera camera;
 
     /* init camera position */
-	glm_vec3_copy((vec3){23.756206f, 0.00000f, 2.155274f}, camera.position);
+	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, camera.position);
     /* init camera target */
-	glm_vec3_copy((vec3){14.963508f, 0.00000f, 1.405361f}, camera.target);
+	glm_vec3_copy((vec3){1.0f, 10.0f, 1.0f}, camera.target);
     /* init up vector */
 	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, camera.up);
 
@@ -143,10 +143,9 @@ void rotateTopBot(t_camera* camera, float angle) {
     glm_mat4_mulv3(rotation, direction, 1.0f, direction);
 
 	/* Check if the new direction is too high or too low */
-    if (direction[1] > 2.0f || direction[1] < -2.0f) {
+    if (direction[1] > 4.0f || direction[1] < -4.0f) {
         return;
     }
-
 
     /* Update the target based on the rotated direction */
     glm_vec3_add(camera->position, direction, camera->target);
@@ -198,10 +197,11 @@ void move_camera_up(t_camera* camera, float distance)
 void reset_camera(void *context)
 {
 	t_context *c = context;
+
     /* init camera position */
-	glm_vec3_copy((vec3){23.756206f, 0.00000f, 2.155274f}, c->cam.position);
+	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, c->cam.position);
     /* init camera target */
-	glm_vec3_copy((vec3){14.963508f, 0.00000f, 1.405361f}, c->cam.target);
+	glm_vec3_copy((vec3){1.0f, 10.0f, 1.0f}, c->cam.target);
     /* init up vector */
 	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, c->cam.up);
 

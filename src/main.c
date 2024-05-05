@@ -56,7 +56,6 @@ FT_INLINE void main_loop(t_context *context, GLuint vao, GLuint skyTexture) {
         handle_input(context);
         display_fps();
     }
-
 }
 
 
@@ -82,10 +81,6 @@ int main() {
     window = init_openGL_context();
     context.win_ptr = window;
 
-    // context.chunks = ft_calloc(sizeof(t_chunks), TEST_CHUNK_MAX);
-    // if (!context.chunks) {
-    //     return (1);
-    // }
 	if (!(context.world = ft_calloc(sizeof(t_world), 1))) {
 		return (1);
 	} else if (!(context.world->chunksMap = hashmap_init(HASHMAP_SIZE_100, chunksMapFree))) {

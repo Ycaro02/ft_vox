@@ -60,9 +60,12 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
 			t_block *block = (t_block *)it.value;
 			
 			if (block->flag != BLOCK_HIDDEN) {
-				block_array[idx][0] = block->x + (chunks->x * CHUNKS_WIDTH);
-				block_array[idx][1] = block->y + (subID * SUB_CHUNKS_HEIGHT);
-				block_array[idx][2] = block->z + (chunks->z * CHUNKS_WIDTH);
+				block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
+				block_array[idx][1] = (f32)block->y + (f32)(subID * SUB_CHUNKS_HEIGHT);
+				block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
+				if (idx == 0) {
+					ft_printf_fd(1, "Block %u x:%f y:%f z:%f\n", idx, block_array[idx][0], block_array[idx][1], block_array[idx][2]);
+				}
 				++idx;
 			}
 			next = hashmap_next(&it);
@@ -105,6 +108,7 @@ void fillChunks(hashMap *chunksMap) {
 		chunks->id = i;
 		chunks->x = off[chunks->id][0];
 		chunks->z = off[chunks->id][1];
+		ft_printf_fd(1, "Chunk %u x:%d z:%d\n", chunks->id, chunks->x, chunks->z);
 
 		chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 		// chunks->sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
