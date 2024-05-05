@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 15:43:41 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/01 15:18:22 by ycaro            ###   ########.fr       */
+/*   Updated: 2024/05/05 21:51:19 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 
 #define BUFFER_SIZE 1
 #define OUT_OF_UINT32 (uint64_t)(UINT32_MAX + 1)
-#define PACKED_STRUCT __attribute__((packed))
 
 /* Libft */
 char    *get_next_line(int fd); /* Get next line */

@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/05 12:31:06 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/05 21:52:43 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@
 */
 
 /* Block position structure */
-typedef struct s_block_pos {
+typedef struct PACKED_STRUCT s_block_pos {
 	s32 x;
 	s32 y;
 	s32 z;

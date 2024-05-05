@@ -60,10 +60,23 @@ void act_reset_camera(t_context *c) {
     reset_camera(c);
 }
 
+void testChunksExist(t_context *c) {
+	t_block_pos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
+	ft_printf_fd(1, YELLOW"\nTest for chunk: %d, %d %d: "RESET, pos.x, pos.y, pos.z);
+
+	t_chunks *chunks = hashmap_get(c->world->chunksMap, pos);
+	if (chunks) {
+		ft_printf_fd(1, GREEN"Chunk exist\n"RESET);
+	} else {
+		ft_printf_fd(1, RED"Chunk not exist\n"RESET);
+	}
+
+}
+
 /* Display cam data : C */
 void act_display_camera_value(t_context *c) {
     ft_printf_fd(1, CYAN"\nPos: %f, %f, %f\n"RESET, c->cam.position[0], c->cam.position[1],c->cam.position[2]);
-	ft_printf_fd(1, PINK"Chunk Pos %d, %d, %d\n", c->cam.chunkPos[0], c->cam.chunkPos[1], c->cam.chunkPos[2]);
+	ft_printf_fd(1, PINK"Chunk X[%d], Z[%d], Y:|%d|\n", c->cam.chunkPos[0], c->cam.chunkPos[2], c->cam.chunkPos[1]);
 	// display_camera_value(&c->cam);
 }
 
@@ -130,6 +143,7 @@ void handle_input(void *context)
 		{GLFW_KEY_DOWN, act_rotate_camera_down, REPEAT},
 		{GLFW_KEY_ENTER, act_reset_camera, SINGLE_PRESS},
 		{GLFW_KEY_C, act_display_camera_value, SINGLE_PRESS},
+		{GLFW_KEY_E, testChunksExist, SINGLE_PRESS},
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(t_key_action));
 	s32				state = GLFW_RELEASE;

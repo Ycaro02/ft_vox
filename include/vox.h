@@ -49,7 +49,7 @@
 #define DIR_LEFT 1
 
 /* HARDCOED CHUNK NUMBER */
-#define TEST_CHUNK_MAX 9U
+#define TEST_CHUNK_MAX 9
 
 enum block_type {
     AIR=0U,      /* Air block (Empty) */

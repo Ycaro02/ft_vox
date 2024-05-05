@@ -61,7 +61,7 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
 */
 vec3 *getBlockArray(t_context *c, hashMap *chunksMap) {
 	u32 visibleBlock = 0, instanceCount = 0;
-	u32 visible_block_array[TEST_CHUNK_MAX] = {0};
+	u32 visible_block_array[200] = {0};
 
 	hashMap_it it = hashmap_iterator(chunksMap);
 	s8 next = hashmap_next(&it); 

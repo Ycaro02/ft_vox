@@ -92,6 +92,9 @@ int main() {
     glm_mat4_identity(context.cube.rotation);
 
 	fillChunks(context.world->chunksMap);
+
+	chunksLoadArround(&context, 0, 0, 3);
+
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 
 	/* Init skybox */
@@ -107,6 +110,7 @@ int main() {
 
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);
+
 
 	main_loop(&context, vao, skyTexture);
 
