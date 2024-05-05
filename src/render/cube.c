@@ -61,7 +61,10 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
 */
 vec3 *getBlockArray(t_context *c, hashMap *chunksMap) {
 	u32 visibleBlock = 0, instanceCount = 0;
-	u32 visible_block_array[200] = {0};
+	// u32 visible_block_array[1000] = {0}; /* SMASH STACK HERE */
+	u32 *visible_block_array = NULL; /* SMASH STACK HERE */
+
+	visible_block_array = ft_calloc(sizeof(u32), hashmap_size(chunksMap));
 
 	hashMap_it it = hashmap_iterator(chunksMap);
 	s8 next = hashmap_next(&it); 
@@ -91,6 +94,7 @@ vec3 *getBlockArray(t_context *c, hashMap *chunksMap) {
 		next = hashmap_next(&it);
 	}
 
+	free(visible_block_array);
 	ft_printf_fd(1, CYAN"instanceCount: %d\n"RESET, instanceCount);
 	c->renderBlock = instanceCount;
 	return (block_array);

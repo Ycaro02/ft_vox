@@ -93,7 +93,7 @@ int main() {
 
 	fillChunks(context.world->chunksMap);
 
-	chunksLoadArround(&context, 0, 0, 3);
+	chunksLoadArround(&context, 0, 0, 2);
 
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 

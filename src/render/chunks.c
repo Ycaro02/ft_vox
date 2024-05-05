@@ -66,9 +66,9 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
 				block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
 				block_array[idx][1] = (f32)block->y + (f32)(subID * SUB_CHUNKS_HEIGHT);
 				block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
-				if (idx == 0) {
-					ft_printf_fd(1, "First block chunkId:%d x:%f y:%f z:%f\n", chunks->id, block_array[idx][0], block_array[idx][1], block_array[idx][2]);
-				}
+				// if (idx == 0) {
+				// 	ft_printf_fd(1, "First block chunkId:%d x:%f y:%f z:%f\n", chunks->id, block_array[idx][0], block_array[idx][1], block_array[idx][2]);
+				// }
 				++idx;
 			}
 			next = hashmap_next(&it);
@@ -154,9 +154,7 @@ void chunksLoadArround(t_context *c, s32 chunksX, s32 chunksZ, s32 radius) {
 				// ft_printf_fd(1, RED"Chunk not exist REALX:%d x: %d z: %d\n"RESET, pos.x, pos.y, pos.z);
 				t_chunks *newChunks = chunksLoad(pos.y, pos.z);
 				hashmap_set_entry(c->world->chunksMap, pos, newChunks);
-				ft_printf_fd(1, ORANGE"Chunk Created x: %d z: %d\n"RESET, pos.y, pos.z);
-			} else {
-				ft_printf_fd(1, GREEN"Chunk exist   x: %d z: %d\n"RESET, pos.y, pos.z);
+				// ft_printf_fd(1, ORANGE"Chunk Created x: %d z: %d\n"RESET, pos.y, pos.z);
 			}
 		}
 	}
