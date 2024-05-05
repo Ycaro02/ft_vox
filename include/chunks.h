@@ -33,19 +33,21 @@ typedef struct s_sub_chunks {
 	u32				metadata;		/* Sub Chunk metadata */
 } t_sub_chunks;
 
-typedef struct s_cardinal_offset {
-	s32 north;
-	s32 south;
-	s32 east;
-	s32 west;
-} t_cardinal_offset;
+// typedef struct s_cardinal_offset {
+// 	s32 north;
+// 	s32 south;
+// 	s32 east;
+// 	s32 west;
+// } t_cardinal_offset;
 
 typedef struct s_chunks {
 	t_sub_chunks	sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
-	t_cardinal_offset offset;			/* offset to get the cardinal sub_chunks */
 	u32				nb_block;			/* nb block (outdated value total of blockmap subchunk) */
     u32				id;     			/* Chunk Id */
 	u32				visible_block;		/* Number of visible block */
+	s32				x;					/* Chunk X */	
+	s32				z;					/* Chunk Z */
+	// t_cardinal_offset offset;			/* offset to get the cardinal sub_chunks */
 } t_chunks;
 
 /* Render chunks.c */

@@ -32,18 +32,20 @@ size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
  * @param chunks Chunks array pointer
 */
 void BRUT_FillChunks(t_chunks *chunks) {
-	t_cardinal_offset chunk_offset[] = {
-		{0, 0, 0, 0},\
-		{16, 0, 0, 0},\
-		{0, 16, 0, 0},\
-		{0, 0, 16, 0},\
-		{0, 0, 0, 16},\
-		{16, 0, 16, 0},\
-		{16, 0, 0, 16},\
-		{0, 16, 16, 0},\
-		{0, 16, 0, 16},\
+	static vec2_s32 off[] = {
+		{0, 0},\
+		{1, 0},\
+		{-1, 0},\
+		{0, 1},\
+		{0, -1},\
+		{1, 1},\
+		{-1, -1},\
+		{1, -1},\
+		{-1, 1},\
 	};
-	chunks->offset = chunk_offset[chunks->id]; 
+	// chunks->offset = chunk_offset[chunks->id];
+	chunks->x = off[chunks->id][0];
+	chunks->z = off[chunks->id][1];
 	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i]);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
@@ -63,9 +65,6 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
 	u32 idx = 0;
 
 	(void)chunkID;
-	s64 x_offset = 0, z_offset = 0;
-	x_offset = (s64)(chunks->offset.north) - (s64)(chunks->offset.south); 
-	z_offset = (s64)(chunks->offset.west) - (s64)(chunks->offset.east);
 
 	for (u32 subID = 0; subID < SUBCHUNKS_DISPLAY; ++subID) {
 		hashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
@@ -74,9 +73,9 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
 			t_block *block = (t_block *)it.value;
 			
 			if (block->flag != BLOCK_HIDDEN) {
-				block_array[idx][0] = block->x + x_offset;
+				block_array[idx][0] = block->x + (chunks->x * CHUNKS_WIDTH);
 				block_array[idx][1] = block->y + (subID * SUB_CHUNKS_HEIGHT);
-				block_array[idx][2] = block->z + z_offset;
+				block_array[idx][2] = block->z + (chunks->z * CHUNKS_WIDTH);
 				++idx;
 			}
 			next = hashmap_next(&it);

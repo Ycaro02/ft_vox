@@ -1,5 +1,5 @@
-#include "include/vox.h"			/* Main project header */
-#include "include/chunks.h"		/* Main project header */
+#include "../../include/vox.h"			/* Main project header */
+#include "../../include/chunks.h"		/* Main project header */
 
 
 #define OFFSET_GET(chunksID) (((chunksID / 4) * 16)) 
@@ -11,36 +11,47 @@
 
 // #define WEST_OFFSET_GET(chunksID) (((chunksID % 2) * 16))
 
-void cardinalOffsetScale(t_cardinal_offset *offset, u32 mult) {
-    offset->east += (mult * 16);
-    offset->west += (mult * 16);
-    offset->south += (mult * 16);
-    offset->north += (mult * 16);
+void cardinalOffsetScale(t_cardinal_offset *offset, u32 add) {
+    offset->east += add;
+    offset->west += add;
+    offset->south += add;
+    offset->north += add;
 }
 
 t_cardinal_offset chunksOffsetGet(u32 chunksID) {
-    t_cardinal_offset chunk_offset[] = {
+    // t_cardinal_offset chunk_offset[] = {
+	// 	{0, 0, 0, 0},\
+	// 	{16, 0, 0, 0},\
+	// 	{0, 16, 0, 0},\
+	// 	{0, 0, 16, 0},\
+	// 	{0, 0, 0, 16},\
+	// 	{16, 0, 16, 0},\
+	// 	{16, 0, 0, 16},\
+	// 	{0, 16, 16, 0},\
+	// 	{0, 16, 0, 16},\
+	// };
+	t_cardinal_offset chunk_offset[] = {
 		{0, 0, 0, 0},\
-		{16, 0, 0, 0},\
-		{0, 16, 0, 0},\
-		{0, 0, 16, 0},\
-		{0, 0, 0, 16},\
-		{16, 0, 16, 0},\
-		{16, 0, 0, 16},\
-		{0, 16, 16, 0},\
-		{0, 16, 0, 16},\
+		{1, 0, 0, 0},\
+		{0, 1, 0, 0},\
+		{0, 0, 1, 0},\
+		{0, 0, 0, 1},\
+		{1, 0, 1, 0},\
+		{1, 0, 0, 1},\
+		{0, 1, 1, 0},\
+		{0, 1, 0, 1},\
 	};
-    static u32 mult = 0;
     static u32 offsetMax = 9;
+    u32 up = 0;
 
 
     u32 id = 0;
     if (chunksID != 0) {
         id = chunksID % offsetMax;
-        mult = chunksID / offsetMax;
+        up = chunksID / offsetMax;
     }
     // ft_printf_fd(1, "For CID %d id: %d\n", chunksID, id);
-    cardinalOffsetScale(&chunk_offset[id], mult);
+    cardinalOffsetScale(&chunk_offset[id], up);
     return (chunk_offset[id]);
 }
 
