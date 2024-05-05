@@ -32,20 +32,7 @@ size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
  * @param chunks Chunks array pointer
 */
 void BRUT_FillChunks(t_chunks *chunks) {
-	static vec2_s32 off[] = {
-		{0, 0},\
-		{1, 0},\
-		{-1, 0},\
-		{0, 1},\
-		{0, -1},\
-		{1, 1},\
-		{-1, -1},\
-		{1, -1},\
-		{-1, 1},\
-	};
-	// chunks->offset = chunk_offset[chunks->id];
-	chunks->x = off[chunks->id][0];
-	chunks->z = off[chunks->id][1];
+
 	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i]);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
@@ -90,12 +77,83 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
  * @brief Fill all chunks, call brut fill chunk on all chunkks and set hashmap
  * @param c Context pointer
 */
-void fillChunks(t_context *c) {
+void fillChunks(hashMap *chunksMap) {
+		static vec2_s32 off[] = {
+		{0, 0},\
+		{1, 0},\
+		{-1, 0},\
+		{0, 1},\
+		{0, -1},\
+		{1, 1},\
+		{-1, -1},\
+		{1, -1},\
+		{-1, 1},\
+	};
+	if (!chunksMap) {
+		ft_printf_fd(2, "ChunksMap is NULL in fillChunks\n");
+		return ;
+	}
+
+
 	for (u32 i = 0; i < TEST_CHUNK_MAX; i++) {
-		c->chunks[i].sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-		c->chunks[i].sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-		c->chunks[i].id = i;
-		BRUT_FillChunks(&c->chunks[i]);
+		t_chunks *chunks = ft_calloc(sizeof(t_chunks), 1);
+		if (!chunks) {
+			ft_printf_fd(2, "Failed to allocate chunks\n");
+			return ;
+		}
+
+		chunks->id = i;
+		chunks->x = off[chunks->id][0];
+		chunks->z = off[chunks->id][1];
+
+		chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+		// chunks->sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+		BRUT_FillChunks(chunks);
+
+		hashmap_set_entry(chunksMap, (t_block_pos){chunks->id, chunks->x, chunks->z}, chunks);
+		// c->chunks[i].sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+		// c->chunks[i].sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+		// BRUT_FillChunks(&c->chunks[i]);
 	}
 
 }
+
+/**
+ * @brief Scan the environment around the player
+ * @param c Context pointer
+ * @param player_x Player's x position
+ * @param player_z Player's z position
+ * @param radius The radius around the player to scan
+*/
+// void scanEnvironment(t_context *c, s64 player_x, s64 player_z, u32 radius) {
+//     // Calculate the chunk coordinates of the player
+//     s64 player_chunk_x = player_x / CHUNK_SIZE;
+//     s64 player_chunk_z = player_z / CHUNK_SIZE;
+
+//     // Loop over all chunks in the radius around the player
+//     for (s64 x = player_chunk_x - radius; x <= player_chunk_x + radius; x++) {
+//         for (s64 z = player_chunk_z - radius; z <= player_chunk_z + radius; z++) {
+//             // Calculate the ID of the chunk
+//             u32 chunk_id = x + z * CHUNKS_PER_ROW;
+
+//             // Check if the chunk is within the array bounds
+//             if (chunk_id < TEST_CHUNK_MAX) {
+//                 t_chunks *chunk = &c->chunks[chunk_id];
+
+//                 // Loop over all blocks in the chunk
+//                 for (u32 subID = 0; subID < SUBCHUNKS_DISPLAY; ++subID) {
+//                     hashMap_it it = hashmap_iterator(chunk->sub_chunks[subID].block_map);
+//                     s8 next = hashmap_next(&it);
+//                     while (next) {
+//                         t_block *block = (t_block *)it.value;
+
+//                         // Perform an action with the block
+//                         // ...
+
+//                         next = hashmap_next(&it);
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }

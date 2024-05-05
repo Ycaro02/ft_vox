@@ -69,16 +69,17 @@ typedef struct PACKED_STRUCT s_block {
 
 typedef struct s_world {
 	u64			seed;			/* World seed */
-	t_chunks	*chunks;		/* Chunks array */
-	u32			nb_chunks;		/* Number of chunks loaded */
+	hashMap		*chunksMap;		/* Chunks hashmap */
+	u32			chunksLoaded;	/* Number of chunks loaded */
 } t_world;
 
 /* Context structure */
 typedef struct s_context {
+	t_world		*world;				/* World structure */
 	t_camera	cam;				/* camera structure */
     GLFWwindow	*win_ptr;			/* Window pointer */
 	t_modelCube	cube;				/* Data Cube structure */
-    t_chunks    *chunks;        	/* current chunk */
+    // t_chunks    *chunks;        	/* current chunk */
 	GLuint		cubeShaderID;		/* shader program id */
 	GLuint		skyboxShaderID;		/* shader program id */
 	GLuint		skyboxVAO;				/* skybox VAO */

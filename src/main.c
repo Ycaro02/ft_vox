@@ -12,9 +12,10 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
 
 void vox_destroy(t_context *c, GLuint *atlas)
 {
-    hashmap_destroy(c->chunks->sub_chunks[0].block_map);
-    free(atlas);
-    free(c->chunks);
+	free(atlas);
+	hashmap_destroy(c->world->chunksMap);
+	free(c->world);
+	free(c->cube.vertex);
     glfwTerminate();
 
 }
@@ -29,7 +30,7 @@ FT_INLINE void display_fps() {
 	double currentTime = glfwGetTime();
 	nbFrames++;
 	if (currentTime - lastTime >= 1.0) {
-		ft_printf_fd(1, "\r\033[K"ORANGE"%f ms/frame, %d FPS"RESET, (1000.0 / (double)nbFrames), nbFrames);
+		ft_printf_fd(1, RESET_LINE""ORANGE"%f ms/frame, %d FPS"RESET, (1000.0 / (double)nbFrames), nbFrames);
 		nbFrames = 0;
 		lastTime += 1.0;
 	}
@@ -58,23 +59,44 @@ FT_INLINE void main_loop(t_context *context, GLuint vao, GLuint skyTexture) {
 
 }
 
+
+/* Basic function you can provide to hashmap_init */
+void chunksMapFree(void *entry) {
+	hashMap_entry *e = (hashMap_entry *)entry;
+	if (e->value) {
+		t_chunks *chunks = (t_chunks *)e->value;
+		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
+			hashmap_destroy(chunks->sub_chunks[i].block_map);
+		}
+		// hashmap_destroy(chunks->sub_chunks[1].block_map);
+		free(e->value); /* free the value (allocaated ptr) */
+	}
+	free(e); /* free the entry t_list node */
+}
+
 int main() {
     t_context context;
     GLFWwindow* window;
 
+	ft_bzero(&context, sizeof(t_context));
     window = init_openGL_context();
     context.win_ptr = window;
 
-    context.chunks = ft_calloc(sizeof(t_chunks), TEST_CHUNK_MAX);
-    if (!context.chunks) {
-        return (1);
-    }
+    // context.chunks = ft_calloc(sizeof(t_chunks), TEST_CHUNK_MAX);
+    // if (!context.chunks) {
+    //     return (1);
+    // }
+	if (!(context.world = ft_calloc(sizeof(t_world), 1))) {
+		return (1);
+	} else if (!(context.world->chunksMap = hashmap_init(HASHMAP_SIZE_100, chunksMapFree))) {
+		return (1);
+	}
 
 	/* init context camera */
 	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	fillChunks(&context);
+	fillChunks(context.world->chunksMap);
 	GLuint vao = setupCubeVAO(&context, &context.cube);
 
 	/* Init skybox */

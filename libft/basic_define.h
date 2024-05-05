@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 17:03:53 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/25 17:42:33 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/05 13:47:29 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@
 #define		FILL_YELLOW			"\033[7;33m"
 #define		FILL_RED			"\033[7;31m"
 #define		FILL_YELBLACK		"\033[40;33m"
+
+#define		RESET_LINE			"\r\033[K"
 
 /* Inline function */
 #define		FT_INLINE   static inline __attribute((always_inline))

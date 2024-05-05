@@ -51,7 +51,7 @@ typedef struct s_chunks {
 } t_chunks;
 
 /* Render chunks.c */
-void	fillChunks(t_context *c);
+void	fillChunks(hashMap *chunksMap);
 u32		chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID);
 
 #endif /* HEADER_CHUNKS_H */

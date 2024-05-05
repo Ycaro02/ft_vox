@@ -14,6 +14,7 @@
    fun:malloc
    fun:_XlcDefaultMapModifiers
    fun:XSetLocaleModifiers
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -33,9 +34,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
+   fun:getSystemContentScale
+   fun:_glfwInitX11
 }
 {
    <insert_a_suppression_name_here>
@@ -43,6 +43,9 @@
    match-leak-kinds: reachable
    fun:malloc
    fun:_XimOpenIM
+   fun:_XimRegisterIMInstantiateCallback
+   fun:XRegisterIMInstantiateCallback
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -77,10 +80,11 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
-   fun:main
 }
 {
    <insert_a_suppression_name_here>
@@ -93,6 +97,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -108,6 +114,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -122,6 +130,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -139,10 +149,11 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
-   fun:main
 }
 {
    <insert_a_suppression_name_here>
@@ -158,9 +169,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
+   fun:getSystemContentScale
+   fun:_glfwInitX11
 }
 {
    <insert_a_suppression_name_here>
@@ -179,6 +189,7 @@
    obj:*
    obj:*
 }
+
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
@@ -223,78 +234,6 @@
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:malloc
-   fun:malloc
-   fun:strdup
-   fun:_dl_load_cache_lookup
-   fun:_dl_map_object
-   fun:openaux
-   fun:_dl_catch_exception
-   fun:_dl_map_object_deps
-   fun:dl_open_worker_begin
-   fun:_dl_catch_exception
-   fun:dl_open_worker
-   fun:_dl_catch_exception
-   fun:_dl_open
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:malloc
-   fun:malloc
-   fun:_dl_new_object
-   fun:_dl_map_object_from_fd
-   fun:_dl_map_object
-   fun:openaux
-   fun:_dl_catch_exception
-   fun:_dl_map_object_deps
-   fun:dl_open_worker_begin
-   fun:_dl_catch_exception
-   fun:dl_open_worker
-   fun:_dl_catch_exception
-   fun:_dl_open
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:malloc
-   fun:malloc
-   fun:strdup
-   fun:_dl_load_cache_lookup
-   fun:_dl_map_object
-   fun:dl_open_worker_begin
-   fun:_dl_catch_exception
-   fun:dl_open_worker
-   fun:_dl_catch_exception
-   fun:_dl_open
-   fun:dlopen_doit
-   fun:_dl_catch_exception
-   fun:_dl_catch_error
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:malloc
-   fun:malloc
-   fun:_dl_new_object
-   fun:_dl_map_object_from_fd
-   fun:_dl_map_object
-   fun:dl_open_worker_begin
-   fun:_dl_catch_exception
-   fun:dl_open_worker
-   fun:_dl_catch_exception
-   fun:_dl_open
-   fun:dlopen_doit
-   fun:_dl_catch_exception
-   fun:_dl_catch_error
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:malloc
    fun:_XlcCreateLocaleDataBase
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
@@ -304,9 +243,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
+   fun:getSystemContentScale
+   fun:_glfwInitX11
 }
 {
    <insert_a_suppression_name_here>
@@ -340,7 +278,7 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
+   fun:getSystemContentScale
 }
 {
    <insert_a_suppression_name_here>
@@ -350,6 +288,8 @@
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -369,9 +309,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
+   fun:getSystemContentScale
+   fun:_glfwInitX11
 }
 {
    <insert_a_suppression_name_here>
@@ -380,6 +319,8 @@
    fun:malloc
    fun:_XrmInternalStringToQuark
    fun:XrmInitialize
+   fun:_glfwConnectX11
+   fun:_glfwSelectPlatform
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -400,7 +341,7 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
+   fun:getSystemContentScale
 }
 {
    <insert_a_suppression_name_here>
@@ -414,10 +355,11 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
-   fun:main
 }
 {
    <insert_a_suppression_name_here>
@@ -430,6 +372,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -447,10 +391,11 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
-   fun:main
 }
 {
    <insert_a_suppression_name_here>
@@ -466,9 +411,44 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
+   fun:getSystemContentScale
+   fun:_glfwInitX11
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:strdup
+   fun:_dl_load_cache_lookup
+   fun:_dl_map_object
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
 }
 {
    <insert_a_suppression_name_here>
@@ -483,10 +463,9 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
-   fun:main
 }
 {
    <insert_a_suppression_name_here>
@@ -518,10 +497,9 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
-   fun:main
 }
 {
    <insert_a_suppression_name_here>
@@ -537,9 +515,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
+   fun:getSystemContentScale
+   fun:_glfwInitX11
 }
 {
    <insert_a_suppression_name_here>
@@ -553,10 +530,47 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
-   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:strdup
+   fun:_dl_load_cache_lookup
+   fun:_dl_map_object
+   fun:openaux
+   fun:_dl_catch_exception
+   fun:_dl_map_object_deps
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:openaux
+   fun:_dl_catch_exception
+   fun:_dl_map_object_deps
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
 }
 {
    <insert_a_suppression_name_here>
@@ -572,28 +586,8 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:calloc
-   fun:calloc
-   fun:_dl_check_map_versions
-   fun:dl_open_worker_begin
-   fun:_dl_catch_exception
-   fun:dl_open_worker
-   fun:_dl_catch_exception
-   fun:_dl_open
-   fun:dlopen_doit
-   fun:_dl_catch_exception
-   fun:_dl_catch_error
-   fun:_dlerror_run
-   fun:dlopen_implementation
-   fun:dlopen@@GLIBC_2.34
+   fun:getSystemContentScale
+   fun:_glfwInitX11
 }
 {
    <insert_a_suppression_name_here>
@@ -611,6 +605,25 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:_dl_close_worker.part.0.isra.0
+   fun:_dl_close_worker
+   fun:_dl_close
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlclose@@GLIBC_2.34
+   fun:_glfwPlatformFreeModule
+   fun:_glfwTerminateGLX
+   fun:_glfwTerminateX11
+   fun:terminate
+   fun:glfwTerminate
 }
 {
    <insert_a_suppression_name_here>
@@ -668,18 +681,53 @@
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
    fun:calloc
-   fun:_dl_new_object
-   fun:_dl_map_object_from_fd
-   fun:_dl_map_object
-   fun:openaux
-   fun:_dl_catch_exception
-   fun:_dl_map_object_deps
+   fun:calloc
+   fun:_dl_check_map_versions
    fun:dl_open_worker_begin
    fun:_dl_catch_exception
    fun:dl_open_worker
    fun:_dl_catch_exception
    fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen_implementation
+   fun:dlopen@@GLIBC_2.34
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:getSystemContentScale
+   fun:_glfwInitX11
 }
 {
    <insert_a_suppression_name_here>
@@ -698,42 +746,6 @@
    fun:dlopen_doit
    fun:_dl_catch_exception
    fun:_dl_catch_error
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:calloc
-   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
-   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
-   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
-   fun:_XlcCreateLC
-   fun:_XlcUtf8Loader
-   fun:_XOpenLC
-   fun:_XrmInitParseInfo
-   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
-   fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:calloc
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
-   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
-   fun:_XlcCreateLC
-   fun:_XlcUtf8Loader
-   fun:_XOpenLC
-   fun:_XrmInitParseInfo
-   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
-   fun:XrmGetStringDatabase
-   fun:glfwInit
-   fun:window_create
-   fun:init_openGL_context
 }
 {
    <insert_a_suppression_name_here>
@@ -776,6 +788,8 @@
    fun:calloc
    fun:_XrmInternalStringToQuark
    fun:XrmInitialize
+   fun:_glfwConnectX11
+   fun:_glfwSelectPlatform
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -789,6 +803,8 @@
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:_XrmInternalStringToQuark
    fun:XrmInitialize
+   fun:_glfwConnectX11
+   fun:_glfwSelectPlatform
    fun:glfwInit
    fun:window_create
    fun:init_openGL_context
@@ -809,5 +825,23 @@
    fun:_XrmInitParseInfo
    obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
    fun:XrmGetStringDatabase
-   fun:glfwInit
+   fun:getSystemContentScale
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:calloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:openaux
+   fun:_dl_catch_exception
+   fun:_dl_map_object_deps
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
 }

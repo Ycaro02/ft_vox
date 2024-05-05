@@ -35,22 +35,13 @@ t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int
                 for (int x = 0; x < width; x++) {
                     int tex_index = ((i * height + y) * tex_width + (j * width + x)) * type;
                     int square_index = (y * width + x) * type;
-
                     ft_memcpy(&square[square_index], &texture[tex_index], type);
-
-                    /* If the square is pink (RGB: 255,0,255 or RGBA: 255,0,255,255), skip this square */
-                    if (is_square_empty(square, width, height, type, ignore_color)) {
-                        free(square);
-                        square = NULL;
-                        break;
-                    }
                 }
-
-                if (!square) break;  // if square was skipped, break from the y loop as well
             }
-
-            if (square) {
-                // all_square[square_count] = square;
+			if (is_square_empty(square, width, height, type, ignore_color)) {
+					free(square);
+					square = NULL;
+			} else {
                 ft_lstadd_back(&square_lst, ft_lstnew(square));
                 square_count++;
             }

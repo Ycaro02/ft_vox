@@ -59,21 +59,48 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
  * @param c context
  * @return block array
 */
-vec3 *getBlockArray(t_context *c) {
+vec3 *getBlockArray(t_context *c, hashMap *chunksMap) {
 	u32 visibleBlock = 0, instanceCount = 0;
 	u32 visible_block_array[TEST_CHUNK_MAX] = {0};
 
-	for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
-		visible_block_array[i] = c->chunks[i].visible_block;
-		visibleBlock += c->chunks[i].visible_block;
+	hashMap_it it = hashmap_iterator(chunksMap);
+	s8 next = hashmap_next(&it); 
+	u32 i = 0;
+
+	while (next) {
+		t_chunks *chunks = (t_chunks *)it.value;
+		visible_block_array[i] = chunks->visible_block;
+		visibleBlock += chunks->visible_block; 
+		++i;
+		next = hashmap_next(&it);
 	}
+	// for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
+	// 	visible_block_array[i] = c->chunks[i].visible_block;
+	// 	visibleBlock += c->chunks[i].visible_block;
+	// }
 
     vec3 *block_array = ft_calloc(sizeof(vec3), visibleBlock);
+	ft_printf_fd(1, GREEN"visibleBlock: %u\n"RESET, visibleBlock);
 
-	for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
+
+	it = hashmap_iterator(chunksMap);
+	next = hashmap_next(&it);
+	i = 0;
+
+	while (next) {
+		t_chunks *chunks = (t_chunks *)it.value;
 		u32 offset = get_block_arr_offset(visible_block_array, i); 
-		instanceCount += chunks_cube_get(&c->chunks[i], &block_array[offset], i);
+		instanceCount += chunks_cube_get(chunks, &block_array[offset], i);
+		++i;
+		next = hashmap_next(&it);
 	}
+
+	// for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
+	// 	u32 offset = get_block_arr_offset(visible_block_array, i); 
+	// 	instanceCount += chunks_cube_get(&c->chunks[i], &block_array[offset], i);
+	// }
+
+
 	ft_printf_fd(1, CYAN"instanceCount: %d\n"RESET, instanceCount);
 	c->renderBlock = instanceCount;
 	return (block_array);
@@ -127,7 +154,7 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	glEnableVertexAttribArray(2);
 
 
-	vec3 *block_array = getBlockArray(c);
+	vec3 *block_array = getBlockArray(c, c->world->chunksMap);
 	if (!block_array) {
 		ft_printf_fd(1, RED"Error: block_array is NULL\n"RESET);
 		return (0);
@@ -135,6 +162,8 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	
 	/* Instance position */
 	GLuint instanceVBO = bufferGlCreate(GL_ARRAY_BUFFER, c->renderBlock * sizeof(vec3), (void *)block_array[0]);
+
+	free(block_array);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(VAO);

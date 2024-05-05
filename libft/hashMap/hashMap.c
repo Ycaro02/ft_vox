@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/02 16:26:03 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/05 12:30:52 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void hashmap_entry_free(void *entry) {
 	free(e); /* free the entry t_list node */
 }
 
-u64 hash_block_position(u32 x, u32 y, u32 z) {
+u64 hash_block_position(s32 x, s32 y, s32 z) {
     u64 key = ((u64)x << 42) | ((u64)y << 21) | (u64)z;
     return (key);
 }

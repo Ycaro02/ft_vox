@@ -84,7 +84,10 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
     ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n", w, h, type);
 
 	u8 *fliped_text = imageFlip180(texture, w, h, type);
-	free(texture);
+	// free(texture);
+
+	ft_printf_fd(1, "Texture fliped, %c\n", fliped_text ? 'Y' : 'N');
+	ft_printf_fd(1, "Texture fliped: w %d, h %d, type %d\n", w, h, type);
 
     t_list *square_lst = cut_texture_into_squares(fliped_text, w, h, squareWidth, squareHeight, type, ignore_color);
     if (!square_lst) {
@@ -125,6 +128,9 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+
+	free(texture);
 
     return (textureID);
 }

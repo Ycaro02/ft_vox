@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/03 09:34:55 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/05 12:31:06 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,9 @@
 
 /* Block position structure */
 typedef struct s_block_pos {
-	u32 x;
-	u32 y;
-	u32 z;
+	s32 x;
+	s32 y;
+	s32 z;
 } t_block_pos;
 
 /* HashMap entry key + value + original data */
@@ -115,7 +115,7 @@ typedef struct s_hashmap_it {
  * @param x,y,z block coordinate
  * @return u64 KEY used to store the block in hashMap
 */
-u64 hash_block_position(u32 x, u32 y, u32 z);
+u64 hash_block_position(s32 x, s32 y, s32 z);
 
 /**
  * @brief HashMap init, create a new HashMap 

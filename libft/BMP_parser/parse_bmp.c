@@ -83,7 +83,7 @@ FT_INLINE u8 check_file_size(u8 *file, u64 file_size, bmp_hdr header, bmp_info_h
 u8 *imageFlip180(u8 *image, int width, int height, int type)
 {
     int data_size = type == 3 ? RGB_SIZE : RGBA_SIZE;
-    u8 *flipped_image = malloc(width * height * data_size);
+    u8 *flipped_image = ft_calloc(width * height * data_size, sizeof(u8));
 
     if (!flipped_image) {
         return (NULL);
