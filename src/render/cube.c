@@ -1,7 +1,6 @@
 #include "../../include/vox.h"
 #include "../../include/cube.h"
 
-
 /**
  * @brief Draw a cube
  * @param VAO Vertex Array Object
@@ -29,7 +28,7 @@ void drawAllCube(GLuint VAO, u32 nb_cube) {
  * @param chunk_id chunk id
  * @return offset of the block array
 */
-u32 get_block_arr_offset(u32 *visible_block_array, u32 chunk_id) {
+u32 blockArrayOffsetGet(u32 *visible_block_array, u32 chunk_id) {
 	u32 offset = 0;
 	for (u32 i = 0; i < chunk_id; ++i) {
 		offset += visible_block_array[i];
@@ -54,17 +53,9 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
 	return (vbo);
 }
 
-/**
- * @brief Get the block array
- * @param c context
- * @return block array
-*/
-vec3 *getBlockArray(t_context *c, hashMap *chunksMap) {
-	u32 visibleBlock = 0, instanceCount = 0;
-	// u32 visible_block_array[1000] = {0}; /* SMASH STACK HERE */
-	u32 *visible_block_array = NULL; /* SMASH STACK HERE */
-
-	visible_block_array = ft_calloc(sizeof(u32), hashmap_size(chunksMap));
+u32 *totalVisibleBlockGet(hashMap *chunksMap, u32 *visibleBlock)
+{
+	u32 *visible_block_array = ft_calloc(sizeof(u32), hashmap_size(chunksMap));
 
 	hashMap_it it = hashmap_iterator(chunksMap);
 	s8 next = hashmap_next(&it); 
@@ -73,31 +64,48 @@ vec3 *getBlockArray(t_context *c, hashMap *chunksMap) {
 	while (next) {
 		t_chunks *chunks = (t_chunks *)it.value;
 		visible_block_array[i] = chunks->visible_block;
-		visibleBlock += chunks->visible_block; 
+		*visibleBlock += chunks->visible_block; 
 		++i;
 		next = hashmap_next(&it);
 	}
+	return (visible_block_array);
+}
 
+/**
+ * @brief Get the block array
+ * @param c context
+ * @return block array
+*/
+vec3 *getBlockArray(t_context *c, hashMap *chunksMap, u32 *visibleBlockArr, u32 visibleBlock) {
+	u32 instanceCount = 0;
     vec3 *block_array = ft_calloc(sizeof(vec3), visibleBlock);
-	ft_printf_fd(1, GREEN"visibleBlock: %u\n"RESET, visibleBlock);
-
-
-	it = hashmap_iterator(chunksMap);
-	next = hashmap_next(&it);
-	i = 0;
+	hashMap_it it = hashmap_iterator(chunksMap);
+	s8 next = hashmap_next(&it); 
+	u32 i = 0;
 
 	while (next) {
 		t_chunks *chunks = (t_chunks *)it.value;
-		u32 offset = get_block_arr_offset(visible_block_array, i); 
+		u32 offset = blockArrayOffsetGet(visibleBlockArr, i); 
 		instanceCount += chunks_cube_get(chunks, &block_array[offset], i);
 		++i;
 		next = hashmap_next(&it);
 	}
 
-	free(visible_block_array);
+	free(visibleBlockArr);
 	ft_printf_fd(1, CYAN"instanceCount: %d\n"RESET, instanceCount);
 	c->renderBlock = instanceCount;
 	return (block_array);
+}
+
+vec3 *chunksToBlockArray(t_context *c, hashMap *chunksMap) {
+	u32 visibleBlock = 0;
+	u32 *visibleBlockArr = totalVisibleBlockGet(chunksMap, &visibleBlock);
+	if (!visibleBlockArr || visibleBlock == 0) {
+		ft_printf_fd(1, "Error get visible block\n");
+		return (NULL);
+	}
+	ft_printf_fd(1, GREEN"visibleBlock: %u\n"RESET, visibleBlock);
+	return (getBlockArray(c, c->world->chunksMap, visibleBlockArr, visibleBlock));
 }
 
 GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
@@ -148,7 +156,7 @@ GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
 	glEnableVertexAttribArray(2);
 
 
-	vec3 *block_array = getBlockArray(c, c->world->chunksMap);
+	vec3 *block_array = chunksToBlockArray(c, c->world->chunksMap);
 	if (!block_array) {
 		ft_printf_fd(1, RED"Error: block_array is NULL\n"RESET);
 		return (0);
