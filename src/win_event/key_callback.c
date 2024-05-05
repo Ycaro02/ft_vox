@@ -7,30 +7,30 @@ void act_escape(t_context *c) {
 
 /* Zoom : W */
 void act_zoom(t_context *c) {
-    move_camera_forward(&c->cam, CAM_MOVE_HORIZONTAL);
+    move_camera_forward(&c->cam, 0.5f);
 }
 
 /* Unzoom : S */
 void act_unzoom(t_context *c) {
-    move_camera_backward(&c->cam, CAM_MOVE_HORIZONTAL);
+    move_camera_backward(&c->cam, 0.5f);
 }
 
-/* Unzoom: C */
+/* Unzoom: D */
 void act_move_right(t_context *c) {
-	straf_camera(&c->cam, CAM_MOVE_HORIZONTAL, DIR_RIGHT);
+	straf_camera(&c->cam, 0.5f, DIR_RIGHT);
 }
 
-/* Unzoom: Z */
+/* Unzoom: A */
 void act_move_left(t_context *c) {
-	straf_camera(&c->cam, CAM_MOVE_HORIZONTAL, DIR_LEFT);
+	straf_camera(&c->cam, 0.5f, DIR_LEFT);
 }
 
-/* Rotate camera left : A */
+/* Rotate camera left : LEFT */
 void act_rotate_camera_left(t_context *c) {
 	rotate_camera(&c->cam, CAM_MOVE_HORIZONTAL, VEC3_ROTATEY);
 }
 
-/* Rotate camera right D */
+/* Rotate camera right: RIGHT */
 void act_rotate_camera_right(t_context *c) {
     rotate_camera(&c->cam, -CAM_MOVE_HORIZONTAL, VEC3_ROTATEY);
 }
@@ -45,7 +45,7 @@ void act_rotate_camera_down(t_context *c) {
 	rotateTopBot(&c->cam, CAM_MOVE_HORIZONTAL);
 }
 
-/* Up camera : E */
+/* Up camera : SPACE */
 void act_up_camera(t_context *c) {
     move_camera_up(&c->cam, CAM_UP_DOWN);
 }
@@ -60,9 +60,11 @@ void act_reset_camera(t_context *c) {
     reset_camera(c);
 }
 
-/* Display cam data : SPACE */
+/* Display cam data : C */
 void act_display_camera_value(t_context *c) {
-    display_camera_value(&c->cam);
+    ft_printf_fd(1, CYAN"\nPos: %f, %f, %f\n"RESET, c->cam.position[0], c->cam.position[1],c->cam.position[2]);
+	ft_printf_fd(1, PINK"Chunk Pos %d, %d, %d\n", c->cam.chunkPos[0], c->cam.chunkPos[1], c->cam.chunkPos[2]);
+	// display_camera_value(&c->cam);
 }
 
 /* Change polygon mode : P */
@@ -127,6 +129,7 @@ void handle_input(void *context)
 		{GLFW_KEY_UP, act_rotate_camera_top, REPEAT},
 		{GLFW_KEY_DOWN, act_rotate_camera_down, REPEAT},
 		{GLFW_KEY_ENTER, act_reset_camera, SINGLE_PRESS},
+		{GLFW_KEY_C, act_display_camera_value, SINGLE_PRESS},
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(t_key_action));
 	s32				state = GLFW_RELEASE;

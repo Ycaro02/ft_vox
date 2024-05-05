@@ -1,4 +1,13 @@
 #include "../../include/vox.h"
+#include "../../include/cube.h"
+
+void chunkPosGet(t_camera *camera)
+{
+	f32 chunkSize = 16.0f * CUBE_SIZE; // cubeSize is 0.5
+	camera->chunkPos[0]= round(camera->position[0] / chunkSize);
+	camera->chunkPos[1] = round(camera->position[1] / chunkSize);
+	camera->chunkPos[2] = round(camera->position[2] / chunkSize);
+}
 
 /**
  * @brief Display camera value
@@ -64,12 +73,15 @@ void update_camera(void *context, GLuint shader_id)
 {
 	t_context *c = context;
 
+
     /* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
 
     set_shader_var_mat4(shader_id, "view", c->cam.view);
     set_shader_var_mat4(shader_id, "projection", c->cam.projection);
 	set_shader_var_mat4(shader_id, "model", c->cube.rotation);
+	
+	chunkPosGet(&c->cam);
 }
 
 /**

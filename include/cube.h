@@ -16,6 +16,8 @@ typedef struct PACKED_STRUCT s_vertex_texture {
     vec2_f32 texCoord;
 } VertexTexture;
 
+#define CUBE_SIZE 0.500000f 
+
 /* Define cube face vertex */
 /* bl-> tr -> br -> tl */
 #define CUBE_BACK_FACE_VERTEX \

@@ -74,10 +74,6 @@ vec3 *getBlockArray(t_context *c, hashMap *chunksMap) {
 		++i;
 		next = hashmap_next(&it);
 	}
-	// for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
-	// 	visible_block_array[i] = c->chunks[i].visible_block;
-	// 	visibleBlock += c->chunks[i].visible_block;
-	// }
 
     vec3 *block_array = ft_calloc(sizeof(vec3), visibleBlock);
 	ft_printf_fd(1, GREEN"visibleBlock: %u\n"RESET, visibleBlock);
@@ -94,12 +90,6 @@ vec3 *getBlockArray(t_context *c, hashMap *chunksMap) {
 		++i;
 		next = hashmap_next(&it);
 	}
-
-	// for (u32 i = 0; i < TEST_CHUNK_MAX; ++i) {
-	// 	u32 offset = get_block_arr_offset(visible_block_array, i); 
-	// 	instanceCount += chunks_cube_get(&c->chunks[i], &block_array[offset], i);
-	// }
-
 
 	ft_printf_fd(1, CYAN"instanceCount: %d\n"RESET, instanceCount);
 	c->renderBlock = instanceCount;

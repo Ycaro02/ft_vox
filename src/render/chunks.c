@@ -8,9 +8,9 @@
 */
 size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
 {
-    for (u32 i = 0; i < SUB_CHUNKS_WIDTH; ++i) {
-        for (u32 j = 0; j < SUB_CHUNKS_HEIGHT; ++j) {
-            for (u32 k = 0; k < SUB_CHUNKS_DEPTH; ++k) {
+    for (s32 i = 0; i < 16; ++i) {
+        for (s32 j = 0; j < 16; ++j) {
+            for (s32 k = 0; k < 16; ++k) {
                 t_block *block = ft_calloc(sizeof(t_block), 1);
 				if (!block) {
 					ft_printf_fd(2, "Failed to allocate block\n");
@@ -58,7 +58,10 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
 		next = hashmap_next(&it);
 		while (next) {
 			t_block *block = (t_block *)it.value;
-			
+			/*	Need to change world translation logic must give offset with camera position origin
+				This function can be this implementation but we need to parse chunks hashMap before to
+				give only chunks to render to this function
+			*/
 			if (block->flag != BLOCK_HIDDEN) {
 				block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
 				block_array[idx][1] = (f32)block->y + (f32)(subID * SUB_CHUNKS_HEIGHT);
