@@ -121,10 +121,6 @@ u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 GLuint bufferGlCreate(GLenum type, u32 size, void *data);
 
 
-/* chunks.c */
-t_list *chunksToRenderChunks(Context *c, HashMap *chunksMap);
-void renderChunkFree(RenderChunks *render);
-
 #endif /* VOX_HEADER_H */
 
 

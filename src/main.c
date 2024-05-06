@@ -1,6 +1,6 @@
 #include "../include/vox.h"			/* Main project header */
 #include "../include/skybox.h"		/* skybox rendering */
-
+#include "../include/render_chunks.h"
 
 void drawAllChunks(GLuint VAO, u32 nb_chunk, t_list *renderChunksList) {
 	t_list *current = renderChunksList;

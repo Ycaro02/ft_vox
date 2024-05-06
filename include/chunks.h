@@ -42,12 +42,6 @@ typedef struct s_chunks {
 	s32				z;					/* Chunk Z */
 } Chunks;
 
-typedef struct s_render_chunks {
-    vec3	*block_array;		/* Block array (VBO data represent block instance position) */
-    GLuint	instanceVBO;		/* Instance VBO */
-    u32		visibleBlock;		/* Number of visible block in this chunks */
-} RenderChunks;
-
 /* Render chunks.c */
 void	fillChunks(HashMap *chunksMap);
 u32		chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID);
