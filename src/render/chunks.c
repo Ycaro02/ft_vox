@@ -84,8 +84,6 @@ s32 getChunkID() {
 	return (chunksID++);
 }
 
-
-
 Chunks *chunksLoad(s32 x, s32 z) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
@@ -162,7 +160,7 @@ void chunksLoadArround(Context *c, s32 chunksX, s32 chunksZ, s32 radius) {
 
 
 GLuint setupInstanceVBOForThisChunk(vec3* block_array, u32 visibleBlock) {
-    return (bufferGlCreate(GL_ARRAY_BUFFER, visibleBlock * sizeof(vec3), block_array));
+    return (bufferGlCreate(GL_ARRAY_BUFFER, visibleBlock * sizeof(vec3), (void *)block_array[0]));
 }
 
 void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
@@ -183,14 +181,16 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
 		return (NULL);
 	}
 	fillBlockArrayForChunk(render, chunks);
+	ft_printf_fd(1, "Visible block in render chunks create\n", render->visibleBlock);
 	render->instanceVBO = setupInstanceVBOForThisChunk(render->block_array, render->visibleBlock); // crée un VBO pour les données d'instance de ce render
-    return (render);
+	ft_printf_fd(1, "VBO %u\n", render->instanceVBO);
+	return (render);
 }
 
 
-RenderChunks **singleChunksToBlockArray(Context *c, HashMap *chunksMap) {
+RenderChunks **chunksToRenderChunks(Context *c, HashMap *chunksMap) {
     u32 numChunks = hashmap_size(chunksMap);
-    RenderChunks **chunkArray = ft_calloc(sizeof(RenderChunks*), numChunks);
+    RenderChunks **renderChunks = ft_calloc(sizeof(RenderChunks*), numChunks);
 
 	(void)c;
     HashMap_it it = hashmap_iterator(chunksMap);
@@ -199,10 +199,10 @@ RenderChunks **singleChunksToBlockArray(Context *c, HashMap *chunksMap) {
 
     while (next) {
         Chunks *chunks = (Chunks *)it.value;
-        chunkArray[i] = renderChunkCreate(chunks);
+        renderChunks[i] = renderChunkCreate(chunks);
         ++i;
         next = hashmap_next(&it);
     }
 
-    return chunkArray;
+    return (renderChunks);
 }

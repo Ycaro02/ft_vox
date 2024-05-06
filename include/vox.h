@@ -107,7 +107,7 @@ enum AtlasId {
 
 /* render/cube.c */
 GLuint	setupCubeVAO(Context *c, ModelCube *cube);
-void	drawAllCube(GLuint vao, u32 nb_cube);
+void	drawAllCube(GLuint vao, GLuint vbo, u32 nb_cube);
 
 /* texture load_texture */
 GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
@@ -119,6 +119,10 @@ u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
 /* cube.c */
 GLuint bufferGlCreate(GLenum type, u32 size, void *data);
+
+
+/* chunks.c */
+RenderChunks **chunksToRenderChunks(Context *c, HashMap *chunksMap);
 
 #endif /* VOX_HEADER_H */
 

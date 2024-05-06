@@ -7,9 +7,16 @@
  * @param vertex_nb number of vertex
  * @param cubeId cube id
 */
-void drawCube(GLuint VAO, u32 vertex_nb, u32 cubeId) {
+void drawCube(GLuint VAO, GLuint VBO, u32 vertex_nb, u32 cubeId) {
 	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribDivisor(1, 1);
+	
 	glDrawElementsInstanced(GL_TRIANGLES, vertex_nb, GL_UNSIGNED_INT, 0, cubeId);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
@@ -18,8 +25,8 @@ void drawCube(GLuint VAO, u32 vertex_nb, u32 cubeId) {
  * @param VAO Vertex Array Object
  * @param nb_cube number of cube to draw 
 */	
-void drawAllCube(GLuint VAO, u32 nb_cube) {
-	drawCube(VAO, 6*6, nb_cube);
+void drawAllCube(GLuint VAO, GLuint VBO, u32 nb_cube) {
+	drawCube(VAO, VBO, 6*6, nb_cube);
 }
 
 /**
@@ -53,62 +60,9 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
 	return (vbo);
 }
 
-u32 *totalVisibleBlockGet(HashMap *chunksMap, u32 *visibleBlock)
-{
-	u32 *visible_block_array = ft_calloc(sizeof(u32), hashmap_size(chunksMap));
-
-	HashMap_it it = hashmap_iterator(chunksMap);
-	s8 next = hashmap_next(&it); 
-	u32 i = 0;
-
-	while (next) {
-		Chunks *chunks = (Chunks *)it.value;
-		visible_block_array[i] = chunks->visible_block;
-		*visibleBlock += chunks->visible_block; 
-		++i;
-		next = hashmap_next(&it);
-	}
-	return (visible_block_array);
-}
-
-/**
- * @brief Get the block array
- * @param c context
- * @return block array
-*/
-vec3 *getBlockArray(Context *c, HashMap *chunksMap, u32 *visibleBlockArr, u32 visibleBlock) {
-	u32 instanceCount = 0;
-    vec3 *block_array = ft_calloc(sizeof(vec3), visibleBlock);
-	HashMap_it it = hashmap_iterator(chunksMap);
-	s8 next = hashmap_next(&it); 
-	u32 i = 0;
-
-	while (next) {
-		Chunks *chunks = (Chunks *)it.value;
-		u32 offset = blockArrayOffsetGet(visibleBlockArr, i); 
-		instanceCount += chunks_cube_get(chunks, &block_array[offset], i);
-		++i;
-		next = hashmap_next(&it);
-	}
-
-	free(visibleBlockArr);
-	ft_printf_fd(1, CYAN"instanceCount: %d\n"RESET, instanceCount);
-	c->renderBlock = instanceCount;
-	return (block_array);
-}
-
-vec3 *chunksToBlockArray(Context *c, HashMap *chunksMap) {
-	u32 visibleBlock = 0;
-	u32 *visibleBlockArr = totalVisibleBlockGet(chunksMap, &visibleBlock);
-	if (!visibleBlockArr || visibleBlock == 0) {
-		ft_printf_fd(1, "Error get visible block\n");
-		return (NULL);
-	}
-	ft_printf_fd(1, GREEN"visibleBlock: %u\n"RESET, visibleBlock);
-	return (getBlockArray(c, c->world->chunksMap, visibleBlockArr, visibleBlock));
-}
-
 GLuint setupCubeVAO(Context *c, ModelCube *cube) {
+	(void)c;
+
 	static const VertexTexture vertex[] = {
 		CUBE_BACK_FACE_VERTEX,
 		CUBE_FRONT_FACE_VERTEX,
@@ -154,29 +108,80 @@ GLuint setupCubeVAO(Context *c, ModelCube *cube) {
 	/* Texture Coordinate attribute */
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)sizeof(vec3));
 	glEnableVertexAttribArray(2);
-
-
-	vec3 *block_array = chunksToBlockArray(c, c->world->chunksMap);
-	if (!block_array) {
-		ft_printf_fd(1, RED"Error: block_array is NULL\n"RESET);
-		return (0);
-	}
-	
-	/* Instance position */
-	GLuint instanceVBO = bufferGlCreate(GL_ARRAY_BUFFER, c->renderBlock * sizeof(vec3), (void *)block_array[0]);
-
-	free(block_array);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glVertexAttribDivisor(1, 1);
-
-    /* Unbind VBO and VAO */
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
     return (VAO);
+
+	// vec3 *block_array = chunksToBlockArray(c, c->world->chunksMap);
+	// if (!block_array) {
+	// 	ft_printf_fd(1, RED"Error: block_array is NULL\n"RESET);
+	// 	return (0);
+	// }
+	// /* Instance position */
+	// GLuint instanceVBO = bufferGlCreate(GL_ARRAY_BUFFER, c->renderBlock * sizeof(vec3), (void *)block_array[0]);
+	// free(block_array);
+	// glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// glBindVertexArray(VAO);
+	// glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	// glEnableVertexAttribArray(1);
+	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// glVertexAttribDivisor(1, 1);
+    /* Unbind VBO and VAO */
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindVertexArray(0);
+    // return (VAO);
 }
+
+// u32 *totalVisibleBlockGet(HashMap *chunksMap, u32 *visibleBlock)
+// {
+// 	u32 *visible_block_array = ft_calloc(sizeof(u32), hashmap_size(chunksMap));
+
+// 	HashMap_it it = hashmap_iterator(chunksMap);
+// 	s8 next = hashmap_next(&it); 
+// 	u32 i = 0;
+
+// 	while (next) {
+// 		Chunks *chunks = (Chunks *)it.value;
+// 		visible_block_array[i] = chunks->visible_block;
+// 		*visibleBlock += chunks->visible_block; 
+// 		++i;
+// 		next = hashmap_next(&it);
+// 	}
+// 	return (visible_block_array);
+// }
+
+// /**
+//  * @brief Get the block array
+//  * @param c context
+//  * @return block array
+// */
+// vec3 *getBlockArray(Context *c, HashMap *chunksMap, u32 *visibleBlockArr, u32 visibleBlock) {
+// 	u32 instanceCount = 0;
+//     vec3 *block_array = ft_calloc(sizeof(vec3), visibleBlock);
+// 	HashMap_it it = hashmap_iterator(chunksMap);
+// 	s8 next = hashmap_next(&it); 
+// 	u32 i = 0;
+
+// 	while (next) {
+// 		Chunks *chunks = (Chunks *)it.value;
+// 		u32 offset = blockArrayOffsetGet(visibleBlockArr, i); 
+// 		instanceCount += chunks_cube_get(chunks, &block_array[offset], i);
+// 		++i;
+// 		next = hashmap_next(&it);
+// 	}
+
+// 	free(visibleBlockArr);
+// 	ft_printf_fd(1, CYAN"instanceCount: %d\n"RESET, instanceCount);
+// 	c->renderBlock = instanceCount;
+// 	return (block_array);
+// }
+
+// vec3 *chunksToBlockArray(Context *c, HashMap *chunksMap) {
+// 	u32 visibleBlock = 0;
+// 	u32 *visibleBlockArr = totalVisibleBlockGet(chunksMap, &visibleBlock);
+// 	if (!visibleBlockArr || visibleBlock == 0) {
+// 		ft_printf_fd(1, "Error get visible block\n");
+// 		return (NULL);
+// 	}
+// 	ft_printf_fd(1, GREEN"visibleBlock: %u\n"RESET, visibleBlock);
+// 	return (getBlockArray(c, c->world->chunksMap, visibleBlockArr, visibleBlock));
+// }
