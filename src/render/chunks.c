@@ -168,6 +168,11 @@ void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
 }
 
 
+void renderChunkFree(RenderChunks *render) {
+	free(render->block_array);
+	free(render);
+}
+
 RenderChunks *renderChunkCreate(Chunks *chunks) {
     RenderChunks *render = malloc(sizeof(RenderChunks));
 	if (!render) {
@@ -188,9 +193,10 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
 }
 
 
-RenderChunks **chunksToRenderChunks(Context *c, HashMap *chunksMap) {
-    u32 numChunks = hashmap_size(chunksMap);
-    RenderChunks **renderChunks = ft_calloc(sizeof(RenderChunks*), numChunks);
+t_list *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
+    // u32 numChunks = hashmap_size(chunksMap);
+    // RenderChunks **renderChunks = ft_calloc(sizeof(RenderChunks*), numChunks);
+	t_list *renderChunksList = NULL;
 
 	(void)c;
     HashMap_it it = hashmap_iterator(chunksMap);
@@ -199,10 +205,12 @@ RenderChunks **chunksToRenderChunks(Context *c, HashMap *chunksMap) {
 
     while (next) {
         Chunks *chunks = (Chunks *)it.value;
-        renderChunks[i] = renderChunkCreate(chunks);
-        ++i;
+        RenderChunks *renderChunk = renderChunkCreate(chunks);
+		// renderChunks[i] = renderChunkCreate(chunks);
+        ft_lstadd_back(&renderChunksList, ft_lstnew(renderChunk));
+		++i;
         next = hashmap_next(&it);
     }
 
-    return (renderChunks);
+    return (renderChunksList);
 }

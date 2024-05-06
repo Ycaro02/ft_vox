@@ -2,18 +2,20 @@
 #include "../include/skybox.h"		/* skybox rendering */
 
 
-void drawAllChunks(GLuint VAO, u32 nb_chunk, RenderChunks **renderChunks) {
+void drawAllChunks(GLuint VAO, u32 nb_chunk, t_list *renderChunksList) {
+	t_list *current = renderChunksList;
+	
 	for (u32 i = 0; i < nb_chunk; ++i) {
-		drawAllCube(VAO, renderChunks[i]->instanceVBO, renderChunks[i]->visibleBlock);
+		RenderChunks *renderChunk = (RenderChunks *)current->content;
+		drawAllCube(VAO, renderChunk->instanceVBO, renderChunk->visibleBlock);
+		current = current->next;
 	}
 }
 
-void renderScene(Context *c, GLuint vao, GLuint shader_id, RenderChunks **renderChunks) {
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void chunksRender(Context *c, GLuint vao, GLuint shader_id, t_list *renderChunksList) {
     glLoadIdentity();
 	glUseProgram(shader_id);
-    // drawAllCube(vao, c->renderBlock);
-	drawAllChunks(vao, c->world->chunksMap->size, renderChunks);
+	drawAllChunks(vao, c->world->chunksMap->size, renderChunksList);
     glFlush();
 }
 
@@ -44,7 +46,7 @@ FT_INLINE void display_fps() {
 	}
 }
 
-FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, RenderChunks **renderChunks) {
+FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, t_list *renderChunksList) {
 
     while (!glfwWindowShouldClose(context->win_ptr)) {
     
@@ -54,9 +56,8 @@ FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, Render
         displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
 
         // glUseProgram(context->cubeShaderID);
-        renderScene(context, vao, context->cubeShaderID, renderChunks);
+        chunksRender(context, vao, context->cubeShaderID, renderChunksList);
 
-      
 	    glfwSwapBuffers(context->win_ptr);
         glfwPollEvents();
         handle_input(context);
@@ -104,7 +105,7 @@ int main() {
 
 	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
 
-	RenderChunks **renderChunks = chunksToRenderChunks(&context, context.world->chunksMap);
+	t_list *renderChunksList = chunksToRenderChunks(&context, context.world->chunksMap);
 
 	/* Init skybox */
 	context.skyboxVAO = skyboxInit();
@@ -120,8 +121,9 @@ int main() {
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);
 
-	main_loop(&context, cubeVAO, skyTexture, renderChunks);
+	main_loop(&context, cubeVAO, skyTexture, renderChunksList);
 
+	ft_lstclear(&renderChunksList, free);
     vox_destroy(&context, textureAtlas);
     return 0;
 }

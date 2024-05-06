@@ -122,7 +122,8 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data);
 
 
 /* chunks.c */
-RenderChunks **chunksToRenderChunks(Context *c, HashMap *chunksMap);
+t_list *chunksToRenderChunks(Context *c, HashMap *chunksMap);
+void renderChunkFree(RenderChunks *render);
 
 #endif /* VOX_HEADER_H */
 
