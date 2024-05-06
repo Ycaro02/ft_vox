@@ -15,7 +15,7 @@ typedef struct s_modelCube {
 	vec3			*vertex;		/* vertex array, give to openGL context */
 	u32				v_size;			/* vertex size */
 	mat4			rotation;		/* rotation matrix */
-}	t_modelCube;
+}	ModelCube;
 
 /* shader_utils.c */
 void 	set_shader_var_vec4(GLuint shader_id, char *var_name, vec4 vec);
@@ -25,7 +25,7 @@ GLuint	load_shader(char *vertexShader, char *fragmentShader);
 
 
 /* obj_rotate.c */
-void rotate_object_around_center(t_modelCube* cube, vec3 rotate_vec, float angle, GLuint shader_id); 
-void get_obj_center(t_modelCube* cube, vec3 center);
+void rotate_object_around_center(ModelCube* cube, vec3 rotate_vec, float angle, GLuint shader_id); 
+void get_obj_center(ModelCube* cube, vec3 center);
 
 #endif /* HEADER_RENDER_H */

@@ -53,16 +53,16 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
 	return (vbo);
 }
 
-u32 *totalVisibleBlockGet(hashMap *chunksMap, u32 *visibleBlock)
+u32 *totalVisibleBlockGet(HashMap *chunksMap, u32 *visibleBlock)
 {
 	u32 *visible_block_array = ft_calloc(sizeof(u32), hashmap_size(chunksMap));
 
-	hashMap_it it = hashmap_iterator(chunksMap);
+	HashMap_it it = hashmap_iterator(chunksMap);
 	s8 next = hashmap_next(&it); 
 	u32 i = 0;
 
 	while (next) {
-		t_chunks *chunks = (t_chunks *)it.value;
+		Chunks *chunks = (Chunks *)it.value;
 		visible_block_array[i] = chunks->visible_block;
 		*visibleBlock += chunks->visible_block; 
 		++i;
@@ -76,15 +76,15 @@ u32 *totalVisibleBlockGet(hashMap *chunksMap, u32 *visibleBlock)
  * @param c context
  * @return block array
 */
-vec3 *getBlockArray(t_context *c, hashMap *chunksMap, u32 *visibleBlockArr, u32 visibleBlock) {
+vec3 *getBlockArray(Context *c, HashMap *chunksMap, u32 *visibleBlockArr, u32 visibleBlock) {
 	u32 instanceCount = 0;
     vec3 *block_array = ft_calloc(sizeof(vec3), visibleBlock);
-	hashMap_it it = hashmap_iterator(chunksMap);
+	HashMap_it it = hashmap_iterator(chunksMap);
 	s8 next = hashmap_next(&it); 
 	u32 i = 0;
 
 	while (next) {
-		t_chunks *chunks = (t_chunks *)it.value;
+		Chunks *chunks = (Chunks *)it.value;
 		u32 offset = blockArrayOffsetGet(visibleBlockArr, i); 
 		instanceCount += chunks_cube_get(chunks, &block_array[offset], i);
 		++i;
@@ -97,7 +97,7 @@ vec3 *getBlockArray(t_context *c, hashMap *chunksMap, u32 *visibleBlockArr, u32 
 	return (block_array);
 }
 
-vec3 *chunksToBlockArray(t_context *c, hashMap *chunksMap) {
+vec3 *chunksToBlockArray(Context *c, HashMap *chunksMap) {
 	u32 visibleBlock = 0;
 	u32 *visibleBlockArr = totalVisibleBlockGet(chunksMap, &visibleBlock);
 	if (!visibleBlockArr || visibleBlock == 0) {
@@ -108,7 +108,7 @@ vec3 *chunksToBlockArray(t_context *c, hashMap *chunksMap) {
 	return (getBlockArray(c, c->world->chunksMap, visibleBlockArr, visibleBlock));
 }
 
-GLuint setupCubeVAO(t_context *c, t_modelCube *cube) {
+GLuint setupCubeVAO(Context *c, ModelCube *cube) {
 	static const VertexTexture vertex[] = {
 		CUBE_BACK_FACE_VERTEX,
 		CUBE_FRONT_FACE_VERTEX,

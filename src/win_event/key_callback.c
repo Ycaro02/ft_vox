@@ -1,70 +1,70 @@
 #include "../../include/vox.h"
 
 /* Escapte Key : ESC */
-void act_escape(t_context *c) {
+void act_escape(Context *c) {
     glfwSetWindowShouldClose(c->win_ptr, GL_TRUE);
 }
 
 /* Zoom : W */
-void act_zoom(t_context *c) {
+void act_zoom(Context *c) {
     move_camera_forward(&c->cam, 0.5f);
 }
 
 /* Unzoom : S */
-void act_unzoom(t_context *c) {
+void act_unzoom(Context *c) {
     move_camera_backward(&c->cam, 0.5f);
 }
 
 /* Unzoom: D */
-void act_move_right(t_context *c) {
+void act_move_right(Context *c) {
 	straf_camera(&c->cam, 0.5f, DIR_RIGHT);
 }
 
 /* Unzoom: A */
-void act_move_left(t_context *c) {
+void act_move_left(Context *c) {
 	straf_camera(&c->cam, 0.5f, DIR_LEFT);
 }
 
 /* Rotate camera left : LEFT */
-void act_rotate_camera_left(t_context *c) {
+void act_rotate_camera_left(Context *c) {
 	rotate_camera(&c->cam, CAM_MOVE_HORIZONTAL, VEC3_ROTATEY);
 }
 
 /* Rotate camera right: RIGHT */
-void act_rotate_camera_right(t_context *c) {
+void act_rotate_camera_right(Context *c) {
     rotate_camera(&c->cam, -CAM_MOVE_HORIZONTAL, VEC3_ROTATEY);
 }
 
 /* Rotate camera top UP */
-void act_rotate_camera_top(t_context *c) {
+void act_rotate_camera_top(Context *c) {
 	rotateTopBot(&c->cam, -CAM_MOVE_HORIZONTAL);
 }
 
 /* Rotate camera down : DOWN */
-void act_rotate_camera_down(t_context *c) {
+void act_rotate_camera_down(Context *c) {
 	rotateTopBot(&c->cam, CAM_MOVE_HORIZONTAL);
 }
 
 /* Up camera : SPACE */
-void act_up_camera(t_context *c) {
+void act_up_camera(Context *c) {
     move_camera_up(&c->cam, CAM_UP_DOWN);
 }
 
 /* Down camera : Q */
-void act_down_camera(t_context *c) {
+void act_down_camera(Context *c) {
     move_camera_up(&c->cam, -CAM_UP_DOWN);
 }
 
 /* Reset cam : ENTER */
-void act_reset_camera(t_context *c) {
-    reset_camera(c);
+void act_reseCamera(Context *c) {
+    reseCamera(c);
 }
 
-void testChunksExist(t_context *c) {
-	t_block_pos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
+void testChunksExist(Context *c) {
+	BlockPos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
 	ft_printf_fd(1, YELLOW"\nTest for chunk: %d, %d %d: "RESET, pos.x, pos.y, pos.z);
 
-	t_chunks *chunks = hashmap_get(c->world->chunksMap, pos);
+	Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 	if (chunks) {
 		ft_printf_fd(1, GREEN"Chunk exist\n"RESET);
 	} else {
@@ -74,14 +74,14 @@ void testChunksExist(t_context *c) {
 }
 
 /* Display cam data : C */
-void act_display_camera_value(t_context *c) {
+void act_display_camera_value(Context *c) {
     ft_printf_fd(1, CYAN"\nPos: %f, %f, %f\n"RESET, c->cam.position[0], c->cam.position[1],c->cam.position[2]);
 	ft_printf_fd(1, PINK"Chunk X[%d], Z[%d], Y:|%d|\n", c->cam.chunkPos[0], c->cam.chunkPos[2], c->cam.chunkPos[1]);
 	// display_camera_value(&c->cam);
 }
 
 /* Change polygon mode : P */
-void act_change_polygon_mode(t_context *c) {
+void act_change_polygon_mode(Context *c) {
 	/* To store in context structure */
     static u8 fill_mode = 1;
 	
@@ -91,27 +91,27 @@ void act_change_polygon_mode(t_context *c) {
 }
 
 /* Rotate object left : LEFT */
-// void act_rotate_object_left(t_context *c) {
+// void act_rotate_object_left(Context *c) {
 // 	rotate_object_around_center(&c->cube, VEC3_ROTATEX, ROTATE_ANGLE, c->cubeShaderID);
 // }
 
 // /* Rotate object right : RIGHT */
-// void act_rotate_object_right(t_context *c) {
+// void act_rotate_object_right(Context *c) {
 // 	rotate_object_around_center(&c->cube, VEC3_ROTATEX, -ROTATE_ANGLE, c->cubeShaderID);
 // }
 
 // /* Rotate object up : UP */
-// void act_rotate_object_up(t_context *c) {
+// void act_rotate_object_up(Context *c) {
 // 	rotate_object_around_center(&c->cube, VEC3_ROTATEY, ROTATE_ANGLE, c->cubeShaderID);
 // }
 
 // /* Rotate object down : DOWN */
-// void act_rotate_object_down(t_context *c) {
+// void act_rotate_object_down(Context *c) {
 // 	rotate_object_around_center(&c->cube, VEC3_ROTATEY, -ROTATE_ANGLE, c->cubeShaderID);
 // }
 
 // /* Rotate object Z up : PAGE UP*/
-// void act_rotate_object_z_up(t_context *c) {
+// void act_rotate_object_z_up(Context *c) {
 // 	rotate_object_around_center(&c->cube, VEC3_ROTATEZ, ROTATE_ANGLE, c->cubeShaderID);
 // }
 
@@ -128,7 +128,7 @@ void handle_input(void *context)
 {
 	/* To store in context structure */
 	static u8		previous_state[GLFW_KEY_LAST] = {0};
-	t_key_action	key_actions[] = {
+	KeyAction	key_actions[] = {
 		{GLFW_KEY_ESCAPE, act_escape, SINGLE_PRESS},
 		{GLFW_KEY_P, act_change_polygon_mode, SINGLE_PRESS},
 		{GLFW_KEY_W, act_zoom, REPEAT},
@@ -141,13 +141,13 @@ void handle_input(void *context)
 		{GLFW_KEY_RIGHT, act_rotate_camera_right, REPEAT},
 		{GLFW_KEY_UP, act_rotate_camera_top, REPEAT},
 		{GLFW_KEY_DOWN, act_rotate_camera_down, REPEAT},
-		{GLFW_KEY_ENTER, act_reset_camera, SINGLE_PRESS},
+		{GLFW_KEY_ENTER, act_reseCamera, SINGLE_PRESS},
 		{GLFW_KEY_C, act_display_camera_value, SINGLE_PRESS},
 		{GLFW_KEY_E, testChunksExist, SINGLE_PRESS},
 	};
-	u32 			max = (sizeof(key_actions) / sizeof(t_key_action));
+	u32 			max = (sizeof(key_actions) / sizeof(KeyAction));
 	s32				state = GLFW_RELEASE;
- 	t_context 		*c = context;
+ 	Context 		*c = context;
 
 	for (u32 i = 0; i < max; i++) {
         state = glfwGetKey(c->win_ptr, key_actions[i].key);

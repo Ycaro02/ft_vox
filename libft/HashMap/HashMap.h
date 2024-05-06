@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/05 21:52:43 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/06 12:12:58 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
  *	- Many hash table designs also allow arbitrary insertions and deletions of key-value pairs, at (amortized) constant average cost per operation.
  *	- In many situations, hash tables turn out to be more efficient than search trees or any other table lookup structure.
  *	- For this implementation, we will use a simple hash function to hash the block position (x,y,z) to a unique key.
- *	- The hash map is implemented with a list of t_list pointers, each t_list pointer is the head of a list of hashMap_entry
+ *	- The hash map is implemented with a list of t_list pointers, each t_list pointer is the head of a list of HashMap_entry
  **	- Main features:
  *		- store any type of data (void*), the user will have to handle the data type and give a free function to free the data.
  *		- get the length of the map.
@@ -51,35 +51,35 @@ typedef struct PACKED_STRUCT s_block_pos {
 	s32 x;
 	s32 y;
 	s32 z;
-} t_block_pos;
+} BlockPos;
 
 /* HashMap entry key + value + original data */
 typedef struct s_hashmap_entry {
-	t_block_pos 	origin_data;	/* Original data (block pos) */
+	BlockPos 	origin_data;	/* Original data (block pos) */
 	u64				key;			/* Key of the entry */
 	void 			*value;			/* Value linked */
-} hashMap_entry;
+} HashMap_entry;
 
 /* HashMap structure */
 typedef struct s_hashmap {
-	t_list 		**entries;				/* array of t_list double ptr, head of each hashMap_entry list*/
+	t_list 		**entries;				/* array of t_list double ptr, head of each HashMap_entry list*/
 	size_t		capacity;				/* Capacity of the array ( entry size, number of list ptr )*/
 	size_t		size;					/* Number of current item stored  */
 	void		(*free_obj)(void *obj); /* Free function to free the given obj */
 	// u64			(*hash)(); /* Hash function to hash the given obj/data to a key */
 	// s8			(*obj_cmp)(void *a, void *b); /* Scmp obj function  */
-} hashMap;
+} HashMap;
 
 /* HashMap iterator struct */
 typedef struct s_hashmap_it {
 	u64			key;			/* Key of the current node */
 	void 		*value;			/* Value of the current node */
 	
-	/* Fields get with hashMap iterator/next don't use these directly */
-	hashMap		*_map;			/* HashMap head in this iterator */
+	/* Fields get with HashMap iterator/next don't use these directly */
+	HashMap		*_map;			/* HashMap head in this iterator */
 	size_t		_idx;			/* Current index in the array */
 	t_list		*_current;		/* Current node in the list */
-} hashMap_it;
+} HashMap_it;
 
 
 /* First capacity init, prime number arround 100 or 1000*/
@@ -113,7 +113,7 @@ typedef struct s_hashmap_it {
 /**
  * @brief hash block coordinate to a unique key
  * @param x,y,z block coordinate
- * @return u64 KEY used to store the block in hashMap
+ * @return u64 KEY used to store the block in HashMap
 */
 u64 hash_block_position(s32 x, s32 y, s32 z);
 
@@ -122,12 +122,12 @@ u64 hash_block_position(s32 x, s32 y, s32 z);
  * @param capacity initial capacity of the HashMap
  * If the capacity is not a prime number, the capacity will be set to the next (grather) prime number 
  * @param free_obj function to free the object
- * @return hashMap* new HashMap (NULL if failed)
+ * @return HashMap* new HashMap (NULL if failed)
 */
-hashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj));
+HashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj));
 
 /**
- * @brief HashMap entry free, free the entry (give to parameter to hashMap init see implementation in hashMap.c)
+ * @brief HashMap entry free, free the entry (give to parameter to HashMap init see implementation in HashMap.c)
  * @param entry entry to free
 */
 void hashmap_entry_free(void *entry);
@@ -136,7 +136,7 @@ void hashmap_entry_free(void *entry);
  * @brief HashMap destroy the map and free all the memory
  * @param map HashMap to destroy
 */
-void hashmap_destroy(hashMap *map);
+void hashmap_destroy(HashMap *map);
 
 /**
  * @brief HashMap get the associated value with the key (x,y,z are the key)
@@ -144,7 +144,7 @@ void hashmap_destroy(hashMap *map);
  * @param x,y,z key to search
  * @return void* value associated with the key (NULL if not found)
 */
-void *hashmap_get(hashMap *map, t_block_pos p);
+void *hashmap_get(HashMap *map, BlockPos p);
 
 /**
  * @brief HashMap set the value associated with the key (x,y,z are the key)
@@ -153,14 +153,14 @@ void *hashmap_get(hashMap *map, t_block_pos p);
  * @param value value to set
  * @return u8 HASHMAP_UPT_ENTRY if update, HASHMAP_ADD_ENTRY if add, HASHMAP_MALLOC_ERROR if malloc failed
 */
-u8 hashmap_set_entry(hashMap *map, t_block_pos p, void *value);
+u8 hashmap_set_entry(HashMap *map, BlockPos p, void *value);
 
 /**
  * @brief Function to get the length of the hash map
  * @param map HashMap to get the length
  * @return size_t length of the map
 */
-size_t hashmap_size(hashMap *map);
+size_t hashmap_size(HashMap *map);
 
 
 /**
@@ -168,27 +168,27 @@ size_t hashmap_size(hashMap *map);
  * @param map HashMap to get the capacity
  * @return size_t capacity of the map
 */
-size_t hashmap_capacity(hashMap *map);
+size_t hashmap_capacity(HashMap *map);
 
 /**
  * @brief Function to create and initialize an iterator for the hash map 
  * @param map HashMap to iterate
- * @return hashMap_it Iterator to the first entry in the map
+ * @return HashMap_it Iterator to the first entry in the map
 */
-hashMap_it hashmap_iterator(hashMap *map);
+HashMap_it hashmap_iterator(HashMap *map);
 
 /**
  *  @brief Function to move to the next item in the hash map
  *	@param it Iterator to move
  *	@return int TRUE if move successful, FALSE otherwise (end of the map)
 */
-s8 hashmap_next(hashMap_it *it);
+s8 hashmap_next(HashMap_it *it);
 
 /**
  * @brief Expand the given hashmap capacity
  * @param map HashMap to expand
  * @return int TRUE if expansion successful, FALSE otherwise
 */
-s8 hashmap_expand(hashMap *map);
+s8 hashmap_expand(HashMap *map);
 
 #endif /* HEADER_HASHMAP_H */

@@ -1,7 +1,7 @@
 #include "../../include/vox.h"
 #include "../../include/cube.h"
 
-void chunkPosGet(t_camera *camera)
+void chunkPosGet(Camera *camera)
 {
 	f32 chunkSize = 8.0; // cubeSize is 0.5
 	camera->chunkPos[0]= floor(camera->position[0] / chunkSize);
@@ -15,7 +15,7 @@ void chunkPosGet(t_camera *camera)
 */
 void display_camera_value(void *context)
 {
-	t_context *c = context;
+	Context *c = context;
 	ft_printf_fd(1, CYAN"Camera position: %f %f %f\n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
 	ft_printf_fd(1, "Camera target: %f %f %f\n", c->cam.target[0], c->cam.target[1], c->cam.target[2]);
 	ft_printf_fd(1, "Camera up: %f %f %f\n", c->cam.up[0], c->cam.up[1], c->cam.up[2]);
@@ -43,9 +43,9 @@ void display_camera_value(void *context)
  * @param far far plane
  * @return new camera
 */
-t_camera create_camera(float fov, float aspect_ratio, float near, float far)
+Camera create_camera(float fov, float aspect_ratio, float near, float far)
 {
-    t_camera camera;
+    Camera camera;
 
     /* init camera position */
 	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, camera.position);
@@ -71,7 +71,7 @@ t_camera create_camera(float fov, float aspect_ratio, float near, float far)
 */
 void update_camera(void *context, GLuint shader_id) 
 {
-	t_context *c = context;
+	Context *c = context;
 
 
     /* Look at view */
@@ -89,7 +89,7 @@ void update_camera(void *context, GLuint shader_id)
  * @param camera camera to move
  * @param distance distance to move
 */
-void move_camera_forward(t_camera* camera, float distance) 
+void move_camera_forward(Camera* camera, float distance) 
 {
     vec3 direction;
 
@@ -101,7 +101,7 @@ void move_camera_forward(t_camera* camera, float distance)
 }
 
 
-void straf_camera(t_camera* camera, float distance, s8 dir) {
+void straf_camera(Camera* camera, float distance, s8 dir) {
 	vec3 direction, right;
 
 	/* Compute direction vector */
@@ -127,7 +127,7 @@ void straf_camera(t_camera* camera, float distance, s8 dir) {
  * @param camera camera to move
  * @param distance distance to move
 */
-void move_camera_backward(t_camera* camera, float distance) {
+void move_camera_backward(Camera* camera, float distance) {
     move_camera_forward(camera, -distance);
 }
 
@@ -137,7 +137,7 @@ void move_camera_backward(t_camera* camera, float distance) {
  * @param distance distance to move
  * @param axis axis to move
 */
-void rotateTopBot(t_camera* camera, float angle) {
+void rotateTopBot(Camera* camera, float angle) {
     mat4 rotation = GLM_MAT4_IDENTITY_INIT;
     vec3 axis;
 
@@ -163,7 +163,7 @@ void rotateTopBot(t_camera* camera, float angle) {
     glm_vec3_add(camera->position, direction, camera->target);
 }
 
-void rotate_camera(t_camera* camera, float angle, vec3 axis) {
+void rotate_camera(Camera* camera, float angle, vec3 axis) {
     mat4 rotation = GLM_MAT4_IDENTITY_INIT;
 
     /* Create rotation matrix */
@@ -185,7 +185,7 @@ void rotate_camera(t_camera* camera, float angle, vec3 axis) {
  * @param camera camera to move
  * @param distance distance to move
 */
-void move_camera_up(t_camera* camera, float distance) 
+void move_camera_up(Camera* camera, float distance) 
 {
     vec3 direction, right, up_movement, up = {0.0f, 1.0f, 0.0f};
     
@@ -206,9 +206,9 @@ void move_camera_up(t_camera* camera, float distance)
 }
 
 /* Hard code camera postition */
-void reset_camera(void *context)
+void reseCamera(void *context)
 {
-	t_context *c = context;
+	Context *c = context;
 
     /* init camera position */
 	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, c->cam.position);

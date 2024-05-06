@@ -688,7 +688,7 @@ extern "C" {
  *  @analysis Application programmer error.  Ensure a context is current before
  *  calling functions that require a current context.
  */
-#define GLFW_NO_CURRENT_CONTEXT     0x00010002
+#define GLFW_NO_CURRENContext     0x00010002
 /*! @brief One of the arguments to the function was an invalid enum value.
  *
  *  One of the arguments to the function was an invalid enum value, for example
@@ -6178,7 +6178,7 @@ GLFWAPI void glfwSwapBuffers(GLFWwindow* window);
  *  glfwExtensionSupported.
  *
  *  A context must be current on the calling thread.  Calling this function
- *  without a current context will cause a @ref GLFW_NO_CURRENT_CONTEXT error.
+ *  without a current context will cause a @ref GLFW_NO_CURRENContext error.
  *
  *  This function does not apply to Vulkan.  If you are rendering with Vulkan,
  *  see the present mode of your swapchain instead.
@@ -6187,7 +6187,7 @@ GLFWAPI void glfwSwapBuffers(GLFWwindow* window);
  *  until the buffers are swapped by @ref glfwSwapBuffers.
  *
  *  @errors Possible errors include @ref GLFW_NOT_INITIALIZED, @ref
- *  GLFW_NO_CURRENT_CONTEXT and @ref GLFW_PLATFORM_ERROR.
+ *  GLFW_NO_CURRENContext and @ref GLFW_PLATFORM_ERROR.
  *
  *  @remark This function is not called during context creation, leaving the
  *  swap interval set to whatever is the default for that API.  This is done
@@ -6217,7 +6217,7 @@ GLFWAPI void glfwSwapInterval(int interval);
  *  creation API extensions.
  *
  *  A context must be current on the calling thread.  Calling this function
- *  without a current context will cause a @ref GLFW_NO_CURRENT_CONTEXT error.
+ *  without a current context will cause a @ref GLFW_NO_CURRENContext error.
  *
  *  As this functions retrieves and searches one or more extension strings each
  *  call, it is recommended that you cache its results if it is going to be used
@@ -6233,7 +6233,7 @@ GLFWAPI void glfwSwapInterval(int interval);
  *  otherwise.
  *
  *  @errors Possible errors include @ref GLFW_NOT_INITIALIZED, @ref
- *  GLFW_NO_CURRENT_CONTEXT, @ref GLFW_INVALID_VALUE and @ref
+ *  GLFW_NO_CURRENContext, @ref GLFW_INVALID_VALUE and @ref
  *  GLFW_PLATFORM_ERROR.
  *
  *  @thread_safety This function may be called from any thread.
@@ -6255,7 +6255,7 @@ GLFWAPI int glfwExtensionSupported(const char* extension);
  *  by the current context.
  *
  *  A context must be current on the calling thread.  Calling this function
- *  without a current context will cause a @ref GLFW_NO_CURRENT_CONTEXT error.
+ *  without a current context will cause a @ref GLFW_NO_CURRENContext error.
  *
  *  This function does not apply to Vulkan.  If you are rendering with Vulkan,
  *  see @ref glfwGetInstanceProcAddress, `vkGetInstanceProcAddr` and
@@ -6266,7 +6266,7 @@ GLFWAPI int glfwExtensionSupported(const char* extension);
  *  [error](@ref error_handling) occurred.
  *
  *  @errors Possible errors include @ref GLFW_NOT_INITIALIZED, @ref
- *  GLFW_NO_CURRENT_CONTEXT and @ref GLFW_PLATFORM_ERROR.
+ *  GLFW_NO_CURRENContext and @ref GLFW_PLATFORM_ERROR.
  *
  *  @remark The address of a given function is not guaranteed to be the same
  *  between contexts.

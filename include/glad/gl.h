@@ -807,7 +807,7 @@ typedef void (*GLADpostcallback)(void *ret, const char *name, GLADapiproc apipro
 #define GL_INDEX_SHIFT 0x0D12
 #define GL_INDEX_WRITEMASK 0x0C21
 #define GL_INFO_LOG_LENGTH 0x8B84
-#define GL_INNOCENT_CONTEXT_RESET 0x8254
+#define GL_INNOCENContext_RESET 0x8254
 #define GL_INT 0x1404
 #define GL_INTENSITY 0x8049
 #define GL_INTENSITY12 0x804C

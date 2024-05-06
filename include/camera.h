@@ -13,7 +13,7 @@
 #define VEC3_ROTATEZ (vec3){0.0f, 0.0f, 1.0f}
 
 /* Camera structure */
-typedef struct t_camera {
+typedef struct s_camera {
     vec3		position;			/* position vector */
     vec3		target;				/* target vector */
     vec3		up;					/* up vector */
@@ -21,18 +21,18 @@ typedef struct t_camera {
     mat4		projection;			/* projection matrix */
     vec3_s32        chunkPos;          /* Chunk position */
 	// mat4		view_no_translation;
-} t_camera;
+} Camera;
 
-t_camera create_camera(float fov, float aspect_ratio, float near, float far);
-void move_camera_forward(t_camera* camera, float distance);
-void move_camera_backward(t_camera* camera, float distance);
-void move_camera_up(t_camera* camera, float distance);
-void rotate_camera(t_camera* camera, float angle, vec3 axis);
+Camera create_camera(float fov, float aspect_ratio, float near, float far);
+void move_camera_forward(Camera* camera, float distance);
+void move_camera_backward(Camera* camera, float distance);
+void move_camera_up(Camera* camera, float distance);
+void rotate_camera(Camera* camera, float angle, vec3 axis);
 void display_camera_value(void *context);
-void reset_camera(void *context);
+void reseCamera(void *context);
 void update_camera(void *context, GLuint shader_id);
-void straf_camera(t_camera* camera, float distance, s8 dir);
+void straf_camera(Camera* camera, float distance, s8 dir);
 
-void rotateTopBot(t_camera* camera, float angle);
+void rotateTopBot(Camera* camera, float angle);
 
 #endif /* HEADER_CAMERA_H */

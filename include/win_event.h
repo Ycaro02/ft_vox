@@ -10,7 +10,7 @@ typedef struct s_key_action {
     int key;			/* key code */
     void (*action)();	/* action to do, function ptr void (t_obj_model *model)*/
 	u8	repeat;			/* auto repeat until key release */
-} t_key_action;
+} KeyAction;
 
 void handle_input(void *context);
 

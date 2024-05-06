@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    source.mk                                          :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+         #
+#    By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/11 16:54:20 by nfour             #+#    #+#              #
-#    Updated: 2024/05/01 14:38:06 by ycaro            ###   ########.fr        #
+#    Updated: 2024/05/06 12:14:01 by nfour            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -88,9 +88,9 @@ MATH_DIR			=	math
 MATH_SRC			=	basic_math.c
 
 
-HASHMAP_DIR			=	hashMap
+HASHMAP_DIR			=	HashMap
 
-HASHMAP_SRC			=	hashMap.c\
+HASHMAP_SRC			=	HashMap.c\
 
 BMP_PARSER_DIR		=	BMP_parser
 

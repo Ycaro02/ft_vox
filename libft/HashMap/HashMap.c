@@ -6,17 +6,17 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/05 12:30:52 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/06 12:12:20 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-#include "hashMap.h"
+#include "HashMap.h"
 #include "primeNumber.h"
 
 /* Basic function you can provide to hashmap_init */
 void hashmap_entry_free(void *entry) {
-	hashMap_entry *e = (hashMap_entry *)entry;
+	HashMap_entry *e = (HashMap_entry *)entry;
 	if (e->value) {
 		free(e->value); /* replace this by your free function */
 	}
@@ -28,22 +28,22 @@ u64 hash_block_position(s32 x, s32 y, s32 z) {
     return (key);
 }
 
-hashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj)) {
-	hashMap *map = NULL;
+HashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj)) {
+	HashMap *map = NULL;
 
 	if (!free_obj) {
 		ft_printf_fd(2, "hashmap_init: free_obj is NULL user need to provide free function\n");
 		return (NULL);
 	}
 	
-	map = ft_calloc(sizeof(hashMap), 1);
+	map = ft_calloc(sizeof(HashMap), 1);
 	if (!map) {
 		return (NULL);
 	}
 
 	size_t prime_capacity = GET_NEXT_PRIME(capacity);
 
-	map->entries = ft_calloc(sizeof(hashMap_entry), prime_capacity);
+	map->entries = ft_calloc(sizeof(HashMap_entry), prime_capacity);
 	if (!map->entries) {
 		free(map);
 		return (NULL);
@@ -55,7 +55,7 @@ hashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj)) {
 	return (map);
 }
 
-void hashmap_destroy(hashMap *map) {
+void hashmap_destroy(HashMap *map) {
 	if (!map) {
 		return ;
 	}
@@ -66,13 +66,13 @@ void hashmap_destroy(hashMap *map) {
 	free(map);			/* free map */
 }
 
-void *hashmap_get(hashMap *map, t_block_pos p) {
+void *hashmap_get(HashMap *map, BlockPos p) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
 
 	t_list *entry = map->entries[index];
 	while (entry) {
-		hashMap_entry *e = (hashMap_entry *)entry->content;
+		HashMap_entry *e = (HashMap_entry *)entry->content;
 		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
 			return (e->value);
 		}
@@ -81,14 +81,14 @@ void *hashmap_get(hashMap *map, t_block_pos p) {
 	return (NULL);
 }
 
-u8 hashmap_set_entry(hashMap *map, t_block_pos p, void *value) {
+u8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
 
 	/* Check if the entry already exist */
 	t_list *current = map->entries[index];
 	while (current) {
-		hashMap_entry *e = (hashMap_entry *)current->content;
+		HashMap_entry *e = (HashMap_entry *)current->content;
 		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
 			if (e->value) {
 				free(e->value);
@@ -99,11 +99,11 @@ u8 hashmap_set_entry(hashMap *map, t_block_pos p, void *value) {
 		current = current->next;
 	}
 
-	t_list *entry = ft_lstnew(ft_calloc(sizeof(hashMap_entry), 1));
+	t_list *entry = ft_lstnew(ft_calloc(sizeof(HashMap_entry), 1));
 	if (!entry) {
 		return (HASHMAP_MALLOC_ERROR);
 	}
-	hashMap_entry *e = (hashMap_entry *)entry->content;
+	HashMap_entry *e = (HashMap_entry *)entry->content;
 	e->origin_data.x = p.x;
 	e->origin_data.y = p.y;
 	e->origin_data.z = p.z;
@@ -115,7 +115,7 @@ u8 hashmap_set_entry(hashMap *map, t_block_pos p, void *value) {
 }
 
 
-s8 hashmap_expand(hashMap *map) 
+s8 hashmap_expand(HashMap *map) 
 {
 	/* Compute new size */
     size_t new_capacity = (map->capacity * 2);
@@ -131,7 +131,7 @@ s8 hashmap_expand(hashMap *map)
     for (size_t i = 0; i < map->capacity; i++) {
         t_list *current = map->entries[i];
         while (current) {
-            hashMap_entry *entry = (hashMap_entry *)current->content;
+            HashMap_entry *entry = (HashMap_entry *)current->content;
             size_t new_index = HASHMAP_INDEX(entry->key, new_capacity); /* Calculate new index */
             t_list *new_entry = ft_lstnew(entry);
             if (!new_entry) {
@@ -158,16 +158,16 @@ s8 hashmap_expand(hashMap *map)
     return (TRUE); /* Expansion successful */
 }
 
-size_t hashmap_size(hashMap *map) {
+size_t hashmap_size(HashMap *map) {
     return (map->size);
 }
 
-size_t hashmap_capacity(hashMap *map) {
+size_t hashmap_capacity(HashMap *map) {
     return (map->capacity);
 }
 
-hashMap_it hashmap_iterator(hashMap *map) {
-    hashMap_it it;
+HashMap_it hashmap_iterator(HashMap *map) {
+    HashMap_it it;
 
     it._map = map;
     it._idx = 0;
@@ -175,8 +175,8 @@ hashMap_it hashmap_iterator(hashMap *map) {
     return (it);
 }
 
-s8 hashmap_next(hashMap_it *it) {
-    hashMap *map = it->_map;
+s8 hashmap_next(HashMap_it *it) {
+    HashMap *map = it->_map;
 	t_list *entry = NULL;
 
     /* Loop through the entries array */
@@ -190,7 +190,7 @@ s8 hashmap_next(hashMap_it *it) {
             }
             if (it->_current != NULL) {
                 /* Go to the next entry list */
-                hashMap_entry *hm_entry = it->_current->content;
+                HashMap_entry *hm_entry = it->_current->content;
                 it->key = hm_entry->key;
                 it->value = hm_entry->value;
                 return (TRUE);

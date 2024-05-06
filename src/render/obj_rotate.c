@@ -5,7 +5,7 @@
  * @param m object model
  * @param center center vector
 */
-void get_obj_center(t_modelCube *cube, vec3 center) 
+void get_obj_center(ModelCube *cube, vec3 center) 
 {
     vec3 total = {0.0f};
 
@@ -33,7 +33,7 @@ FT_INLINE void mat_mult_translation(mat4 mat, vec3 translation) {
  * @param angle angle used to rotate
  * @param shader_id shader id for update model matrix
 */
-void rotate_object_around_center(t_modelCube* cube, vec3 rotate_vec, float angle, GLuint shader_id) 
+void rotate_object_around_center(ModelCube* cube, vec3 rotate_vec, float angle, GLuint shader_id) 
 {
     vec3 obj_center = {0}, obj_center_neg = {0};
     mat4 translation_to_origin = {0}, rotation = {0};

@@ -9,7 +9,7 @@
 
 #include "../libft/libft.h"		                /* Libft functions */
 #include "../libft/parse_flag/parse_flag.h"		/* Parse flag functions */
-#include "../libft/hashMap/hashMap.h"			/* Hashmap functions */
+#include "../libft/HashMap/HashMap.h"			/* Hashmap functions */
 #include "../libft/BMP_parser/parse_bmp.h"		/* BMP parser functions */
 #include "window.h"					            /* Window related functions */
 #include "win_event.h"				            /* Window event handling functions */
@@ -51,7 +51,7 @@
 /* HARDCOED CHUNK NUMBER */
 #define TEST_CHUNK_MAX 9
 
-enum block_type {
+enum BlockType {
     AIR=0U,      /* Air block (Empty) */
     DIRT=1U,     /* Dirt block (Exposed to light) */
     STONE=2U,    /* Stone block (Underground) */
@@ -64,27 +64,27 @@ typedef struct PACKED_STRUCT s_block {
     u32 type;       /* Block type */
 	u8  flag;       /* Block flag */
     // u32 chunkId;    /* Chunk ID */
-}   t_block;
+}   Block;
 
 
 typedef struct s_world {
 	u64			seed;			/* World seed */
-	hashMap		*chunksMap;		/* Chunks hashmap */
+	HashMap		*chunksMap;		/* Chunks hashmap */
 	u32			chunksLoaded;	/* Number of chunks loaded */
-} t_world;
+} World;
 
 /* Context structure */
 typedef struct s_context {
-	t_world		*world;				/* World structure */
-	t_camera	cam;				/* camera structure */
+	World		*world;				/* World structure */
+	Camera	cam;				/* camera structure */
     GLFWwindow	*win_ptr;			/* Window pointer */
-	t_modelCube	cube;				/* Data Cube structure */
-    // t_chunks    *chunks;        	/* current chunk */
+	ModelCube	cube;				/* Data Cube structure */
+    // Chunks    *chunks;        	/* current chunk */
 	GLuint		cubeShaderID;		/* shader program id */
 	GLuint		skyboxShaderID;		/* shader program id */
 	GLuint		skyboxVAO;				/* skybox VAO */
 	u32			renderBlock;		/* Total block to render */
-} t_context;
+} Context;
 
 /* Atlas texture ID */
 enum AtlasId {
@@ -106,7 +106,7 @@ enum AtlasId {
 
 
 /* render/cube.c */
-GLuint	setupCubeVAO(t_context *c, t_modelCube *cube);
+GLuint	setupCubeVAO(Context *c, ModelCube *cube);
 void	drawAllCube(GLuint vao, u32 nb_cube);
 
 /* texture load_texture */
@@ -114,12 +114,12 @@ GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u
 void set_shader_texture(GLuint shaderId, GLuint *atlas, u32 index, u32 textureType);	
 GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
 /* render/occlusion_culling */
-u32 checkHiddenBlock(t_chunks *chunks, u32 subChunksID);
+u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
 #endif /* VOX_HEADER_H */
 
 
-// struct compact_block {
+// struct compacBlock {
 // 	u32 shape_texture;
 // 	/*
 // 		u16 shape;

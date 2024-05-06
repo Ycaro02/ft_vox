@@ -6,12 +6,12 @@
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
+size_t BRUT_fill_subchunks(SubChunks *sub_chunk)
 {
     for (s32 i = 0; i < 16; ++i) {
         for (s32 j = 0; j < 16; ++j) {
             for (s32 k = 0; k < 16; ++k) {
-                t_block *block = ft_calloc(sizeof(t_block), 1);
+                Block *block = ft_calloc(sizeof(Block), 1);
 				if (!block) {
 					ft_printf_fd(2, "Failed to allocate block\n");
 					return (0);
@@ -20,7 +20,7 @@ size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
                 block->y = j;
                 block->z = k;
                 block->type = STONE;
-				hashmap_set_entry(sub_chunk->block_map, (t_block_pos){i, j, k}, block);
+				hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
             }
         }
     }
@@ -31,7 +31,7 @@ size_t BRUT_fill_subchunks(t_sub_chunks *sub_chunk)
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void BRUT_FillChunks(t_chunks *chunks) {
+void BRUT_FillChunks(Chunks *chunks) {
 
 	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i]);
@@ -46,7 +46,7 @@ void BRUT_FillChunks(t_chunks *chunks) {
  * @param chunkID Chunk ID [in]
  * @return u32 Number of visible block
 */
-u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
+u32 chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID)
 {
     s8 next = TRUE;
 	u32 idx = 0;
@@ -54,12 +54,12 @@ u32 chunks_cube_get(t_chunks *chunks, vec3 *block_array, u32 chunkID)
 	(void)chunkID;
 
 	for (u32 subID = 0; subID < SUBCHUNKS_DISPLAY; ++subID) {
-		hashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
+		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
 		next = hashmap_next(&it);
 		while (next) {
-			t_block *block = (t_block *)it.value;
+			Block *block = (Block *)it.value;
 			/*	Need to change world translation logic must give offset with camera position origin
-				This function can be this implementation but we need to parse chunks hashMap before to
+				This function can be this implementation but we need to parse chunks HashMap before to
 				give only chunks to render to this function
 			*/
 			if (block->flag != BLOCK_HIDDEN) {
@@ -86,8 +86,8 @@ s32 getChunkID() {
 
 
 
-t_chunks *chunksLoad(s32 x, s32 z) {
-	t_chunks *chunks = ft_calloc(sizeof(t_chunks), 1);
+Chunks *chunksLoad(s32 x, s32 z) {
+	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
 		return (NULL);
@@ -109,7 +109,7 @@ t_chunks *chunksLoad(s32 x, s32 z) {
  * @brief Fill all chunks, call brut fill chunk on all chunkks and set hashmap
  * @param c Context pointer
 */
-void fillChunks(hashMap *chunksMap) {
+void fillChunks(HashMap *chunksMap) {
 		static vec2_s32 off[] = {
 		{0, 0},\
 		{1, 0},\
@@ -127,8 +127,8 @@ void fillChunks(hashMap *chunksMap) {
 	}
 
 	for (s32 i = 0; i < TEST_CHUNK_MAX; i++) {
-		t_chunks *chunks = chunksLoad(off[i][0], off[i][1]);
-		hashmap_set_entry(chunksMap, (t_block_pos){0, chunks->x, chunks->z}, chunks);
+		Chunks *chunks = chunksLoad(off[i][0], off[i][1]);
+		hashmap_set_entry(chunksMap, (BlockPos){0, chunks->x, chunks->z}, chunks);
 	}
 
 }
@@ -140,7 +140,7 @@ void fillChunks(hashMap *chunksMap) {
  * @param curr_z Player's z position
  * @param radius The radius around the player to scan
 */
-void chunksLoadArround(t_context *c, s32 chunksX, s32 chunksZ, s32 radius) {
+void chunksLoadArround(Context *c, s32 chunksX, s32 chunksZ, s32 radius) {
 	(void)chunksX;
 	(void)chunksZ;
 
@@ -148,11 +148,11 @@ void chunksLoadArround(t_context *c, s32 chunksX, s32 chunksZ, s32 radius) {
 	s32  currentZ = c->cam.chunkPos[2];
 	for (s32 i = -radius; i < radius; ++i) {
 		for (s32 j = -radius; j < radius; ++j) {
-			t_block_pos pos = { .x = 0, .y = currentX + i, .z = currentZ + j};
-			t_chunks *chunks = hashmap_get(c->world->chunksMap, pos);
+			BlockPos pos = { .x = 0, .y = currentX + i, .z = currentZ + j};
+			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 			if (!chunks) {
 				// ft_printf_fd(1, RED"Chunk not exist REALX:%d x: %d z: %d\n"RESET, pos.x, pos.y, pos.z);
-				t_chunks *newChunks = chunksLoad(pos.y, pos.z);
+				Chunks *newChunks = chunksLoad(pos.y, pos.z);
 				hashmap_set_entry(c->world->chunksMap, pos, newChunks);
 				// ft_printf_fd(1, ORANGE"Chunk Created x: %d z: %d\n"RESET, pos.y, pos.z);
 			}

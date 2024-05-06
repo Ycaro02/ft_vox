@@ -1,7 +1,7 @@
 #include "../include/vox.h"			/* Main project header */
 #include "../include/skybox.h"		/* skybox rendering */
 
-void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
+void renderScene(Context *c, GLuint vao, GLuint shader_id) {
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 	glUseProgram(shader_id);
@@ -10,7 +10,7 @@ void renderScene(t_context *c, GLuint vao, GLuint shader_id) {
 }
 
 
-void vox_destroy(t_context *c, GLuint *atlas)
+void vox_destroy(Context *c, GLuint *atlas)
 {
 	free(atlas);
 	hashmap_destroy(c->world->chunksMap);
@@ -36,7 +36,7 @@ FT_INLINE void display_fps() {
 	}
 }
 
-FT_INLINE void main_loop(t_context *context, GLuint vao, GLuint skyTexture) {
+FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture) {
 
     while (!glfwWindowShouldClose(context->win_ptr)) {
         update_camera(context, context->cubeShaderID);
@@ -61,9 +61,9 @@ FT_INLINE void main_loop(t_context *context, GLuint vao, GLuint skyTexture) {
 
 /* Basic function you can provide to hashmap_init */
 void chunksMapFree(void *entry) {
-	hashMap_entry *e = (hashMap_entry *)entry;
+	HashMap_entry *e = (HashMap_entry *)entry;
 	if (e->value) {
-		t_chunks *chunks = (t_chunks *)e->value;
+		Chunks *chunks = (Chunks *)e->value;
 		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
@@ -74,14 +74,14 @@ void chunksMapFree(void *entry) {
 }
 
 int main() {
-    t_context context;
+    Context context;
     GLFWwindow* window;
 
-	ft_bzero(&context, sizeof(t_context));
+	ft_bzero(&context, sizeof(Context));
     window = init_openGL_context();
     context.win_ptr = window;
 
-	if (!(context.world = ft_calloc(sizeof(t_world), 1))) {
+	if (!(context.world = ft_calloc(sizeof(World), 1))) {
 		return (1);
 	} else if (!(context.world->chunksMap = hashmap_init(HASHMAP_SIZE_100, chunksMapFree))) {
 		return (1);

@@ -6,14 +6,14 @@
  * @param x,y,z the position of the block
  * @return TRUE if all neighbors exist, FALSE otherwise
 */
-s8 allNeighborsExist(hashMap *block_map, u32 x, u32 y, u32 z)
+s8 allNeighborsExist(HashMap *block_map, u32 x, u32 y, u32 z)
 {
-	if (hashmap_get(block_map, (t_block_pos){x + 1, y, z}) &&
-		hashmap_get(block_map, (t_block_pos){x - 1, y, z}) &&
-		hashmap_get(block_map, (t_block_pos){x, y + 1, z}) &&
-		hashmap_get(block_map, (t_block_pos){x, y - 1, z}) &&
-		hashmap_get(block_map, (t_block_pos){x, y, z + 1}) &&
-		hashmap_get(block_map, (t_block_pos){x, y, z - 1}))
+	if (hashmap_get(block_map, (BlockPos){x + 1, y, z}) &&
+		hashmap_get(block_map, (BlockPos){x - 1, y, z}) &&
+		hashmap_get(block_map, (BlockPos){x, y + 1, z}) &&
+		hashmap_get(block_map, (BlockPos){x, y - 1, z}) &&
+		hashmap_get(block_map, (BlockPos){x, y, z + 1}) &&
+		hashmap_get(block_map, (BlockPos){x, y, z - 1}))
 	{
 		return (TRUE);
 	}
@@ -27,16 +27,16 @@ s8 allNeighborsExist(hashMap *block_map, u32 x, u32 y, u32 z)
  * @param chunks the chunks containing all blocks
  * @return the number of visible block
 */
-u32 checkHiddenBlock(t_chunks *chunks, u32 subChunksID)
+u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID)
 {
     s8 next = TRUE;
-	hashMap *block_map = chunks->sub_chunks[subChunksID].block_map;
-	hashMap_it it = hashmap_iterator(block_map);
+	HashMap *block_map = chunks->sub_chunks[subChunksID].block_map;
+	HashMap_it it = hashmap_iterator(block_map);
 	next = hashmap_next(&it);
 	u32 nb_block = hashmap_size(block_map);
 
 	while (next) {
-		t_block *block = (t_block *)it.value;
+		Block *block = (Block *)it.value;
 		if (allNeighborsExist(block_map, block->x, block->y, block->z)) {
 			block->flag = BLOCK_HIDDEN;
 			--nb_block;
