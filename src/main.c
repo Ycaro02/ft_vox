@@ -48,6 +48,9 @@ FT_INLINE void display_fps() {
 
 FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, t_list *renderChunksList) {
 
+	// t_list *newRenderLst = NULL;
+	// (void)renderChunksList;
+
     while (!glfwWindowShouldClose(context->win_ptr)) {
     
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -55,7 +58,9 @@ FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, t_list
         // Draw skybox first
         displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
 
-        // glUseProgram(context->cubeShaderID);
+		// chunksLoadArround(context, context->cam.chunkPos[0] ,context->cam.chunkPos[2], 1);
+		// newRenderLst = chunksToRenderChunks(context, context->world->chunksMap);
+        // chunksRender(context, vao, context->cubeShaderID, newRenderLst);
         chunksRender(context, vao, context->cubeShaderID, renderChunksList);
 
 	    glfwSwapBuffers(context->win_ptr);
@@ -96,12 +101,10 @@ int main() {
 	}
 
 	/* init context camera */
-	context.cam = create_camera(45.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	fillChunks(context.world->chunksMap);
-
-	chunksLoadArround(&context, 0, 0, 2);
+	chunksLoadArround(&context, 0, 0, 3);
 
 	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
 
