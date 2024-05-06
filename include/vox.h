@@ -116,6 +116,10 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
 /* render/occlusion_culling */
 u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
+
+/* cube.c */
+GLuint bufferGlCreate(GLenum type, u32 size, void *data);
+
 #endif /* VOX_HEADER_H */
 
 
