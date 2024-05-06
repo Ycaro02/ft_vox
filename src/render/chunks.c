@@ -170,7 +170,7 @@ void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
 }
 
 
-RenderChunks *createChunk(Chunks *chunks) {
+RenderChunks *renderChunkCreate(Chunks *chunks) {
     RenderChunks *render = malloc(sizeof(RenderChunks));
 	if (!render) {
 		ft_printf_fd(2, "Failed to allocate render\n");
@@ -199,7 +199,7 @@ RenderChunks **singleChunksToBlockArray(Context *c, HashMap *chunksMap) {
 
     while (next) {
         Chunks *chunks = (Chunks *)it.value;
-        chunkArray[i] = createChunk(chunks);
+        chunkArray[i] = renderChunkCreate(chunks);
         ++i;
         next = hashmap_next(&it);
     }
