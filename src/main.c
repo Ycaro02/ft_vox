@@ -104,7 +104,7 @@ int main() {
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	chunksLoadArround(&context, 0, 0, 3);
+	chunksLoadArround(&context, 0, 0, 2);
 
 	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
 

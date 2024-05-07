@@ -94,10 +94,23 @@ void move_camera_forward(Camera* camera, float distance)
     vec3 direction;
 
     glm_vec3_sub(camera->target, camera->position, direction); /* tocheck */
+
+	/* Plane direction vector */
+	direction[1] = 0.0f;
+
     glm_vec3_normalize(direction);
     glm_vec3_scale(direction, distance, direction);
 	glm_vec3_add(camera->position, direction, camera->position);
 	glm_vec3_add(camera->target, direction, camera->target);
+}
+
+/**
+ * @brief Move camera backward
+ * @param camera camera to move
+ * @param distance distance to move
+*/
+void move_camera_backward(Camera* camera, float distance) {
+    move_camera_forward(camera, -distance);
 }
 
 
@@ -122,14 +135,6 @@ void straf_camera(Camera* camera, float distance, s8 dir) {
 	glm_vec3_add(camera->target, right, camera->target); /* move up target */
 }
 
-/**
- * @brief Move camera backward
- * @param camera camera to move
- * @param distance distance to move
-*/
-void move_camera_backward(Camera* camera, float distance) {
-    move_camera_forward(camera, -distance);
-}
 
 /**
  * @brief Move camera left
@@ -155,15 +160,16 @@ void rotateTopBot(Camera* camera, float angle) {
     glm_mat4_mulv3(rotation, direction, 1.0f, direction);
 
 	/* Check if the new direction is too high or too low */
-    if (direction[1] > 4.0f || direction[1] < -4.0f) {
+    if (direction[1] > 1.0f || direction[1] < -1.0f) {
         return;
     }
+
 
     /* Update the target based on the rotated direction */
     glm_vec3_add(camera->position, direction, camera->target);
 }
 
-void rotate_camera(Camera* camera, float angle, vec3 axis) {
+void rotate_camera(Camera *camera, float angle, vec3 axis) {
     mat4 rotation = GLM_MAT4_IDENTITY_INIT;
 
     /* Create rotation matrix */
@@ -173,7 +179,6 @@ void rotate_camera(Camera* camera, float angle, vec3 axis) {
     vec3 direction;
 	glm_vec3_sub(camera->target, camera->position, direction);
 
-	// mat4_mult_vec3(rotation, direction, 1.0f, direction);
 	glm_mat4_mulv3(rotation, direction, 1.0f, direction);
 
     /* Update the target based on the rotated direction */
@@ -185,7 +190,7 @@ void rotate_camera(Camera* camera, float angle, vec3 axis) {
  * @param camera camera to move
  * @param distance distance to move
 */
-void move_camera_up(Camera* camera, float distance) 
+void move_camera_up(Camera *camera, float distance) 
 {
     vec3 direction, right, up_movement, up = {0.0f, 1.0f, 0.0f};
     
