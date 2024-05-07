@@ -1,19 +1,17 @@
 #ifndef HEADER_PERLIN_NOISE_H
 #define HEADER_PERLIN_NOISE_H
 
-#define PERLIN_NOISE_HEIGHT 256
-#define PERLIN_NOISE_WIDTH 256
+#define PERLIN_NOISE_HEIGHT 20
+#define PERLIN_NOISE_WIDTH 20
 
 #include "../libft/libft.h"
 
-FT_INLINE void randomGenerationInit(unsigned int seed) {
-	srand(seed);
-}
-
-FT_INLINE int randomGenerationGet(int max) {
-	return ((rand() - (max / 2)) % PERLIN_NOISE_HEIGHT);
-}
-
+/**
+ * @brief Get a random number between -max/2 and PERLIN_NOISE_HEIGHT
+ * @param number The number of random number to generate
+ * @param max The maximum value of the random number
+ * @return int* The array of random number
+*/
 FT_INLINE int *randomMultipleGenerationGet(int number, int max) {
 	int *array = malloc(sizeof(int) * number);
 
@@ -21,6 +19,21 @@ FT_INLINE int *randomMultipleGenerationGet(int number, int max) {
 		array[i] = ((rand() - (max / 2)) % PERLIN_NOISE_HEIGHT);
 	}
 	return (array);
+}
+
+/**
+ * @brief Initialize the random generation with a seed
+ * @param seed The seed to initialize the random generation
+*/
+FT_INLINE void randomGenerationInit(unsigned int seed) {
+	srand(seed);
+}
+
+/**
+ * @brief Get a random number between -max/2 and PERLIN_NOISE_HEIGHT
+*/
+FT_INLINE int randomGenerationGet(int max) {
+	return ((rand() - (max / 2)) % PERLIN_NOISE_HEIGHT);
 }
 
 FT_INLINE void noiseGradienCompute(int x, int y, vec2_f32 dest) {
@@ -33,24 +46,15 @@ FT_INLINE void noiseGradienCompute(int x, int y, vec2_f32 dest) {
 	dest[1] = y / distance;
 }
 
-FT_INLINE vec2_f32 **gradientNoiseGeneration(int width, int height) {
-	vec2_f32 **noise = malloc(sizeof(vec2_f32 *) * height);
+/**
+ * @brief Generate a 2D array of gradient noise
+ * @param width The width of the array
+ * @param height The height of the array
+ * @return vec2_f32** The 2D array of gradient noise
+*/
+vec2_f32 **gradientNoiseGeneration(int width, int height);
 
-	if (!noise) {
-		return (NULL);
-	}
 
-	for (int i = 0; i < height; i++) {
-		noise[i] = malloc(sizeof(vec2_f32 *) * width);
-		if (!noise[i]) {
-			free_incomplete_array((void **)noise, i);
-			return (NULL);
-		}
-		for (int j = 0; j < width; j++) {
-			noiseGradienCompute(randomGenerationGet(INT_MAX), randomGenerationGet(INT_MAX), noise[i][j]);
-		}
-	}
-	return (noise);
-}
+f32 perlinNoise(vec2_f32 **gradient, f32 x, f32 y);
 
 #endif /* HEADER_PERLIN_NOISE_H */

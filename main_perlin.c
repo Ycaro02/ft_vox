@@ -8,27 +8,29 @@ int main (int argc, char **argv) {
 	}
 
 	randomGenerationInit(seed);
-	int *array = randomMultipleGenerationGet(10, INT_MAX);
-	for (int i = 0; i < 10; i++) {
-		ft_printf_fd(1, ORANGE"%d, Rand: %d\n"RESET, i, array[i]);
-	}
-	free(array);
 
-
-	vec2_f32 **noise = gradientNoiseGeneration(PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT);
-	if (!noise) {
+	vec2_f32 **gradient = gradientNoiseGeneration(PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT);
+	if (!gradient) {
 		ft_printf_fd(2, RED"Error: Noise generation failed\n"RESET);
 		return (1);
 	}
 	ft_printf_fd(1, GREEN"Success: Noise generation\n"RESET);
-	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < 10; j++) {
-			ft_printf_fd(1, "[%f][%f]\n, ", noise[i][j][0], noise[i][j][1]);
+	for (int i = 0; i < PERLIN_NOISE_HEIGHT; i++) {
+		for (int j = 0; j < PERLIN_NOISE_WIDTH; j++) {
+			ft_printf_fd(1, "[%f][%f]\n", gradient[i][j][0], gradient[i][j][1]);
 		}
-		// ft_printf_fd(1, "\n");
+	}
+	// free_incomplete_array((void **)gradient, PERLIN_NOISE_HEIGHT);
+
+	for (int i = 0; i < PERLIN_NOISE_HEIGHT - 1; i++) {
+		for (int j = 0; j < PERLIN_NOISE_WIDTH - 1; j++) {
+			f32 float_i = (f32)i + 0.500;
+			f32 float_j = (f32)j + 0.500; 
+			f32 noise = perlinNoise(gradient, float_i, float_j);
+			ft_printf_fd(1, YELLOW"for [%d][%d]:"RESET" "PINK"[%f]\n"RESET, i,j,noise);
+		}
 	}
 
-	free_incomplete_array((void **)noise, PERLIN_NOISE_HEIGHT);
 
-	return 0;
+	return (0);
 }
