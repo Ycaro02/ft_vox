@@ -26,6 +26,8 @@
 		"float.h": "c",
 		"parse_bmp.h": "c",
 		"cube.h": "c",
-		"chunks.h": "c"
+		"chunks.h": "c",
+		"perlin_noise.h": "c",
+		"ft_printf.h": "c"
 	}
 }
