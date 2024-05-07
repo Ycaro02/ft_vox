@@ -36,7 +36,7 @@ vec2_f32 **gradientNoiseGeneration(int width, int height) {
 */
 f32 smoothStep(f32 w) {
      if (w <= 0.0) {
-		ft_printf_fd(1, "NEG w: %f\n", w);
+		// ft_printf_fd(1, "NEG w: %f\n", w);
 		return (0.0);
 	 } else if (w >= 1.0) {
 		return (1.0);
@@ -104,4 +104,47 @@ f32 perlinNoise(vec2_f32 **gradient, f32 x, f32 y) {
 
 	value = interpolateValues(ix0, ix1, sy);
 	return (value);
+}
+
+/**
+ * @brief Generate a 2D sample of Perlin noise
+ * @param width: Width of the sample
+ * @param height: Height of the sample
+ * @return 2D sample of Perlin noise
+*/
+f32 **noiseSample2D(int width, int height) {
+    // Generate the gradient noise
+    vec2_f32 **gradient = gradientNoiseGeneration(width, height);
+
+    // Allocate memory for the sample
+    f32 **sample = malloc(sizeof(f32 *) * height);
+    if (!sample) {
+        return (NULL);
+    }
+
+    for (int i = 0; i < height; i++) {
+        sample[i] = malloc(sizeof(f32) * width);
+        if (!sample[i]) {
+            free_incomplete_array((void **)sample, i);
+            return (NULL);
+        }
+    }
+
+    // Fill the sample with Perlin noise
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            sample[i][j] = perlinNoise(gradient, (f32)j / width, (f32)i / height);
+			// f32 fj = (f32)j + 0.500000;
+			// f32 fi = (f32)i + 0.500000;
+            // sample[i][j] = perlinNoise(gradient, fj, fi);
+        }
+    }
+
+    // Free the gradient noise
+    for (int i = 0; i < height; i++) {
+        free(gradient[i]);
+    }
+    free(gradient);
+
+    return (sample);
 }

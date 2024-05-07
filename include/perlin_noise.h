@@ -57,4 +57,6 @@ vec2_f32 **gradientNoiseGeneration(int width, int height);
 
 f32 perlinNoise(vec2_f32 **gradient, f32 x, f32 y);
 
+f32 **noiseSample2D(int width, int height);
+
 #endif /* HEADER_PERLIN_NOISE_H */
