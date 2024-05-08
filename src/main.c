@@ -1,6 +1,7 @@
 #include "../include/vox.h"			/* Main project header */
 #include "../include/skybox.h"		/* skybox rendering */
 #include "../include/render_chunks.h"
+#include "../include/perlin_noise.h"
 
 void drawAllChunks(GLuint VAO, u32 nb_chunk, t_list *renderChunksList) {
 	t_list *current = renderChunksList;
@@ -26,7 +27,8 @@ void vox_destroy(Context *c, GLuint *atlas)
 	hashmap_destroy(c->world->chunksMap);
 	free(c->world);
 	free(c->cube.vertex);
-    glfwTerminate();
+    free(c->perlinNoise);
+	glfwTerminate();
 
 }
 
@@ -101,14 +103,18 @@ int main() {
 		return (1);
 	}
 
+	context.perlinNoise = perlinImageGet(42, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, 8, 1.0, 2.0);
+	if (!context.perlinNoise) {
+		ft_printf_fd(1, "Error: perlinNoise error\n");
+		return (1);
+	}
+
 	/* init context camera */
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
 	chunksLoadArround(&context, 0, 0, 3);
-
 	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
-
 	t_list *renderChunksList = chunksToRenderChunks(&context, context.world->chunksMap);
 
 	/* Init skybox */
@@ -120,7 +126,7 @@ int main() {
 	/* Init cube */
 	context.cubeShaderID = load_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
     GLuint *textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
-	set_shader_texture(context.cubeShaderID, textureAtlas, ATLAS_STONE, GL_TEXTURE_2D);
+	set_shader_texture(context.cubeShaderID, textureAtlas, 16, GL_TEXTURE_2D);
 
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);

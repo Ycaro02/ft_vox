@@ -29,7 +29,7 @@ FT_INLINE int randomGenerationGet() {
 /**
  * noise_image.c *
 */
-u8 *perlinImageGet(int width, int height, int octaves, f32 persistence, f32 lacurarity);
+u8 *perlinImageGet(unsigned int seed, int width, int height, int octaves, f32 persistence, f32 lacurarity);
 
 
 /**

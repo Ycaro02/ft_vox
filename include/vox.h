@@ -84,6 +84,7 @@ typedef struct s_context {
 	GLuint		skyboxShaderID;		/* shader program id */
 	GLuint		skyboxVAO;				/* skybox VAO */
 	u32			renderBlock;		/* Total block to render */
+	u8			*perlinNoise;		/* perlinNoise data */
 } Context;
 
 /* Atlas texture ID */

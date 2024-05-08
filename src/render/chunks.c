@@ -6,38 +6,67 @@
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t BRUT_fill_subchunks(SubChunks *sub_chunk)
+size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s8 nb)
 {
+	// s32 startYWorld = nb * 16;
+	(void)nb;
+
     for (s32 i = 0; i < 16; ++i) {
         for (s32 j = 0; j < 16; ++j) {
             for (s32 k = 0; k < 16; ++k) {
-                Block *block = ft_calloc(sizeof(Block), 1);
-				if (!block) {
-					ft_printf_fd(2, "Failed to allocate block\n");
-					return (0);
+                if (j < maxHeight[i][k]) {
+					Block *block = ft_calloc(sizeof(Block), 1);
+					if (!block) {
+						ft_printf_fd(2, "Failed to allocate block\n");
+						return (0);
+					}
+					block->x = i;
+					block->y = j;
+					block->z = k;
+					block->type = STONE;
+					hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
 				}
-                block->x = i;
-                block->y = j;
-                block->z = k;
-                block->type = STONE;
-				hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
             }
+			// startYWorld++;
         }
     }
 	return (hashmap_size(sub_chunk->block_map));
 }
 
+f32 localXToWorld(Chunks *chunks, s32 x) {
+	return ((f32)x + (f32)(chunks->x * 16));
+}
+
+f32 localZToWorld(Chunks *chunks, s32 z) {
+	return ((f32)z + (f32)(chunks->z * 16));
+}
+
+
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void BRUT_FillChunks(Chunks *chunks) {
+void BRUT_FillChunks(Context *c, Chunks *chunks) {
+	s32 **maxHeight = ft_calloc(sizeof(s32 *), 16);
+
+	for (u32 y = 0; y < 16; ++y) {
+		maxHeight[y] = ft_calloc(sizeof(s32), 16);
+		for (u32 x = 0; x < 16; ++x) {
+			s32 xWorld = (s32)localXToWorld(chunks, x);
+			s32 yWorld = (s32)localZToWorld(chunks, y);
+			s32 idx = ((yWorld * 16) + xWorld) % (1024 * 1024); // care here need to protect
+			if (idx < 0) {idx = -idx; } /* just need to abs val */
+			maxHeight[y][x] = (s32)(c->perlinNoise[idx]) / 10;
+			// ft_printf_fd(1, "max [%d][%d], %d\n", y,x, maxHeight[y][x]);
+		}
+	}
 
 	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
-		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i]);
+		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], maxHeight, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
 	}
 }
+
 
 /**
  * @brief Get the block array object
@@ -64,11 +93,10 @@ u32 chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID)
 			*/
 			if (block->flag != BLOCK_HIDDEN) {
 				block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
+				// block_array[idx][0] = localXToWorld(chunks, block->x);
 				block_array[idx][1] = (f32)block->y + (f32)(subID * SUB_CHUNKS_HEIGHT);
+				// block_array[idx][2] = localZToWorld(chunks, block->z);
 				block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
-				// if (idx == 0) {
-				// 	ft_printf_fd(1, "First block chunkId:%d x:%f y:%f z:%f\n", chunks->id, block_array[idx][0], block_array[idx][1], block_array[idx][2]);
-				// }
 				++idx;
 			}
 			next = hashmap_next(&it);
@@ -84,7 +112,7 @@ s32 getChunkID() {
 	return (chunksID++);
 }
 
-Chunks *chunksLoad(s32 x, s32 z) {
+Chunks *chunksLoad(Context *c, s32 x, s32 z) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
@@ -99,36 +127,8 @@ Chunks *chunksLoad(s32 x, s32 z) {
 	/* need to loop here to create all subchunks */
 	chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 	// chunks->sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-	BRUT_FillChunks(chunks);
+	BRUT_FillChunks(c, chunks);
 	return (chunks);
-}
-
-/**
- * @brief Fill all chunks, call brut fill chunk on all chunkks and set hashmap
- * @param c Context pointer
-*/
-void fillChunks(HashMap *chunksMap) {
-		static vec2_s32 off[] = {
-		{0, 0},\
-		{1, 0},\
-		{-1, 0},\
-		{0, 1},\
-		{0, -1},\
-		{1, 1},\
-		{-1, -1},\
-		{1, -1},\
-		{-1, 1},\
-	};
-	if (!chunksMap) {
-		ft_printf_fd(2, "ChunksMap is NULL in fillChunks\n");
-		return ;
-	}
-
-	for (s32 i = 0; i < TEST_CHUNK_MAX; i++) {
-		Chunks *chunks = chunksLoad(off[i][0], off[i][1]);
-		hashmap_set_entry(chunksMap, (BlockPos){0, chunks->x, chunks->z}, chunks);
-	}
-
 }
 
 /**
@@ -150,7 +150,7 @@ void chunksLoadArround(Context *c, s32 chunksX, s32 chunksZ, s32 radius) {
 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 			if (!chunks) {
 				// ft_printf_fd(1, RED"Chunk not exist REALX:%d x: %d z: %d\n"RESET, pos.x, pos.y, pos.z);
-				Chunks *newChunks = chunksLoad(pos.y, pos.z);
+				Chunks *newChunks = chunksLoad(c, pos.y, pos.z);
 				hashmap_set_entry(c->world->chunksMap, pos, newChunks);
 				// ft_printf_fd(1, ORANGE"Chunk Created x: %d z: %d\n"RESET, pos.y, pos.z);
 			}

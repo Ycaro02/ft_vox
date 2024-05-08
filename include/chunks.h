@@ -43,8 +43,11 @@ typedef struct s_chunks {
 } Chunks;
 
 /* Render chunks.c */
-void	fillChunks(HashMap *chunksMap);
 u32		chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID);
 void	chunksLoadArround(Context *c, s32 chunksX, s32 chunksZ, s32 radius);
+
+/* unused first function */
+void fillChunks(Context *c, HashMap *chunksMap);
+
 
 #endif /* HEADER_CHUNKS_H */
