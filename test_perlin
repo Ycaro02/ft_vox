@@ -1,3 +1,0 @@
-gcc main_perlin.c src/perlin/perlin_noise.c libft/libft.a -lm -g && valgrind ./a.out 42
-
-gcc main_perlin.c src/perlin/perlin_noise.c  src/window/openGL_glw_init.c src/glad/gl.c libft/libft.a -lm -lGL -lglfw3 -Lrsc/lib_deps/ -g && valgrind ./a.out

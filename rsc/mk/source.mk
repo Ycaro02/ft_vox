@@ -8,6 +8,7 @@ SUB_SRC_DIR		=	glad\
 					camera\
 					render\
 					texture\
+					perlin_noise\
 
 ALL_SRC_DIR		=	$(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_SRC_DIR))
 
@@ -25,7 +26,9 @@ SRCS			=	window/openGL_glw_init.c\
 					render/render_chunks.c\
 					render/skybox.c\
 					texture/load_texture.c\
-
+					perlin_noise/perlin_noise.c\
+					perlin_noise/noise_utils.c\
+					perlin_noise/noise_image.c\
 
 # SRCS_BONUS		=	main_bonus.c
 

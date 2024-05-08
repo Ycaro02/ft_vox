@@ -1,13 +1,22 @@
-#include "../../libft/libft.h"
 #include "../../include/perlin_noise.h"
 
 /**
- * @brief Compute the gradient vector, SEED must be initialized before
- * by calling randomGenerationInit()
- * @param width: Width of the gradient vector
- * @param height: Height of the gradient vector
- * @return Gradient vector
+ * @brief Compute the gradient of a noise
+ * @param x The x coordinate
+ * @param y The y coordinate
+ * @param dest The destination vector 
 */
+FT_INLINE void noiseGradienCompute(int x, int y, vec2_f32 dest) {
+	f64 powX = x * x;
+	f64 powY = y * y;
+
+	f32 distance = sqrt(powX + powY);
+
+	dest[0] = (f32)x / distance * 0.5;
+	dest[1] = (f32)y / distance * 0.5;
+}
+
+
 vec2_f32 **gradientNoiseGeneration(int width, int height) {
 	vec2_f32 **noise = malloc(sizeof(vec2_f32 *) * height);
 
@@ -22,7 +31,7 @@ vec2_f32 **gradientNoiseGeneration(int width, int height) {
 			return (NULL);
 		}
 		for (int j = 0; j < width; j++) {
-			noiseGradienCompute(randomGenerationGet(INT_MAX), randomGenerationGet(INT_MAX), noise[i][j]);
+			noiseGradienCompute(randomGenerationGet(), randomGenerationGet(), noise[i][j]);
 		}
 	}
 	return (noise);
@@ -51,10 +60,8 @@ f32 smoothStep(f32 w) {
  * @param w: Weight must be between 0 and 1
 */
 f32 interpolateValues(f32 a0, f32 a1, f32 w) {
-	// ft_printf_fd(1, "a0: %f, a1: %f, w: %f smoothW: %f\n", a0, a1, w, smoothStep(w));
-	// ft_printf_fd(1, "smoothStep(w): %f\n", smoothStep(w));
-	// ft_printf_fd(1, "a0 + (a1 - a0) * smoothStep(w): %f\n", a0 + (a1 - a0) * smoothStep(w));
 	return (a0 + (a1 - a0) * smoothStep(w));
+
 }
 
 /**
@@ -73,18 +80,13 @@ f32 dotGridGradient(vec2_f32 **gradient, int ix, int iy, f32 x, f32 y) {
 	return ((dx * gradient[iy][ix][0]) + (dy * gradient[iy][ix][1]));
 }
 
-/**
- * @brief Compute the perlin noise value for x, y coordinates
- * @param gradient: Gradient vector
- * @param x, y: float coordinate
- * @return Perlin noise value
-*/
+
 f32 perlinNoise(vec2_f32 **gradient, f32 x, f32 y) {
 	/* Determine grid cellule point */
-	s32 x0 = floor(x);
+	s32 x0 = (s32)floor(x);
 	s32 x1 = x0 + 1;
 
-	s32 y0 = floor(y);
+	s32 y0 = (s32)floor(y);
 	s32 y1 = y0 + 1;
 
 	/* Determine interpolation weights */
@@ -106,45 +108,56 @@ f32 perlinNoise(vec2_f32 **gradient, f32 x, f32 y) {
 	return (value);
 }
 
-/**
- * @brief Generate a 2D sample of Perlin noise
- * @param width: Width of the sample
- * @param height: Height of the sample
- * @return 2D sample of Perlin noise
-*/
-f32 **noiseSample2D(int width, int height) {
-    // Generate the gradient noise
-    vec2_f32 **gradient = gradientNoiseGeneration(width, height);
 
-    // Allocate memory for the sample
-    f32 **sample = malloc(sizeof(f32 *) * height);
+f32 **noiseSample2D(vec2_f32 **gradient, int width, int height, f32 frequency) {
+
+    f32 **sample = floatDoubleArrayAlloc(height, width);
     if (!sample) {
         return (NULL);
     }
 
-    for (int i = 0; i < height; i++) {
-        sample[i] = malloc(sizeof(f32) * width);
-        if (!sample[i]) {
-            free_incomplete_array((void **)sample, i);
-            return (NULL);
-        }
-    }
-
-    // Fill the sample with Perlin noise
+    /* Fill the sample with Perlin noise */ 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            sample[i][j] = perlinNoise(gradient, (f32)j / width, (f32)i / height);
-			// f32 fj = (f32)j + 0.500000;
-			// f32 fi = (f32)i + 0.500000;
-            // sample[i][j] = perlinNoise(gradient, fj, fi);
+			f32 x = (f32)j / (f32)width * frequency;
+			f32 y = (f32)i / (f32)height * frequency;
+            sample[i][j] = perlinNoise(gradient, x,y);
         }
     }
-
-    // Free the gradient noise
-    for (int i = 0; i < height; i++) {
-        free(gradient[i]);
-    }
-    free(gradient);
-
     return (sample);
+}
+
+
+f32 **perlinNoiseOctaveSample2D(vec2_f32 **gradient, int width, int height, int octaves, f32 persistence, f32 lacunarity) {
+    f32 **octaveNoise = floatDoubleArrayAlloc(height, width);
+    f32 amplitude = 1.0f;
+    f32 totalAmplitude = 0.0f;
+    f32 frequency = 1.0f;
+
+    /* Loop through octaves */
+    for (int octave = 0; octave < octaves; octave++) {
+        /* Sample noise at this octave with current frequency */
+        f32 **noise = noiseSample2D(gradient, width, height, frequency);
+
+        totalAmplitude += amplitude;
+
+        /* Add noise to the final result with appropriate amplitude */
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                octaveNoise[i][j] += noise[i][j] * amplitude;
+            }
+        }
+        free_incomplete_array((void **)noise, height);
+        /* Update amplitude and frequency for next octave */
+        amplitude *= persistence;
+        frequency *= lacunarity;
+    }
+
+    /* Normalize the result by dividing by total amplitude */
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            octaveNoise[i][j] /= totalAmplitude;
+        }
+    }
+    return (octaveNoise);
 }
