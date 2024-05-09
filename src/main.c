@@ -21,9 +21,8 @@ void chunksRender(Context *c, GLuint vao, GLuint shader_id, t_list *renderChunks
 }
 
 
-void vox_destroy(Context *c, GLuint *atlas)
+void vox_destroy(Context *c)
 {
-	free(atlas);
 	hashmap_destroy(c->world->chunksMap);
 	free(c->world);
 	free(c->cube.vertex);
@@ -125,12 +124,14 @@ int main() {
 	context.skyboxVAO = skyboxInit();
 	context.skyboxShaderID = load_shader(SKY_VERTEX_SHADER, SKY_FRAGMENT_SHADER);
 	GLuint skyTexture = load_cubemap(TEXTURE_SKY_PATH, 1024, 1024, (vec3_u8){0, 0, 0}); /* black */
-	set_shader_texture(context.skyboxShaderID, &skyTexture, 0, GL_TEXTURE_CUBE_MAP);
+	set_shader_texture(context.skyboxShaderID, skyTexture, GL_TEXTURE_CUBE_MAP, "texture1");
 
 	/* Init cube */
 	context.cubeShaderID = load_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
-    GLuint *textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
-	set_shader_texture(context.cubeShaderID, textureAtlas, 55, GL_TEXTURE_2D);
+    // GLuint *textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
+    GLuint textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
+	set_shader_texture(context.cubeShaderID, textureAtlas, GL_TEXTURE_3D, "textureAtlas");
+
 
 	// 52 top grass
 	// 53 stone
@@ -142,6 +143,6 @@ int main() {
 	main_loop(&context, cubeVAO, skyTexture, renderChunksList);
 
 	ft_lstclear(&renderChunksList, free);
-    vox_destroy(&context, textureAtlas);
+    vox_destroy(&context);
     return 0;
 }

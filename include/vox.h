@@ -114,8 +114,8 @@ GLuint	setupCubeVAO(Context *c, ModelCube *cube);
 void	drawAllCube(GLuint vao, GLuint vbo, u32 nb_cube);
 
 /* texture load_texture */
-GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
-void set_shader_texture(GLuint shaderId, GLuint *atlas, u32 index, u32 textureType);	
+GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
+void set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *varName);
 GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
 /* render/occlusion_culling */
 u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
@@ -123,7 +123,6 @@ u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
 /* cube.c */
 GLuint bufferGlCreate(GLenum type, u32 size, void *data);
-
 
 #endif /* VOX_HEADER_H */
 

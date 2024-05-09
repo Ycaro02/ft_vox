@@ -1,5 +1,54 @@
 #include "../../include/vox.h"
 
+void init_openGL_texture_3D(u8 *data, u32 width, u32 height, u32 depth, u16 texture_type, GLuint *texturesID)
+{
+    glGenTextures(1, texturesID);
+    glBindTexture(GL_TEXTURE_3D, *texturesID);
+    /* Set the texture wrapping parameters */
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);
+    /* Set texture filtering parameters */
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);    // Set texture filtering to GL_LINEAR
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    
+    /* Load the texture */
+    glTexImage3D(GL_TEXTURE_3D, 0, texture_type, width, height, depth, 0, texture_type, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_3D);
+}
+
+/* new atlas 3D logic */
+GLuint load_gl_texture_3D(t_list *atlas, int type, u32 depth)
+{
+    // u32 textureNumber = ft_lstsize(atlas);
+    u16 data_type = GL_RGB;
+    if (type == 4) {
+        data_type = GL_RGBA;
+    }
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_3D, textureID);
+
+    u32 i = 0;
+    u8 *data_3D = malloc(sizeof(u8) * 16 * 16 * depth * type); // Assuming each texture is 16x16 and type is the number of color channels
+
+    for (t_list *curr = atlas; curr; curr = curr->next) {
+        u8 *data = curr->content;
+        ft_memcpy(data_3D + i * 16 * 16 * type, data, 16 * 16 * type); // Copy each 2D texture into the 3D texture data
+        ++i;
+    }
+
+    glTexImage3D(GL_TEXTURE_3D, 0, data_type, 16, 16, depth, 0, data_type, GL_UNSIGNED_BYTE, data_3D);
+    glGenerateMipmap(GL_TEXTURE_3D);
+
+	init_openGL_texture_3D(data_3D, 16, 16, depth, data_type, &textureID);
+
+    free(data_3D);
+    return textureID;
+}
+
+
+
 void init_openGL_texture(u8 *data, u32 width, u32 height, u16 texture_type, GLuint* textures, int index)
 {
     glGenTextures(1, &textures[index]);
@@ -17,61 +66,41 @@ void init_openGL_texture(u8 *data, u32 width, u32 height, u16 texture_type, GLui
 
 }
 
-void set_shader_texture(GLuint shaderId, GLuint *atlas, u32 index, u32 textureType)
+void set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *varName)
 {
 	glUseProgram(shaderId);
-    glActiveTexture(GL_TEXTURE0 + index);
+    glActiveTexture(GL_TEXTURE0);
     // glBindTexture(GL_TEXTURE_2D, atlas[index]);
-    glBindTexture(textureType, atlas[index]);
-    GLuint texture_loc = glGetUniformLocation(shaderId, "texture1");
-    glUniform1i(texture_loc, index);
+    glBindTexture(textureType, atlasID);
+    GLuint texture_loc = glGetUniformLocation(shaderId, varName);
+    glUniform1i(texture_loc, 0);
 }
 
-GLuint *load_gl_texture_atlas(t_list *atlas, int type)
-{
-    u32 textureNumber = ft_lstsize(atlas);
-    u16 data_type = GL_RGB;
-    if (type == 4) {
-        data_type = GL_RGBA;
-    }
-    GLuint *texture_id = malloc(sizeof(GLuint) * textureNumber);
-    u32 i = 0;
-
-    for (t_list *curr = atlas; curr; curr = curr->next) {
-        u8 *data = curr->content;
-        init_openGL_texture(data, 16, 16, data_type, texture_id, i);
-        ++i;
-    }
-    return (texture_id);
-}
-
-
-GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color) {
+GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color) {
     int w,h,type;
 
     u8 *texture = parse_bmp_file(path, &w, &h, &type);
     if (!texture) {
         ft_printf_fd(2, "Failed to load texture %s\n", path);
-        return (NULL);
+        return (0);
     }
     ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n",w,h,type);
     t_list *square_lst = cut_texture_into_squares(texture, w, h, squareWidth, squareHeight, type, ignore_color);
     if (!square_lst) {
         free(texture);
         ft_printf_fd(2, "Failed to cut texture\n");
-        return (NULL);
+        return (0);
     }
     ft_printf_fd(1, "Texture cuted\n");
     free(texture);
 
-	
-
-
-    GLuint *atlas = load_gl_texture_atlas(square_lst, type);
+    GLuint atlas = load_gl_texture_3D(square_lst, type, ft_lstsize(square_lst));
 
     lst_clear(&square_lst, free);
     return (atlas);
 }
+
+
 
 GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignore_color) {
     GLuint textureID;
@@ -84,13 +113,13 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
         ft_printf_fd(2, "Failed to load texture %s\n", path);
         return 0;
     }
-    ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n", w, h, type);
+    // ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n", w, h, type);
 
 	u8 *fliped_text = imageFlip180(texture, w, h, type);
 	// free(texture);
 
-	ft_printf_fd(1, "Texture fliped, %c\n", fliped_text ? 'Y' : 'N');
-	ft_printf_fd(1, "Texture fliped: w %d, h %d, type %d\n", w, h, type);
+	// ft_printf_fd(1, "Texture fliped, %c\n", fliped_text ? 'Y' : 'N');
+	// ft_printf_fd(1, "Texture fliped: w %d, h %d, type %d\n", w, h, type);
 
     t_list *square_lst = cut_texture_into_squares(fliped_text, w, h, squareWidth, squareHeight, type, ignore_color);
     if (!square_lst) {
