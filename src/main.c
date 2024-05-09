@@ -41,6 +41,14 @@ FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMa
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // Draw skybox first
         displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
+
+		/*	
+			We need to load chunks arround camera ( maybe load a large amount of chunks first ), start multithreading 
+			detect chunks in camera view ( by the camera angle ), start frustum culling to avoid rendering chunks that are not in the camera view
+			compare chunks in camera view with renderChunksMap ( Refact map input given for renderChunksMap, use chunks input instead (just store x,z) ) 
+			add necesary renderChunks to renderChunksMap (easier part )
+		*/
+
         chunksRender(context, vao, context->cubeShaderID, renderChunksMap);
 	    glfwSwapBuffers(context->win_ptr);
         glfwPollEvents();
@@ -99,13 +107,12 @@ int main() {
 	/* Init skybox */
 	context.skyboxVAO = skyboxInit();
 	context.skyboxShaderID = load_shader(SKY_VERTEX_SHADER, SKY_FRAGMENT_SHADER);
-	GLuint skyTexture = load_cubemap(TEXTURE_SKY_PATH, 1024, 1024, (vec3_u8){0, 0, 0}); /* black */
+	GLuint skyTexture = load_cubemap(TEXTURE_SKY_PATH, 1024, 1024);
 	set_shader_texture(context.skyboxShaderID, skyTexture, GL_TEXTURE_CUBE_MAP, "texture1");
 
 	/* Init cube */
 	context.cubeShaderID = load_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
-    // GLuint *textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
-    GLuint textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
+    GLuint textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16);
 	set_shader_texture(context.cubeShaderID, textureAtlas, GL_TEXTURE_3D, "textureAtlas");
 
 	/* Disable VSync to avoid fps locking */

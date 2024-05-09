@@ -168,9 +168,9 @@ enum BlockType {
 GLuint	setupCubeVAO(Context *c, ModelCube *cube);
 
 /* texture load_texture */
-GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
+GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth);
 void set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *varName);
-GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignore_color);
+GLuint load_cubemap(char* path, int squareHeight, int squareWidth);
 /* render/occlusion_culling */
 u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 

@@ -76,7 +76,7 @@ void set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *
     glUniform1i(texture_loc, 0);
 }
 
-GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color) {
+GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth) {
     int w,h,type;
 
     u8 *texture = parse_bmp_file(path, &w, &h, &type);
@@ -85,7 +85,7 @@ GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8
         return (0);
     }
     ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n",w,h,type);
-    t_list *square_lst = cut_texture_into_squares(texture, w, h, squareWidth, squareHeight, type, ignore_color);
+    t_list *square_lst = cut_texture_into_squares(texture, w, h, squareWidth, squareHeight, type);
     if (!square_lst) {
         free(texture);
         ft_printf_fd(2, "Failed to cut texture\n");
@@ -102,7 +102,7 @@ GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8
 
 
 
-GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignore_color) {
+GLuint load_cubemap(char* path, int squareHeight, int squareWidth) {
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
@@ -121,7 +121,7 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth, vec3_u8 ignor
 	// ft_printf_fd(1, "Texture fliped, %c\n", fliped_text ? 'Y' : 'N');
 	// ft_printf_fd(1, "Texture fliped: w %d, h %d, type %d\n", w, h, type);
 
-    t_list *square_lst = cut_texture_into_squares(fliped_text, w, h, squareWidth, squareHeight, type, ignore_color);
+    t_list *square_lst = cut_texture_into_squares(fliped_text, w, h, squareWidth, squareHeight, type);
     if (!square_lst) {
         free(fliped_text);
         ft_printf_fd(2, "Failed to cut fliped_text\n");

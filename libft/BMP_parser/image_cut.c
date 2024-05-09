@@ -2,9 +2,8 @@
 
 #define PINK_VEC (vec3_u8){255, 0, 255}
 
-s8 is_square_empty(u8* square, int width, int height, int type, vec3_u8 color) {
+s8 is_square_empty(u8* square, int width, int height, int type) {
 	vec3_u8 firstColor = {0,0,0};
-	(void)color;
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
@@ -24,7 +23,7 @@ s8 is_square_empty(u8* square, int width, int height, int type, vec3_u8 color) {
     return (TRUE);
 }
 
-t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int width, int height, int type, vec3_u8 ignore_color) {
+t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int width, int height, int type) {
     int num_squares_x = tex_width / width;
     int num_squares_y = tex_height / height;
     int square_count = 0;
@@ -45,7 +44,7 @@ t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int
                     ft_memcpy(&square[square_index], &texture[tex_index], type);
                 }
             }
-			if (is_square_empty(square, width, height, type, ignore_color)) {
+			if (is_square_empty(square, width, height, type)) {
 					free(square);
 					square = NULL;
 			} else {
