@@ -3,6 +3,7 @@
 
 #include "../libft/HashMap/HashMap.h"
 
+
 #define CHUNKS_HEIGHT   256U	/* that will be 256 */
 #define CHUNKS_WIDTH    16U
 #define CHUNKS_DEPTH    16U
@@ -23,9 +24,6 @@
 /* Just need to change it to display/fill  more subchunks */
 #define SUBCHUNKS_DISPLAY 1U
 
-/* Just define context here to avoid compilation error */
-struct s_context;
-typedef struct s_context Context;
 
 typedef struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
@@ -39,13 +37,5 @@ typedef struct s_chunks {
 	s32				x;					/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;					/* Chunk offset Z can be negative (relative to origine chunks) */
 } Chunks;
-
-/* Render chunks.c */
-u32		chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID);
-void	chunksLoadArround(Context *c, s32 radius);
-
-/* unused first function */
-// void fillChunks(Context *c, HashMap *chunksMap);
-
 
 #endif /* HEADER_CHUNKS_H */

@@ -1,20 +1,29 @@
 #include "../../include/vox.h"
 #include "../../include/cube.h"
-
+#include "../../include/render_chunks.h"
 /**
  * @brief Draw a cube
  * @param VAO Vertex Array Object
  * @param vertex_nb number of vertex
  * @param cubeId cube id
 */
-void drawCube(GLuint VAO, GLuint VBO, u32 vertex_nb, u32 cubeId) {
+void drawCube(GLuint VAO, RenderChunks *render, u32 vertex_nb, u32 cubeId) {
 	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, render->instanceVBO);
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glVertexAttribDivisor(1, 1);
 	
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, render->typeBlockVBO);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)0);
+	glVertexAttribDivisor(3, 1);
+
+
+
 	glDrawElementsInstanced(GL_TRIANGLES, vertex_nb, GL_UNSIGNED_INT, 0, cubeId);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -25,8 +34,10 @@ void drawCube(GLuint VAO, GLuint VBO, u32 vertex_nb, u32 cubeId) {
  * @param VAO Vertex Array Object
  * @param nb_cube number of cube to draw 
 */	
-void drawAllCube(GLuint VAO, GLuint VBO, u32 nb_cube) {
-	drawCube(VAO, VBO, 6*6, nb_cube);
+void drawAllCube(GLuint VAO, RenderChunks *render) {
+	u32 nb_cube = render->visibleBlock;
+
+	drawCube(VAO, render, 6*6, nb_cube);
 }
 
 /**
@@ -164,7 +175,7 @@ GLuint setupCubeVAO(Context *c, ModelCube *cube) {
 // 	while (next) {
 // 		Chunks *chunks = (Chunks *)it.value;
 // 		u32 offset = blockArrayOffsetGet(visibleBlockArr, i); 
-// 		instanceCount += chunks_cube_get(chunks, &block_array[offset], i);
+// 		instanceCount += chunksCubeGet(chunks, &block_array[offset], i);
 // 		++i;
 // 		next = hashmap_next(&it);
 // 	}

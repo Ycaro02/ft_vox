@@ -7,7 +7,7 @@ GLuint setupInstanceVBOForThisChunk(vec3* block_array, u32 visibleBlock) {
 }
 
 void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
-    chunks_cube_get(chunks, render->block_array, 0);
+    chunksCubeGet(chunks, render, 0);
 }
 
 
@@ -22,14 +22,27 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
 		ft_printf_fd(2, "Failed to allocate render\n");
 		return (NULL);
 	}
+
     render->visibleBlock = chunks->visible_block;
-    render->block_array = ft_calloc(sizeof(vec3), render->visibleBlock);
+    
+	render->blockTypeID = ft_calloc(sizeof(f32), render->visibleBlock);
+	if (!render->blockTypeID) {
+		ft_printf_fd(2, "Failed to allocate blockTypeID\n");
+		return (NULL);
+	}
+	
+	render->block_array = ft_calloc(sizeof(vec3), render->visibleBlock);
     if (!render->block_array) {
 		ft_printf_fd(2, "Failed to allocate block_array\n");
 		return (NULL);
 	}
 	fillBlockArrayForChunk(render, chunks);
 	render->instanceVBO = setupInstanceVBOForThisChunk(render->block_array, render->visibleBlock); // crée un VBO pour les données d'instance de ce render
+	
+	
+	// fillBlockTypeForchunk(render, chunks);
+	
+	render->typeBlockVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->visibleBlock * sizeof(GLuint), (void *)&render->blockTypeID[0]);
 	return (render);
 }
 

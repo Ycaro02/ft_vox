@@ -8,7 +8,7 @@ void drawAllChunks(GLuint VAO, u32 nb_chunk, t_list *renderChunksList) {
 	
 	for (u32 i = 0; i < nb_chunk; ++i) {
 		RenderChunks *renderChunk = (RenderChunks *)current->content;
-		drawAllCube(VAO, renderChunk->instanceVBO, renderChunk->visibleBlock);
+		drawAllCube(VAO, renderChunk);
 		current = current->next;
 	}
 }
@@ -132,11 +132,6 @@ int main() {
     GLuint textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
 	set_shader_texture(context.cubeShaderID, textureAtlas, GL_TEXTURE_3D, "textureAtlas");
 
-
-	// 52 top grass
-	// 53 stone
-	// 54 dirt
-	// 55 dirt/grass side
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);
 

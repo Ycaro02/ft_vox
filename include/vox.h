@@ -17,7 +17,6 @@
 #include "render.h"								/* Render functions */
 #include "chunks.h"								/* Chunks functions */
 
-
 /* Screen size */
 #define SCREEN_WIDTH	1366			/* Screen width */
 #define SCREEN_HEIGHT	768			/* Screen height */
@@ -53,17 +52,12 @@
 /* HARDCOED CHUNK NUMBER */
 #define TEST_CHUNK_MAX 9
 
-enum BlockType {
-    AIR=0U,      /* Air block (Empty) */
-    DIRT=1U,     /* Dirt block (Exposed to light) */
-    STONE=2U,    /* Stone block (Underground) */
-};
 
 typedef struct PACKED_STRUCT s_block {
     s32 x;          /* Block x position */
     s32 y;          /* Block y position (height) */
     s32 z;          /* Block z position */
-    u32 type;       /* Block type */
+    s8	type;       /* Block type */
 	u8  flag;       /* Block flag */
     // u32 chunkId;    /* Chunk ID */
 }   Block;
@@ -89,79 +83,53 @@ typedef struct s_context {
 	u8			*perlinNoise;		/* perlinNoise data */
 } Context;
 
-/*
-	cassagepierre(0-9)
-	laine(rouge,orange,jaune,vert_clair,vert,cyan,bleu_clear,bleu,bleu_violet,violet,violet_clair,rose_clair,rose,noir,gris,blanc)
-	eponge
-	verre
-	start fullwhite
-	start fullgold
-	MineraiGold
-	MineraiFer
-	MineraiCharbon
-	biblioteche
-	PIerre avec lianne
-	OBSIDIAN
-	SEMIE_FULLWHITE
-	SEMIE_FULLGOLD
-	COBBLE
-	BEDROCK
-	SABLE
-	GRAVIER
-	TRONC_SIDE
-	TRONC_INTERIEUR
-	FEUILLE
-	FULL_WHITE
-
-*/
-
 enum AtlasID {
-    AT_BREAK_STONE = 0,         /* Break stone */
-    AT_BREAK_STONE1,            /* Break stone 1 */
-    AT_BREAK_STONE2,            /* Break stone 2 */
-    AT_BREAK_STONE3,            /* Break stone 3 */
-    AT_BREAK_STONE4,            /* Break stone 4 */
-    AT_BREAK_STONE5,            /* Break stone 5 */
-    AT_BREAK_STONE6,            /* Break stone 6 */
-    AT_BREAK_STONE7,            /* Break stone 7 */
-    AT_BREAK_STONE8,            /* Break stone 8 */
-    AT_BREAK_STONE9,            /* Break stone 9 */
-    AT_WOOL_RED,                /* Wool red */
-    AT_WOOL_ORANGE,             /* Wool orange */
-    AT_WOOL_YELLOW,             /* Wool yellow */
-    AT_WOOL_LIGHTGREEN,         /* Wool lime */
-    AT_WOOL_GREEN,              /* Wool green */
-    AT_WOOL_CYAN,               /* Wool cyan */
-    AT_WOOL_LIGHT_BLUE,         /* Wool light blue */
-    AT_WOOL_BLUE,               /* Wool blue */
-    AT_WOOL_PURPLE,             /* Wool purple */
-    AT_WOOL_MAGENTA,            /* Wool magenta */
-    AT_WOOL_LIGHTMAGENTA,            /* Wool magenta */
-    AT_WOOL_PINK,               /* Wool pink */
-    AT_WOOL_DARKPINK,               /* Wool pink */
-    AT_WOOL_GRAY,               /* Wool gray */
-    AT_WOOL_LIGHT_GRAY,         /* Wool light gray */
-    AT_WOOL_WHITE,              /* Wool white */
-    AT_SPONGE=26,                  /* Sponge */
-    AT_GLASS,                   /* Glass */
-	AT_EMPTYTOREMOVE=28,		/* Empty to remove */
-    AT_FULL_WHITE_START,        /* Full white start */
-    AT_FULL_GOLD_START,         /* Full gold start */
-    AT_GOLD_ORE=31,                /* Gold ore */
-    AT_IRON_ORE,                /* Iron ore */
-    AT_COAL_ORE,                /* Coal ore */
-    AT_BOOKSHELF,               /* Bookshelf */
-    AT_STONE_WITH_VINES,        /* Stone with vines */
-    AT_OBSIDIAN,                /* Obsidian */
-    AT_SEMI_FULL_WHITE,         /* Semi full white */
-    AT_SEMI_FULL_GOLD,          /* Semi full gold */
-    AT_COBBLESTONE=39,             /* Cobblestone */
-    AT_BEDROCK,                 /* Bedrock */
-    AT_SAND,                    /* Sand */
-    AT_GRAVEL,                  /* Gravel */
-    AT_LOG_SIDE,                /* Log side */
-    AT_LOG_INTERIOR,            /* Log interior */
-    AT_LEAVES,                  /* Leaves */
+    AT_BREAK_STONE=0,     /* Break stone */
+    AT_BREAK_STONE1,        /* Break stone 1 */
+    AT_BREAK_STONE2,        /* Break stone 2 */
+    AT_BREAK_STONE3,        /* Break stone 3 */
+    AT_BREAK_STONE4,        /* Break stone 4 */
+    AT_BREAK_STONE5,        /* Break stone 5 */
+    AT_BREAK_STONE6,        /* Break stone 6 */
+    AT_BREAK_STONE7,        /* Break stone 7 */
+    AT_BREAK_STONE8,        /* Break stone 8 */
+    AT_BREAK_STONE9,        /* Break stone 9 */
+    AT_WOOL_RED=10,            /* Wool red */
+    AT_WOOL_ORANGE,         /* Wool orange */
+    AT_WOOL_YELLOW,         /* Wool yellow */
+    AT_WOOL_LIGHTGREEN,     /* Wool lime */
+    AT_WOOL_GREEN,          /* Wool green */
+    AT_WOOL_CYAN,           /* Wool cyan */
+    AT_WOOL_LIGHT_BLUE,     /* Wool light blue */
+    AT_WOOL_BLUE,           /* Wool blue */
+    AT_WOOL_PURPLE,         /* Wool purple */
+    AT_WOOL_MAGENTA,        /* Wool magenta */
+    AT_WOOL_LIGHTMAGENTA,   /* Wool magenta */
+    AT_WOOL_PINK,           /* Wool pink */
+    AT_WOOL_DARKPINK,       /* Wool pink */
+    AT_WOOL_GRAY,           /* Wool gray */
+    AT_WOOL_LIGHT_GRAY,     /* Wool light gray */
+    AT_WOOL_WHITE,          /* Wool white */
+    AT_SPONGE=26,           /* Sponge */
+    AT_GLASS,               /* Glass */
+	AT_EMPTYTOREMOVE=28,	/* Empty to remove */
+    AT_FULL_WHITE_START,    /* Full white start */
+    AT_FULL_GOLD_START,     /* Full gold start */
+    AT_GOLD_ORE=31,         /* Gold ore */
+    AT_IRON_ORE,            /* Iron ore */
+    AT_COAL_ORE,            /* Coal ore */
+    AT_BOOKSHELF,           /* Bookshelf */
+    AT_STONE_WITH_VINES,    /* Stone with vines */
+    AT_OBSIDIAN,            /* Obsidian */
+    AT_SEMI_FULL_WHITE,     /* Semi full white */
+    AT_SEMI_FULL_GOLD,      /* Semi full gold */
+    AT_COBBLESTONE=39,      /* Cobblestone */
+    AT_BEDROCK,             /* Bedrock */
+    AT_SAND,                /* Sand */
+    AT_GRAVEL,              /* Gravel */
+    AT_LOG_SIDE,            /* Log side */
+    AT_LOG_INTERIOR,        /* Log interior */
+    AT_LEAVES,				/* Leaves */
     AT_FULL_WHITE=46,       /* Full white */
 	AT_FULLGOLD=47,			/* Full gold */
 	AT_SHROOM_REDW=48,		/* Red White mushroom */
@@ -186,10 +154,18 @@ enum AtlasID {
 	AT_LITTLE_TREE=67,		/* Little tree */
 };
 
+enum BlockType {
+    AIR=0,      /* Air block (Empty) */
+    STONE=53,    /* Stone block (Underground) */
+    DIRT=54,     /* Dirt block (Exposed to light) */
+	GRASS=55,    /* Grass block (Exposed to light) */
+	GRASS_TOP=AT_GRASS_TOP,	/* Grass top */
+};
+
+
 
 /* render/cube.c */
 GLuint	setupCubeVAO(Context *c, ModelCube *cube);
-void	drawAllCube(GLuint vao, GLuint vbo, u32 nb_cube);
 
 /* texture load_texture */
 GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u8 ignore_color);

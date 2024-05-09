@@ -1,7 +1,7 @@
 #include "../../include/vox.h"			/* Main project header */
 #include "../../include/chunks.h"		/* Main project header */
 #include "../../include/perlin_noise.h"	/* Main project header */
-
+#include "../../include/render_chunks.h"
 
 /**
  * @brief BRUT fill subchunks with block
@@ -25,7 +25,13 @@ size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s32 nb)
 					block->x = i;
 					block->y = j;
 					block->z = k;
-					block->type = STONE;
+					if (startYWorld + j > maxHeight[i][k] - 5) {
+						block->type = DIRT;
+						if (startYWorld + j == maxHeight[i][k] - 1)
+							block->type = GRASS_TOP;
+					} else {
+						block->type = STONE;
+					}
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
 				}
             }
@@ -114,6 +120,7 @@ void BRUT_FillChunks(Context *c, Chunks *chunks) {
 }
 
 
+
 /**
  * @brief Get the block array object
  * @param chunks Chunks pointer (data to parse)
@@ -121,7 +128,7 @@ void BRUT_FillChunks(Context *c, Chunks *chunks) {
  * @param chunkID Chunk ID [in]
  * @return u32 Number of visible block
 */
-u32 chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID)
+u32 chunksCubeGet(Chunks *chunks, RenderChunks *render , u32 chunkID)
 {
     s8 next = TRUE;
 	u32 idx = 0;
@@ -138,11 +145,13 @@ u32 chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID)
 				give only chunks to render to this function
 			*/
 			if (block->flag != BLOCK_HIDDEN) {
-				block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
-				// block_array[idx][0] = localXToWorld(chunks, block->x);
-				block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
-				// block_array[idx][2] = localZToWorld(chunks, block->z);
-				block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
+				render->block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
+				// render->block_array[idx][0] = localXToWorld(chunks, block->x);
+				render->block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
+				// render->block_array[idx][2] = localZToWorld(chunks, block->z);
+				render->block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
+				render->blockTypeID[idx] = (f32)block->type;
+				ft_printf_fd(1, "Block %d = %f\n", block->type, render->blockTypeID[idx]);
 				++idx;
 			}
 			next = hashmap_next(&it);
