@@ -44,7 +44,7 @@ typedef struct s_chunks {
 
 /* Render chunks.c */
 u32		chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID);
-void	chunksLoadArround(Context *c, s32 chunksX, s32 chunksZ, s32 radius);
+void	chunksLoadArround(Context *c, s32 radius);
 
 /* unused first function */
 void fillChunks(Context *c, HashMap *chunksMap);

@@ -119,6 +119,7 @@ Chunks *chunksLoad(Context *c, s32 x, s32 z) {
 		return (NULL);
 	}
 
+
 	chunks->id = getChunkID();
 	chunks->x = x;
 	chunks->z = z;
@@ -138,18 +139,20 @@ Chunks *chunksLoad(Context *c, s32 x, s32 z) {
  * @param curr_z Player's z position
  * @param radius The radius around the player to scan
 */
-void chunksLoadArround(Context *c, s32 chunksX, s32 chunksZ, s32 radius) {
-	(void)chunksX;
-	(void)chunksZ;
-
+void chunksLoadArround(Context *c, s32 radius) {
 	s32  currentX = c->cam.chunkPos[0];
 	s32  currentZ = c->cam.chunkPos[2];
 	for (s32 i = -radius; i < radius; ++i) {
 		for (s32 j = -radius; j < radius; ++j) {
-			BlockPos pos = { .x = 0, .y = currentX + i, .z = currentZ + j};
+			BlockPos pos = {0};
+			pos.x = 0;
+			pos.y = currentX + i;
+			pos.z = currentZ + j;
 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 			if (!chunks) {
 				// ft_printf_fd(1, RED"Chunk not exist REALX:%d x: %d z: %d\n"RESET, pos.x, pos.y, pos.z);
+				ft_printf_fd(1, PINK"Before chunks load %d %d\n"RESET, pos.y, pos.z);
+
 				Chunks *newChunks = chunksLoad(c, pos.y, pos.z);
 				hashmap_set_entry(c->world->chunksMap, pos, newChunks);
 				// ft_printf_fd(1, ORANGE"Chunk Created x: %d z: %d\n"RESET, pos.y, pos.z);
