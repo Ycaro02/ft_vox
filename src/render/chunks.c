@@ -1,5 +1,7 @@
 #include "../../include/vox.h"			/* Main project header */
 #include "../../include/chunks.h"		/* Main project header */
+#include "../../include/perlin_noise.h"	/* Main project header */
+
 
 /**
  * @brief BRUT fill subchunks with block
@@ -55,6 +57,27 @@ s32 maxHeightGet(s32 **maxHeight) {
 	return (max);
 }
 
+// Génère la hauteur du terrain pour une coordonnée mondiale donnée en utilisant le bruit de Perlin
+float perlinNoiseHeight(u8 *perlinNoise, int worldX, int worldZ) {
+    // Déterminez les coordonnées locales par rapport au centre du bruit de Perlin
+    int localX = worldX + (PERLIN_NOISE_WIDTH / 2);
+    int localZ = worldZ + (PERLIN_NOISE_HEIGHT / 2);
+    
+	// ft_printf_fd(1, ORANGE"World: [%d][%d] Local: [%d][%d]\n"RESET,worldX,worldZ,localX,localZ);
+
+	int idx = (localX + localZ) % PERLIN_ARRAY_SIZE;
+    // Lire la valeur de bruit de Perlin à partir du tableau de valeurs normalisées
+    float perlinValue = (float)perlinNoise[idx] / 255.0f;
+
+    // Échelle pour ajuster la hauteur du terrain en fonction de la taille du monde
+    float scale = 100.0f;
+
+	// ft_printf_fd(1, ORANGE"World: [%d][%d] Idx: [%d] "RESET""GREEN"Height: %f\n"RESET,worldX,worldZ,idx,(perlinValue * scale));
+    // Retourne la valeur de bruit de Perlin comme hauteur du terrain
+    return perlinValue * scale;
+}
+
+
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
@@ -65,16 +88,14 @@ void BRUT_FillChunks(Context *c, Chunks *chunks) {
 	for (u32 y = 0; y < 16; ++y) {
 		maxHeight[y] = ft_calloc(sizeof(s32), 16);
 		for (u32 x = 0; x < 16; ++x) {
-			// s32 xWorld = (s32)localXToWorld(chunks, x);
-			// s32 yWorld = (s32)localZToWorld(chunks, y);
-			// s32 idx = ((yWorld * 16) + xWorld) % (1024 * 1024); // care here need to protect
-			// if (idx < 0) {idx = -idx; } /* just need to abs val */
 			s32 xWorld = (s32)localXToWorld(chunks, x);
 			s32 yWorld = (s32)localZToWorld(chunks, y);
-			s32 idx = ((yWorld * 16) + xWorld + (1024 * 1024)) % (1024 * 1024);
+			// s32 idx = ((yWorld * 16) + xWorld + (1024 * 1024)) % (1024 * 1024);
+			// maxHeight[y][x] = 30 + ((s32)(c->perlinNoise[idx]) / 4);
 
-			maxHeight[y][x] = 30 + ((s32)(c->perlinNoise[idx]) / 4);
-			ft_printf_fd(1, "max [%d][%d], %d\n", y,x, maxHeight[y][x]);
+			maxHeight[y][x] = perlinNoiseHeight(c->perlinNoise, xWorld, yWorld);
+
+			// ft_printf_fd(1, "max [%d][%d], %d\n", y,x, maxHeight[y][x]);
 		}
 	}
 

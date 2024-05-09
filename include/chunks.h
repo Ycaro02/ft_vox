@@ -29,8 +29,6 @@ typedef struct s_context Context;
 
 typedef struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
-	u32				flag;			/* Sub Chunk Id and flag */
-	u32				metadata;		/* Sub Chunk metadata */
 } SubChunks;
 
 typedef struct s_chunks {
@@ -38,8 +36,8 @@ typedef struct s_chunks {
 	u32				nb_block;			/* nb block (outdated value total of blockmap subchunk) */
     s32				id;     			/* Chunk Id */
 	u32				visible_block;		/* Number of visible block */
-	s32				x;					/* Chunk X */	
-	s32				z;					/* Chunk Z */
+	s32				x;					/* Chunk offset X can be negative  (relative to origine chunks) */	
+	s32				z;					/* Chunk offset Z can be negative (relative to origine chunks) */
 } Chunks;
 
 /* Render chunks.c */
@@ -47,7 +45,7 @@ u32		chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID);
 void	chunksLoadArround(Context *c, s32 radius);
 
 /* unused first function */
-void fillChunks(Context *c, HashMap *chunksMap);
+// void fillChunks(Context *c, HashMap *chunksMap);
 
 
 #endif /* HEADER_CHUNKS_H */

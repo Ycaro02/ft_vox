@@ -5,6 +5,8 @@
 #define PERLIN_NOISE_HEIGHT 1024
 #define PERLIN_NOISE_WIDTH 1024
 
+#define PERLIN_ARRAY_SIZE (1024 * 1024)
+
 #include "../libft/libft.h"
 
 /**
