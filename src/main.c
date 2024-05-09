@@ -103,7 +103,7 @@ int main() {
 		return (1);
 	}
 
-	context.perlinNoise = perlinImageGet(42, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, 8, 1.0, 2.0);
+	context.perlinNoise = perlinImageGet(42, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, 4, 1.0, 2.0);
 	if (!context.perlinNoise) {
 		ft_printf_fd(1, "Error: perlinNoise error\n");
 		return (1);
@@ -113,7 +113,7 @@ int main() {
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	chunksLoadArround(&context, 0, 0, 3);
+	chunksLoadArround(&context, 1);
 	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
 	t_list *renderChunksList = chunksToRenderChunks(&context, context.world->chunksMap);
 

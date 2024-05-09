@@ -48,7 +48,7 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
     Camera camera;
 
 
-	bzero(&camera, sizeof(Camera));
+	ft_bzero(&camera, sizeof(Camera));
     /* init camera position */
 	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, camera.position);
     /* init camera target */

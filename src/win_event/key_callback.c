@@ -7,22 +7,22 @@ void act_escape(Context *c) {
 
 /* Zoom : W */
 void act_zoom(Context *c) {
-    move_camera_forward(&c->cam, 0.5f);
+    move_camera_forward(&c->cam, 0.2f);
 }
 
 /* Unzoom : S */
 void act_unzoom(Context *c) {
-    move_camera_backward(&c->cam, 0.5f);
+    move_camera_backward(&c->cam, 0.2f);
 }
 
 /* Unzoom: D */
 void act_move_right(Context *c) {
-	straf_camera(&c->cam, 0.5f, DIR_RIGHT);
+	straf_camera(&c->cam, 0.1f, DIR_RIGHT);
 }
 
 /* Unzoom: A */
 void act_move_left(Context *c) {
-	straf_camera(&c->cam, 0.5f, DIR_LEFT);
+	straf_camera(&c->cam, 0.1f, DIR_LEFT);
 }
 
 /* Rotate camera left : LEFT */

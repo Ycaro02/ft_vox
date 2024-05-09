@@ -6,15 +6,15 @@
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s8 nb)
+size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s32 nb)
 {
-	// s32 startYWorld = nb * 16;
+	s32 startYWorld = nb * 16;
 	(void)nb;
 
     for (s32 i = 0; i < 16; ++i) {
         for (s32 j = 0; j < 16; ++j) {
             for (s32 k = 0; k < 16; ++k) {
-                if (j < maxHeight[i][k]) {
+                if (startYWorld + j < maxHeight[i][k]) {
 					Block *block = ft_calloc(sizeof(Block), 1);
 					if (!block) {
 						ft_printf_fd(2, "Failed to allocate block\n");
@@ -42,6 +42,19 @@ f32 localZToWorld(Chunks *chunks, s32 z) {
 }
 
 
+s32 maxHeightGet(s32 **maxHeight) {
+	s32 max = 0;
+
+	for (s32 i = 0; i < 16; ++i) {
+		for (s32 j = 0; j < 16; ++j) {
+			if (maxHeight[i][j] > max) {
+				max = maxHeight[i][j];
+			}
+		}
+	}
+	return (max);
+}
+
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
@@ -52,16 +65,28 @@ void BRUT_FillChunks(Context *c, Chunks *chunks) {
 	for (u32 y = 0; y < 16; ++y) {
 		maxHeight[y] = ft_calloc(sizeof(s32), 16);
 		for (u32 x = 0; x < 16; ++x) {
+			// s32 xWorld = (s32)localXToWorld(chunks, x);
+			// s32 yWorld = (s32)localZToWorld(chunks, y);
+			// s32 idx = ((yWorld * 16) + xWorld) % (1024 * 1024); // care here need to protect
+			// if (idx < 0) {idx = -idx; } /* just need to abs val */
 			s32 xWorld = (s32)localXToWorld(chunks, x);
 			s32 yWorld = (s32)localZToWorld(chunks, y);
-			s32 idx = ((yWorld * 16) + xWorld) % (1024 * 1024); // care here need to protect
-			if (idx < 0) {idx = -idx; } /* just need to abs val */
-			maxHeight[y][x] = (s32)(c->perlinNoise[idx]) / 10;
-			// ft_printf_fd(1, "max [%d][%d], %d\n", y,x, maxHeight[y][x]);
+			s32 idx = ((yWorld * 16) + xWorld + (1024 * 1024)) % (1024 * 1024);
+
+			maxHeight[y][x] = 30 + ((s32)(c->perlinNoise[idx]) / 4);
+			ft_printf_fd(1, "max [%d][%d], %d\n", y,x, maxHeight[y][x]);
 		}
 	}
 
-	for (u32 i = 0; i < SUBCHUNKS_DISPLAY; ++i) {
+	s32 chunkMaxY = maxHeightGet(maxHeight);
+
+
+	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
+		ft_printf_fd(1, "Subchunk hashmap %d created, max: %d\n", i, chunkMaxY);
+		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+	}
+
+	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], maxHeight, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
 	}
@@ -82,7 +107,7 @@ u32 chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID)
 
 	(void)chunkID;
 
-	for (u32 subID = 0; subID < SUBCHUNKS_DISPLAY; ++subID) {
+	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
 		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
 		next = hashmap_next(&it);
 		while (next) {
@@ -94,7 +119,7 @@ u32 chunks_cube_get(Chunks *chunks, vec3 *block_array, u32 chunkID)
 			if (block->flag != BLOCK_HIDDEN) {
 				block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
 				// block_array[idx][0] = localXToWorld(chunks, block->x);
-				block_array[idx][1] = (f32)block->y + (f32)(subID * SUB_CHUNKS_HEIGHT);
+				block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
 				// block_array[idx][2] = localZToWorld(chunks, block->z);
 				block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
 				++idx;
@@ -112,7 +137,7 @@ s32 getChunkID() {
 	return (chunksID++);
 }
 
-Chunks *chunksLoad(Context *c, s32 x, s32 z) {
+Chunks *chunksLoad(Context *c, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
@@ -121,12 +146,12 @@ Chunks *chunksLoad(Context *c, s32 x, s32 z) {
 
 
 	chunks->id = getChunkID();
-	chunks->x = x;
-	chunks->z = z;
+	chunks->x = chunkX;
+	chunks->z = chunkZ;
 
 	ft_printf_fd(1, ORANGE"Chunk i:|%d|"RESET""CYAN"x:[%d] z:[%d]"RESET"\n", chunks->id, chunks->x, chunks->z);
 	/* need to loop here to create all subchunks */
-	chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+	// chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 	// chunks->sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 	BRUT_FillChunks(c, chunks);
 	return (chunks);
