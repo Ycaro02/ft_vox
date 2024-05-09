@@ -3,17 +3,24 @@
 #define PINK_VEC (vec3_u8){255, 0, 255}
 
 s8 is_square_empty(u8* square, int width, int height, int type, vec3_u8 color) {
+	vec3_u8 firstColor = {0,0,0};
+	(void)color;
+
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             int square_index = (y * width + x) * type;
 
-            // If the pixel is not pink (RGB: 255,0,255 or RGBA: 255,0,255,255), return false
-            if (!(square[square_index] == color[0] && square[square_index + 1] == color[1] && square[square_index + 2] == color[2])) {
-                return (FALSE);
-            }
+			if (y == 0 && x == 0) {
+				firstColor[0] = square[square_index];
+				firstColor[1] = square[square_index + 1];
+				firstColor[2] = square[square_index + 2];
+			}
+
+			if (!(square[square_index] == firstColor[0] && square[square_index + 1] == firstColor[1] && square[square_index + 2] == firstColor[2])) {
+				return (FALSE);
+			}
         }
     }
-    // If all pixels were pink, return true
     return (TRUE);
 }
 
