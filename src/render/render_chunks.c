@@ -47,18 +47,38 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
 }
 
 
-t_list *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
-	t_list *renderChunksList = NULL;
+/* Basic function you can provide to hashmap_init */
+void renderChunksMapFree(void *entry) {
+	HashMap_entry *e = (HashMap_entry *)entry;
+	if (e->value) {
+		RenderChunks *render = (RenderChunks *)e->value;
+		free(render->blockTypeID);
+		free(render->block_array);
+		glDeleteBuffers(1, &render->instanceVBO);
+		glDeleteBuffers(1, &render->typeBlockVBO);
+		// close VBO
+		free(e->value); /* free the value (alocated ptr content of t_list ) */
+	}
+	free(e); /* free the entry t_list node */
+}
+
+
+HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
+	// t_list *renderChunksList = NULL;
     HashMap_it it = hashmap_iterator(chunksMap);
     s8 next = hashmap_next(&it); 
+
+
+	HashMap *renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, renderChunksMapFree);
 
 	(void)c;
     while (next) {
         Chunks *chunks = (Chunks *)it.value;
         RenderChunks *renderChunk = renderChunkCreate(chunks);
-        ft_lstadd_back(&renderChunksList, ft_lstnew(renderChunk));
+        // ft_lstadd_back(&renderChunksList, ft_lstnew(renderChunk));
+		hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(renderChunk), renderChunk);
         next = hashmap_next(&it);
     }
 
-    return (renderChunksList);
+    return (renderChunksMap);
 }

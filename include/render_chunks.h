@@ -12,7 +12,8 @@ typedef struct s_render_chunks {
 } RenderChunks;
 
 /* render/render_chunks.c */
-t_list *chunksToRenderChunks(Context *c, HashMap *chunksMap);
+// t_list *chunksToRenderChunks(Context *c, HashMap *chunksMap);
+HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap);
 void renderChunkFree(RenderChunks *render);
 
 /* Render chunks.c */
@@ -21,5 +22,7 @@ void	chunksLoadArround(Context *c, s32 radius);
 
 /* render/cube.c*/
 void drawAllCube(GLuint VAO, RenderChunks *render);
+
+#define RENDER_CHUNKS_ID(r) ((BlockPos){(s32)r->instanceVBO, (s32)r->typeBlockVBO, (s32)r->visibleBlock})
 
 #endif /* HEADER_RENDER_CHUNKS_H */
