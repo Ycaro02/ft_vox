@@ -3,6 +3,13 @@
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
 
+// void renderChunksMapAdd(Context *c, HashMap *renderChunksMap, RenderChunks *render) {
+// 	RenderChunks *test = hashmap_get(renderChunksMap, RENDER_CHUNKS_ID(render));
+// 	if (!test) {
+// 		hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(render), render);
+// 	}
+// }
+
 void drawAllChunks(GLuint VAO, HashMap *renderChunksMap) {
 	HashMap_it	it = hashmap_iterator(renderChunksMap);
 	s8			next = 1;
@@ -21,8 +28,7 @@ void chunksRender(Context *c, GLuint VAO, GLuint shader_id, HashMap *renderChunk
 }
 
 
-void vox_destroy(Context *c)
-{
+void vox_destroy(Context *c) {
 	hashmap_destroy(c->world->chunksMap);
 	free(c->world);
 	free(c->cube.vertex);
@@ -30,33 +36,12 @@ void vox_destroy(Context *c)
 	glfwTerminate();
 }
 
-FT_INLINE void display_fps() {
-	static double lastTime = 0.0f; 
-	static int nbFrames = 0;
-
-	if (lastTime == 0.0f) {
-		lastTime = glfwGetTime();
-	}
-	double currentTime = glfwGetTime();
-	nbFrames++;
-	if (currentTime - lastTime >= 1.0) {
-		ft_printf_fd(1, RESET_LINE""ORANGE"%f ms/frame, %d FPS"RESET, (1000.0 / (double)nbFrames), nbFrames);
-		nbFrames = 0;
-		lastTime += 1.0;
-	}
-}
-
 FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMap *renderChunksMap) {
-
-
     while (!glfwWindowShouldClose(context->win_ptr)) {
-    
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         // Draw skybox first
         displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
         chunksRender(context, vao, context->cubeShaderID, renderChunksMap);
-
 	    glfwSwapBuffers(context->win_ptr);
         glfwPollEvents();
         handle_input(context);
@@ -74,7 +59,6 @@ void chunksMapFree(void *entry) {
 		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
-		// hashmap_destroy(chunks->sub_chunks[1].block_map);
 		free(e->value); /* free the value (allocaated ptr) */
 	}
 	free(e); /* free the entry t_list node */
@@ -108,7 +92,7 @@ int main() {
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	chunksLoadArround(&context, 1);
+	chunksLoadArround(&context, 3);
 	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 

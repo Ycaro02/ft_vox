@@ -146,12 +146,10 @@ u32 chunksCubeGet(Chunks *chunks, RenderChunks *render , u32 chunkID)
 			*/
 			if (block->flag != BLOCK_HIDDEN) {
 				render->block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
-				// render->block_array[idx][0] = localXToWorld(chunks, block->x);
 				render->block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
-				// render->block_array[idx][2] = localZToWorld(chunks, block->z);
 				render->block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
 				render->blockTypeID[idx] = (f32)block->type;
-				ft_printf_fd(1, "Block %d = %f\n", block->type, render->blockTypeID[idx]);
+				// ft_printf_fd(1, "Block %d = %f\n", block->type, render->blockTypeID[idx]);
 				++idx;
 			}
 			next = hashmap_next(&it);
