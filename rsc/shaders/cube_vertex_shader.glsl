@@ -12,7 +12,7 @@ uniform mat4 model;
 
 void main()
 {
-	TexCoord = vec3(aTexCoord, 52.0 / 67.0);
+	TexCoord = vec3(aTexCoord, 36.0 / 67.0);
     mat4 m = model;
 	m[3] = vec4(aInstancePos, 1.0) + model[3];
     gl_Position = projection * view * m * vec4(aPos, 1.0);
