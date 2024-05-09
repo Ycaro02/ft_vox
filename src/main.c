@@ -130,8 +130,12 @@ int main() {
 	/* Init cube */
 	context.cubeShaderID = load_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
     GLuint *textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16, (vec3_u8){255, 0, 255}); /* PINK */
-	set_shader_texture(context.cubeShaderID, textureAtlas, ATLAS_SIDE_GRASS, GL_TEXTURE_2D);
+	set_shader_texture(context.cubeShaderID, textureAtlas, 55, GL_TEXTURE_2D);
 
+	// 52 top grass
+	// 53 stone
+	// 54 dirt
+	// 55 dirt/grass side
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);
 

@@ -29,12 +29,12 @@ void set_shader_texture(GLuint shaderId, GLuint *atlas, u32 index, u32 textureTy
 
 GLuint *load_gl_texture_atlas(t_list *atlas, int type)
 {
-    u32 lst_size = ft_lstsize(atlas);
+    u32 textureNumber = ft_lstsize(atlas);
     u16 data_type = GL_RGB;
     if (type == 4) {
         data_type = GL_RGBA;
     }
-    GLuint *texture_id = malloc(sizeof(GLuint) * lst_size);
+    GLuint *texture_id = malloc(sizeof(GLuint) * textureNumber);
     u32 i = 0;
 
     for (t_list *curr = atlas; curr; curr = curr->next) {

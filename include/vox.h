@@ -24,7 +24,8 @@
 
 /* Texture atlas path */
 // #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
-#define TEXTURE_ATLAS_PATH "rsc/texture/new_texture_atlas.bmp"
+// #define TEXTURE_ATLAS_PATH "rsc/texture/new_texture_atlas.bmp"
+#define TEXTURE_ATLAS_PATH "rsc/texture/Terrain.bmp"
 
 /* Sky path */
 #define TEXTURE_SKY_PATH "rsc/texture/skybox.bmp"
