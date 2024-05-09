@@ -89,6 +89,10 @@ void chunksMapFree(void *entry) {
 	free(e); /* free the entry t_list node */
 }
 
+u8 *perlinNoiseGeneration(unsigned int seed) {
+	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, 4, 2.0, 2.0));
+}
+
 int main() {
     Context context;
     GLFWwindow* window;
@@ -103,7 +107,7 @@ int main() {
 		return (1);
 	}
 
-	context.perlinNoise = perlinImageGet(42, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, 4, 2.0, 2.0);
+	context.perlinNoise = perlinNoiseGeneration(42); /* seed 42 */
 	if (!context.perlinNoise) {
 		ft_printf_fd(1, "Error: perlinNoise error\n");
 		return (1);
