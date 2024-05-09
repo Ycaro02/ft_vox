@@ -42,7 +42,8 @@ t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int
 					free(square);
 					square = NULL;
 			} else {
-                ft_lstadd_back(&square_lst, ft_lstnew(square));
+				u8 *reverse = imageFlip180(square, width, height, type);
+                ft_lstadd_back(&square_lst, ft_lstnew(reverse));
                 square_count++;
             }
         }

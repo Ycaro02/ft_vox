@@ -64,6 +64,9 @@ GLuint *load_texture_atlas(char *path, int squareHeight, int squareWidth, vec3_u
     ft_printf_fd(1, "Texture cuted\n");
     free(texture);
 
+	
+
+
     GLuint *atlas = load_gl_texture_atlas(square_lst, type);
 
     lst_clear(&square_lst, free);
