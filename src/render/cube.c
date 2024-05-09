@@ -117,7 +117,8 @@ GLuint setupCubeVAO(Context *c, ModelCube *cube) {
 	glEnableVertexAttribArray(0);
 
 	/* Texture Coordinate attribute */
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)sizeof(vec3));
+	// glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)sizeof(vec3));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)sizeof(vec3));
 	glEnableVertexAttribArray(2);
     glBindVertexArray(0);
     return (VAO);

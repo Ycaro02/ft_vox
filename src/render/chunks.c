@@ -28,7 +28,7 @@ size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s32 nb)
 					if (startYWorld + j > maxHeight[i][k] - 5) {
 						block->type = DIRT;
 						if (startYWorld + j == maxHeight[i][k] - 1)
-							block->type = GRASS_TOP;
+							block->type = GRASS;
 					} else {
 						block->type = STONE;
 					}
