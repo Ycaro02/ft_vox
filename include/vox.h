@@ -18,8 +18,10 @@
 #include "chunks.h"								/* Chunks functions */
 
 /* Screen size */
-#define SCREEN_WIDTH	1366			/* Screen width */
-#define SCREEN_HEIGHT	768			/* Screen height */
+// #define SCREEN_WIDTH	1366			/* Screen width */
+// #define SCREEN_HEIGHT	768			/* Screen height */
+#define SCREEN_WIDTH	600			/* Screen width */
+#define SCREEN_HEIGHT	500			/* Screen height */
 
 /* Texture atlas path */
 // #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
