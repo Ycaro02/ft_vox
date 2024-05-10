@@ -3,6 +3,19 @@
 #include "../../include/perlin_noise.h"	/* Main project header */
 #include "../../include/render_chunks.h"
 
+/* Basic function you can provide to hashmap_init */
+void chunksMapFree(void *entry) {
+	HashMap_entry *e = (HashMap_entry *)entry;
+	if (e->value) {
+		Chunks *chunks = (Chunks *)e->value;
+		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
+			hashmap_destroy(chunks->sub_chunks[i].block_map);
+		}
+		free(e->value); /* free the value (allocaated ptr) */
+	}
+	free(e); /* free the entry t_list node */
+}
+
 /**
  * @brief BRUT fill subchunks with block
  * @param sub_chunk Subchunk pointer
@@ -63,25 +76,18 @@ s32 maxHeightGet(s32 **maxHeight) {
 	return (max);
 }
 
-// Génère la hauteur du terrain pour une coordonnée mondiale donnée en utilisant le bruit de Perlin
-float perlinNoiseHeight(u8 *perlinNoise, int worldX, int worldZ) {
-    // Déterminez les coordonnées locales par rapport au centre du bruit de Perlin
-    int localX = worldX + (PERLIN_NOISE_WIDTH / 2);
-    int localZ = worldZ + (PERLIN_NOISE_HEIGHT / 2);
-    
+
+float perlinNoiseHeight(u8 *perlinNoise, s32 worldX, s32 worldZ) {
+    /* Set local X and Z coordinates based on the center of the Perlin noise array */
+    s32 localX = worldX + (PERLIN_NOISE_WIDTH / 2);
+    s32 localZ = worldZ + (PERLIN_NOISE_HEIGHT / 2);
 	// ft_printf_fd(1, ORANGE"World: [%d][%d] Local: [%d][%d]\n"RESET,worldX,worldZ,localX,localZ);
+	s32 idx = (localX + localZ) % PERLIN_ARRAY_SIZE;
+    f32 perlinValue = (f32)perlinNoise[idx] / 255.0f;
+    f32 scale = 100.0f;
 
-	int idx = (localX + localZ) % PERLIN_ARRAY_SIZE;
-    // Lire la valeur de bruit de Perlin à partir du tableau de valeurs normalisées
-    float perlinValue = (float)perlinNoise[idx] / 255.0f;
-
-    // Échelle pour ajuster la hauteur du terrain en fonction de la taille du monde
-    float scale = 100.0f;
-
-	// ft_printf_fd(1, ORANGE"World: [%d][%d] Idx: [%d] "RESET""GREEN"Height: %f\n"RESET,worldX,worldZ,idx,(perlinValue * scale));
-    // Retourne la valeur de bruit de Perlin comme hauteur du terrain
-    return ((perlinValue * scale) - 40.0f);
-    // return ((perlinValue * scale));
+    // return ((perlinValue * scale) - 40.0f);
+    return ((perlinValue * scale));
 }
 
 

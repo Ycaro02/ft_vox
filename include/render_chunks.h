@@ -1,7 +1,7 @@
 #ifndef HEADER_RENDER_CHUNKS_H
 #define HEADER_RENDER_CHUNKS_H
 
-#include "vox.h"
+#include "chunks.h"
 
 typedef struct s_render_chunks {
     vec3		*block_array;		/* Block array (VBO data represent block instance position) */
@@ -12,8 +12,9 @@ typedef struct s_render_chunks {
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
 } RenderChunks;
 
+#define RENDER_CHUNKS_ID(r) ((BlockPos)r->chunkID)
+
 /* render/render_chunks.c */
-// t_list *chunksToRenderChunks(Context *c, HashMap *chunksMap);
 HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap);
 void renderChunkFree(RenderChunks *render);
 
@@ -23,10 +24,17 @@ void	chunksLoadArround(Context *c, s32 radius);
 RenderChunks *renderChunkCreate(Chunks *chunks);
 
 
+/* render/load_chunks.c */
+s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
+s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
+void chunksViewHandling(Context *c, HashMap *renderChunksMap);
+
 /* render/cube.c*/
 void drawAllCube(GLuint VAO, RenderChunks *render);
 
-// #define RENDER_CHUNKS_ID(r) ((BlockPos){(s32)r->instanceVBO, (s32)r->typeBlockVBO, (s32)r->visibleBlock})
-#define RENDER_CHUNKS_ID(r) ((BlockPos)r->chunkID)
+/* render/occlusion_culling */
+u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
+
+
 
 #endif /* HEADER_RENDER_CHUNKS_H */

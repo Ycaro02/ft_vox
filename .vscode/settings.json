@@ -29,6 +29,8 @@
 		"chunks.h": "c",
 		"perlin_noise.h": "c",
 		"ft_printf.h": "c",
-		"render_chunks.h": "c"
+		"render_chunks.h": "c",
+		"render.h": "c",
+		"world.h": "c"
 	}
 }

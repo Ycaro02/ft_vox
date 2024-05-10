@@ -25,6 +25,7 @@ SRCS			=	window/openGL_glw_init.c\
 					render/chunks.c\
 					render/render_chunks.c\
 					render/skybox.c\
+					render/load_chunks.c\
 					texture/load_texture.c\
 					perlin_noise/perlin_noise.c\
 					perlin_noise/noise_utils.c\

@@ -4,8 +4,7 @@
 #include <math.h>					            /* LIBC Math functions */
 #include "glad/gl.h"				            /* Glad functions (Include glad header BEFORE glfw3) */
 #include "glfw3/glfw3.h"			            /* GLFW functions */
-
-#include "../rsc/deps/cglm/include/cglm/cglm.h" 
+#include "../rsc/deps/cglm/include/cglm/cglm.h" /* CGLM C maths openGL */
 
 #include "../libft/libft.h"		                /* Libft functions */
 #include "../libft/parse_flag/parse_flag.h"		/* Parse flag functions */
@@ -15,13 +14,10 @@
 #include "win_event.h"				            /* Window event handling functions */
 #include "camera.h"                             /* Camera handling function */
 #include "render.h"								/* Render functions */
-#include "chunks.h"								/* Chunks functions */
 
 /* Screen size */
-// #define SCREEN_WIDTH	1366			/* Screen width */
-// #define SCREEN_HEIGHT	768			/* Screen height */
-#define SCREEN_WIDTH	600			/* Screen width */
-#define SCREEN_HEIGHT	500			/* Screen height */
+#define SCREEN_WIDTH	800			/* Screen width */
+#define SCREEN_HEIGHT	600			/* Screen height */
 
 /* Texture atlas path */
 // #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
@@ -68,27 +64,6 @@ typedef struct PACKED_STRUCT s_block {
 	u8  flag;       /* Block flag */
     // u32 chunkId;    /* Chunk ID */
 }   Block;
-
-
-typedef struct s_world {
-	u64			seed;			/* World seed */
-	HashMap		*chunksMap;		/* Chunks hashmap */
-	u32			chunksLoaded;	/* Number of chunks loaded */
-} World;
-
-/* Context structure */
-typedef struct s_context {
-	World		*world;				/* World structure */
-	Camera		cam;				/* camera structure */
-    GLFWwindow	*win_ptr;			/* Window pointer */
-	ModelCube	cube;				/* Data Cube structure */
-    // Chunks    *chunks;        	/* current chunk */
-	GLuint		cubeShaderID;		/* shader program id */
-	GLuint		skyboxShaderID;		/* shader program id */
-	GLuint		skyboxVAO;				/* skybox VAO */
-	u32			renderBlock;		/* Total block to render */
-	u8			*perlinNoise;		/* perlinNoise data */
-} Context;
 
 enum AtlasID {
     AT_BREAK_STONE=0,     /* Break stone */
@@ -169,24 +144,11 @@ enum BlockType {
 	GRASS_TOP=AT_GRASS_TOP,	/* Grass top */
 };
 
-
-
-/* render/cube.c */
-GLuint	setupCubeVAO(Context *c, ModelCube *cube);
-
 /* texture load_texture */
 GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth);
 void set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *varName);
 GLuint load_cubemap(char* path, int squareHeight, int squareWidth);
-/* render/occlusion_culling */
-u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
-
-/* cube.c */
-GLuint bufferGlCreate(GLenum type, u32 size, void *data);
-
-/* chunks */
-Chunks *chunksLoad(Context *c, s32 chunkX, s32 chunkZ);;
 
 #endif /* VOX_HEADER_H */
 

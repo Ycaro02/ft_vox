@@ -1,4 +1,5 @@
-#include "../../include/vox.h"
+#include "../../include/world.h"
+#include "../../include/chunks.h"
 
 /* Escapte Key : ESC */
 void act_escape(Context *c) {

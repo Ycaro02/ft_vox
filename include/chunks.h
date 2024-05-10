@@ -1,8 +1,7 @@
 #ifndef HEADER_CHUNKS_H
 #define HEADER_CHUNKS_H
 
-#include "../libft/HashMap/HashMap.h"
-
+#include "world.h"
 
 #define CHUNKS_HEIGHT   256U	/* that will be 256 */
 #define CHUNKS_WIDTH    16U
@@ -39,5 +38,10 @@ typedef struct s_chunks {
 
 
 #define CHUNKS_MAP_ID_GET(offsetX, offsetZ) ((BlockPos){0, offsetX, offsetZ})
+
+void chunksMapFree(void *entry);
+
+/* chunks */
+Chunks *chunksLoad(Context *c, s32 chunkX, s32 chunkZ);;
 
 #endif /* HEADER_CHUNKS_H */

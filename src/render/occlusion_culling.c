@@ -1,4 +1,5 @@
-#include "../../include/vox.h"
+#include "../../include/world.h"
+#include "../../include/chunks.h"
 
 /**
  * @brief Check if all neighbors of a block exist

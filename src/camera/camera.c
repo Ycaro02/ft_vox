@@ -1,4 +1,4 @@
-#include "../../include/vox.h"
+#include "../../include/world.h"
 #include "../../include/cube.h"
 
 void chunkPosGet(Camera *camera)

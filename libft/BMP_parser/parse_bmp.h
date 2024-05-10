@@ -17,7 +17,7 @@ typedef struct PACKED_STRUCT s_bmp_hdr {
 
 /* BMP info header */
 typedef struct s_bmp_info_hdr {
-    u32 size;                       /* This of this info header */
+    u32 size;                       /* Size of this info header */
     int width, height;              /* width and height of img in pixel */
     u16 planes;                     /* number of planes */
     u16 bits;                       /* number of bits per pixel */

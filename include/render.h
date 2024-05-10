@@ -3,13 +3,6 @@
 
 #include "vox.h"
 
-// typedef struct s_render {
-//     GLuint			vao;			/* vertex array object */
-// 	GLuint			vbo;			/* vertex buffer object */
-// 	GLuint			ebo;			/* element buffer object */
-// 	// GLuint			cubeShaderID;		/* shader program id */
-// } t_render;
-
 /* Model structure */
 typedef struct s_modelCube {
 	vec3			*vertex;		/* vertex array, give to openGL context */

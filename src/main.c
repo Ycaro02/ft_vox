@@ -5,74 +5,6 @@
 #include "../include/perlin_noise.h"
 
 
-s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
-	return (hashmap_get(renderChunksMap, chunkID) != NULL);
-}
-
-s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID) {
-	return (hashmap_get(chunksMap, chunkID) != NULL);
-}
-
-/* 
-	We start to the local chunks position offset
-	Then fire a ray from the camera to the view direction until max render distance
-	Detect the chunk offset position of ray travel
-	Then we can load the chunk
-*/
-
-#define MAX_RENDER_DISTANCE 30.0f
-
-void drawLine(vec3 start, vec3 end) {
-	glLineWidth(5.0f);
-	glColor3f(1.0f, 0.0f, 0.0f);
-    glBegin(GL_LINES);
-    glVertex3fv(start);
-	// ft_printf_fd(1, GREEN"Draw line from %f %f %f to %f %f %f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2], end[0], end[1], end[2]);
-    glVertex3fv(end);
-    glEnd();
-	glFlush();
-}
-
-void worldToChunksPos(vec3 current, vec3 chunkOffset)
-{
-    f32 chunkSize = 8.0; // cubeSize is 0.5
-    chunkOffset[0] = floor(current[0] / chunkSize);
-    chunkOffset[1] = floor(current[1] / chunkSize);
-    chunkOffset[2] = floor(current[2] / chunkSize);
-}
-
-void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
-    vec3 start_position, ray_direction, chunk_coords, current_position;
-
-    glm_vec3_copy(c->cam.position, start_position);
-    glm_vec3_copy(c->cam.viewVector, ray_direction);
-    glm_vec3_zero(chunk_coords);
-    glm_vec3_zero(current_position);
-
-    f32 travel_increment = 6.0f, current = 0;
-	vec3 travelVector;
-
-	while (current <= MAX_RENDER_DISTANCE) {
-		/* Scale ray dir */
-		glm_vec3_scale(ray_direction, current, travelVector);
-		/* add scaled ray vector add start position in current position */
-		glm_vec3_add(start_position, travelVector, current_position);
-		/* Convert world coordonate to chunk offset */
-		worldToChunksPos(current_position, chunk_coords);
-
-		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
-		if (!chunkIsLoaded(c->world->chunksMap, chunkID)) {
-			Chunks *chunks = chunksLoad(c, chunkID.y, chunkID.z);
-			hashmap_set_entry(c->world->chunksMap, chunkID, chunks);
-		} else if (!chunksIsRenderer(renderChunksMap, chunkID)) {
-			RenderChunks *render = renderChunkCreate(hashmap_get(c->world->chunksMap, chunkID));
-			hashmap_set_entry(renderChunksMap, chunkID, render);
-		}
-		current += travel_increment;
-	}
-}
-
-
 void drawAllChunks(GLuint VAO, HashMap *renderChunksMap) {
 	HashMap_it	it = hashmap_iterator(renderChunksMap);
 	s8			next = 1;
@@ -108,41 +40,17 @@ FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMa
 		
 		/* Update data */
 		update_camera(context, context->cubeShaderID);
-        display_fps();
 		chunksViewHandling(context, renderChunksMap);
 		
 		/* Render logic */
-		// (void)vao, (void)skyTexture, (void)renderChunksMap;
         displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
         chunksRender(context, vao, context->cubeShaderID, renderChunksMap);
-	    
-		// Appel à drawLine() avec des coordonnées fixes
-		vec3 start_position;
-		vec3 end_position = {0.0f, 0.0f, 0.0f};
-		vec3 scaleView;
-		glm_vec3_copy(context->cam.position, start_position); // Copie la position de la caméra dans start_position
-		glm_vec3_scale(context->cam.viewVector, 20000.0f, scaleView);
-		glm_vec3_add(start_position, scaleView, end_position); // Calcule la position finale du rayon
-		// end_position[1] = context->cam.position[1];
 
-		drawLine(start_position, end_position); // Dessine une ligne entre la position de départ et la position finale du rayon
 		glfwSwapBuffers(context->win_ptr);
+        display_fps();
     }
 }
 
-
-/* Basic function you can provide to hashmap_init */
-void chunksMapFree(void *entry) {
-	HashMap_entry *e = (HashMap_entry *)entry;
-	if (e->value) {
-		Chunks *chunks = (Chunks *)e->value;
-		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
-			hashmap_destroy(chunks->sub_chunks[i].block_map);
-		}
-		free(e->value); /* free the value (allocaated ptr) */
-	}
-	free(e); /* free the entry t_list node */
-}
 
 u8 *perlinNoiseGeneration(unsigned int seed) {
 	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
@@ -172,7 +80,7 @@ int main() {
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	chunksLoadArround(&context, 1);
+	chunksLoadArround(&context, 5);
 	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 
@@ -195,5 +103,5 @@ int main() {
 	// ft_lstclear(&renderChunksList, free);
 	hashmap_destroy(renderChunksMap);
     vox_destroy(&context);
-    return 0;
+    return (0);
 }
