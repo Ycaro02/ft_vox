@@ -52,6 +52,11 @@
 /* HARDCOED CHUNK NUMBER */
 #define TEST_CHUNK_MAX 9
 
+/* Perlin noise value generation for relief */
+#define PERLIN_OCTAVE 4
+#define PERLIN_PERSISTENCE 2.0
+#define PERLIN_LACUNARITY 2.0
+
 
 typedef struct PACKED_STRUCT s_block {
     s32 x;          /* Block x position */
@@ -72,7 +77,7 @@ typedef struct s_world {
 /* Context structure */
 typedef struct s_context {
 	World		*world;				/* World structure */
-	Camera	cam;				/* camera structure */
+	Camera		cam;				/* camera structure */
     GLFWwindow	*win_ptr;			/* Window pointer */
 	ModelCube	cube;				/* Data Cube structure */
     // Chunks    *chunks;        	/* current chunk */
@@ -177,6 +182,9 @@ u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
 /* cube.c */
 GLuint bufferGlCreate(GLenum type, u32 size, void *data);
+
+/* chunks */
+Chunks *chunksLoad(Context *c, s32 chunkX, s32 chunkZ);;
 
 #endif /* VOX_HEADER_H */
 

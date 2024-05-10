@@ -27,22 +27,22 @@ void act_move_left(Context *c) {
 
 /* Rotate camera left : LEFT */
 void act_rotate_camera_left(Context *c) {
-	rotate_camera(&c->cam, CAM_MOVE_HORIZONTAL, VEC3_ROTATEY);
+	rotate_camera(&c->cam, 1.0f, VEC3_ROTATEY);
 }
 
 /* Rotate camera right: RIGHT */
 void act_rotate_camera_right(Context *c) {
-    rotate_camera(&c->cam, -CAM_MOVE_HORIZONTAL, VEC3_ROTATEY);
+    rotate_camera(&c->cam, -1.0f, VEC3_ROTATEY);
 }
 
 /* Rotate camera top UP */
 void act_rotate_camera_top(Context *c) {
-	rotateTopBot(&c->cam, -CAM_MOVE_HORIZONTAL);
+	rotateTopBot(&c->cam, -1.0f);
 }
 
 /* Rotate camera down : DOWN */
 void act_rotate_camera_down(Context *c) {
-	rotateTopBot(&c->cam, CAM_MOVE_HORIZONTAL);
+	rotateTopBot(&c->cam, 1.0f);
 }
 
 /* Up camera : SPACE */
@@ -62,6 +62,7 @@ void act_reseCamera(Context *c) {
 
 void testChunksExist(Context *c) {
 	BlockPos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
+	ft_printf_fd(1, "Cam position: X|%f, Y:%f Z:|%f, \n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
 	ft_printf_fd(1, YELLOW"\nTest for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, pos.y, pos.z);
 	Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 	if (chunks) {

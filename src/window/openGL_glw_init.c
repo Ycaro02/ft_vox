@@ -74,7 +74,7 @@ GLFWwindow *init_openGL_context()
 	ft_printf_fd(1, CYAN"Renderer device: %s\n"RESET, renderer);
 
 	/* Set the clear color */
-	glClearColor(0.0f, 0.0f, 0.8f, 1.0f);
+	// glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     return (win);
 }
 

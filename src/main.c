@@ -1,14 +1,106 @@
 #include "../include/vox.h"			/* Main project header */
 #include "../include/skybox.h"		/* skybox rendering */
+#include "../include/chunks.h"		/* Chunks */
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
 
-// void renderChunksMapAdd(Context *c, HashMap *renderChunksMap, RenderChunks *render) {
-// 	RenderChunks *test = hashmap_get(renderChunksMap, RENDER_CHUNKS_ID(render));
-// 	if (!test) {
-// 		hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(render), render);
-// 	}
-// }
+
+s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
+	return (hashmap_get(renderChunksMap, chunkID) != NULL);
+}
+
+s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID) {
+	return (hashmap_get(chunksMap, chunkID) != NULL);
+}
+
+/* 
+	We start to the local chunks position offset
+	Then fire a ray from the camera to the view direction until max render distance
+	Detect the chunk offset position of ray travel
+	Then we can load the chunk
+*/
+
+#define MAX_RENDER_DISTANCE 20.0f
+
+void drawLine(vec3 start, vec3 end) {
+	glLineWidth(5.0f);
+	glColor3f(1.0f, 0.0f, 0.0f);
+    glBegin(GL_LINES);
+    glVertex3fv(start);
+	// ft_printf_fd(1, GREEN"Draw line from %f %f %f to %f %f %f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2], end[0], end[1], end[2]);
+    glVertex3fv(end);
+    glEnd();
+	glFlush();
+}
+
+void worldToChunksPos(vec3 current, vec3 chunkOffset)
+{
+	f32 chunkSize = 8.0; // cubeSize is 0.5
+	chunkOffset[0]= floor(current[0] / chunkSize);
+	chunkOffset[1] = floor(current[1] / chunkSize);
+	chunkOffset[2] = floor(current[2] / chunkSize);
+}
+
+void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
+    vec3 start_position, ray_direction, chunk_coords, current_position;
+    f32 fov = 100.0f; // Angle de vue de la caméra
+
+    glm_vec3_copy(c->cam.position, start_position);
+    glm_vec3_copy(c->cam.viewVector, ray_direction); // Utilisez directement le viewVector de la caméra comme direction du rayon
+    glm_vec3_zero(chunk_coords);
+    glm_vec3_zero(current_position);
+
+    // Calculer le nombre de rayons en fonction de la résolution de l'écran
+    int num_rays = SCREEN_WIDTH;
+    // Angle entre chaque rayon
+    f32 ray_angle = glm_rad(fov) / num_rays;
+
+    // Distance de voyage maximale pour charger les chunks
+    f32 max_travel_distance = MAX_RENDER_DISTANCE;
+
+    // Pas de voyage entre chaque itération
+    f32 travel_increment = 6.0f;
+
+    // Parcourir chaque rayon
+    for (int i = 0; i < num_rays; ++i) {
+        // Calculer la direction du rayon actuel
+        f32 angle = (i - num_rays / 2.0f) * ray_angle;
+        vec3 ray_direction = {
+            cos(angle),
+            0, // Assurez-vous que le rayon reste sur le plan horizontal
+            sin(angle)
+        };
+
+        f32 current_travel_distance = 0;
+
+		vec3 travelVector;
+
+        // Voyage jusqu'à la distance maximale
+        while (current_travel_distance < max_travel_distance) {
+            // Mise à l'échelle de la direction du rayon par la distance de voyage actuelle
+            glm_vec3_scale(ray_direction, current_travel_distance, travelVector);
+            // Ajout du vecteur de direction du rayon à la position de départ
+            glm_vec3_add(start_position, travelVector, current_position);
+            // Conversion en coordonnées de chunk
+            worldToChunksPos(current_position, chunk_coords);
+
+            BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
+
+            // Chargement des chunks
+            if (!chunkIsLoaded(c->world->chunksMap, chunkID)) {
+                Chunks *chunks = chunksLoad(c, chunkID.y, chunkID.z);
+                hashmap_set_entry(c->world->chunksMap, chunkID, chunks);
+            } else if (!chunksIsRenderer(renderChunksMap, chunkID)) {
+                RenderChunks *render = renderChunkCreate(hashmap_get(c->world->chunksMap, chunkID));
+                hashmap_set_entry(renderChunksMap, chunkID, render);
+            }
+
+            // Augmenter la distance de voyage pour la prochaine itération
+            current_travel_distance += travel_increment;
+        }
+    }
+}
+
 
 void drawAllChunks(GLuint VAO, HashMap *renderChunksMap) {
 	HashMap_it	it = hashmap_iterator(renderChunksMap);
@@ -39,22 +131,31 @@ void vox_destroy(Context *c) {
 FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMap *renderChunksMap) {
     while (!glfwWindowShouldClose(context->win_ptr)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // Draw skybox first
-        displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
-
-		/*	
-			We need to load chunks arround camera ( maybe load a large amount of chunks first ), start multithreading 
-			detect chunks in camera view ( by the camera angle ), start frustum culling to avoid rendering chunks that are not in the camera view
-			compare chunks in camera view with renderChunksMap ( Refact map input given for renderChunksMap, use chunks input instead (just store x,z) ) 
-			add necesary renderChunks to renderChunksMap (easier part )
-		*/
-
-        chunksRender(context, vao, context->cubeShaderID, renderChunksMap);
-	    glfwSwapBuffers(context->win_ptr);
-        glfwPollEvents();
+		/* Input handling */
+		glfwPollEvents();
         handle_input(context);
-        update_camera(context, context->cubeShaderID);
+		
+		/* Update data */
+		update_camera(context, context->cubeShaderID);
         display_fps();
+		chunksViewHandling(context, renderChunksMap);
+		
+		/* Render logic */
+		// (void)vao, (void)skyTexture, (void)renderChunksMap;
+        displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
+        chunksRender(context, vao, context->cubeShaderID, renderChunksMap);
+	    
+		// Appel à drawLine() avec des coordonnées fixes
+		vec3 start_position;
+		vec3 end_position = {0.0f, 0.0f, 0.0f};
+		vec3 scaleView;
+		glm_vec3_copy(context->cam.position, start_position); // Copie la position de la caméra dans start_position
+		glm_vec3_scale(context->cam.viewVector, 2000.0f, scaleView);
+		glm_vec3_add(context->cam.position, scaleView, end_position); // Calcule la position finale du rayon
+		// end_position[1] = context->cam.position[1];
+
+		drawLine(start_position, end_position); // Dessine une ligne entre la position de départ et la position finale du rayon
+		glfwSwapBuffers(context->win_ptr);
     }
 }
 
@@ -73,7 +174,7 @@ void chunksMapFree(void *entry) {
 }
 
 u8 *perlinNoiseGeneration(unsigned int seed) {
-	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, 4, 2.0, 2.0));
+	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
 }
 
 int main() {
@@ -100,7 +201,7 @@ int main() {
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	chunksLoadArround(&context, 5);
+	chunksLoadArround(&context, 1);
 	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 

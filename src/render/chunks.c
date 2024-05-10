@@ -81,6 +81,7 @@ float perlinNoiseHeight(u8 *perlinNoise, int worldX, int worldZ) {
 	// ft_printf_fd(1, ORANGE"World: [%d][%d] Idx: [%d] "RESET""GREEN"Height: %f\n"RESET,worldX,worldZ,idx,(perlinValue * scale));
     // Retourne la valeur de bruit de Perlin comme hauteur du terrain
     return ((perlinValue * scale) - 40.0f);
+    // return ((perlinValue * scale));
 }
 
 

@@ -86,16 +86,13 @@ void update_camera(void *context, GLuint shader_id)
 {
 	Context *c = context;
 
-
     /* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
-
     set_shader_var_mat4(shader_id, "view", c->cam.view);
     set_shader_var_mat4(shader_id, "projection", c->cam.projection);
 	set_shader_var_mat4(shader_id, "model", c->cube.rotation);
-	
-	updateViewVec(&c->cam);
 
+	updateViewVec(&c->cam);
 	chunkPosGet(&c->cam);
 }
 
@@ -140,7 +137,6 @@ void straf_camera(Camera* camera, float distance, s8 dir) {
 	glm_vec3_normalize(right);
 
 	/* Compute up movement vector, normalise and scale it */
-	// glm_vec3_normalize(right);
 	glm_vec3_scale(right, distance, right);
 
 	if (dir == DIR_LEFT) {

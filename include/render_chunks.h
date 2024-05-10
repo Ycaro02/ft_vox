@@ -20,6 +20,8 @@ void renderChunkFree(RenderChunks *render);
 /* Render chunks.c */
 u32		chunksCubeGet(Chunks *chunks, RenderChunks *render);
 void	chunksLoadArround(Context *c, s32 radius);
+RenderChunks *renderChunkCreate(Chunks *chunks);
+
 
 /* render/cube.c*/
 void drawAllCube(GLuint VAO, RenderChunks *render);
