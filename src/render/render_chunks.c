@@ -16,33 +16,23 @@ void renderChunkFree(RenderChunks *render) {
 }
 
 RenderChunks *renderChunkCreate(Chunks *chunks) {
-    RenderChunks *render = malloc(sizeof(RenderChunks));
-	if (!render) {
+    RenderChunks *render = NULL;
+	
+	if (!(render = malloc(sizeof(RenderChunks)))) {
 		ft_printf_fd(2, "Failed to allocate render\n");
 		return (NULL);
 	}
-
 	render->chunkID = CHUNKS_MAP_ID_GET(chunks->x, chunks->z);
-
     render->visibleBlock = chunks->visible_block;
-    
-	render->blockTypeID = ft_calloc(sizeof(f32), render->visibleBlock);
-	if (!render->blockTypeID) {
+	if (!(render->blockTypeID = ft_calloc(sizeof(f32), render->visibleBlock))) {
 		ft_printf_fd(2, "Failed to allocate blockTypeID\n");
 		return (NULL);
-	}
-	
-	render->block_array = ft_calloc(sizeof(vec3), render->visibleBlock);
-    if (!render->block_array) {
+	} else if (!(render->block_array = ft_calloc(sizeof(vec3), render->visibleBlock))) {
 		ft_printf_fd(2, "Failed to allocate block_array\n");
 		return (NULL);
 	}
 	fillBlockArrayForChunk(render, chunks);
 	render->instanceVBO = setupInstanceVBOForThisChunk(render->block_array, render->visibleBlock); // crée un VBO pour les données d'instance de ce render
-	
-	
-	// fillBlockTypeForchunk(render, chunks);
-	
 	render->typeBlockVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->visibleBlock * sizeof(GLuint), (void *)&render->blockTypeID[0]);
 	return (render);
 }
@@ -65,20 +55,14 @@ void renderChunksMapFree(void *entry) {
 
 
 HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
-	// t_list *renderChunksList = NULL;
-    HashMap_it it = hashmap_iterator(chunksMap);
-    s8 next = hashmap_next(&it); 
-
+	(void)c;
+    HashMap_it	it = hashmap_iterator(chunksMap);
+    s8			next = 1; 
 
 	HashMap *renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, renderChunksMapFree);
-
-	(void)c;
-    while (next) {
-        Chunks *chunks = (Chunks *)it.value;
-        RenderChunks *renderChunk = renderChunkCreate(chunks);
-        // ft_lstadd_back(&renderChunksList, ft_lstnew(renderChunk));
+    while ((next = hashmap_next(&it))) {
+        RenderChunks *renderChunk = renderChunkCreate((Chunks *)it.value);
 		hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(renderChunk), renderChunk);
-        next = hashmap_next(&it);
     }
 
     return (renderChunksMap);
