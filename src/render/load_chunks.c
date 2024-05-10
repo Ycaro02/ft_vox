@@ -13,8 +13,7 @@ s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID) {
 	return (hashmap_get(chunksMap, chunkID) != NULL);
 }
 
-void worldToChunksPos(vec3 current, vec3 chunkOffset)
-{
+void worldToChunksPos(vec3 current, vec3 chunkOffset) {
     f32 chunkSize = 8.0; // cubeSize is 0.5
     chunkOffset[0] = floor(current[0] / chunkSize);
     chunkOffset[1] = floor(current[1] / chunkSize);
@@ -49,3 +48,29 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 		}
 	}
 }
+
+/**
+ * @brief Get the number of threads available on the system
+ * @return The number of threads available on the system
+*/
+long ThreadsAvailableGet() {
+	long num_threads = sysconf(_SC_NPROCESSORS_ONLN);
+    if (num_threads == -1) {
+        perror("sysconf");
+        return 1;
+    }
+	return (num_threads);
+}
+
+// typedef struct s_thread_data {
+// 	Context *c;
+// 	s32 chunkX;
+// 	s32 chunkZ;
+// } ThreadData;
+
+// void threadChunksLoad(void *data) {
+// 	ThreadData *threadData = (ThreadData *)data;
+
+// 	Chunks *chunks = chunksLoad(threadData->c, threadData->chunkX, threadData->chunkZ);
+// 	hashmap_set_entry(c->world->chunksMap, CHUNKS_MAP_ID_GET(threadData->chunkX, threadData->chunkZ), chunks);
+// }

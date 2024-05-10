@@ -1,6 +1,7 @@
 #ifndef VOX_HEADER_H
 #define VOX_HEADER_H
 
+#include <threads.h>				            /* Threads functions */
 #include <math.h>					            /* LIBC Math functions */
 #include "glad/gl.h"				            /* Glad functions (Include glad header BEFORE glfw3) */
 #include "glfw3/glfw3.h"			            /* GLFW functions */

@@ -32,6 +32,8 @@
 		"render_chunks.h": "c",
 		"render.h": "c",
 		"world.h": "c",
-		"cube_definition.h": "c"
+		"cube_definition.h": "c",
+		"shader_utils.h": "c",
+		"threads.h": "c"
 	}
 }
