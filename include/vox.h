@@ -13,7 +13,7 @@
 #include "window.h"					            /* Window related functions */
 #include "win_event.h"				            /* Window event handling functions */
 #include "camera.h"                             /* Camera handling function */
-#include "render.h"								/* Render functions */
+#include "shader_utils.h"						/* Shader utils functions */
 
 /* Screen size */
 #define SCREEN_WIDTH	800			/* Screen width */
