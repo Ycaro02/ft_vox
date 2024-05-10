@@ -22,6 +22,8 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
 		return (NULL);
 	}
 
+	render->chunkID = CHUNKS_MAP_ID_GET(chunks->x, chunks->z);
+
     render->visibleBlock = chunks->visible_block;
     
 	render->blockTypeID = ft_calloc(sizeof(f32), render->visibleBlock);
