@@ -3,7 +3,7 @@
 #include "../include/chunks.h"		/* Chunks */
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
-
+#include "../include/thread_load.h"
 
 void drawAllChunks(GLuint VAO, HashMap *renderChunksMap) {
 	HashMap_it	it = hashmap_iterator(renderChunksMap);
@@ -63,6 +63,8 @@ int main() {
 	ft_bzero(&context, sizeof(Context));
     window = init_openGL_context();
     context.win_ptr = window;
+
+	threadInit(&context);
 
 	if (!(context.world = ft_calloc(sizeof(World), 1))) {
 		return (1);

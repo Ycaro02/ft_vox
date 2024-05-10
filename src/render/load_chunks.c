@@ -1,6 +1,7 @@
 #include "../../include/vox.h"
 #include "../../include/chunks.h"
 #include "../../include/render_chunks.h"
+#include "../../include/thread_load.h"
 
 #define MAX_RENDER_DISTANCE 40.0f
 #define TRAVEL_INCREMENT 6.0f
@@ -20,6 +21,7 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
     chunkOffset[2] = floor(current[2] / chunkSize);
 }
 
+
 void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
     vec3 start_position, ray_direction, chunk_coords, current_position, travelVector;
     f32 current = 0;
@@ -28,6 +30,8 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
     glm_vec3_copy(c->cam.viewVector, ray_direction);
     glm_vec3_zero(chunk_coords);
     glm_vec3_zero(current_position);
+
+	// s32 threadNb = 0;
 
 
 	while ((current += TRAVEL_INCREMENT) <= MAX_RENDER_DISTANCE) {
@@ -40,37 +44,17 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 
 		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
 		if (!chunkIsLoaded(c->world->chunksMap, chunkID)) {
-			Chunks *chunks = chunksLoad(c, chunkID.y, chunkID.z);
+			Chunks *chunks = chunksLoad(c->perlinNoise, chunkID.y, chunkID.z);
 			hashmap_set_entry(c->world->chunksMap, chunkID, chunks);
-		} else if (!chunksIsRenderer(renderChunksMap, chunkID)) {
+			// threadNb += theadInitChunkLoad(c, &c->mtx, (s32)chunk_coords[0], (s32)chunk_coords[2]);
+		} if (!chunksIsRenderer(renderChunksMap, chunkID)) {
 			RenderChunks *render = renderChunkCreate(hashmap_get(c->world->chunksMap, chunkID));
 			hashmap_set_entry(renderChunksMap, chunkID, render);
 		}
 	}
+
+	// threadWaitForWorker(c);
 }
 
-/**
- * @brief Get the number of threads available on the system
- * @return The number of threads available on the system
-*/
-long ThreadsAvailableGet() {
-	long num_threads = sysconf(_SC_NPROCESSORS_ONLN);
-    if (num_threads == -1) {
-        perror("sysconf");
-        return 1;
-    }
-	return (num_threads);
-}
 
-// typedef struct s_thread_data {
-// 	Context *c;
-// 	s32 chunkX;
-// 	s32 chunkZ;
-// } ThreadData;
 
-// void threadChunksLoad(void *data) {
-// 	ThreadData *threadData = (ThreadData *)data;
-
-// 	Chunks *chunks = chunksLoad(threadData->c, threadData->chunkX, threadData->chunkZ);
-// 	hashmap_set_entry(c->world->chunksMap, CHUNKS_MAP_ID_GET(threadData->chunkX, threadData->chunkZ), chunks);
-// }

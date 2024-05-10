@@ -3,11 +3,16 @@
 
 #include "vox.h"
 #include "cube.h"
+#include <threads.h>
 
 typedef struct s_world {
 	u64			seed;			/* World seed */
 	HashMap		*chunksMap;		/* Chunks hashmap */
 } World;
+
+typedef struct s_worker_thread WorkerThread;
+
+typedef mtx_t Mutex;
 
 /* Context structure */
 typedef struct s_context {
@@ -20,6 +25,8 @@ typedef struct s_context {
 	GLuint		skyboxVAO;			/* skybox VAO */
 	u32			renderBlock;		/* Total block to render */
 	u8			*perlinNoise;		/* perlinNoise data */
+	WorkerThread	*thread;			/* Thread structure array */
+	Mutex			mtx;
 } Context;
 
 /* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */

@@ -95,7 +95,7 @@ float perlinNoiseHeight(u8 *perlinNoise, s32 worldX, s32 worldZ) {
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void BRUT_FillChunks(Context *c, Chunks *chunks) {
+void BRUT_FillChunks(u8 *perlinNoise, Chunks *chunks) {
 	s32 **maxHeight = ft_calloc(sizeof(s32 *), 16);
 
 	for (u32 y = 0; y < 16; ++y) {
@@ -106,7 +106,7 @@ void BRUT_FillChunks(Context *c, Chunks *chunks) {
 			// s32 idx = ((yWorld * 16) + xWorld + (1024 * 1024)) % (1024 * 1024);
 			// maxHeight[y][x] = 30 + ((s32)(c->perlinNoise[idx]) / 4);
 
-			maxHeight[y][x] = perlinNoiseHeight(c->perlinNoise, xWorld, yWorld);
+			maxHeight[y][x] = perlinNoiseHeight(perlinNoise, xWorld, yWorld);
 
 			// ft_printf_fd(1, "max [%d][%d], %d\n", y,x, maxHeight[y][x]);
 		}
@@ -170,7 +170,7 @@ s32 getChunkID() {
 	return (chunksID++);
 }
 
-Chunks *chunksLoad(Context *c, s32 chunkX, s32 chunkZ) {
+Chunks *chunksLoad(u8 *perlinNoise, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
@@ -186,7 +186,7 @@ Chunks *chunksLoad(Context *c, s32 chunkX, s32 chunkZ) {
 	/* need to loop here to create all subchunks */
 	// chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 	// chunks->sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-	BRUT_FillChunks(c, chunks);
+	BRUT_FillChunks(perlinNoise, chunks);
 	return (chunks);
 }
 
@@ -208,7 +208,7 @@ void chunksLoadArround(Context *c, s32 radius) {
 				// ft_printf_fd(1, RED"Chunk not exist REALX:%d x: %d z: %d\n"RESET, pos.x, pos.y, pos.z);
 				ft_printf_fd(1, PINK"Before chunks load %d %d\n"RESET, pos.y, pos.z);
 
-				Chunks *newChunks = chunksLoad(c, pos.y, pos.z);
+				Chunks *newChunks = chunksLoad(c->perlinNoise, pos.y, pos.z);
 				hashmap_set_entry(c->world->chunksMap, pos, newChunks);
 				// ft_printf_fd(1, ORANGE"Chunk Created x: %d z: %d\n"RESET, pos.y, pos.z);
 			}
