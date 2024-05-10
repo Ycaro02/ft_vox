@@ -7,9 +7,8 @@ GLuint setupInstanceVBOForThisChunk(vec3* block_array, u32 visibleBlock) {
 }
 
 void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
-    chunksCubeGet(chunks, render, 0);
+    chunksCubeGet(chunks, render);
 }
-
 
 void renderChunkFree(RenderChunks *render) {
 	free(render->block_array);

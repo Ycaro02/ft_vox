@@ -17,7 +17,7 @@ HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap);
 void renderChunkFree(RenderChunks *render);
 
 /* Render chunks.c */
-u32		chunksCubeGet(Chunks *chunks, RenderChunks *render, u32 chunkID);
+u32		chunksCubeGet(Chunks *chunks, RenderChunks *render);
 void	chunksLoadArround(Context *c, s32 radius);
 
 /* render/cube.c*/

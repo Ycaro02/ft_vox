@@ -62,14 +62,34 @@ void act_reseCamera(Context *c) {
 
 void testChunksExist(Context *c) {
 	BlockPos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
-	ft_printf_fd(1, YELLOW"\nTest for chunk: %d, %d %d: "RESET, pos.x, pos.y, pos.z);
-
+	ft_printf_fd(1, YELLOW"\nTest for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, pos.y, pos.z);
 	Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 	if (chunks) {
 		ft_printf_fd(1, GREEN"Chunk exist\n"RESET);
 	} else {
 		ft_printf_fd(1, RED"Chunk not exist\n"RESET);
 	}
+
+	Camera *cam = &c->cam;
+	f32 xDir = cam->viewVector[0];
+	// f32 yDir = cam->viewVector[1];
+	f32 zDir = cam->viewVector[2];
+
+	char *NordSouth = "Unknown";
+	if (xDir >= 0.0f) {
+		NordSouth = CYAN"Nord"RESET;
+	} else if (xDir < 0.0f) {
+		NordSouth = RED"South"RESET;
+	} 
+
+	char *EstWest = "Unknown";
+	if (zDir > 0.0f) {
+		EstWest = ORANGE"East"RESET;
+	} else if (zDir < 0.0f) {
+		EstWest = PINK"West"RESET;
+	}
+
+	ft_printf_fd(1, PINK"View vec: X|%f|, Z|%f| "RESET":\n[%s] [%s]\n", xDir, zDir, NordSouth, EstWest);
 
 }
 
@@ -89,32 +109,6 @@ void act_change_polygon_mode(Context *c) {
     fill_mode = !fill_mode;
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE + fill_mode);
 }
-
-/* Rotate object left : LEFT */
-// void act_rotate_object_left(Context *c) {
-// 	rotate_object_around_center(&c->cube, VEC3_ROTATEX, ROTATE_ANGLE, c->cubeShaderID);
-// }
-
-// /* Rotate object right : RIGHT */
-// void act_rotate_object_right(Context *c) {
-// 	rotate_object_around_center(&c->cube, VEC3_ROTATEX, -ROTATE_ANGLE, c->cubeShaderID);
-// }
-
-// /* Rotate object up : UP */
-// void act_rotate_object_up(Context *c) {
-// 	rotate_object_around_center(&c->cube, VEC3_ROTATEY, ROTATE_ANGLE, c->cubeShaderID);
-// }
-
-// /* Rotate object down : DOWN */
-// void act_rotate_object_down(Context *c) {
-// 	rotate_object_around_center(&c->cube, VEC3_ROTATEY, -ROTATE_ANGLE, c->cubeShaderID);
-// }
-
-// /* Rotate object Z up : PAGE UP*/
-// void act_rotate_object_z_up(Context *c) {
-// 	rotate_object_around_center(&c->cube, VEC3_ROTATEZ, ROTATE_ANGLE, c->cubeShaderID);
-// }
-
 
 /**
  * @brief Set key callback for the window

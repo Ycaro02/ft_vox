@@ -19,6 +19,7 @@ typedef struct s_camera {
     vec3		up;					/* up vector */
     mat4		view;				/* view matrix */
     mat4		projection;			/* projection matrix */
+	vec3		viewVector;			/* view vector */
     vec3_s32    chunkPos;          /* Chunk position */
 	// mat4		view_no_translation;
 } Camera;

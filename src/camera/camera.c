@@ -35,6 +35,14 @@ void display_camera_value(void *context)
 	}
 }
 
+
+void updateViewVec(Camera *camera)
+{
+	camera->viewVector[0] = -camera->view[0][2];
+	camera->viewVector[1] = -camera->view[1][2];
+	camera->viewVector[2] = -camera->view[2][2];
+}
+
 /**
  * @brief Create a new camera
  * @param fov field of view
@@ -50,9 +58,9 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
 
 	ft_bzero(&camera, sizeof(Camera));
     /* init camera position */
-	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, camera.position);
+	glm_vec3_copy((vec3){1.0f, 10.0f, 1.0f}, camera.position);
     /* init camera target */
-	glm_vec3_copy((vec3){1.0f, 10.0f, 1.0f}, camera.target);
+	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, camera.target);
     /* init up vector */
 	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, camera.up);
 
@@ -62,6 +70,9 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
 
     /* Compute projection matrice */
 	glm_perspective(glm_rad(fov), aspect_ratio, near, far, camera.projection);
+
+	updateViewVec(&camera);
+
 
     return (camera);
 }
@@ -83,6 +94,8 @@ void update_camera(void *context, GLuint shader_id)
     set_shader_var_mat4(shader_id, "projection", c->cam.projection);
 	set_shader_var_mat4(shader_id, "model", c->cube.rotation);
 	
+	updateViewVec(&c->cam);
+
 	chunkPosGet(&c->cam);
 }
 

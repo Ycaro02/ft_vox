@@ -24,7 +24,6 @@
 /* Just need to change it to display/fill  more subchunks */
 #define SUBCHUNKS_DISPLAY 1U
 
-
 typedef struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
 } SubChunks;
@@ -37,5 +36,8 @@ typedef struct s_chunks {
 	s32				x;					/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;					/* Chunk offset Z can be negative (relative to origine chunks) */
 } Chunks;
+
+
+#define CHUNKS_MAP_ID_GET(offsetX, offsetZ) ((BlockPos){0, offsetX, offsetZ})
 
 #endif /* HEADER_CHUNKS_H */

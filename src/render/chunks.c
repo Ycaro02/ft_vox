@@ -128,12 +128,10 @@ void BRUT_FillChunks(Context *c, Chunks *chunks) {
  * @param chunkID Chunk ID [in]
  * @return u32 Number of visible block
 */
-u32 chunksCubeGet(Chunks *chunks, RenderChunks *render , u32 chunkID)
+u32 chunksCubeGet(Chunks *chunks, RenderChunks *render)
 {
     s8 next = TRUE;
 	u32 idx = 0;
-
-	(void)chunkID;
 
 	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
 		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
@@ -197,10 +195,7 @@ void chunksLoadArround(Context *c, s32 radius) {
 	s32  currentZ = c->cam.chunkPos[2];
 	for (s32 i = -radius; i < radius; ++i) {
 		for (s32 j = -radius; j < radius; ++j) {
-			BlockPos pos = {0};
-			pos.x = 0;
-			pos.y = currentX + i;
-			pos.z = currentZ + j;
+			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 			if (!chunks) {
 				// ft_printf_fd(1, RED"Chunk not exist REALX:%d x: %d z: %d\n"RESET, pos.x, pos.y, pos.z);
