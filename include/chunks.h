@@ -37,8 +37,6 @@ typedef struct s_chunks {
 } Chunks;
 
 
-#define CHUNKS_MAP_ID_GET(offsetX, offsetZ) ((BlockPos){0, offsetX, offsetZ})
-
 void chunksMapFree(void *entry);
 
 /* chunks */

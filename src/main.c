@@ -80,8 +80,8 @@ int main() {
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	chunksLoadArround(&context, 5);
-	GLuint cubeVAO = setupCubeVAO(&context, &context.cube);
+	chunksLoadArround(&context, 2);
+	GLuint cubeVAO = setupCubeVAO(&context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 
 	/* Init skybox */

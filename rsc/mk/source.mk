@@ -20,7 +20,6 @@ SRCS			=	window/openGL_glw_init.c\
 					camera/camera.c\
 					render/shader_utils.c\
 					render/cube.c\
-					render/obj_rotate.c\
 					render/occlusion_culling.c\
 					render/chunks.c\
 					render/render_chunks.c\

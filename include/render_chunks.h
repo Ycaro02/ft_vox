@@ -12,29 +12,26 @@ typedef struct s_render_chunks {
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
 } RenderChunks;
 
-#define RENDER_CHUNKS_ID(r) ((BlockPos)r->chunkID)
-
 /* render/render_chunks.c */
-HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap);
-void renderChunkFree(RenderChunks *render);
+HashMap			*chunksToRenderChunks(Context *c, HashMap *chunksMap);
+void			renderChunkFree(RenderChunks *render);
 
 /* Render chunks.c */
-u32		chunksCubeGet(Chunks *chunks, RenderChunks *render);
-void	chunksLoadArround(Context *c, s32 radius);
-RenderChunks *renderChunkCreate(Chunks *chunks);
-
+u32				chunksCubeGet(Chunks *chunks, RenderChunks *render);
+void			chunksLoadArround(Context *c, s32 radius);
+RenderChunks 	*renderChunkCreate(Chunks *chunks);
 
 /* render/load_chunks.c */
-s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
-s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
-void chunksViewHandling(Context *c, HashMap *renderChunksMap);
+s8				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
+s8				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
+void			chunksViewHandling(Context *c, HashMap *renderChunksMap);
 
-/* render/cube.c*/
-void drawAllCube(GLuint VAO, RenderChunks *render);
 
 /* render/occlusion_culling */
 u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
+/* render/cube.c to be refact */
+void	drawAllCube(GLuint VAO, RenderChunks *render);
 
 
 #endif /* HEADER_RENDER_CHUNKS_H */

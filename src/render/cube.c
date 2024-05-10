@@ -71,8 +71,7 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
 	return (vbo);
 }
 
-GLuint setupCubeVAO(Context *c, ModelCube *cube) {
-	(void)c;
+GLuint setupCubeVAO(ModelCube *cube) {
 
 	static const VertexTexture vertex[] = {
 		CUBE_BACK_FACE_VERTEX,
