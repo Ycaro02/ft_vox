@@ -20,7 +20,7 @@ s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID) {
 	Then we can load the chunk
 */
 
-#define MAX_RENDER_DISTANCE 36.0f
+#define MAX_RENDER_DISTANCE 30.0f
 
 void drawLine(vec3 start, vec3 end) {
 	glLineWidth(5.0f);
@@ -41,63 +41,23 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset)
     chunkOffset[2] = floor(current[2] / chunkSize);
 }
 
-//void debugChunkView() {
-//			if (i == 0 && current_travel_distance >= MAX_RENDER_DISTANCE) {
-//				ft_printf_fd(1, PINK"\nFirst Ray: ");
-//				ft_printf_fd(1, "Angle: %f ", angle);
-//				ft_printf_fd(1, "Ray Direction: %f, %f, %f ", ray_direction[0], ray_direction[1], ray_direction[2]);
-//				ft_printf_fd(1, "Current Position: %f, %f, %f ", current_position[0], current_position[1], current_position[2]);
-//				ft_printf_fd(1, "Chunk Coords: %f, %f, %f ", chunk_coords[0], chunk_coords[1], chunk_coords[2]);
-//				ft_printf_fd(1, "ChunkID: X:%d Z:%d\n"RESET, chunkID.y, chunkID.z);
-//			} else if (i == num_rays - 1 && current_travel_distance >= MAX_RENDER_DISTANCE) {
-//				ft_printf_fd(1, RED"Last Ray: ");
-//				ft_printf_fd(1, "Angle: %f ", angle);
-//				ft_printf_fd(1, "Ray Direction: %f, %f, %f ", ray_direction[0], ray_direction[1], ray_direction[2]);
-//				ft_printf_fd(1, "Current Position: %f, %f, %f ", current_position[0], current_position[1], current_position[2]);
-//				ft_printf_fd(1, "Chunk Coords: %f, %f, %f ", chunk_coords[0], chunk_coords[1], chunk_coords[2]);
-//				ft_printf_fd(1, " -> LastChunkID: X:%d Z:%d\n"RESET, chunkID.y, chunkID.z);
-//			}
-
-//}
-
 void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
     vec3 start_position, ray_direction, chunk_coords, current_position;
-    // f32 fov = 80.0f; // Angle de vue de la caméra
 
     glm_vec3_copy(c->cam.position, start_position);
-    glm_vec3_copy(c->cam.viewVector, ray_direction); // Utilisez directement le viewVector de la caméra comme direction du rayon
+    glm_vec3_copy(c->cam.viewVector, ray_direction);
     glm_vec3_zero(chunk_coords);
     glm_vec3_zero(current_position);
 
-	/* try to extrapolate ray direction X and Z */
-	// if (ray_direction[0] < 0.0f) {
-	// 	ray_direction[0] = -1.0f;
-	// } else {
-	// 	ray_direction[0] = 1.0f;
-	// }
-	// if (ray_direction[2] < 0.0f) {
-	// 	ray_direction[0] = -1.0f;
-	// } else {
-	// 	ray_direction[2] = 1.0f;
-	// }
-
-
-    // Distance de voyage maximale pour charger les chunks
-    f32 max_travel_distance = MAX_RENDER_DISTANCE;
-
-    // Pas de voyage entre chaque itération
-    f32 travel_increment = 6.0f;
-
-	f32 current_travel_distance = 0;
+    f32 travel_increment = 6.0f, current = 0;
 	vec3 travelVector;
 
-	// Voyage jusqu'à la distance maximale
-	while (current_travel_distance <= max_travel_distance) {
-		// Mise à l'échelle de la direction du rayon par la distance de voyage actuelle
-		glm_vec3_scale(ray_direction, current_travel_distance, travelVector);
-		// Ajout du vecteur de direction du rayon à la position de départ
+	while (current <= MAX_RENDER_DISTANCE) {
+		/* Scale ray dir */
+		glm_vec3_scale(ray_direction, current, travelVector);
+		/* add scaled ray vector add start position in current position */
 		glm_vec3_add(start_position, travelVector, current_position);
-		// Conversion en coordonnées de chunk
+		/* Convert world coordonate to chunk offset */
 		worldToChunksPos(current_position, chunk_coords);
 
 		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
@@ -108,9 +68,7 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 			RenderChunks *render = renderChunkCreate(hashmap_get(c->world->chunksMap, chunkID));
 			hashmap_set_entry(renderChunksMap, chunkID, render);
 		}
-
-		// Augmenter la distance de voyage pour la prochaine itération
-		current_travel_distance += travel_increment;
+		current += travel_increment;
 	}
 }
 
