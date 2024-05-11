@@ -23,13 +23,13 @@ typedef struct s_thread_entity {
 	Thread		thread;
 	s8			busy;
 	ThreadData	*data;
-	// t_list 		*dataQueue;
 } ThreadEntity;
 
 struct s_worker_thread {
     ThreadEntity	*workers;
     s64         	max;
     s64         	current;
+	t_list 			*dataQueue;
 };
 
 /**
@@ -45,7 +45,7 @@ FT_INLINE s64 ThreadsAvailableGet() {
 	return (num_threads);
 }
 
-void threadInit(Context *c);
+s8 threadInit(Context *c);
 void threadWaitForWorker(Context *c);
 s8 theadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ);
 

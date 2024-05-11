@@ -2,6 +2,7 @@
 #include "../../include/chunks.h"		/* Main project header */
 #include "../../include/perlin_noise.h"	/* Main project header */
 #include "../../include/render_chunks.h"
+#include "../../include/thread_load.h"
 
 /* Basic function you can provide to hashmap_init */
 void chunksMapFree(void *entry) {
@@ -116,7 +117,7 @@ void BRUT_FillChunks(u8 *perlinNoise, Chunks *chunks) {
 
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
-		ft_printf_fd(1, "Subchunk hashmap %d created, max: %d\n", i, chunkMaxY);
+		// ft_printf_fd(1, "Subchunk hashmap %d created, max: %d\n", i, chunkMaxY);
 		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 	}
 
@@ -176,16 +177,9 @@ Chunks *chunksLoad(u8 *perlinNoise, s32 chunkX, s32 chunkZ) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
 		return (NULL);
 	}
-
-
 	chunks->id = getChunkID();
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
-
-	ft_printf_fd(1, ORANGE"Chunk i:|%d|"RESET""CYAN"x:[%d] z:[%d]"RESET"\n", chunks->id, chunks->x, chunks->z);
-	/* need to loop here to create all subchunks */
-	// chunks->sub_chunks[0].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-	// chunks->sub_chunks[1].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 	BRUT_FillChunks(perlinNoise, chunks);
 	return (chunks);
 }
@@ -203,15 +197,17 @@ void chunksLoadArround(Context *c, s32 radius) {
 	for (s32 i = -radius; i < radius; ++i) {
 		for (s32 j = -radius; j < radius; ++j) {
 			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
+			
+			mtx_lock(&c->mtx);
 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
+			mtx_unlock(&c->mtx);
 			if (!chunks) {
-				// ft_printf_fd(1, RED"Chunk not exist REALX:%d x: %d z: %d\n"RESET, pos.x, pos.y, pos.z);
-				ft_printf_fd(1, PINK"Before chunks load %d %d\n"RESET, pos.y, pos.z);
-
-				Chunks *newChunks = chunksLoad(c->perlinNoise, pos.y, pos.z);
-				hashmap_set_entry(c->world->chunksMap, pos, newChunks);
-				// ft_printf_fd(1, ORANGE"Chunk Created x: %d z: %d\n"RESET, pos.y, pos.z);
+				theadInitChunkLoad(c, &c->mtx, pos.y, pos.z);
 			}
 		}
 	}
+
+	ft_printf_fd(1, RED"Chunks load arround Waiting for ThreadNb: %d\n"RESET, c->thread->current);
+	threadWaitForWorker(c);
+	ft_printf_fd(1, GREEN"Chunks load arround  After wait ThreadNb: %d\n"RESET, c->thread->current);
 }

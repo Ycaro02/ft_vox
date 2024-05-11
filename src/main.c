@@ -40,7 +40,7 @@ FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMa
 		
 		/* Update data */
 		update_camera(context, context->cubeShaderID);
-		chunksViewHandling(context, renderChunksMap);
+		// chunksViewHandling(context, renderChunksMap);
 		
 		/* Render logic */
         displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
@@ -64,7 +64,10 @@ int main() {
     window = init_openGL_context();
     context.win_ptr = window;
 
-	threadInit(&context);
+	if (!threadInit(&context)) {
+		ft_printf_fd(2, "Error: threadInit failed\n");
+		return (1);
+	}
 
 	if (!(context.world = ft_calloc(sizeof(World), 1))) {
 		return (1);
@@ -82,7 +85,7 @@ int main() {
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	chunksLoadArround(&context, 2);
+	chunksLoadArround(&context, 10);
 	GLuint cubeVAO = setupCubeVAO(&context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 

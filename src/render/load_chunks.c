@@ -6,6 +6,17 @@
 #define MAX_RENDER_DISTANCE 40.0f
 #define TRAVEL_INCREMENT 6.0f
 
+s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
+	for (s32 i = 0; i < c->thread->max; ++i) {
+		if (c->thread->workers[i].busy == WORKER_BUSY \
+			&& c->thread->workers[i].data->chunkX == chunkX \
+			&& c->thread->workers[i].data->chunkZ == chunkZ) {
+			return (1);
+		}
+	}
+	return (0);
+}
+
 s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
 	return (hashmap_get(renderChunksMap, chunkID) != NULL);
 }
@@ -31,7 +42,7 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
     glm_vec3_zero(chunk_coords);
     glm_vec3_zero(current_position);
 
-	// s32 threadNb = 0;
+	s32 threadNb = 0;
 
 
 	while ((current += TRAVEL_INCREMENT) <= MAX_RENDER_DISTANCE) {
@@ -43,17 +54,25 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 		worldToChunksPos(current_position, chunk_coords);
 
 		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
-		if (!chunkIsLoaded(c->world->chunksMap, chunkID)) {
-			Chunks *chunks = chunksLoad(c->perlinNoise, chunkID.y, chunkID.z);
-			hashmap_set_entry(c->world->chunksMap, chunkID, chunks);
-			// threadNb += theadInitChunkLoad(c, &c->mtx, (s32)chunk_coords[0], (s32)chunk_coords[2]);
-		} if (!chunksIsRenderer(renderChunksMap, chunkID)) {
+		mtx_lock(&c->mtx);
+		if (!chunkIsLoaded(c->world->chunksMap, chunkID)\
+			&& !workerIsLoadingChunks(c, (s32)chunk_coords[0], (s32)chunk_coords[2])) {
+			// Chunks *chunks = chunksLoad(c->perlinNoise, chunkID.y, chunkID.z);
+			// hashmap_set_entry(c->world->chunksMap, chunkID, chunks);
+			mtx_unlock(&c->mtx);
+			threadNb += theadInitChunkLoad(c, &c->mtx, (s32)chunk_coords[0], (s32)chunk_coords[2]);
+		} else if (!chunksIsRenderer(renderChunksMap, chunkID) && hashmap_get(c->world->chunksMap, chunkID)) {
 			RenderChunks *render = renderChunkCreate(hashmap_get(c->world->chunksMap, chunkID));
 			hashmap_set_entry(renderChunksMap, chunkID, render);
+			mtx_unlock(&c->mtx);
+		} else {
+			mtx_unlock(&c->mtx);
 		}
-	}
 
-	// threadWaitForWorker(c);
+	}
+	ft_printf_fd(1, RED"Waiting for ThreadNb: %d\n"RESET, threadNb);
+	threadWaitForWorker(c);
+	ft_printf_fd(1, GREEN"After wait ThreadNb: %d\n"RESET, c->thread->current);
 }
 
 

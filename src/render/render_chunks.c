@@ -18,6 +18,11 @@ void renderChunkFree(RenderChunks *render) {
 RenderChunks *renderChunkCreate(Chunks *chunks) {
     RenderChunks *render = NULL;
 	
+	if (!chunks) {
+		// ft_printf_fd(2, "Chunks is NULL\n");
+		return (NULL);
+	}
+
 	if (!(render = malloc(sizeof(RenderChunks)))) {
 		ft_printf_fd(2, "Failed to allocate render\n");
 		return (NULL);
