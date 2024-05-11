@@ -49,7 +49,6 @@ void move_camera_forward(Camera* camera, float distance);
 void move_camera_backward(Camera* camera, float distance);
 void move_camera_up(Camera* camera, float distance);
 void rotate_camera(Camera* camera, float angle, vec3 axis);
-void display_camera_value(void *context);
 void reseCamera(void *context);
 void update_camera(void *context, GLuint shader_id);
 void straf_camera(Camera* camera, float distance, s8 dir);

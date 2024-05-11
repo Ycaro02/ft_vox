@@ -84,8 +84,10 @@ int main() {
 	/* init context camera */
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
+	// display_camera_value(&context);
 
-	chunksLoadArround(&context, 5);
+
+	chunksLoadArround(&context, 4);
 	GLuint cubeVAO = setupCubeVAO(&context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 

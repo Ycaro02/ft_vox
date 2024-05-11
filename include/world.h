@@ -42,4 +42,6 @@ typedef struct s_context {
 GLuint bufferGlCreate(GLenum type, u32 size, void *data);
 
 
+void display_camera_value(Context *context);
+
 #endif /* HEADER_WORLD_H */

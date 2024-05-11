@@ -65,7 +65,6 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 		Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
 		mtx_unlock(&c->mtx);
 
-		/* Debug here */
 		debugFrustrum(chunks, c, renderChunksMap, chunkID);
 
 		// s8 inView = chunks && frustrumCheck(&c->cam, chunks);

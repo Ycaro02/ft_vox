@@ -46,10 +46,14 @@ s8 intersects(Frustum* frustum, BoundingBox* box) {
         vec3 positiveVertex;
         glm_vec3_copy(box->min, positiveVertex);
 
-		if (frustum->planes[i][0] * box->max[0] >= 0) positiveVertex[0] = box->max[0]; // x 
-		if (frustum->planes[i][1] * box->max[1] >= 0) positiveVertex[1] = box->max[1]; // y 
-		if (frustum->planes[i][2] * box->max[2] >= 0) positiveVertex[2] = box->max[2]; // z
-        // [3] == w
+		// if (frustum->planes[i][0] * box->max[0] >= 0) positiveVertex[0] = box->max[0]; // x 
+		// if (frustum->planes[i][1] * box->max[1] >= 0) positiveVertex[1] = box->max[1]; // y 
+		// if (frustum->planes[i][2] * box->max[2] >= 0) positiveVertex[2] = box->max[2]; // z
+        
+		if (frustum->planes[i][0] >= 0) positiveVertex[0] = box->max[0]; // x
+		if (frustum->planes[i][1] >= 0) positiveVertex[1] = box->max[1]; // y
+		if (frustum->planes[i][2] >= 0) positiveVertex[2] = box->max[2]; // z
+		// [3] == w
 		glm_normalize(positiveVertex);
         float dotProduct = glm_dot(frustum->planes[i], positiveVertex);
 		float realDot = -fabs(dotProduct);
@@ -69,9 +73,14 @@ s8 intersects(Frustum* frustum, BoundingBox* box) {
 s8 frustrumCheck(Camera *camera, Chunks *chunk)
 {
 	BoundingBox	box = calculateBoundingBox(chunk);
-	ft_printf_fd(1, ORANGE"Chunk X|%d| Z|%d|\nBox min |%f| |%f| |%f|\nmax: |%f| |%f| |%f|\n"RESET,\
-		chunk->x, chunk->z, box.min[0], box.min[1], box.min[2], box.max[0], box.max[1], box.max[2]);
-	
+	/* display box */
+	// ft_printf_fd(1, ORANGE"Chunk X|%d| Z|%d|\nBox min |%f| |%f| |%f|\nmax: |%f| |%f| |%f|\n"RESET,\
+	// 	chunk->x, chunk->z, box.min[0], box.min[1], box.min[2], box.max[0], box.max[1], box.max[2]);
+	// 	/* display frustrum data */
+	// ft_printf_fd(1, CYAN"Frustum data\n"RESET);
+	// for (int i = 0; i < 6; i++) {
+	// 	ft_printf_fd(1, YELLOW"Plane %d: %f %f %f %f\n"RESET, i, camera->frustum.planes[i][0], camera->frustum.planes[i][1], camera->frustum.planes[i][2], camera->frustum.planes[i][3]);
+	// }
 	if (intersects(&camera->frustum, &box)) {
 		// ft_printf_fd(1, PINK"Chunk X|%d| Z|%d| is in frustum\n"RESET, chunk->x, chunk->z);
 		return (1);
@@ -94,9 +103,9 @@ void chunkPosGet(Camera *camera)
  * @brief Display camera value
  * @param cam camera structure
 */
-void display_camera_value(void *context)
+void display_camera_value(Context *c)
 {
-	Context *c = context;
+	// Context *c = context;
 	ft_printf_fd(1, CYAN"position: %f %f %f\n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
 	ft_printf_fd(1, "target: %f %f %f\n", c->cam.target[0], c->cam.target[1], c->cam.target[2]);
 	ft_printf_fd(1, "up: %f %f %f\n", c->cam.up[0], c->cam.up[1], c->cam.up[2]);
@@ -113,6 +122,12 @@ void display_camera_value(void *context)
 	for (u32 i = 0; i < 4; i++) {
 		ft_printf_fd(1, "%f %f %f %f\n", c->cube.rotation[i][0], c->cube.rotation[i][1], c->cube.rotation[i][2], c->cube.rotation[i][3]);
 	}
+	ft_printf_fd(1, RESET"View vector: %f %f %f\n", c->cam.viewVector[0], c->cam.viewVector[1], c->cam.viewVector[2]);
+	ft_printf_fd(1, ORANGE"Frustum: \n"RESET);
+	for (u32 i = 0; i < 6; i++) {
+		ft_printf_fd(1, "Plane %d: %f %f %f %f\n", i, c->cam.frustum.planes[i][0], c->cam.frustum.planes[i][1], c->cam.frustum.planes[i][2], c->cam.frustum.planes[i][3]);
+	}
+
 }
 
 
@@ -164,7 +179,6 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
 	updateViewVec(&camera);
 
 	camera.frustum = calculateFrustum(&camera);
-
     return (camera);
 }
 

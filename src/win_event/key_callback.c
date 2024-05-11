@@ -63,8 +63,8 @@ void act_reseCamera(Context *c) {
 
 void testChunksExist(Context *c) {
 	BlockPos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
-	// ft_printf_fd(1, "Cam position: X|%f, Y:%f Z:|%f, \n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
-	display_camera_value(&c->cam);
+	ft_printf_fd(1, "Cam position: X|%f, Y:%f Z:|%f, \n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
+	display_camera_value(c);
 	ft_printf_fd(1, YELLOW"\nTest for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, pos.y, pos.z);
 	Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 	if (chunks) {
