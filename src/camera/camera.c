@@ -1,5 +1,76 @@
 #include "../../include/world.h"
 #include "../../include/cube.h"
+#include "../../include/camera.h"
+#include "../../include/chunks.h"
+
+/* frustru, start */
+
+Frustum calculateFrustum(Camera *camera) {
+    Frustum frustum;
+
+    // Combinez les matrices de vue et de projection pour obtenir la matrice de clip
+    mat4 clip;
+    glm_mat4_mul(camera->projection, camera->view, clip);
+
+    // Extraire les plans du frustum de la matrice de clip
+    glm_vec4_sub(clip[3], clip[0], frustum.planes[0]); // Droite
+    glm_vec4_add(clip[3], clip[0], frustum.planes[1]); // Gauche
+    glm_vec4_sub(clip[3], clip[1], frustum.planes[2]); // Bas
+    glm_vec4_add(clip[3], clip[1], frustum.planes[3]); // Haut
+    glm_vec4_sub(clip[3], clip[2], frustum.planes[4]); // Proche
+    glm_vec4_add(clip[3], clip[2], frustum.planes[5]); // Loin
+
+    // Normaliser les plans
+    for (int i = 0; i < 6; i++) {
+        glm_vec4_normalize(frustum.planes[i]);
+    }
+
+    // Ignorer la composante Y de la position de la caméra dans les plans
+    for (int i = 0; i < 6; i++) {
+        frustum.planes[i][1] = 0.0f;
+    }
+
+    return (frustum);
+}
+
+BoundingBox calculateBoundingBox(Chunks *chunk) {
+    BoundingBox box;
+
+    glm_vec3_copy((vec3){chunk->x * 8.0f, 0, chunk->z * 8.0f}, box.min);
+    glm_vec3_add(box.min, (vec3){8.0f, 0, 8.0f}, box.max);
+    return box;
+}
+
+s8 intersects(Frustum* frustum, BoundingBox* box) {
+    for (int i = 0; i < 6; i++) {
+        vec3 positiveVertex;
+		glm_vec3_copy(box->min, positiveVertex);
+        if (frustum->planes[i][0] >= 0) positiveVertex[0] = box->max[0]; // x 
+        if (frustum->planes[i][1] >= 0) positiveVertex[1] = box->max[1]; // y 
+        if (frustum->planes[i][2] >= 0) positiveVertex[2] = box->max[2]; // z
+
+		// [3] == w
+        if (glm_dot(frustum->planes[i], positiveVertex) < -frustum->planes[i][3]) {
+            return (FALSE); // La boîte est en dehors de ce plan, donc elle est en dehors du frustum
+        }
+    }
+    return (TRUE); // La boîte est à l'intérieur de tous les plans, donc elle est à l'intérieur du frustum
+}
+
+s8 frustrumCheck(Camera *camera, Chunks *chunk, Frustum *frustum)
+{
+	(void)camera;
+	BoundingBox	box = calculateBoundingBox(chunk);
+	
+	if (intersects(frustum, &box)) {
+		// ft_printf_fd(1, PINK"Chunk X|%d| Z|%d| is in frustum\n"RESET, chunk->x, chunk->z);
+		return (1);
+	}
+	return (0);
+}
+
+
+/* ENd frustrum */
 
 void chunkPosGet(Camera *camera)
 {
@@ -73,6 +144,7 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
 
 	updateViewVec(&camera);
 
+	camera.frustum = calculateFrustum(&camera);
 
     return (camera);
 }
@@ -94,6 +166,8 @@ void update_camera(void *context, GLuint shader_id)
 
 	updateViewVec(&c->cam);
 	chunkPosGet(&c->cam);
+	c->cam.frustum = calculateFrustum(&c->cam);
+
 }
 
 /**

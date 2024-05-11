@@ -5,19 +5,20 @@
 #include "cube.h"
 #include <threads.h>
 
+struct s_camera;
+
 typedef struct s_world {
 	u64			seed;			/* World seed */
 	HashMap		*chunksMap;		/* Chunks hashmap */
 } World;
 
 typedef struct s_worker_thread WorkerThread;
-
 typedef mtx_t Mutex;
 
 /* Context structure */
 typedef struct s_context {
 	World		*world;				/* World structure */
-	Camera		cam;				/* camera structure */
+	struct s_camera		cam;				/* camera structure */
     GLFWwindow	*win_ptr;			/* Window pointer */
 	ModelCube	cube;				/* Data Cube structure */
 	GLuint		cubeShaderID;		/* shader program id */
@@ -34,6 +35,7 @@ typedef struct s_context {
 
 /* Chunks ID in chunksHashmap, same id than RENDER_CHUNKS_ID(RenderChunks) */
 #define CHUNKS_MAP_ID_GET(offsetX, offsetZ) ((BlockPos){0, offsetX, offsetZ})
+
 
 
 /* cube.c */

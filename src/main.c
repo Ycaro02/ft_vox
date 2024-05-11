@@ -40,8 +40,8 @@ FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMa
 		
 		/* Update data */
 		update_camera(context, context->cubeShaderID);
-		// chunksViewHandling(context, renderChunksMap);
-		
+		chunksViewHandling(context, renderChunksMap);
+
 		/* Render logic */
         displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
         chunksRender(context, vao, context->cubeShaderID, renderChunksMap);
@@ -85,7 +85,7 @@ int main() {
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 
-	chunksLoadArround(&context, 10);
+	chunksLoadArround(&context, 5);
 	GLuint cubeVAO = setupCubeVAO(&context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 

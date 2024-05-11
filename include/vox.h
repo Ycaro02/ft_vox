@@ -151,6 +151,7 @@ void set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *
 GLuint load_cubemap(char* path, int squareHeight, int squareWidth);
 
 
+
 #endif /* VOX_HEADER_H */
 
 

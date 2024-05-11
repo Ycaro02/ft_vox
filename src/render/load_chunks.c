@@ -42,9 +42,6 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
     glm_vec3_zero(chunk_coords);
     glm_vec3_zero(current_position);
 
-	s32 threadNb = 0;
-
-
 	while ((current += TRAVEL_INCREMENT) <= MAX_RENDER_DISTANCE) {
 		/* Scale ray dir */
 		glm_vec3_scale(ray_direction, current, travelVector);
@@ -55,24 +52,32 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 
 		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
 		mtx_lock(&c->mtx);
-		if (!chunkIsLoaded(c->world->chunksMap, chunkID)\
-			&& !workerIsLoadingChunks(c, (s32)chunk_coords[0], (s32)chunk_coords[2])) {
-			// Chunks *chunks = chunksLoad(c->perlinNoise, chunkID.y, chunkID.z);
-			// hashmap_set_entry(c->world->chunksMap, chunkID, chunks);
-			mtx_unlock(&c->mtx);
-			threadNb += theadInitChunkLoad(c, &c->mtx, (s32)chunk_coords[0], (s32)chunk_coords[2]);
-		} else if (!chunksIsRenderer(renderChunksMap, chunkID) && hashmap_get(c->world->chunksMap, chunkID)) {
-			RenderChunks *render = renderChunkCreate(hashmap_get(c->world->chunksMap, chunkID));
+		// if (!chunkIsLoaded(c->world->chunksMap, chunkID)
+		// 	&& !workerIsLoadingChunks(c, (s32)chunk_coords[0], (s32)chunk_coords[2])) {
+		// 	// Chunks *chunks = chunksLoad(c->perlinNoise, chunkID.y, chunkID.z);
+		// 	// hashmap_set_entry(c->world->chunksMap, chunkID, chunks);
+		// 	mtx_unlock(&c->mtx);
+		// 	threadNb += theadInitChunkLoad(c, &c->mtx, (s32)chunk_coords[0], (s32)chunk_coords[2]);
+		// } else 
+		Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
+		mtx_unlock(&c->mtx);
+		if (chunks && !chunksIsRenderer(renderChunksMap, chunkID)) {
+			ft_printf_fd(1, PINK"GRAB Chunk X|%d| Z|%d| detected -> "RESET, chunks->x, chunks->z);
+			if (frustrumCheck(&c->cam, chunks, &c->cam.frustum)) {
+				ft_printf_fd(1, CYAN"Is in frustum\n"RESET);
+			} else {
+				ft_printf_fd(1, RED"Is not in frustum\n"RESET);
+			}
+		}
+		if (!chunksIsRenderer(renderChunksMap, chunkID) && chunks && frustrumCheck(&c->cam, chunks, &c->cam.frustum)) {
+			RenderChunks *render = renderChunkCreate(chunks);
 			hashmap_set_entry(renderChunksMap, chunkID, render);
-			mtx_unlock(&c->mtx);
-		} else {
-			mtx_unlock(&c->mtx);
 		}
 
 	}
-	ft_printf_fd(1, RED"Waiting for ThreadNb: %d\n"RESET, threadNb);
-	threadWaitForWorker(c);
-	ft_printf_fd(1, GREEN"After wait ThreadNb: %d\n"RESET, c->thread->current);
+	// ft_printf_fd(1, RED"Waiting for ThreadNb: %d\n"RESET, threadNb);
+	// threadWaitForWorker(c);
+	// ft_printf_fd(1, GREEN"After wait ThreadNb: %d\n"RESET, c->thread->current);
 }
 
 

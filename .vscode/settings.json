@@ -35,6 +35,7 @@
 		"cube_definition.h": "c",
 		"shader_utils.h": "c",
 		"threads.h": "c",
-		"thread_load.h": "c"
+		"thread_load.h": "c",
+		"camera.h": "c"
 	}
 }

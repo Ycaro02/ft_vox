@@ -41,9 +41,6 @@ void lst_popfront(t_list **lst) {
 
 int threadChunksLoad(void *data) {
 	ThreadData *t = (ThreadData *)data;
-
-
-
 	Chunks *chunks = chunksLoad(t->c->perlinNoise, t->chunkX, t->chunkZ);
 	mtx_lock(t->mtx);
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunks);
@@ -59,12 +56,12 @@ s8 theadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	if (!(tdata = malloc(sizeof(ThreadData)))) {
 		return (FALSE);
 	}	
+
+	mtx_lock(mtx);
 	tdata->c = c;
 	tdata->mtx = mtx;
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
-
-	mtx_lock(mtx);
 	if ((threadID = threadFreeWorkerGet(c)) == -1) {
 		ft_printf_fd(1, "Thread is full, store data in lst, size: %d\n", ft_lstsize(c->thread->dataQueue));
 		ft_lstadd_front(&c->thread->dataQueue, ft_lstnew(tdata));
@@ -83,7 +80,7 @@ s8 theadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 
 void threadWaitForWorker(Context *c) {
 	s64 i = 0;
-	while (i < c->thread->max && c->thread->current > 0) {
+	while (c->thread->current > 0) {
 		if (c->thread->workers[i].busy == WORKER_BUSY) {
 			thrd_join(c->thread->workers[i].thread, NULL);
 			if (c->thread->dataQueue != NULL) {

@@ -1,6 +1,6 @@
 #include "../../include/vox.h"			/* Main project header */
-#include "../../include/chunks.h"
-#include "../../include/render_chunks.h"
+#include "../../include/chunks.h"		/* Main project header */
+#include "../../include/render_chunks.h"	/* Main project header */
 
 GLuint setupInstanceVBOForThisChunk(vec3* block_array, u32 visibleBlock) {
     return (bufferGlCreate(GL_ARRAY_BUFFER, visibleBlock * sizeof(vec3), (void *)block_array[0]));
@@ -60,14 +60,15 @@ void renderChunksMapFree(void *entry) {
 
 
 HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
-	(void)c;
     HashMap_it	it = hashmap_iterator(chunksMap);
     s8			next = 1; 
 
 	HashMap *renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, renderChunksMapFree);
     while ((next = hashmap_next(&it))) {
-        RenderChunks *renderChunk = renderChunkCreate((Chunks *)it.value);
-		hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(renderChunk), renderChunk);
+		if (frustrumCheck(&c->cam, (Chunks *)it.value, &c->cam.frustum)) {
+			RenderChunks *renderChunk = renderChunkCreate((Chunks *)it.value);
+			hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(renderChunk), renderChunk);
+		}
     }
 
     return (renderChunksMap);

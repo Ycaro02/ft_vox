@@ -34,4 +34,5 @@ u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 void	drawAllCube(GLuint VAO, RenderChunks *render);
 
 
+
 #endif /* HEADER_RENDER_CHUNKS_H */
