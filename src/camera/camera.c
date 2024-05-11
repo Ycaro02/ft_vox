@@ -74,7 +74,7 @@ s8 frustrumCheck(Camera *camera, Chunks *chunk)
 {
 	BoundingBox	box = calculateBoundingBox(chunk);
 	/* display box */
-	// ft_printf_fd(1, ORANGE"Chunk X|%d| Z|%d|\nBox min |%f| |%f| |%f|\nmax: |%f| |%f| |%f|\n"RESET,\
+	// ft_printf_fd(1, ORANGE"Chunk X|%d| Z|%d|\nBox min |%f| |%f| |%f|\nmax: |%f| |%f| |%f|\n"RESET,
 	// 	chunk->x, chunk->z, box.min[0], box.min[1], box.min[2], box.max[0], box.max[1], box.max[2]);
 	// 	/* display frustrum data */
 	// ft_printf_fd(1, CYAN"Frustum data\n"RESET);

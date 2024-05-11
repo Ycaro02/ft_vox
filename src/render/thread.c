@@ -68,7 +68,7 @@ s8 theadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 		mtx_unlock(mtx);
 		return (FALSE);
 	}
-	ft_printf_fd(1, GREEN"ThreadID: %d create [%d][%d]\n"RESET, threadID, chunkX, chunkZ);
+	// ft_printf_fd(1, RESET_LINE""PINK"Thread: %d"RESET""CYAN" create [%d][%d]"RESET, threadID, chunkX, chunkZ);
 	c->thread->current += 1;
 	c->thread->workers[threadID].busy = WORKER_BUSY;
 	c->thread->workers[threadID].data = tdata;
@@ -85,10 +85,11 @@ void threadWaitForWorker(Context *c) {
 			thrd_join(c->thread->workers[i].thread, NULL);
 			if (c->thread->dataQueue != NULL) {
 				ThreadData *tdata = (ThreadData *)c->thread->dataQueue->content;
-				ft_printf_fd(1, GREEN"ThreadID: %d create [%d][%d]\n"RESET, i, tdata->chunkX, tdata->chunkZ);
+				// ft_printf_fd(1, GREEN"ThreadID: %d create [%d][%d]\n"RESET, i, tdata->chunkX, tdata->chunkZ);
 				c->thread->workers[i].data = tdata;
 				lst_popfront(&c->thread->dataQueue);
 				thrd_create(&c->thread->workers[i].thread, threadChunksLoad, tdata);
+				ft_printf_fd(1, RESET_LINE""ORANGE"Workers queue busy %d chunks remaining to load"RESET, ft_lstsize(c->thread->dataQueue) );
 			} else {
 				c->thread->workers[i].busy = WORKER_FREE;
 				c->thread->current -= 1;
