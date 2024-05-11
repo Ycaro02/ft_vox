@@ -37,32 +37,42 @@ BoundingBox calculateBoundingBox(Chunks *chunk) {
     BoundingBox box;
 
     glm_vec3_copy((vec3){chunk->x * 8.0f, 0, chunk->z * 8.0f}, box.min);
-    glm_vec3_add(box.min, (vec3){8.0f, 0, 8.0f}, box.max);
+    glm_vec3_sub(box.min, (vec3){-8.0f, 0, -8.0f}, box.max);
     return box;
 }
 
 s8 intersects(Frustum* frustum, BoundingBox* box) {
     for (int i = 0; i < 6; i++) {
         vec3 positiveVertex;
-		glm_vec3_copy(box->min, positiveVertex);
-        if (frustum->planes[i][0] >= 0) positiveVertex[0] = box->max[0]; // x 
-        if (frustum->planes[i][1] >= 0) positiveVertex[1] = box->max[1]; // y 
-        if (frustum->planes[i][2] >= 0) positiveVertex[2] = box->max[2]; // z
+        glm_vec3_copy(box->min, positiveVertex);
 
-		// [3] == w
-        if (glm_dot(frustum->planes[i], positiveVertex) < -frustum->planes[i][3]) {
+		if (frustum->planes[i][0] * box->max[0] >= 0) positiveVertex[0] = box->max[0]; // x 
+		if (frustum->planes[i][1] * box->max[1] >= 0) positiveVertex[1] = box->max[1]; // y 
+		if (frustum->planes[i][2] * box->max[2] >= 0) positiveVertex[2] = box->max[2]; // z
+        // [3] == w
+		glm_normalize(positiveVertex);
+        float dotProduct = glm_dot(frustum->planes[i], positiveVertex);
+		float realDot = -fabs(dotProduct);
+
+		ft_printf_fd(1, GREEN"TEST: Dot|%f|->realDot|%f| -frust|%f|\n"RESET, dotProduct,realDot, -frustum->planes[i][3]);
+
+
+
+        if (!float_less_equal(realDot, -frustum->planes[i][3]) && !float_equal(dotProduct, 0.0f)) {
+            ft_printf_fd(1, RED"Failed i|%d|-> RealDot|%f| -frust|%f|\n", i, realDot, -frustum->planes[i][3]);
             return (FALSE); // La boîte est en dehors de ce plan, donc elle est en dehors du frustum
         }
     }
     return (TRUE); // La boîte est à l'intérieur de tous les plans, donc elle est à l'intérieur du frustum
 }
 
-s8 frustrumCheck(Camera *camera, Chunks *chunk, Frustum *frustum)
+s8 frustrumCheck(Camera *camera, Chunks *chunk)
 {
-	(void)camera;
 	BoundingBox	box = calculateBoundingBox(chunk);
+	ft_printf_fd(1, ORANGE"Chunk X|%d| Z|%d|\nBox min |%f| |%f| |%f|\nmax: |%f| |%f| |%f|\n"RESET,\
+		chunk->x, chunk->z, box.min[0], box.min[1], box.min[2], box.max[0], box.max[1], box.max[2]);
 	
-	if (intersects(frustum, &box)) {
+	if (intersects(&camera->frustum, &box)) {
 		// ft_printf_fd(1, PINK"Chunk X|%d| Z|%d| is in frustum\n"RESET, chunk->x, chunk->z);
 		return (1);
 	}
@@ -87,20 +97,19 @@ void chunkPosGet(Camera *camera)
 void display_camera_value(void *context)
 {
 	Context *c = context;
-	ft_printf_fd(1, CYAN"Camera position: %f %f %f\n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
-	ft_printf_fd(1, "Camera target: %f %f %f\n", c->cam.target[0], c->cam.target[1], c->cam.target[2]);
-	ft_printf_fd(1, "Camera up: %f %f %f\n", c->cam.up[0], c->cam.up[1], c->cam.up[2]);
-	ft_printf_fd(1, "Camera view: \n");
+	ft_printf_fd(1, CYAN"position: %f %f %f\n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
+	ft_printf_fd(1, "target: %f %f %f\n", c->cam.target[0], c->cam.target[1], c->cam.target[2]);
+	ft_printf_fd(1, "up: %f %f %f\n", c->cam.up[0], c->cam.up[1], c->cam.up[2]);
+	ft_printf_fd(1, "view: \n");
 	for (u32 i = 0; i < 4; i++) {
-		ft_printf_fd(1, "%f %f %f %f\n", c->cam.view[i][0], c->cam.view[i][1], c->cam.view[i][2], c->cam.view[i][3]);
+		ft_printf_fd(1, "|%f||%f||%f||%f|\n", c->cam.view[i][0], c->cam.view[i][1], c->cam.view[i][2], c->cam.view[i][3]);
 	}
-	ft_printf_fd(1, "Camera projection: \n");
+	ft_printf_fd(1, "projection: \n");
 	for (u32 i = 0; i < 4; i++) {
-		ft_printf_fd(1, "%f %f %f %f\n", c->cam.projection[i][0], c->cam.projection[i][1], c->cam.projection[i][2], c->cam.projection[i][3]);
+		ft_printf_fd(1, "|%f||%f||%f||%f|\n", c->cam.projection[i][0], c->cam.projection[i][1], c->cam.projection[i][2], c->cam.projection[i][3]);
 	}
-	ft_printf_fd(1, RESET);
 
-	ft_printf_fd(1, "Model matrix: \n");
+	ft_printf_fd(1, RESET"Model matrix: \n");
 	for (u32 i = 0; i < 4; i++) {
 		ft_printf_fd(1, "%f %f %f %f\n", c->cube.rotation[i][0], c->cube.rotation[i][1], c->cube.rotation[i][2], c->cube.rotation[i][3]);
 	}
@@ -113,6 +122,16 @@ void updateViewVec(Camera *camera)
 	camera->viewVector[1] = -camera->view[1][2];
 	camera->viewVector[2] = -camera->view[2][2];
 }
+
+// f32 clamp(f32 value, f32 min, f32 max) {
+//     if (value < min) {
+//         return min;
+//     } else if (value > max) {
+//         return max;
+//     } else {
+//         return value;
+//     }
+// }
 
 /**
  * @brief Create a new camera
@@ -158,11 +177,19 @@ void update_camera(void *context, GLuint shader_id)
 {
 	Context *c = context;
 
+
+	// projection[3][3] = clamp(projection[3][3], 0.0f, 0.0f);
+	
+
     /* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
+
     set_shader_var_mat4(shader_id, "view", c->cam.view);
     set_shader_var_mat4(shader_id, "projection", c->cam.projection);
 	set_shader_var_mat4(shader_id, "model", c->cube.rotation);
+
+
+
 
 	updateViewVec(&c->cam);
 	chunkPosGet(&c->cam);
@@ -268,6 +295,7 @@ void rotate_camera(Camera *camera, float angle, vec3 axis) {
 
     /* Update the target based on the rotated direction */
 	glm_vec3_add(camera->position, direction, camera->target);
+
 }
 
 /**

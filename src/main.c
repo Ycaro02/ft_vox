@@ -47,7 +47,7 @@ FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMa
         chunksRender(context, vao, context->cubeShaderID, renderChunksMap);
 
 		glfwSwapBuffers(context->win_ptr);
-        display_fps();
+        // display_fps();
     }
 }
 
@@ -60,10 +60,10 @@ int main() {
     Context context;
     GLFWwindow* window;
 
-	ft_bzero(&context, sizeof(Context));
     window = init_openGL_context();
-    context.win_ptr = window;
 
+	ft_bzero(&context, sizeof(Context));
+    context.win_ptr = window;
 	if (!threadInit(&context)) {
 		ft_printf_fd(2, "Error: threadInit failed\n");
 		return (1);

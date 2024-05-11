@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 12:14:36 by nfour             #+#    #+#             */
-/*   Updated: 2024/04/26 10:28:32 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/11 18:12:10 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,8 @@
 
 /* Epsilon */
 #define FT_EPSILON  1e-5f
+
+
+#define VOX_EPSILON 0.01f
 
 #endif /* FT_MATH_DEFINE */

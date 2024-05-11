@@ -6,16 +6,16 @@
 #define MAX_RENDER_DISTANCE 40.0f
 #define TRAVEL_INCREMENT 6.0f
 
-s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
-	for (s32 i = 0; i < c->thread->max; ++i) {
-		if (c->thread->workers[i].busy == WORKER_BUSY \
-			&& c->thread->workers[i].data->chunkX == chunkX \
-			&& c->thread->workers[i].data->chunkZ == chunkZ) {
-			return (1);
-		}
-	}
-	return (0);
-}
+// s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
+// 	for (s32 i = 0; i < c->thread->max; ++i) {
+// 		if (c->thread->workers[i].busy == WORKER_BUSY
+// 			&& c->thread->workers[i].data->chunkX == chunkX
+// 			&& c->thread->workers[i].data->chunkZ == chunkZ) {
+// 			return (1);
+// 		}
+// 	}
+// 	return (0);
+// }
 
 s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
 	return (hashmap_get(renderChunksMap, chunkID) != NULL);
@@ -32,6 +32,16 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
     chunkOffset[2] = floor(current[2] / chunkSize);
 }
 
+
+void debugFrustrum(Chunks *chunk, Context *c, HashMap *renderChunksMap, BlockPos chunkID) {
+	if (chunk && !chunksIsRenderer(renderChunksMap, chunkID)) {
+		if (frustrumCheck(&c->cam, chunk)) {
+			ft_printf_fd(1, CYAN"Is in frustum\n"RESET);
+		} else {
+			ft_printf_fd(1, RED"Is not in frustum\n"RESET);
+		}
+	}
+}
 
 void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
     vec3 start_position, ray_direction, chunk_coords, current_position, travelVector;
@@ -52,24 +62,15 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 
 		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
 		mtx_lock(&c->mtx);
-		// if (!chunkIsLoaded(c->world->chunksMap, chunkID)
-		// 	&& !workerIsLoadingChunks(c, (s32)chunk_coords[0], (s32)chunk_coords[2])) {
-		// 	// Chunks *chunks = chunksLoad(c->perlinNoise, chunkID.y, chunkID.z);
-		// 	// hashmap_set_entry(c->world->chunksMap, chunkID, chunks);
-		// 	mtx_unlock(&c->mtx);
-		// 	threadNb += theadInitChunkLoad(c, &c->mtx, (s32)chunk_coords[0], (s32)chunk_coords[2]);
-		// } else 
 		Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
 		mtx_unlock(&c->mtx);
-		if (chunks && !chunksIsRenderer(renderChunksMap, chunkID)) {
-			ft_printf_fd(1, PINK"GRAB Chunk X|%d| Z|%d| detected -> "RESET, chunks->x, chunks->z);
-			if (frustrumCheck(&c->cam, chunks, &c->cam.frustum)) {
-				ft_printf_fd(1, CYAN"Is in frustum\n"RESET);
-			} else {
-				ft_printf_fd(1, RED"Is not in frustum\n"RESET);
-			}
-		}
-		if (!chunksIsRenderer(renderChunksMap, chunkID) && chunks && frustrumCheck(&c->cam, chunks, &c->cam.frustum)) {
+
+		/* Debug here */
+		debugFrustrum(chunks, c, renderChunksMap, chunkID);
+
+		// s8 inView = chunks && frustrumCheck(&c->cam, chunks);
+
+		if (!chunksIsRenderer(renderChunksMap, chunkID) && chunks) {
 			RenderChunks *render = renderChunkCreate(chunks);
 			hashmap_set_entry(renderChunksMap, chunkID, render);
 		}

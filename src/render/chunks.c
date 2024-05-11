@@ -162,7 +162,7 @@ u32 chunksCubeGet(Chunks *chunks, RenderChunks *render)
 		}
 	}
 
-    ft_printf_fd(1, GREEN"Renderer Cube %u\n"RESET, idx);
+    // ft_printf_fd(1, GREEN"Renderer Cube %u\n"RESET, idx);
     return (idx);
 }
 

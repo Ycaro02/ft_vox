@@ -17,8 +17,8 @@
 #include "shader_utils.h"						/* Shader utils functions */
 
 /* Screen size */
-#define SCREEN_WIDTH	800			/* Screen width */
-#define SCREEN_HEIGHT	600			/* Screen height */
+#define SCREEN_WIDTH	1920			/* Screen width */
+#define SCREEN_HEIGHT	1080			/* Screen height */
 
 /* Texture atlas path */
 // #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"

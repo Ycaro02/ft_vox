@@ -65,7 +65,7 @@ HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
 
 	HashMap *renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, renderChunksMapFree);
     while ((next = hashmap_next(&it))) {
-		if (frustrumCheck(&c->cam, (Chunks *)it.value, &c->cam.frustum)) {
+		if (frustrumCheck(&c->cam, (Chunks *)it.value)) {
 			RenderChunks *renderChunk = renderChunkCreate((Chunks *)it.value);
 			hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(renderChunk), renderChunk);
 		}

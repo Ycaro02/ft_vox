@@ -41,7 +41,7 @@ typedef struct s_camera {
 	// mat4		view_no_translation;
 } Camera; 
 
-s8 frustrumCheck(Camera *camera, Chunks *chunk, Frustum *frustum);
+s8 frustrumCheck(Camera *camera, Chunks *chunk);
 Frustum calculateFrustum(Camera* camera);
 
 Camera create_camera(float fov, float aspect_ratio, float near, float far);

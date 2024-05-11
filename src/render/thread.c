@@ -63,7 +63,7 @@ s8 theadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	if ((threadID = threadFreeWorkerGet(c)) == -1) {
-		ft_printf_fd(1, "Thread is full, store data in lst, size: %d\n", ft_lstsize(c->thread->dataQueue));
+		// ft_printf_fd(1, "Thread is full, store data in lst, size: %d\n", ft_lstsize(c->thread->dataQueue));
 		ft_lstadd_front(&c->thread->dataQueue, ft_lstnew(tdata));
 		mtx_unlock(mtx);
 		return (FALSE);
