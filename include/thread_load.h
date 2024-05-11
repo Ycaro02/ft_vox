@@ -2,7 +2,7 @@
 #define HEADER_THREAD_LOAD_H
 
 #include <stdio.h>
-#include <threads.h>
+#include "../src/tinycthread/tinycthread.h"        /* TinyCThread functions */
 #include <unistd.h>
 #include "world.h"
 

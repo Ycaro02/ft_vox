@@ -19,3 +19,6 @@ if [ ! -f "rsc/lib_deps/libglfw3.a" ]; then
 	./install/clone_compile_glfw3.sh
 fi
 
+if [ ! -d "rsc/deps/tinycthread" ]; then
+	./install/install_tinycthread.sh
+fi

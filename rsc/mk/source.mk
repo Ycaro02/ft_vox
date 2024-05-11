@@ -9,6 +9,7 @@ SUB_SRC_DIR		=	glad\
 					render\
 					texture\
 					perlin_noise\
+					tinycthread\
 
 ALL_SRC_DIR		=	$(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_SRC_DIR))
 
@@ -30,6 +31,7 @@ SRCS			=	window/openGL_glw_init.c\
 					perlin_noise/perlin_noise.c\
 					perlin_noise/noise_utils.c\
 					perlin_noise/noise_image.c\
+					tinycthread/tinycthread.c\
 
 # SRCS_BONUS		=	main_bonus.c
 

@@ -3,7 +3,6 @@
 
 #include "vox.h"
 #include "cube.h"
-#include <threads.h>
 
 struct s_camera;
 

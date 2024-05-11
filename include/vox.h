@@ -1,11 +1,11 @@
 #ifndef VOX_HEADER_H
 #define VOX_HEADER_H
 
-#include <threads.h>				            /* Threads functions */
 #include <math.h>					            /* LIBC Math functions */
 #include "glad/gl.h"				            /* Glad functions (Include glad header BEFORE glfw3) */
 #include "glfw3/glfw3.h"			            /* GLFW functions */
 #include "../rsc/deps/cglm/include/cglm/cglm.h" /* CGLM C maths openGL */
+#include "../src/tinycthread/tinycthread.h"        /* TinyCThread functions */
 
 #include "../libft/libft.h"		                /* Libft functions */
 #include "../libft/parse_flag/parse_flag.h"		/* Parse flag functions */
