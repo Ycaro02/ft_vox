@@ -202,12 +202,29 @@ void chunksLoadArround(Context *c, s32 radius) {
 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 			mtx_unlock(&c->mtx);
 			if (!chunks) {
-				theadInitChunkLoad(c, &c->mtx, pos.y, pos.z);
+				threadInitChunkLoad(c, &c->mtx, pos.y, pos.z);
 			}
 		}
 	}
 
 	ft_printf_fd(1, RED"Chunks load arround Waiting for ThreadNb: %d\n"RESET, c->thread->current);
 	threadWaitForWorker(c);
-	ft_printf_fd(1, GREEN"Chunks load arround  After wait ThreadNb: %d\n"RESET, c->thread->current);
+}
+
+
+/* 
+	Start by creating a supervisor thread that will manage the worker threads
+	In this supervisor thread, we will create a queue of chunks to load.
+	We will then create a worker thread that will load the chunks from the queue and 
+	store it in chunksHashMap . When the 'mandatory chunks' are created, we can send
+	a signal to main thread to start rendering the chunks.
+	In background, the worker thread will continue to load chunks from the queue and the supervisor 
+	continue to join them and add desired load chunks in the queue. 
+	Actualy the queue is a simple linked list of ThreadData structure. Maybe need to replace it by a
+	more efficient structure, hashmap or array of ThreadData. (simply to load nearest chunks first)
+*/
+
+int threadSupervisorInit(Context *c) {
+	
+
 }

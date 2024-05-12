@@ -48,7 +48,7 @@ int threadChunksLoad(void *data) {
 	return (1);
 }
 
-s8 theadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
+s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	ThreadData	*tdata;
 	s32			threadID = -1; 
 

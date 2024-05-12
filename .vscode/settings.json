@@ -36,6 +36,8 @@
 		"shader_utils.h": "c",
 		"threads.h": "c",
 		"thread_load.h": "c",
-		"camera.h": "c"
+		"camera.h": "c",
+		"primenumber.h": "c",
+		"tinycthread.h": "c"
 	}
 }

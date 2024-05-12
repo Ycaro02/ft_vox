@@ -47,6 +47,6 @@ FT_INLINE s64 ThreadsAvailableGet() {
 
 s8 threadInit(Context *c);
 void threadWaitForWorker(Context *c);
-s8 theadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ);
+s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ);
 
 #endif /* HEADER_THREAD_LOAD_H */

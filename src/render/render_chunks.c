@@ -70,6 +70,5 @@ HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
 			hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(renderChunk), renderChunk);
 		}
     }
-
     return (renderChunksMap);
 }

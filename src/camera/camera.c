@@ -191,7 +191,6 @@ void update_camera(void *context, GLuint shader_id)
 {
 	Context *c = context;
 
-
 	// projection[3][3] = clamp(projection[3][3], 0.0f, 0.0f);
 	
 

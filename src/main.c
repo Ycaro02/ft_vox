@@ -87,7 +87,7 @@ int main() {
 	// display_camera_value(&context);
 
 
-	chunksLoadArround(&context, 4);
+	chunksLoadArround(&context, 10);
 	GLuint cubeVAO = setupCubeVAO(&context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 
