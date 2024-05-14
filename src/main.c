@@ -23,7 +23,15 @@ void chunksRender(Context *c, GLuint VAO, GLuint shader_id, HashMap *renderChunk
 }
 
 
-void vox_destroy(Context *c) {
+void vox_destroy(Context *c, HashMap *renderChunksMap) {
+	mtx_lock(&c->threadContext->mtx);
+	c->isPlaying = FALSE;
+	mtx_unlock(&c->threadContext->mtx);
+	
+	thrd_join(c->threadContext->supervisor, NULL);
+	mtx_destroy(&c->threadContext->mtx);
+
+	hashmap_destroy(renderChunksMap);
 	hashmap_destroy(c->world->chunksMap);
 	free(c->world);
 	free(c->cube.vertex);
@@ -63,6 +71,8 @@ int main() {
     window = init_openGL_context();
 
 	ft_bzero(&context, sizeof(Context));
+	
+	context.isPlaying = TRUE;
     context.win_ptr = window;
 	// if (!threadWorkersInit(&context)) {
 	// 	ft_printf_fd(2, "Error: threadWorkersInit failed\n");
@@ -109,8 +119,6 @@ int main() {
 
 	main_loop(&context, cubeVAO, skyTexture, renderChunksMap);
 
-	// ft_lstclear(&renderChunksList, free);
-	hashmap_destroy(renderChunksMap);
-    vox_destroy(&context);
+    vox_destroy(&context, renderChunksMap);
     return (0);
 }

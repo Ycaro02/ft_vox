@@ -113,13 +113,8 @@ GLuint load_cubemap(char* path, int squareHeight, int squareWidth) {
         ft_printf_fd(2, "Failed to load texture %s\n", path);
         return 0;
     }
-    // ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n", w, h, type);
 
 	u8 *fliped_text = imageFlip180(texture, w, h, type);
-	// free(texture);
-
-	// ft_printf_fd(1, "Texture fliped, %c\n", fliped_text ? 'Y' : 'N');
-	// ft_printf_fd(1, "Texture fliped: w %d, h %d, type %d\n", w, h, type);
 
     t_list *square_lst = cut_texture_into_squares(fliped_text, w, h, squareWidth, squareHeight, type);
     if (!square_lst) {

@@ -36,6 +36,7 @@ typedef struct s_context {
 	u32					renderBlock;		/* Total block to render */
 	u8					*perlinNoise;		/* perlinNoise data */
 	ThreadContext		*threadContext;		/* Thread context */
+	s8					isPlaying;			/* Game is playing */
 	// Thread				threadSupervisor;	/* Thread supervisor */
 	// WorkerThread		*thread;			/* Thread structure array */
 	// Mutex				mtx;				/* Mutex */
@@ -53,5 +54,14 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data);
 
 
 void display_camera_value(Context *context);
+
+
+FT_INLINE s8 voxIsRunning(Context *context) {
+	s8 playing = TRUE;
+	mtx_lock(&context->threadContext->mtx);
+	playing = context->isPlaying;
+	mtx_unlock(&context->threadContext->mtx);
+	return (playing);
+}
 
 #endif /* HEADER_WORLD_H */

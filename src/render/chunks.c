@@ -125,6 +125,12 @@ void BRUT_FillChunks(u8 *perlinNoise, Chunks *chunks) {
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], maxHeight, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
 	}
+
+
+	for (u32 y = 0; y < 16; ++y) {
+		free(maxHeight[y]);
+	}
+	free(maxHeight);
 }
 
 
