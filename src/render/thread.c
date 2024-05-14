@@ -75,21 +75,20 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	s32			threadID = -1; 
 
 
-	if (!(tdata = malloc(sizeof(ThreadData)))) {
-		return (FALSE);
-	}	
-
 	mtx_lock(mtx);
+	if ((threadID = threadFreeWorkerGet(c->threadContext)) == -1) {
+		// ft_printf_fd(1, RED"Thread is full\n"RESET, hashmap_size(c->threadContext->chunksMapToLoad));
+		mtx_unlock(mtx);
+		return (FALSE);
+	} else if (!(tdata = malloc(sizeof(ThreadData)))) {
+		ft_printf_fd(2, "Error: threadInitChunkLoad: malloc failed\n");
+		mtx_unlock(mtx);
+		return (FALSE);
+	}
 	tdata->c = c;
 	tdata->mtx = mtx;
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
-	if ((threadID = threadFreeWorkerGet(c->threadContext)) == -1) {
-		ft_printf_fd(1, "Thread is full, store data in lst, size: %d\n", hashmap_size(c->threadContext->chunksMapToLoad));
-		// ft_lstadd_front(&c->threadContext->chunksQueue, ft_lstnew(tdata));
-		mtx_unlock(mtx);
-		return (FALSE);
-	}
 	tdata->threadID = threadID;
 	ft_printf_fd(1, ORANGE"Thread: %d"RESET""CYAN" create [%d][%d], size: %u\n"RESET, threadID, chunkX, chunkZ, hashmap_size(c->threadContext->chunksMapToLoad));
 	c->threadContext->workerCurrent += 1;
@@ -98,6 +97,10 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	mtx_unlock(mtx);
 
 	thrd_create(&c->threadContext->workers[threadID].thread, threadChunksLoad, tdata);
+	if (!thrd_detach(c->threadContext->workers[threadID].thread)) {
+		ft_printf_fd(2, "Error: threadInitChunkLoad: thrd_detach failed\n");
+		return (FALSE);
+	}
 	return (TRUE);
 }
 
@@ -108,15 +111,23 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 */
 void threadWaitForWorker(Context *c) {
 	s64 i = 0, max = 0;
+	s32 status = 0;
 	mtx_lock(&c->threadContext->mtx);
 	max = c->threadContext->workerMax;
-	// busy = c->threadContext->workerCurrent;
 	mtx_unlock(&c->threadContext->mtx);
+
 	while (i < max) {
-		// if (c->threadContext->workers[i].busy == WORKER_BUSY) {
-			thrd_join(c->threadContext->workers[i].thread, NULL);
-			// busy--;
-		// }
+		mtx_lock(&c->threadContext->mtx);
+		status = c->threadContext->workers[i].busy;
+		while (status == WORKER_BUSY) {
+			mtx_unlock(&c->threadContext->mtx);
+			usleep(10000);
+			mtx_lock(&c->threadContext->mtx);
+			status = c->threadContext->workers[i].busy;
+			ft_printf_fd(1, RED"WATING Workers Thread: "RESET""YELLOW"[%d]"RESET""RED" NOT finished: status %d\n"RESET, i, status);
+		}
+		mtx_unlock(&c->threadContext->mtx);
+		ft_printf_fd(1, ORANGE"Workers Thread: "RESET""YELLOW"[%d]"RESET""GREEN" finished: status %d\n"RESET, i, status);
 		++i;
 	}
 }
@@ -147,10 +158,15 @@ s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
 }
 
 s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
-	ThreadData *tdata;
-	if (!(tdata = malloc(sizeof(ThreadData)))) {
+	ThreadData *tdata = NULL;
+
+	if (hashmap_get(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ))\
+		|| workerIsLoadingChunks(c, chunkX, chunkZ)) {
+		return (TRUE);
+	} else if (!(tdata = malloc(sizeof(ThreadData)))) {
 		return (FALSE);
 	}
+
 	mtx_lock(&c->threadContext->mtx);
 	/* Locked */
 	tdata->c = c;
@@ -158,10 +174,7 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	/* If chunks not in chunksMapToload */
-	if (!hashmap_get(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ)) && !workerIsLoadingChunks(c, chunkX, chunkZ)) {
-		hashmap_set_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ), tdata);
-	}
-	// ft_lstadd_front(chunksQueue, ft_lstnew(tdata));
+	hashmap_set_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ), tdata);
 	/* Unlocked */
 	mtx_unlock(&c->threadContext->mtx);
 	return (TRUE);
@@ -230,7 +243,7 @@ s32 threadHandling(void *context) {
 	}
 
 	while (voxIsRunning(c)) {
-		threadChunksLoadArround(c, 1);
+		threadChunksLoadArround(c, 2);
 		mtx_lock(&c->threadContext->mtx);
 		mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
 		mtx_unlock(&c->threadContext->mtx);
@@ -243,7 +256,7 @@ s32 threadHandling(void *context) {
 				mtx_lock(&c->threadContext->mtx);
 				hashmap_remove_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(tdata->chunkX, tdata->chunkZ));
 				mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
-				// ft_printf_fd(1, RESET_LINE""PINK"Workers queue busy %u chunks remaining to load"RESET, mapSize);
+				free(tdata);
 				mtx_unlock(&c->threadContext->mtx);
 			}
 		} else {
@@ -253,6 +266,8 @@ s32 threadHandling(void *context) {
 	}
 
 	threadWaitForWorker(c);
+
+
 	return (TRUE);
 }
 

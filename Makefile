@@ -73,6 +73,9 @@ clean_lib:
 test: $(NAME)
 	@./$(NAME)
 
+vtest: $(NAME)
+	@valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
+
 re:			clean_lib fclean all
 
 .PHONY:		all clean fclean re bonus

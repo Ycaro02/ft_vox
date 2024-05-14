@@ -24,15 +24,25 @@ void chunksRender(Context *c, GLuint VAO, GLuint shader_id, HashMap *renderChunk
 
 
 void vox_destroy(Context *c, HashMap *renderChunksMap) {
+	s32 status = 0;
 	mtx_lock(&c->threadContext->mtx);
 	c->isPlaying = FALSE;
 	mtx_unlock(&c->threadContext->mtx);
 	
-	thrd_join(c->threadContext->supervisor, NULL);
+	thrd_join(c->threadContext->supervisor, &status);
+	ft_printf_fd(1, CYAN"Supervisor thread joined with status %d\n"RESET, status);
+
+	// threadWaitForWorker(c);
+	hashmap_destroy(c->threadContext->chunksMapToLoad);
+	free(c->threadContext->workers);
+
 	mtx_destroy(&c->threadContext->mtx);
 
 	hashmap_destroy(renderChunksMap);
 	hashmap_destroy(c->world->chunksMap);
+
+	// free(c->threadContext->workers);
+	free(c->threadContext);
 	free(c->world);
 	free(c->cube.vertex);
     free(c->perlinNoise);
@@ -71,13 +81,8 @@ int main() {
     window = init_openGL_context();
 
 	ft_bzero(&context, sizeof(Context));
-	
 	context.isPlaying = TRUE;
     context.win_ptr = window;
-	// if (!threadWorkersInit(&context)) {
-	// 	ft_printf_fd(2, "Error: threadWorkersInit failed\n");
-	// 	return (1);
-	// }
 
 	if (!(context.world = ft_calloc(sizeof(World), 1))) {
 		return (1);
@@ -98,7 +103,10 @@ int main() {
 
 
 	/* Init chunks */
-	threadSupervisorInit(&context);
+	if (!threadSupervisorInit(&context)) {
+		ft_printf_fd(2, "Error: threadSupervisorInit failed\n");
+		return (1);
+	}
 	// chunksLoadArround(&context, 10);
 	GLuint cubeVAO = setupCubeVAO(&context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
