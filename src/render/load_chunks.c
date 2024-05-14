@@ -6,16 +6,7 @@
 #define MAX_RENDER_DISTANCE 40.0f
 #define TRAVEL_INCREMENT 6.0f
 
-// s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
-// 	for (s32 i = 0; i < c->thread->max; ++i) {
-// 		if (c->thread->workers[i].busy == WORKER_BUSY
-// 			&& c->thread->workers[i].data->chunkX == chunkX
-// 			&& c->thread->workers[i].data->chunkZ == chunkZ) {
-// 			return (1);
-// 		}
-// 	}
-// 	return (0);
-// }
+
 
 s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
 	return (hashmap_get(renderChunksMap, chunkID) != NULL);
@@ -61,9 +52,11 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 		worldToChunksPos(current_position, chunk_coords);
 
 		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
-		mtx_lock(&c->mtx);
+		// mtx_lock(&c->mtx);
+		mtx_lock(&c->threadContext->mtx);
 		Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
-		mtx_unlock(&c->mtx);
+		mtx_unlock(&c->threadContext->mtx);
+		// mtx_unlock(&c->mtx);
 
 		// debugFrustrum(chunks, c, renderChunksMap, chunkID);
 

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   hashMap.c                                          :+:      :+:    :+:   */
+/*   HashMap.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/06 12:12:20 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/14 15:24:11 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ void hashmap_destroy(HashMap *map) {
 void *hashmap_get(HashMap *map, BlockPos p) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
-
 	t_list *entry = map->entries[index];
+
 	while (entry) {
 		HashMap_entry *e = (HashMap_entry *)entry->content;
 		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
@@ -81,7 +81,7 @@ void *hashmap_get(HashMap *map, BlockPos p) {
 	return (NULL);
 }
 
-u8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
+s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
 
@@ -113,6 +113,40 @@ u8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	(map->size)++;
 	return (HASHMAP_ADD_ENTRY);
 }
+
+s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
+    u64 key = hash_block_position(p.x, p.y, p.z);
+    size_t index = HASHMAP_INDEX(key, map->capacity);
+
+    t_list *current = map->entries[index];
+    t_list *prev = NULL;
+
+    /* loop on linked list of the computed index */
+    while (current) {
+        HashMap_entry *entry = (HashMap_entry *)current->content;
+        if (HASHMAP_SAME_ENTRY(entry, key, p.x, p.y, p.z)) {
+            /* If is the head of the list */
+            if (prev == NULL) {
+                map->entries[index] = current->next;
+            } else { /* If is not the head of the list */
+                prev->next = current->next;
+            }
+            /* free memory */
+            // map->free_obj(entry->value);
+            free(current->content);
+            // current->content = NULL;
+			free(current);
+
+			current = NULL;
+            (map->size)--;
+            return (HASHMAP_DELETE_ENTRY);
+        }
+        prev = current;
+        current = current->next;
+    }
+	return (HASHMAP_NOT_FOUND);
+}
+
 
 
 s8 hashmap_expand(HashMap *map) 

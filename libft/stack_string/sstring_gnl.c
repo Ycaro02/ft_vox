@@ -44,40 +44,9 @@ char **sstring_load_file(char *path)
 		// ft_printf_fd(1, ORANGE"map|%s|"RESET,map);
 	}
 
-	ft_printf_fd(1, YELLOW"In sstring load File %s:"RESET"\n"PINK"|%s|"RESET,path,map);
+	// ft_printf_fd(1, YELLOW"In sstring load File %s:"RESET"\n"PINK"|%s|"RESET,path,map);
 	close(fd);
 	dest = ft_split_trim(map, '\n');
 	free(map);
 	return (dest);
 }
-
-
-// u32 sstring_search(t_sstring *sstr, char c)
-// {
-// 	if (!sstr)
-// 		return (0);
-// 	for (uint16_t i = 0; i < sstr->size; ++i) {
-// 		if (sstr->data[i] == c)
-// 			return (i);
-// 	}
-// 	return (OUT_OF_SSTRING);
-// }
-
-
-// void sstring_rm_first_word(t_sstring *sstr, u32 end)
-// {
-// 	t_sstring tmp;
-
-// 	empty_sstring(&tmp);
-
-// 	if ((sstr->size <= end - 1)) {
-// 		clear_sstring(sstr);
-// 		return;
-// 	}
-
-// 	tmp = fill_sstring(sstr->data + end + 1);
-// 	clear_sstring(sstr);
-// 	ft_printf_fd(1, "tmp: %s\n", tmp.data);
-// 	*sstr = fill_sstring(tmp.data);
-
-// }

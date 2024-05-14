@@ -70,9 +70,10 @@ GLuint load_shader(char *vertexShader, char *fragmentShader)
 		ft_bzero(data, 1024);
 		glGetProgramInfoLog(shaderID , 512, NULL, data);
 		ft_printf_fd(2, "Shader program log: %s\n", data);
-	} else {
-		ft_printf_fd(1, "Shader program linked\n");
-	}
+	} 
+	// else {
+	// 	ft_printf_fd(1, "Shader program linked\n");
+	// }
 
 	glUseProgram(shaderID);
 

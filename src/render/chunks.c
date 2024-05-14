@@ -191,40 +191,22 @@ Chunks *chunksLoad(u8 *perlinNoise, s32 chunkX, s32 chunkZ) {
  * @param curr_z Player's z position
  * @param radius The radius around the player to scan
 */
-void chunksLoadArround(Context *c, s32 radius) {
-	s32  currentX = c->cam.chunkPos[0];
-	s32  currentZ = c->cam.chunkPos[2];
-	for (s32 i = -radius; i < radius; ++i) {
-		for (s32 j = -radius; j < radius; ++j) {
-			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
+// void chunksLoadArround(Context *c, s32 radius) {
+// 	s32  currentX = c->cam.chunkPos[0];
+// 	s32  currentZ = c->cam.chunkPos[2];
+// 	for (s32 i = -radius; i < radius; ++i) {
+// 		for (s32 j = -radius; j < radius; ++j) {
+// 			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
 			
-			mtx_lock(&c->mtx);
-			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
-			mtx_unlock(&c->mtx);
-			if (!chunks) {
-				threadInitChunkLoad(c, &c->mtx, pos.y, pos.z);
-			}
-		}
-	}
+// 			mtx_lock(&c->mtx);
+// 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
+// 			mtx_unlock(&c->mtx);
+// 			if (!chunks) {
+// 				threadInitChunkLoad(c, &c->mtx, pos.y, pos.z);
+// 			}
+// 		}
+// 	}
 
-	ft_printf_fd(1, RED"Chunks load arround Waiting for ThreadNb: %d\n"RESET, c->thread->current);
-	threadWaitForWorker(c);
-}
-
-
-/* 
-	Start by creating a supervisor thread that will manage the worker threads
-	In this supervisor thread, we will create a queue of chunks to load.
-	We will then create a worker thread that will load the chunks from the queue and 
-	store it in chunksHashMap . When the 'mandatory chunks' are created, we can send
-	a signal to main thread to start rendering the chunks.
-	In background, the worker thread will continue to load chunks from the queue and the supervisor 
-	continue to join them and add desired load chunks in the queue. 
-	Actualy the queue is a simple linked list of ThreadData structure. Maybe need to replace it by a
-	more efficient structure, hashmap or array of ThreadData. (simply to load nearest chunks first)
-*/
-
-int threadSupervisorInit(Context *c) {
-	
-
-}
+// 	ft_printf_fd(1, RED"Chunks load arround Waiting for ThreadNb: %d\n"RESET, c->thread->current);
+// 	threadWaitForWorker(c);
+// }

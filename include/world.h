@@ -4,20 +4,30 @@
 #include "vox.h"
 #include "cube.h"
 
-struct s_camera;
+
+typedef struct s_camera Camera;
+typedef struct s_thread_entity ThreadEntity;
+typedef mtx_t Mutex;
+typedef thrd_t Thread;
 
 typedef struct s_world {
-	u64			seed;			/* World seed */
-	HashMap		*chunksMap;		/* Chunks hashmap */
+	u64				seed;			/* World seed */
+	HashMap			*chunksMap;		/* Chunks hashmap */
 } World;
 
-typedef struct s_worker_thread WorkerThread;
-typedef mtx_t Mutex;
+typedef struct s_thread_context {
+	Thread			supervisor;		/* Thread supervisor */
+	Mutex 			mtx;			/* Mutex to protect data */
+	HashMap 		*chunksMapToLoad;	/* Chunks queue to load, (for now contain ThreadData struct) */
+    ThreadEntity	*workers;		/* Worker thread array */
+	s64         	workerMax;		/* Maximum of worker thread (size of workers array) */
+    s64         	workerCurrent;	/* Current busy worker thread */
+} ThreadContext;
 
 /* Context structure */
 typedef struct s_context {
 	World				*world;				/* World structure */
-	struct s_camera		cam;				/* camera structure */
+	Camera				cam;				/* camera structure */
     GLFWwindow			*win_ptr;			/* Window pointer */
 	ModelCube			cube;				/* Data Cube structure */
 	GLuint				cubeShaderID;		/* shader program id */
@@ -25,9 +35,10 @@ typedef struct s_context {
 	GLuint				skyboxVAO;			/* skybox VAO */
 	u32					renderBlock;		/* Total block to render */
 	u8					*perlinNoise;		/* perlinNoise data */
-	Thread				threadSupervisor;	/* Thread supervisor */
-	WorkerThread		*thread;			/* Thread structure array */
-	Mutex				mtx;				/* Mutex */
+	ThreadContext		*threadContext;		/* Thread context */
+	// Thread				threadSupervisor;	/* Thread supervisor */
+	// WorkerThread		*thread;			/* Thread structure array */
+	// Mutex				mtx;				/* Mutex */
 } Context;
 
 /* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */
@@ -35,7 +46,6 @@ typedef struct s_context {
 
 /* Chunks ID in chunksHashmap, same id than RENDER_CHUNKS_ID(RenderChunks) */
 #define CHUNKS_MAP_ID_GET(offsetX, offsetZ) ((BlockPos){0, offsetX, offsetZ})
-
 
 
 /* cube.c */

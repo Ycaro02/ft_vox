@@ -14,6 +14,7 @@ typedef struct s_thread_data {
 	Mutex	*mtx;
 	s32 	chunkX;
 	s32 	chunkZ;
+	s8		threadID;
 } ThreadData;
 
 #define WORKER_FREE 0
@@ -24,13 +25,6 @@ typedef struct s_thread_entity {
 	s8			busy;
 	ThreadData	*data;
 } ThreadEntity;
-
-struct s_worker_thread {
-    ThreadEntity	*workers;
-    s64         	max;
-    s64         	current;
-	t_list 			*dataQueue;
-};
 
 /**
  * @brief Get the number of threads available on the system
@@ -45,8 +39,12 @@ FT_INLINE s64 ThreadsAvailableGet() {
 	return (num_threads);
 }
 
-s8 threadInit(Context *c);
+s8 threadWorkersInit(Context *c);
 void threadWaitForWorker(Context *c);
 s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ);
+
+
+/* Supervisor now init workers */
+s8 threadSupervisorInit(Context *c);
 
 #endif /* HEADER_THREAD_LOAD_H */

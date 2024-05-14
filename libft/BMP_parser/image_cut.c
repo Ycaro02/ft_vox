@@ -58,7 +58,7 @@ t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int
             }
         }
     }
-    ft_printf_fd(1, "Cut texture %d*%d into %d squares of %d\n", tex_width, tex_height, square_count, width);
+    // ft_printf_fd(1, "Cut texture %d*%d into %d squares of %d\n", tex_width, tex_height, square_count, width);
     return (square_lst);
 
 }

@@ -64,10 +64,10 @@ int main() {
 
 	ft_bzero(&context, sizeof(Context));
     context.win_ptr = window;
-	if (!threadInit(&context)) {
-		ft_printf_fd(2, "Error: threadInit failed\n");
-		return (1);
-	}
+	// if (!threadWorkersInit(&context)) {
+	// 	ft_printf_fd(2, "Error: threadWorkersInit failed\n");
+	// 	return (1);
+	// }
 
 	if (!(context.world = ft_calloc(sizeof(World), 1))) {
 		return (1);
@@ -87,7 +87,9 @@ int main() {
 	// display_camera_value(&context);
 
 
-	chunksLoadArround(&context, 10);
+	/* Init chunks */
+	threadSupervisorInit(&context);
+	// chunksLoadArround(&context, 10);
 	GLuint cubeVAO = setupCubeVAO(&context.cube);
 	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 

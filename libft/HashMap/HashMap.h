@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/09 11:07:50 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/14 15:33:58 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,14 @@ typedef struct s_hashmap_it {
 
 
 /* First capacity init, prime number arround 100 or 1000*/
-#define HASHMAP_SIZE_100 151U
-#define HASHMAP_SIZE_1000 1009U
+#define HASHMAP_SIZE_100		151U
+#define HASHMAP_SIZE_1000		1009U
 
-#define HASHMAP_UPT_ENTRY		0U	/* Update hashmap entry */
-#define HASHMAP_ADD_ENTRY		1U	/* Add new entry */
-#define HASHMAP_MALLOC_ERROR	2U	/* Malloc error */
+#define HASHMAP_UPT_ENTRY		0	/* Update hashmap entry */
+#define HASHMAP_ADD_ENTRY		1	/* Add new entry */
+#define HASHMAP_MALLOC_ERROR	2	/* Malloc error */
+#define HASHMAP_DELETE_ENTRY	3	/* Delete entry */
+#define HASHMAP_NOT_FOUND		4	/* Entry not found */
 
 
 /* Hash Map entry.value is valid (not null) */
@@ -151,9 +153,18 @@ void *hashmap_get(HashMap *map, BlockPos p);
  * @param map HashMap to set in
  * @param x,y,z key to set
  * @param value value to set
- * @return u8 HASHMAP_UPT_ENTRY if update, HASHMAP_ADD_ENTRY if add, HASHMAP_MALLOC_ERROR if malloc failed
+ * @return s8 HASHMAP_UPT_ENTRY if update, HASHMAP_ADD_ENTRY if add, HASHMAP_MALLOC_ERROR if malloc failed
 */
-u8 hashmap_set_entry(HashMap *map, BlockPos p, void *value);
+s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value);
+
+
+/**
+ * @brief HashMap remove the entry associated with the key (x,y,z are the key)
+ * @param map HashMap to remove from
+ * @param x,y,z key to remove
+ * @return s8 HASHMAP_DELETE_ENTRY if entry deleted, HASHMAP_NOT_FOUND if entry not found
+*/
+s8 hashmap_remove_entry(HashMap *map, BlockPos p);
 
 /**
  * @brief Function to get the length of the hash map

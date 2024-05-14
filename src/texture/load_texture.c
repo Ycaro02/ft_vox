@@ -84,14 +84,14 @@ GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth) {
         ft_printf_fd(2, "Failed to load texture %s\n", path);
         return (0);
     }
-    ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n",w,h,type);
+    // ft_printf_fd(1, "Texture loaded: w %d, h %d, type %d\n",w,h,type);
     t_list *square_lst = cut_texture_into_squares(texture, w, h, squareWidth, squareHeight, type);
     if (!square_lst) {
         free(texture);
         ft_printf_fd(2, "Failed to cut texture\n");
         return (0);
     }
-    ft_printf_fd(1, "Texture cuted\n");
+    // ft_printf_fd(1, "Texture cuted\n");
     free(texture);
 
     GLuint atlas = load_gl_texture_3D(square_lst, type, ft_lstsize(square_lst));
