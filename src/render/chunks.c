@@ -17,6 +17,40 @@ void chunksMapFree(void *entry) {
 	free(e); /* free the entry t_list node */
 }
 
+Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
+	Block *block = ft_calloc(sizeof(Block), 1);
+	if (!block) {
+		ft_printf_fd(2, "Failed to allocate block\n");
+		return (NULL);
+	}
+
+	block->x = x;
+	block->y = y;
+	block->z = z;
+	
+	s32 realY = startYWorld + y;
+
+	// if (realY > maxHeight && realY < (s32)SEA_LEVEL) {
+	// 	block->type = WATER;
+	// 	return (block);
+	// } 
+	
+	if (realY >= maxHeight && realY <= (s32)SEA_LEVEL) {
+		// block->flag = BLOCK_HIDDEN;
+		block->type = WATER;
+		return (block);
+	}
+
+	if (realY > (s32)((f32)maxHeight * 0.8)) {
+		block->type = DIRT;
+		if (realY == maxHeight - 1)
+			block->type = GRASS;
+	} else {
+		block->type = STONE;
+	}
+	return (block);
+}
+
 /**
  * @brief BRUT fill subchunks with block
  * @param sub_chunk Subchunk pointer
@@ -25,31 +59,16 @@ void chunksMapFree(void *entry) {
 size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s32 nb)
 {
 	s32 startYWorld = nb * 16;
-	(void)nb;
 
     for (s32 i = 0; i < 16; ++i) {
         for (s32 j = 0; j < 16; ++j) {
             for (s32 k = 0; k < 16; ++k) {
-                if (startYWorld + j < maxHeight[i][k]) { /* To change if we are under to sea lvl */
-					Block *block = ft_calloc(sizeof(Block), 1);
-					if (!block) {
-						ft_printf_fd(2, "Failed to allocate block\n");
-						return (0);
+					// if (startYWorld + j < maxHeight[i][k]) {
+					if (startYWorld + j < maxHeight[i][k] || startYWorld + j <= (s32)SEA_LEVEL) {
+						Block *block = blockCreate(i,j,k, maxHeight[i][k], startYWorld);
+						hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
 					}
-					block->x = i;
-					block->y = j;
-					block->z = k;
-					if (startYWorld + j > (s32)((f32)maxHeight[i][k] * 0.8)) {
-						block->type = DIRT;
-						if (startYWorld + j == maxHeight[i][k] - 1)
-							block->type = GRASS;
-					} else {
-						block->type = STONE;
-					}
-					hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
-				}
             }
-			// startYWorld++;
         }
     }
 	return (hashmap_size(sub_chunk->block_map));
@@ -106,14 +125,14 @@ f32 perlinNoiseHeight(Mutex *mtx, u8 *perlinNoise, s32 worldX, s32 worldZ) {
 
     /* Access the interpolated noise value */
     f32 perlinValue = getInterpolatedNoise(perlinNoise, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT);
-    f32 scale = 20.0f;
+    f32 scale = 50.0f;
 
 	(void)mtx;
     // mtx_lock(mtx);
     // ft_printf_fd(1, "Perlin of World "ORANGE"[%d][%d]"RESET"->"PURPLE"[%d][%d]"RESET" "PINK"PVal |%f|"RESET"\n", worldX, worldZ, localX, localZ, perlinValue);
     // mtx_unlock(mtx);
 
-    return (20.0f + (perlinValue * scale));
+    return ((SEA_LEVEL - PERLIN_SUB_HEIGHT) + (perlinValue * scale));
 }
 
 /**
@@ -134,6 +153,9 @@ void BRUT_FillChunks(Mutex *mtx, u8 *perlinNoise, Chunks *chunks) {
 	}
 
 	s32 chunkMaxY = maxHeightGet(maxHeight);
+	if (chunkMaxY < (s32)SEA_LEVEL) {
+		chunkMaxY = (s32)SEA_LEVEL;
+	}
 
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {

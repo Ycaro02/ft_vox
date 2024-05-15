@@ -57,7 +57,9 @@
 #define PERLIN_LACUNARITY 2.0
 
 
-#define PERLIN_SUB_HEIGHT 0.0f
+#define PERLIN_SUB_HEIGHT 20.0f
+
+#define SEA_LEVEL 80.0f
 
 typedef struct PACKED_STRUCT s_block {
     s32 x;          /* Block x position */
@@ -145,6 +147,7 @@ enum BlockType {
     DIRT=54,     /* Dirt block (Exposed to light) */
 	GRASS=55,    /* Grass block (Exposed to light) */
 	GRASS_TOP=AT_GRASS_TOP,	/* Grass top */
+	WATER=AT_WATER,		/* Water */
 };
 
 /* texture load_texture */
