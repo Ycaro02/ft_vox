@@ -87,7 +87,7 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	tdata->threadID = threadID;
-	ft_printf_fd(1, ORANGE"Thread: %d"RESET""CYAN" create [%d][%d], size: %u\n"RESET, threadID, chunkX, chunkZ, hashmap_size(c->threadContext->chunksMapToLoad));
+	// ft_printf_fd(1, ORANGE"Thread: %d"RESET""CYAN" create [%d][%d], size: %u\n"RESET, threadID, chunkX, chunkZ, hashmap_size(c->threadContext->chunksMapToLoad));
 	c->threadContext->workerCurrent += 1;
 	c->threadContext->workers[threadID].busy = WORKER_BUSY;
 	c->threadContext->workers[threadID].data = tdata;

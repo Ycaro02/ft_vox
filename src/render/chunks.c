@@ -78,24 +78,49 @@ s32 maxHeightGet(s32 **maxHeight) {
 }
 
 
-float perlinNoiseHeight(u8 *perlinNoise, s32 worldX, s32 worldZ) {
+/* Interpolate noise value */
+f32 getInterpolatedNoise(u8 *perlinNoise, s32 x, s32 z, s32 width, s32 height) {
+    s32 x0 = x % width;
+    s32 x1 = (x0 + 1) % width;
+    s32 z0 = z % height;
+    s32 z1 = (z0 + 1) % height;
+
+    f32 sx = x - (s32)x;
+    f32 sz = z - (s32)z;
+
+    f32 n0 = perlinNoise[z0 * width + x0] / 255.0f;
+    f32 n1 = perlinNoise[z0 * width + x1] / 255.0f;
+    f32 n2 = perlinNoise[z1 * width + x0] / 255.0f;
+    f32 n3 = perlinNoise[z1 * width + x1] / 255.0f;
+
+    f32 i0 = n0 + sx * (n1 - n0);
+    f32 i1 = n2 + sx * (n3 - n2);
+
+    return (i0 + sz * (i1 - i0));
+}
+
+f32 perlinNoiseHeight(Mutex *mtx, u8 *perlinNoise, s32 worldX, s32 worldZ) {
     /* Set local X and Z coordinates based on the center of the Perlin noise array */
     s32 localX = worldX + (PERLIN_NOISE_WIDTH / 2);
     s32 localZ = worldZ + (PERLIN_NOISE_HEIGHT / 2);
-	// ft_printf_fd(1, ORANGE"World: [%d][%d] Local: [%d][%d]\n"RESET,worldX,worldZ,localX,localZ);
-	s32 idx = (localX + localZ) % PERLIN_ARRAY_SIZE;
-    f32 perlinValue = (f32)perlinNoise[idx] / 255.0f;
-    f32 scale = 100.0f;
 
-    return ((perlinValue * scale) - PERLIN_SUB_HEIGHT) ;
+    /* Access the interpolated noise value */
+    f32 perlinValue = getInterpolatedNoise(perlinNoise, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT);
+    f32 scale = 20.0f;
+
+	(void)mtx;
+    // mtx_lock(mtx);
+    // ft_printf_fd(1, "Perlin of World "ORANGE"[%d][%d]"RESET"->"PURPLE"[%d][%d]"RESET" "PINK"PVal |%f|"RESET"\n", worldX, worldZ, localX, localZ, perlinValue);
+    // mtx_unlock(mtx);
+
+    return (20.0f + (perlinValue * scale));
 }
-
 
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void BRUT_FillChunks(u8 *perlinNoise, Chunks *chunks) {
+void BRUT_FillChunks(Mutex *mtx, u8 *perlinNoise, Chunks *chunks) {
 	s32 **maxHeight = ft_calloc(sizeof(s32 *), 16);
 
 	for (u32 y = 0; y < 16; ++y) {
@@ -103,12 +128,8 @@ void BRUT_FillChunks(u8 *perlinNoise, Chunks *chunks) {
 		for (u32 x = 0; x < 16; ++x) {
 			s32 xWorld = (s32)localXToWorld(chunks, x);
 			s32 yWorld = (s32)localZToWorld(chunks, y);
-			// s32 idx = ((yWorld * 16) + xWorld + (1024 * 1024)) % (1024 * 1024);
-			// maxHeight[y][x] = 30 + ((s32)(c->perlinNoise[idx]) / 4);
+			maxHeight[y][x] = perlinNoiseHeight(mtx, perlinNoise, xWorld, yWorld);
 
-			maxHeight[y][x] = perlinNoiseHeight(perlinNoise, xWorld, yWorld);
-
-			// ft_printf_fd(1, "max [%d][%d], %d\n", y,x, maxHeight[y][x]);
 		}
 	}
 
@@ -116,15 +137,14 @@ void BRUT_FillChunks(u8 *perlinNoise, Chunks *chunks) {
 
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
-		// ft_printf_fd(1, "Subchunk hashmap %d created, max: %d\n", i, chunkMaxY);
 		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-	}
-
-	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], maxHeight, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
+		// free(maxHeight[i]);
 	}
 
+	// for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
+	// }
 
 	for (u32 y = 0; y < 16; ++y) {
 		free(maxHeight[y]);
@@ -189,33 +209,6 @@ Chunks *chunksLoad(Mutex *mtx, u8 *perlinNoise, s32 chunkX, s32 chunkZ) {
 
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
-	BRUT_FillChunks(perlinNoise, chunks);
+	BRUT_FillChunks(mtx, perlinNoise, chunks);
 	return (chunks);
 }
-
-/**
- * @brief Scan the environment to load chunks arround the camera
- * @param c Context pointer
- * @param curr_x Player's x position
- * @param curr_z Player's z position
- * @param radius The radius around the player to scan
-*/
-// void chunksLoadArround(Context *c, s32 radius) {
-// 	s32  currentX = c->cam.chunkPos[0];
-// 	s32  currentZ = c->cam.chunkPos[2];
-// 	for (s32 i = -radius; i < radius; ++i) {
-// 		for (s32 j = -radius; j < radius; ++j) {
-// 			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
-			
-// 			mtx_lock(&c->mtx);
-// 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
-// 			mtx_unlock(&c->mtx);
-// 			if (!chunks) {
-// 				threadInitChunkLoad(c, &c->mtx, pos.y, pos.z);
-// 			}
-// 		}
-// 	}
-
-// 	ft_printf_fd(1, RED"Chunks load arround Waiting for ThreadNb: %d\n"RESET, c->thread->current);
-// 	threadWaitForWorker(c);
-// }
