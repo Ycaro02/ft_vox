@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/15 09:38:16 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/15 10:02:26 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ HashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj)) {
 		return (NULL);
 	}
 
+	mtx_init(&map->mtx, mtx_plain);
 	map->capacity = prime_capacity;
 	map->size = 0;
 	map->free_obj = free_obj;
@@ -62,26 +63,36 @@ void hashmap_destroy(HashMap *map) {
     for (size_t i = 0; i < map->capacity; i++) {
         ft_lstclear(&map->entries[i], map->free_obj);
     }
+	mtx_destroy(&map->mtx);
 	free(map->entries); /* free entry t_list ** array */
 	free(map);			/* free map */
 }
 
 void *hashmap_get(HashMap *map, BlockPos p) {
+	mtx_lock(&map->mtx);
+
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
-	t_list *entry = map->entries[index];
+	t_list	*entry = map->entries[index];
+	void	*value = NULL;
 
 	while (entry) {
 		HashMap_entry *e = (HashMap_entry *)entry->content;
 		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
-			return (e->value);
+			value = e->value;
+			break ;
+			// mtx_unlock(&map->mtx);
+			// return (e->value);
+
 		}
 		entry = entry->next;
 	}
-	return (NULL);
+	mtx_unlock(&map->mtx);
+	return (value);
 }
 
 s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
+	mtx_lock(&map->mtx);
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
 
@@ -94,6 +105,7 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 				free(e->value);
 			}
 			e->value = value;
+			mtx_unlock(&map->mtx);
 			return (HASHMAP_UPT_ENTRY);
 		}
 		current = current->next;
@@ -101,6 +113,7 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 
 	t_list *entry = ft_lstnew(ft_calloc(sizeof(HashMap_entry), 1));
 	if (!entry) {
+		mtx_unlock(&map->mtx);
 		return (HASHMAP_MALLOC_ERROR);
 	}
 	HashMap_entry *e = (HashMap_entry *)entry->content;
@@ -111,10 +124,13 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	e->value = value;
 	ft_lstadd_back(&map->entries[index], entry);
 	(map->size)++;
+	mtx_unlock(&map->mtx);
 	return (HASHMAP_ADD_ENTRY);
 }
 
 s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
+	mtx_lock(&map->mtx);
+
     u64 key = hash_block_position(p.x, p.y, p.z);
     size_t index = HASHMAP_INDEX(key, map->capacity);
 
@@ -137,11 +153,13 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
 			free(current);
 			current = NULL;
             (map->size)--;
+			mtx_unlock(&map->mtx);
             return (HASHMAP_DELETE_ENTRY);
         }
         prev = current;
         current = current->next;
     }
+	mtx_unlock(&map->mtx);
 	return (HASHMAP_NOT_FOUND);
 }
 
@@ -150,6 +168,8 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
 s8 hashmap_expand(HashMap *map) 
 {
 	/* Compute new size */
+	mtx_lock(&map->mtx);
+
     size_t new_capacity = (map->capacity * 2);
 	new_capacity = GET_NEXT_PRIME(new_capacity);
 
@@ -170,6 +190,7 @@ s8 hashmap_expand(HashMap *map)
                 /* Handle memory allocation failure Free memory and return (FALSE) */
                 ft_lstclear(&new_entries[i], free);
                 free(new_entries);
+				mtx_unlock(&map->mtx);
                 return (FALSE);
             }
             ft_lstadd_back(&new_entries[new_index], new_entry);
@@ -187,6 +208,7 @@ s8 hashmap_expand(HashMap *map)
     map->entries = new_entries;
     map->capacity = new_capacity;
 
+	mtx_unlock(&map->mtx);
     return (TRUE); /* Expansion successful */
 }
 
@@ -200,16 +222,20 @@ size_t hashmap_capacity(HashMap *map) {
 
 HashMap_it hashmap_iterator(HashMap *map) {
     HashMap_it it;
+	mtx_lock(&map->mtx);
 
     it._map = map;
     it._idx = 0;
 	it._current = NULL;
+	mtx_unlock(&map->mtx);
     return (it);
 }
 
 s8 hashmap_next(HashMap_it *it) {
     HashMap *map = it->_map;
 	t_list *entry = NULL;
+
+	mtx_lock(&map->mtx);
 
     /* Loop through the entries array */
     while (it->_idx < map->capacity) {
@@ -225,6 +251,7 @@ s8 hashmap_next(HashMap_it *it) {
                 HashMap_entry *hm_entry = it->_current->content;
                 it->key = hm_entry->key;
                 it->value = hm_entry->value;
+				mtx_unlock(&map->mtx);
                 return (TRUE);
             }
         }
@@ -232,5 +259,6 @@ s8 hashmap_next(HashMap_it *it) {
         it->_current = NULL; /* Reset the list node pointer for the next iteration */
     }
     /* No more non-empty entries found */
+	mtx_unlock(&map->mtx);
     return (FALSE);
 }

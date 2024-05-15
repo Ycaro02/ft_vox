@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/14 15:33:58 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/15 10:07:30 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 #define HEADER_HASHMAP_H
 
 #include "../libft.h"
+#include "../../src/tinycthread/tinycthread.h"
+
+typedef mtx_t Mutex;
 
 /**
  *	- Hash Map
@@ -36,6 +39,8 @@
  *		- move to the next entry in the hash map.
  *		- expand the given hashmap capacity when needed.
  *		- update the entry if the key already exists.
+ *		- remove the entry associated with the key.
+ *		- protect against multiple access with a mutex.
  **	- Note:
  * 	- API design from https://benhoyt.com/writings/hash-table-in-c/
  *  - t_list structure definition from ../libft.h
@@ -44,6 +49,8 @@
  *			struct s_list	*next;
  *		} t_list;
  *  - Content must be an allocated pointer on the heap, free will be called on each node with the free_obj function
+
+ * Add Mutex to make it thread safe
 */
 
 /* Block position structure */
@@ -66,6 +73,7 @@ typedef struct s_hashmap {
 	size_t		capacity;				/* Capacity of the array ( entry size, number of list ptr )*/
 	size_t		size;					/* Number of current item stored  */
 	void		(*free_obj)(void *obj); /* Free function to free the given obj */
+	Mutex		mtx;					/* Mutex to protect data */
 	// u64			(*hash)(); /* Hash function to hash the given obj/data to a key */
 	// s8			(*obj_cmp)(void *a, void *b); /* Scmp obj function  */
 } HashMap;
