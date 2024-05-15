@@ -30,7 +30,7 @@ size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s32 nb)
     for (s32 i = 0; i < 16; ++i) {
         for (s32 j = 0; j < 16; ++j) {
             for (s32 k = 0; k < 16; ++k) {
-                if (startYWorld + j < maxHeight[i][k]) {
+                if (startYWorld + j < maxHeight[i][k]) { /* To change if we are under to sea lvl */
 					Block *block = ft_calloc(sizeof(Block), 1);
 					if (!block) {
 						ft_printf_fd(2, "Failed to allocate block\n");
