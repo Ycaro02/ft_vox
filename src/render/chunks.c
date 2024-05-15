@@ -87,8 +87,7 @@ float perlinNoiseHeight(u8 *perlinNoise, s32 worldX, s32 worldZ) {
     f32 perlinValue = (f32)perlinNoise[idx] / 255.0f;
     f32 scale = 100.0f;
 
-    return ((perlinValue * scale) - 30.0f);
-    // return ((perlinValue * scale));
+    return ((perlinValue * scale) - PERLIN_SUB_HEIGHT) ;
 }
 
 

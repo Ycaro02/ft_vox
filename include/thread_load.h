@@ -1,10 +1,10 @@
 #ifndef HEADER_THREAD_LOAD_H
 #define HEADER_THREAD_LOAD_H
 
-#include <stdio.h>
-#include "../src/tinycthread/tinycthread.h"        /* TinyCThread functions */
-#include <unistd.h>
-#include "world.h"
+#include <stdio.h>									/* perror */
+#include <unistd.h>									/* sysconf */	
+#include "../src/tinycthread/tinycthread.h"			/* TinyCThread functions */
+#include "world.h"									/* Context */
 
 typedef thrd_t Thread;
 typedef mtx_t Mutex;

@@ -53,9 +53,11 @@
 
 /* Perlin noise value generation for relief */
 #define PERLIN_OCTAVE 4
-#define PERLIN_PERSISTENCE 2.0
+#define PERLIN_PERSISTENCE 1.2
 #define PERLIN_LACUNARITY 2.0
 
+
+#define PERLIN_SUB_HEIGHT 0.0f
 
 typedef struct PACKED_STRUCT s_block {
     s32 x;          /* Block x position */
