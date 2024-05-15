@@ -53,7 +53,7 @@ void lst_popfront(t_list **lst) {
 */
 int threadChunksLoad(void *data) {
 	ThreadData *t = (ThreadData *)data;
-	Chunks *chunks = chunksLoad(t->c->perlinNoise, t->chunkX, t->chunkZ);
+	Chunks *chunks = chunksLoad(t->mtx, t->c->perlinNoise, t->chunkX, t->chunkZ);
 	mtx_lock(t->mtx);
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunks);
 	t->c->threadContext->workers[t->threadID].busy = WORKER_FREE;
@@ -167,7 +167,7 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
 		return (FALSE);
 	}
 
-	mtx_lock(&c->threadContext->mtx);
+	// mtx_lock(&c->threadContext->mtx);
 	/* Locked */
 	tdata->c = c;
 	tdata->mtx = &c->threadContext->mtx;
@@ -176,7 +176,7 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
 	/* If chunks not in chunksMapToload */
 	hashmap_set_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ), tdata);
 	/* Unlocked */
-	mtx_unlock(&c->threadContext->mtx);
+	// mtx_unlock(&c->threadContext->mtx);
 	return (TRUE);
 }
 
@@ -189,21 +189,24 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
  * @param radius The radius around the player to scan
 */
 s8 threadChunksLoadArround(Context *c, s32 radius) {
+	mtx_lock(&c->threadContext->mtx);
 	s32  currentX = c->cam.chunkPos[0];
 	s32  currentZ = c->cam.chunkPos[2];
+	mtx_unlock(&c->threadContext->mtx);
 	for (s32 i = -radius; i < radius; ++i) {
 		for (s32 j = -radius; j < radius; ++j) {
 			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
 			
 			mtx_lock(&c->threadContext->mtx);
 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
-			mtx_unlock(&c->threadContext->mtx);
 			if (!chunks) {
 				if (!chunksQueueHandling(c, pos.y, pos.z)) {
 					ft_printf_fd(2, "Error: threadChunksLoadArround: chunksQueueHandling failed\n");
+					mtx_unlock(&c->threadContext->mtx);
 					return (FALSE);
 				}
 			}
+			mtx_unlock(&c->threadContext->mtx);
 		}
 	}
 	return (TRUE);

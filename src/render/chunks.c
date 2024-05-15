@@ -177,13 +177,17 @@ s32 getChunkID() {
 	return (chunksID++);
 }
 
-Chunks *chunksLoad(u8 *perlinNoise, s32 chunkX, s32 chunkZ) {
+Chunks *chunksLoad(Mutex *mtx, u8 *perlinNoise, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
 		return (NULL);
 	}
+
+	mtx_lock(mtx);
 	chunks->id = getChunkID();
+	mtx_unlock(mtx);
+
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
 	BRUT_FillChunks(perlinNoise, chunks);

@@ -40,6 +40,6 @@ typedef struct s_chunks {
 void chunksMapFree(void *entry);
 
 /* chunks */
-Chunks *chunksLoad(u8 *perlinNoise, s32 chunkX, s32 chunkZ);;
+Chunks *chunksLoad(Mutex *mtx, u8 *perlinNoise, s32 chunkX, s32 chunkZ);;
 
 #endif /* HEADER_CHUNKS_H */

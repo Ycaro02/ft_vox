@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/14 15:24:11 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/15 09:38:16 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,9 +134,7 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
             /* free memory */
             // map->free_obj(entry->value);
             free(current->content);
-            // current->content = NULL;
 			free(current);
-
 			current = NULL;
             (map->size)--;
             return (HASHMAP_DELETE_ENTRY);

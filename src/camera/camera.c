@@ -205,7 +205,10 @@ void update_camera(void *context, GLuint shader_id)
 
 
 	updateViewVec(&c->cam);
+
+	mtx_lock(&c->threadContext->mtx);
 	chunkPosGet(&c->cam);
+	mtx_unlock(&c->threadContext->mtx);
 	c->cam.frustum = calculateFrustum(&c->cam);
 
 }
