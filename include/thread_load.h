@@ -9,6 +9,7 @@
 typedef thrd_t Thread;
 typedef mtx_t Mutex;
 
+/* Thread data */
 typedef struct s_thread_data {
 	Context *c;
 	Mutex	*mtx;
@@ -17,9 +18,11 @@ typedef struct s_thread_data {
 	s8		threadID;
 } ThreadData;
 
+/* Workers status */
 #define WORKER_FREE 0
 #define WORKER_BUSY 1
 
+/* Thread entity */
 typedef struct s_thread_entity {
 	Thread		thread;
 	s8			busy;
@@ -38,11 +41,6 @@ FT_INLINE s64 ThreadsAvailableGet() {
     }
 	return (num_threads);
 }
-
-s8 threadWorkersInit(Context *c);
-void threadWaitForWorker(Context *c);
-s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ);
-
 
 /* Supervisor now init workers */
 s8 threadSupervisorInit(Context *c);

@@ -109,7 +109,7 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
  * @brief Wait for all the worker threads to finish their job
  * @param c Context
 */
-void threadWaitForWorker(Context *c) {
+void supervisorWaitWorker(Context *c) {
 	s64 i = 0, max = 0;
 	s32 status = 0;
 	mtx_lock(&c->threadContext->mtx);
@@ -145,7 +145,14 @@ void threadWaitForWorker(Context *c) {
 	more efficient structure, hashmap or array of ThreadData. (simply to load nearest chunks first)
 */
 
-
+/** 
+ * @brief Check if a worker is already loading the given chunks
+ * @param c Context
+ * @param chunkX Chunk X
+ * @param chunkZ Chunk Z
+ * @return TRUE if a worker is already loading the chunks FALSE otherwise
+*/
+/* Lock before */
 s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
 	for (s32 i = 0; i < c->threadContext->workerMax; ++i) {
 		if (c->threadContext->workers[i].busy == WORKER_BUSY
@@ -157,6 +164,14 @@ s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
 	return (FALSE);
 }
 
+/**
+ * @brief Add chunks to the queue to load if not already in the queue
+ * @param c Context
+ * @param chunkX Chunk X
+ * @param chunkZ Chunk Z
+ * @return TRUE if success, FALSE if failed to add the chunks to the queue
+*/
+/* Lock before to call this */
 s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
 	ThreadData *tdata = NULL;
 
@@ -167,16 +182,12 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
 		return (FALSE);
 	}
 
-	// mtx_lock(&c->threadContext->mtx);
-	/* Locked */
 	tdata->c = c;
 	tdata->mtx = &c->threadContext->mtx;
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	/* If chunks not in chunksMapToload */
 	hashmap_set_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ), tdata);
-	/* Unlocked */
-	// mtx_unlock(&c->threadContext->mtx);
 	return (TRUE);
 }
 
@@ -212,7 +223,12 @@ s8 threadChunksLoadArround(Context *c, s32 radius) {
 	return (TRUE);
 }
 
-
+/**
+ * @brief Get the nearest chunks to load from the queue
+ * @param c Context
+ * @param chunksMapToLoad HashMap of chunks to load
+ * @return ThreadData pointer to the nearest chunks to load
+*/
 ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	ThreadData *tdata = NULL;
 	s32 distance = 0;
@@ -234,6 +250,11 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	return (tdata);
 }
 
+/**
+ * @brief Thread supervisor function, manage the worker threads
+ * @param context Context
+ * @return TRUE if success, FALSE if failed
+*/
 s32 threadHandling(void *context) {
 	Context *c = (Context *)context;
 	ThreadData *tdata = NULL;
@@ -268,13 +289,15 @@ s32 threadHandling(void *context) {
 		}
 	}
 
-	threadWaitForWorker(c);
-
-
+	supervisorWaitWorker(c);
 	return (TRUE);
 }
 
-
+/**
+ * @brief Initialize the thread supervisor
+ * @param c Context
+ * @return TRUE if success, FALSE if failed
+*/
 s8 threadSupervisorInit(Context *c) {
 	c->threadContext = ft_calloc(sizeof(ThreadContext), 1);
 	if (!c->threadContext) {
