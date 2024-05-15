@@ -53,7 +53,7 @@
 
 /* Perlin noise value generation for relief */
 #define PERLIN_OCTAVE 8
-#define PERLIN_PERSISTENCE 2.0
+#define PERLIN_PERSISTENCE 1.0
 #define PERLIN_LACUNARITY 2.0
 
 
