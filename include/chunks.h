@@ -27,6 +27,16 @@ typedef struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
 } SubChunks;
 
+typedef struct s_debug_perlin {
+	f32 n0, n1, n2, n3;
+	s32 z0, z1, x0, x1;
+	f32 val;
+	f32 add;
+	s32 normalise;
+	s32 givenX, givenZ;
+} DebugPerlin;
+
+
 typedef struct s_chunks {
 	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 	u32				nb_block;			/* nb block (outdated value total of blockmap subchunk) */
@@ -34,12 +44,13 @@ typedef struct s_chunks {
 	u32				visible_block;		/* Number of visible block */
 	s32				x;					/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;					/* Chunk offset Z can be negative (relative to origine chunks) */
+	DebugPerlin		**perlinVal;		/* Perlin noise value */
 } Chunks;
 
 
 void chunksMapFree(void *entry);
 
 /* chunks */
-Chunks *chunksLoad(Mutex *mtx, u8 *perlinNoise, s32 chunkX, s32 chunkZ);;
+Chunks *chunksLoad(Mutex *mtx, u8 **perlin2D, s32 chunkX, s32 chunkZ);;
 
 #endif /* HEADER_CHUNKS_H */

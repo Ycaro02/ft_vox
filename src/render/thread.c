@@ -50,7 +50,7 @@ void lst_popfront(t_list **lst) {
 */
 int threadChunksLoad(void *data) {
 	ThreadData *t = (ThreadData *)data;
-	Chunks *chunks = chunksLoad(t->mtx, t->c->perlinNoise, t->chunkX, t->chunkZ);
+	Chunks *chunks = chunksLoad(t->mtx, t->c->perlin2D, t->chunkX, t->chunkZ);
 	mtx_lock(t->mtx);
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunks);
 	t->c->threadContext->workers[t->threadID].busy = WORKER_FREE;

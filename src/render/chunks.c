@@ -41,7 +41,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 		return (block);
 	}
 
-	if (realY > (s32)((f32)maxHeight * 0.8)) {
+	if (realY >= (s32)((f32)maxHeight * 0.95)) {
 		block->type = DIRT;
 		if (realY == maxHeight - 1)
 			block->type = GRASS;
@@ -56,7 +56,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s32 nb)
+size_t BRUT_fill_subchunks(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb)
 {
 	s32 startYWorld = nb * 16;
 
@@ -64,8 +64,8 @@ size_t BRUT_fill_subchunks(SubChunks *sub_chunk, s32 **maxHeight, s32 nb)
         for (s32 j = 0; j < 16; ++j) {
             for (s32 k = 0; k < 16; ++k) {
 					// if (startYWorld + j < maxHeight[i][k]) {
-					if (startYWorld + j < maxHeight[i][k] || startYWorld + j <= (s32)SEA_LEVEL) {
-						Block *block = blockCreate(i,j,k, maxHeight[i][k], startYWorld);
+					if (startYWorld + j < perlinVal[i][k].normalise || startYWorld + j <= (s32)SEA_LEVEL) {
+						Block *block = blockCreate(i,j,k, perlinVal[i][k].normalise, startYWorld);
 						hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
 					}
             }
@@ -83,13 +83,13 @@ f32 localZToWorld(Chunks *chunks, s32 z) {
 }
 
 
-s32 maxHeightGet(s32 **maxHeight) {
+s32 maxHeightGet(DebugPerlin **perlinVal) {
 	s32 max = 0;
 
 	for (s32 i = 0; i < 16; ++i) {
 		for (s32 j = 0; j < 16; ++j) {
-			if (maxHeight[i][j] > max) {
-				max = maxHeight[i][j];
+			if (perlinVal[i][j].normalise > (s32)max) {
+				max = perlinVal[i][j].normalise;
 			}
 		}
 	}
@@ -98,7 +98,7 @@ s32 maxHeightGet(s32 **maxHeight) {
 
 
 /* Interpolate noise value */
-f32 getInterpolatedNoise(u8 *perlinNoise, s32 x, s32 z, s32 width, s32 height) {
+f32 getInterpolatedNoise(u8 **perlinNoise, s32 x, s32 z, s32 width, s32 height, DebugPerlin *perlinVal) {
     s32 x0 = x % width;
     s32 x1 = (x0 + 1) % width;
     s32 z0 = z % height;
@@ -107,52 +107,62 @@ f32 getInterpolatedNoise(u8 *perlinNoise, s32 x, s32 z, s32 width, s32 height) {
     f32 sx = x - (s32)x;
     f32 sz = z - (s32)z;
 
-    f32 n0 = perlinNoise[z0 * width + x0] / 255.0f;
-    f32 n1 = perlinNoise[z0 * width + x1] / 255.0f;
-    f32 n2 = perlinNoise[z1 * width + x0] / 255.0f;
-    f32 n3 = perlinNoise[z1 * width + x1] / 255.0f;
+	perlinVal->z0 = z0;
+	perlinVal->z1 = z1;
+	perlinVal->x0 = x0;
+	perlinVal->x1 = x1;
 
-    f32 i0 = n0 + sx * (n1 - n0);
-    f32 i1 = n2 + sx * (n3 - n2);
+
+	perlinVal->givenX = x;
+	perlinVal->givenZ = z;
+
+    perlinVal->n0 = perlinNoise[z0][x0] / 255.0f;
+    perlinVal->n1 = perlinNoise[z0][x1] / 255.0f;
+    perlinVal->n2 = perlinNoise[z1][x0] / 255.0f;
+    perlinVal->n3 = perlinNoise[z1][x1] / 255.0f;
+
+    f32 i0 = perlinVal->n0 + sx * (perlinVal->n1 - perlinVal->n0);
+    f32 i1 = perlinVal->n2 + sx * (perlinVal->n3 - perlinVal->n2);
 
     return (i0 + sz * (i1 - i0));
 }
 
-f32 perlinNoiseHeight(Mutex *mtx, u8 *perlinNoise, s32 worldX, s32 worldZ) {
-    /* Set local X and Z coordinates based on the center of the Perlin noise array */
-    s32 localX = worldX + (PERLIN_NOISE_WIDTH / 2);
-    s32 localZ = worldZ + (PERLIN_NOISE_HEIGHT / 2);
-
+f32 perlinNoiseHeight(Mutex *mtx, u8 **perlin2D, s32 localX, s32 localZ, DebugPerlin *perlinVal) {
+    (void)mtx;
     /* Access the interpolated noise value */
-    f32 perlinValue = getInterpolatedNoise(perlinNoise, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT);
+    perlinVal->val = getInterpolatedNoise(perlin2D, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal);
     f32 scale = 50.0f;
 
-	(void)mtx;
-    // mtx_lock(mtx);
-    // ft_printf_fd(1, "Perlin of World "ORANGE"[%d][%d]"RESET"->"PURPLE"[%d][%d]"RESET" "PINK"PVal |%f|"RESET"\n", worldX, worldZ, localX, localZ, perlinValue);
-    // mtx_unlock(mtx);
+    // if (perlinVal->val > 0.5 && perlinVal->val < 0.8) {
+    //     scale = perlinVal->val * 100.0f;
+    // } else if (perlinVal->val >= 0.8) {
+    //     return (150.0f);
+    // }
 
-    return ((SEA_LEVEL - PERLIN_SUB_HEIGHT) + (perlinValue * scale));
+    perlinVal->add =  (perlinVal->val * scale);
+
+    return ((SEA_LEVEL - PERLIN_SUB_HEIGHT) + (perlinVal->val * scale));
 }
-
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void BRUT_FillChunks(Mutex *mtx, u8 *perlinNoise, Chunks *chunks) {
-	s32 **maxHeight = ft_calloc(sizeof(s32 *), 16);
+void BRUT_FillChunks(Mutex *mtx, u8 **perlin2D, Chunks *chunks) {
+	DebugPerlin **perlinVal = ft_calloc(sizeof(DebugPerlin *), 16);
 
-	for (u32 y = 0; y < 16; ++y) {
-		maxHeight[y] = ft_calloc(sizeof(s32), 16);
-		for (u32 x = 0; x < 16; ++x) {
-			s32 xWorld = (s32)localXToWorld(chunks, x);
-			s32 yWorld = (s32)localZToWorld(chunks, y);
-			maxHeight[y][x] = perlinNoiseHeight(mtx, perlinNoise, xWorld, yWorld);
-
+	for (u32 x = 0; x < 16; ++x) {
+		perlinVal[x] = ft_calloc(sizeof(DebugPerlin), 16);
+		for (u32 z = 0; z < 16; ++z) {
+		    /* Set local X and Z coordinates based on the center of the Perlin noise array */
+			s32 globalX = chunks->x * 16 + x;
+			s32 globalZ = chunks->z * 16 + z;
+			s32 localX = globalX + (PERLIN_NOISE_WIDTH / 2);
+			s32 localZ = globalZ + (PERLIN_NOISE_HEIGHT / 2);
+			perlinVal[x][z].normalise = perlinNoiseHeight(mtx, perlin2D, localX, localZ, &perlinVal[x][z]);
 		}
 	}
 
-	s32 chunkMaxY = maxHeightGet(maxHeight);
+	s32 chunkMaxY = maxHeightGet(perlinVal);
 	if (chunkMaxY < (s32)SEA_LEVEL) {
 		chunkMaxY = (s32)SEA_LEVEL;
 	}
@@ -160,18 +170,17 @@ void BRUT_FillChunks(Mutex *mtx, u8 *perlinNoise, Chunks *chunks) {
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
 		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
-		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], maxHeight, i);
+		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], perlinVal, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
+		chunks->perlinVal = perlinVal;
 		// free(maxHeight[i]);
 	}
 
-	// for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
+	// free perlinVal
+	// for (u32 y = 0; y < 16; ++y) {
+	// 	free(perlinVal[y]);
 	// }
-
-	for (u32 y = 0; y < 16; ++y) {
-		free(maxHeight[y]);
-	}
-	free(maxHeight);
+	// free(perlinVal);
 }
 
 
@@ -218,7 +227,7 @@ s32 getChunkID() {
 	return (chunksID++);
 }
 
-Chunks *chunksLoad(Mutex *mtx, u8 *perlinNoise, s32 chunkX, s32 chunkZ) {
+Chunks *chunksLoad(Mutex *mtx, u8 **perlin2D, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
@@ -231,6 +240,6 @@ Chunks *chunksLoad(Mutex *mtx, u8 *perlinNoise, s32 chunkX, s32 chunkZ) {
 
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
-	BRUT_FillChunks(mtx, perlinNoise, chunks);
+	BRUT_FillChunks(mtx, perlin2D, chunks);
 	return (chunks);
 }

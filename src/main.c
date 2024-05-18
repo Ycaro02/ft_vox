@@ -45,7 +45,11 @@ void vox_destroy(Context *c, HashMap *renderChunksMap) {
 	free(c->threadContext);
 	free(c->world);
 	free(c->cube.vertex);
-    free(c->perlinNoise);
+	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; ++i) {
+		free(c->perlin2D[i]);
+	}
+	free(c->perlin2D);
+    // free(c->perlinNoise);
 	glfwTerminate();
 }
 
@@ -74,6 +78,18 @@ u8 *perlinNoiseGeneration(unsigned int seed) {
 	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
 }
 
+
+u8 **array1DTo2D(u8 *array, u32 height, u32 width) {
+	u8 **perlin2D = ft_calloc(height, sizeof(u8 *));
+	for (u32 i = 0; i < height; ++i) {
+		perlin2D[i] = ft_calloc(width, sizeof(u8));
+		for (u32 j = 0; j < width; ++j) {
+			perlin2D[i][j] = array[i * width + j];
+		}
+	}
+	return (perlin2D);
+}
+
 int main() {
     Context context;
     GLFWwindow* window;
@@ -90,11 +106,14 @@ int main() {
 		return (1);
 	}
 
-	context.perlinNoise = perlinNoiseGeneration(42); /* seed 42 */
-	if (!context.perlinNoise) {
+	u8 *perlin1D = perlinNoiseGeneration(42); /* seed 42 */
+	if (!perlin1D) {
 		ft_printf_fd(1, "Error: perlinNoise error\n");
 		return (1);
 	}
+	/* Transform 1D array to 2D array */
+	context.perlin2D = array1DTo2D(perlin1D, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH);
+
 
 	/* init context camera */
 	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);

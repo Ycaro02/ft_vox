@@ -61,6 +61,8 @@
 
 #define SEA_LEVEL 80.0f
 
+
+
 typedef struct PACKED_STRUCT s_block {
     s32 x;          /* Block x position */
     s32 y;          /* Block y position (height) */
