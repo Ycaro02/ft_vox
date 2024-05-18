@@ -20,6 +20,8 @@
 #define SCREEN_WIDTH	1920			/* Screen width */
 #define SCREEN_HEIGHT	1080			/* Screen height */
 
+#define CAM_FOV			80.0f			/* Camera field of view */
+
 /* Texture atlas path */
 // #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
 // #define TEXTURE_ATLAS_PATH "rsc/texture/new_texture_atlas.bmp"

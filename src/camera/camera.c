@@ -161,6 +161,8 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
     Camera camera;
 
 
+	ft_printf_fd(1, CYAN"fov: %f\naspect_ratio: %f\nnear: %f\nfar: %f\n"RESET, fov, aspect_ratio, near, far);
+
 	ft_bzero(&camera, sizeof(Camera));
     /* init camera position */
 	glm_vec3_copy((vec3){1.0f, 10.0f, 1.0f}, camera.position);

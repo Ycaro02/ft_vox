@@ -116,7 +116,7 @@ int main() {
 
 
 	/* init context camera */
-	context.cam = create_camera(80.0f, (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
+	context.cam = create_camera(CAM_FOV, (f32)((f32)SCREEN_WIDTH / (f32)SCREEN_HEIGHT), 0.1f, 100.0f);
     glm_mat4_identity(context.cube.rotation);
 	// display_camera_value(&context);
 

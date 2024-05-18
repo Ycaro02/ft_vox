@@ -131,9 +131,9 @@ f32 perlinNoiseHeight(Mutex *mtx, u8 **perlin2D, s32 localX, s32 localZ, DebugPe
     (void)mtx;
     /* Access the interpolated noise value */
     perlinVal->val = getInterpolatedNoise(perlin2D, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal);
-    f32 scale = 50.0f;
+    f32 scale = 60.0f;
 
-    // if (perlinVal->val > 0.5 && perlinVal->val < 0.8) {
+    // if (perlinVal->val > 0.6 && perlinVal->val < 0.8) {
     //     scale = perlinVal->val * 100.0f;
     // } else if (perlinVal->val >= 0.8) {
     //     return (150.0f);
@@ -172,6 +172,7 @@ void BRUT_FillChunks(Mutex *mtx, u8 **perlin2D, Chunks *chunks) {
 		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], perlinVal, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
+		/* SET DEBUG VALUE HERE */
 		chunks->perlinVal = perlinVal;
 		// free(maxHeight[i]);
 	}

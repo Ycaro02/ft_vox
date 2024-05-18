@@ -37,7 +37,7 @@ GLFWwindow *init_openGL_context()
     GLFWwindow *win = NULL;
 	int version = 0;
 	
-	win = window_create(SCREEN_WIDTH, SCREEN_HEIGHT, "Scop");
+	win = window_create(SCREEN_WIDTH, SCREEN_HEIGHT, "VOX");
 	if (!win) {
 		return (NULL);
 	}

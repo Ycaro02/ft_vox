@@ -75,16 +75,16 @@ void displayPerlinNoise(Chunks *chunks, s32 blockX, s32 blockZ) {
 void testChunksExist(Context *c) {
 	BlockPos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
 	ft_printf_fd(1, "Cam position: X|%f, Y:%f Z:|%f, \n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
-	// display_camera_value(c);
+	display_camera_value(c);
 	ft_printf_fd(1, YELLOW"\nTest for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, pos.y, pos.z);
 	Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 	if (chunks) {
 		ft_printf_fd(1, GREEN"Chunk exist\n"RESET);
-		s32 blockX = (((s32)floor(c->cam.position[0] * 2.0)) % 16);
-		s32 blockZ = (((s32)floor(c->cam.position[2] * 2.0)) % 16);
-		if (blockX < 0) { blockX *= -1; }
-		if (blockZ < 0) { blockZ *= -1; }
-		displayPerlinNoise(chunks, blockX , blockZ);
+		// s32 blockX = (((s32)floor(c->cam.position[0] * 2.0)) % 16);
+		// s32 blockZ = (((s32)floor(c->cam.position[2] * 2.0)) % 16);
+		// if (blockX < 0) { blockX *= -1; }
+		// if (blockZ < 0) { blockZ *= -1; }
+		// displayPerlinNoise(chunks, blockX , blockZ);
 	} else {
 		ft_printf_fd(1, RED"Chunk not exist\n"RESET);
 	}
