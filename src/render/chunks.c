@@ -30,23 +30,16 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	
 	s32 realY = startYWorld + y;
 
-	// if (realY > maxHeight && realY < (s32)SEA_LEVEL) {
-	// 	block->type = WATER;
-	// 	return (block);
-	// } 
-	
-	if (realY >= maxHeight && realY <= (s32)SEA_LEVEL) {
-		// block->flag = BLOCK_HIDDEN;
-		block->type = WATER;
-		return (block);
-	}
-
-	if (realY >= (s32)((f32)maxHeight * 0.95)) {
+	if (realY >=  maxHeight - 4 && realY < maxHeight) {
 		block->type = DIRT;
 		if (realY == maxHeight - 1)
 			block->type = GRASS;
-	} else {
+	} else if (realY < maxHeight) {
 		block->type = STONE;
+	} else if (realY < (s32)SEA_LEVEL) {
+		block->type = WATER;
+	} else {
+		return (NULL);
 	}
 	return (block);
 }
@@ -58,16 +51,15 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 */
 size_t BRUT_fill_subchunks(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb)
 {
+	Block *block = NULL;
 	s32 startYWorld = nb * 16;
 
     for (s32 i = 0; i < 16; ++i) {
         for (s32 j = 0; j < 16; ++j) {
             for (s32 k = 0; k < 16; ++k) {
-					// if (startYWorld + j < maxHeight[i][k]) {
-					if (startYWorld + j < perlinVal[i][k].normalise || startYWorld + j <= (s32)SEA_LEVEL) {
-						Block *block = blockCreate(i,j,k, perlinVal[i][k].normalise, startYWorld);
-						hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
-					}
+				if ((block = blockCreate(i,j,k, perlinVal[i][k].normalise, startYWorld))) {
+					hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
+				}
             }
         }
     }
@@ -97,6 +89,14 @@ s32 maxHeightGet(DebugPerlin **perlinVal) {
 }
 
 
+f32 normalizeU8Tof32(u8 value, u8 start1, u8 stop1, f32 start2, f32 stop2) {
+    return start2 + (stop2 - start2) * ((value - start1) / (f32)(stop1 - start1));
+}
+
+f32 normalisef32Tof32(f32 value, f32 start1, f32 stop1, f32 start2, f32 stop2) {
+	return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
+}
+
 /* Interpolate noise value */
 f32 getInterpolatedNoise(u8 **perlinNoise, s32 x, s32 z, s32 width, s32 height, DebugPerlin *perlinVal) {
     s32 x0 = x % width;
@@ -116,10 +116,10 @@ f32 getInterpolatedNoise(u8 **perlinNoise, s32 x, s32 z, s32 width, s32 height, 
 	perlinVal->givenX = x;
 	perlinVal->givenZ = z;
 
-    perlinVal->n0 = perlinNoise[z0][x0] / 255.0f;
-    perlinVal->n1 = perlinNoise[z0][x1] / 255.0f;
-    perlinVal->n2 = perlinNoise[z1][x0] / 255.0f;
-    perlinVal->n3 = perlinNoise[z1][x1] / 255.0f;
+	perlinVal->n0 = normalizeU8Tof32(perlinNoise[z0][x0], 0, 255, -1.0f, 1.0f);
+	perlinVal->n1 = normalizeU8Tof32(perlinNoise[z0][x1], 0, 255, -1.0f, 1.0f);
+	perlinVal->n2 = normalizeU8Tof32(perlinNoise[z1][x0], 0, 255, -1.0f, 1.0f);
+	perlinVal->n3 = normalizeU8Tof32(perlinNoise[z1][x1], 0, 255, -1.0f, 1.0f);
 
     f32 i0 = perlinVal->n0 + sx * (perlinVal->n1 - perlinVal->n0);
     f32 i1 = perlinVal->n2 + sx * (perlinVal->n3 - perlinVal->n2);
@@ -133,15 +133,19 @@ f32 perlinNoiseHeight(Mutex *mtx, u8 **perlin2D, s32 localX, s32 localZ, DebugPe
     perlinVal->val = getInterpolatedNoise(perlin2D, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal);
     f32 scale = 60.0f;
 
-    // if (perlinVal->val > 0.6 && perlinVal->val < 0.8) {
-    //     scale = perlinVal->val * 100.0f;
-    // } else if (perlinVal->val >= 0.8) {
-    //     return (150.0f);
-    // }
+    if (perlinVal->val > 0.3 && perlinVal->val <= 0.7) {
+        // scale = perlinVal->val * 100.0f;
+		f32 ret = normalisef32Tof32(perlinVal->val, 0.3, 0.7, 100.0f, 150.0f);
+		// ft_printf_fd(1, "PerlinVal scaled from %f to %f\n", perlinVal->val, ret);
+		return (ret);
+
+    } else if (perlinVal->val >= 0.6999f) {
+        return (150.0f);
+    }
 
     perlinVal->add =  (perlinVal->val * scale);
 
-    return ((SEA_LEVEL - PERLIN_SUB_HEIGHT) + (perlinVal->val * scale));
+    return ((SEA_LEVEL) + (perlinVal->val * scale));
 }
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
@@ -158,11 +162,12 @@ void BRUT_FillChunks(Mutex *mtx, u8 **perlin2D, Chunks *chunks) {
 			s32 globalZ = chunks->z * 16 + z;
 			s32 localX = globalX + (PERLIN_NOISE_WIDTH / 2);
 			s32 localZ = globalZ + (PERLIN_NOISE_HEIGHT / 2);
-			perlinVal[x][z].normalise = perlinNoiseHeight(mtx, perlin2D, localX, localZ, &perlinVal[x][z]);
+			perlinVal[x][z].normalise = (s32)perlinNoiseHeight(mtx, perlin2D, localX, localZ, &perlinVal[x][z]);
 		}
 	}
 
 	s32 chunkMaxY = maxHeightGet(perlinVal);
+	/* CAre here */
 	if (chunkMaxY < (s32)SEA_LEVEL) {
 		chunkMaxY = (s32)SEA_LEVEL;
 	}
@@ -207,7 +212,7 @@ u32 chunksCubeGet(Chunks *chunks, RenderChunks *render)
 				This function can be this implementation but we need to parse chunks HashMap before to
 				give only chunks to render to this function
 			*/
-			if (block->flag != BLOCK_HIDDEN) {
+			if (block->flag != BLOCK_HIDDEN && block->type != AIR) {
 				render->block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
 				render->block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
 				render->block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
