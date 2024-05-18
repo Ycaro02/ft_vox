@@ -54,7 +54,7 @@
 #define TEST_CHUNK_MAX 9
 
 /* Perlin noise value generation for relief */
-#define PERLIN_OCTAVE 8
+#define PERLIN_OCTAVE 6
 #define PERLIN_PERSISTENCE 1.0
 #define PERLIN_LACUNARITY 2.0
 
