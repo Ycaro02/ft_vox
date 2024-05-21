@@ -12,35 +12,51 @@ void chunksMapFree(void *entry) {
 		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
+		for (u32 i = 0; chunks->perlinVal[i]; ++i) {
+			free(chunks->perlinVal[i]);
+		}
+		free(chunks->perlinVal);
 		free(e->value); /* free the value (allocaated ptr) */
 	}
 	free(e); /* free the entry t_list node */
 }
 
-Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
-	Block *block = ft_calloc(sizeof(Block), 1);
-	if (!block) {
-		ft_printf_fd(2, "Failed to allocate block\n");
-		return (NULL);
-	}
+// void blocksMapFree(void *entry) {
+// 	HashMap_entry *e = (HashMap_entry *)entry;
+// 	if (e->value) {
+// 		// Block *block = (Block *)e->value;
+// 		free(e->value); /* free the value (allocaated ptr) */
+// 	}
+// 	free(e); /* free the entry t_list node */
+// }
 
-	block->x = x;
-	block->y = y;
-	block->z = z;
-	
-	s32 realY = startYWorld + y;
+
+Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
+	Block	*block = NULL;
+	s32		blockType = AIR;
+	s32		realY = startYWorld + y;
 
 	if (realY >=  maxHeight - 4 && realY < maxHeight) {
-		block->type = DIRT;
+		blockType = DIRT;
 		if (realY == maxHeight - 1)
-			block->type = GRASS;
+			blockType = GRASS;
 	} else if (realY < maxHeight) {
-		block->type = STONE;
+		blockType = STONE;
 	} else if (realY < (s32)SEA_LEVEL) {
-		block->type = WATER;
+		blockType = WATER;
 	} else {
 		return (NULL);
 	}
+		
+	if (!(block = malloc(sizeof(Block)))) {
+		ft_printf_fd(2, "Failed to allocate block\n");
+		return (NULL);
+	}
+	block->type = blockType;
+	block->x = x;
+	block->y = y;
+	block->z = z;
+	block->flag = 0;
 	return (block);
 }
 
@@ -147,12 +163,14 @@ f32 perlinNoiseHeight(Mutex *mtx, u8 **perlin2D, s32 localX, s32 localZ, DebugPe
 
     return ((SEA_LEVEL) + (perlinVal->val * scale));
 }
+
+
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
 void BRUT_FillChunks(Mutex *mtx, u8 **perlin2D, Chunks *chunks) {
-	DebugPerlin **perlinVal = ft_calloc(sizeof(DebugPerlin *), 16);
+	DebugPerlin **perlinVal = ft_calloc(sizeof(DebugPerlin *), 16 + 1);
 
 	for (u32 x = 0; x < 16; ++x) {
 		perlinVal[x] = ft_calloc(sizeof(DebugPerlin), 16);

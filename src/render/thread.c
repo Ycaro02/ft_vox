@@ -241,7 +241,7 @@ s32 threadHandling(void *context) {
 	}
 
 	while (voxIsRunning(c)) {
-		threadChunksLoadArround(c, 5);
+		threadChunksLoadArround(c, CHUNKS_LOAD_RADIUS);
 		mtx_lock(&c->threadContext->mtx);
 		mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
 		mtx_unlock(&c->threadContext->mtx);

@@ -116,7 +116,7 @@ int main() {
 	}
 	/* Transform 1D array to 2D array */
 	context.perlin2D = array1DTo2D(perlin1D, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH);
-
+	free(perlin1D);
 
 	/* init context camera */
 	context.cam = create_camera(CAM_FOV, (f32)((f32)SCREEN_WIDTH / (f32)SCREEN_HEIGHT), 0.1f, 100.0f);

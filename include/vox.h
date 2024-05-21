@@ -22,6 +22,8 @@
 
 #define CAM_FOV			80.0f			/* Camera field of view */
 
+#define CHUNKS_LOAD_RADIUS 1			/* Chunks load radius */
+
 /* Texture atlas path */
 // #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"
 // #define TEXTURE_ATLAS_PATH "rsc/texture/new_texture_atlas.bmp"
