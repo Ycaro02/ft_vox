@@ -49,26 +49,25 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 }
 
 void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
-	RenderChunks *render = NULL;
-    vec3 start_position, ray_direction, chunk_coords, current_position, travelVector;
-    f32 current = 0;
+	RenderChunks	*render = NULL;
+    vec3			start, rayDir, chunkPos, currPos, travelVector;
+    f32				current = 0;
 
-    glm_vec3_copy(c->cam.position, start_position);
-    glm_vec3_copy(c->cam.viewVector, ray_direction);
-    glm_vec3_zero(chunk_coords);
-    glm_vec3_zero(current_position);
+    glm_vec3_copy(c->cam.position, start);
+    glm_vec3_copy(c->cam.viewVector, rayDir);
+    glm_vec3_zero(chunkPos);
+    glm_vec3_zero(currPos);
 
-	renderChunksFrustrumRemove(c, renderChunksMap);
 
 	while ((current += TRAVEL_INCREMENT) <= MAX_RENDER_DISTANCE) {
 		/* Scale ray dir */
-		glm_vec3_scale(ray_direction, current, travelVector);
+		glm_vec3_scale(rayDir, current, travelVector);
 		/* add scaled ray vector add start position in current position */
-		glm_vec3_add(start_position, travelVector, current_position);
+		glm_vec3_add(start, travelVector, currPos);
 		/* Convert world coordonate to chunk offset */
-		worldToChunksPos(current_position, chunk_coords);
+		worldToChunksPos(currPos, chunkPos);
 
-		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
+		BlockPos chunkID = {0, (s32)chunkPos[0], (s32)chunkPos[2]};
 		mtx_lock(&c->threadContext->mtx);
 		Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
 		mtx_unlock(&c->threadContext->mtx);
@@ -84,5 +83,7 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 			hashmap_set_entry(renderChunksMap, chunkID, render);
 		} 
 	}
+
+	renderChunksFrustrumRemove(c, renderChunksMap);
 
 }

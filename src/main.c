@@ -56,7 +56,7 @@ void vox_destroy(Context *c, HashMap *renderChunksMap) {
 	glfwTerminate();
 }
 
-FT_INLINE void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMap *renderChunksMap) {
+void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMap *renderChunksMap) {
     while (!glfwWindowShouldClose(context->win_ptr)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/* Input handling */

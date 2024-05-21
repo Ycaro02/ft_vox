@@ -28,10 +28,10 @@ void			chunksViewHandling(Context *c, HashMap *renderChunksMap);
 
 
 /* render/occlusion_culling */
-u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID);
+u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
 /* render/cube.c to be refact */
-void	drawAllCube(GLuint VAO, RenderChunks *render);
+void			drawAllCube(GLuint VAO, RenderChunks *render);
 
 
 

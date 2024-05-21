@@ -11,19 +11,28 @@ void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
 }
 
 void renderChunkFree(RenderChunks *render) {
+	free(render->blockTypeID);
 	free(render->block_array);
+	glDeleteBuffers(1, &render->instanceVBO);
+	glDeleteBuffers(1, &render->typeBlockVBO);
 	free(render);
 }
+
+void renderChunksMapFree(void *entry) {
+	HashMap_entry *e = (HashMap_entry *)entry;
+	if (e->value) {
+		renderChunkFree((RenderChunks *)e->value);
+	}
+	free(e); /* free the entry t_list node */
+}
+
 
 RenderChunks *renderChunkCreate(Chunks *chunks) {
     RenderChunks *render = NULL;
 	
 	if (!chunks) {
-		// ft_printf_fd(2, "Chunks is NULL\n");
 		return (NULL);
-	}
-
-	if (!(render = malloc(sizeof(RenderChunks)))) {
+	} else if (!(render = malloc(sizeof(RenderChunks)))) {
 		ft_printf_fd(2, "Failed to allocate render\n");
 		return (NULL);
 	}
@@ -31,9 +40,12 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
     render->visibleBlock = chunks->visible_block;
 	if (!(render->blockTypeID = ft_calloc(sizeof(f32), render->visibleBlock))) {
 		ft_printf_fd(2, "Failed to allocate blockTypeID\n");
+		free(render);
 		return (NULL);
 	} else if (!(render->block_array = ft_calloc(sizeof(vec3), render->visibleBlock))) {
 		ft_printf_fd(2, "Failed to allocate block_array\n");
+		free(render->blockTypeID);
+		free(render);
 		return (NULL);
 	}
 	fillBlockArrayForChunk(render, chunks);
@@ -43,20 +55,6 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
 }
 
 
-/* Basic function you can provide to hashmap_init */
-void renderChunksMapFree(void *entry) {
-	HashMap_entry *e = (HashMap_entry *)entry;
-	if (e->value) {
-		RenderChunks *render = (RenderChunks *)e->value;
-		free(render->blockTypeID);
-		free(render->block_array);
-		glDeleteBuffers(1, &render->instanceVBO);
-		glDeleteBuffers(1, &render->typeBlockVBO);
-		// close VBO
-		free(e->value); /* free the value (alocated ptr content of t_list ) */
-	}
-	free(e); /* free the entry t_list node */
-}
 
 
 HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap) {

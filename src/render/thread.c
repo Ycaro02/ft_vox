@@ -152,7 +152,7 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
 	if (hashmap_get(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ))\
 		|| workerIsLoadingChunks(c, chunkX, chunkZ)) {
 		return (TRUE);
-	} else if (!(tdata = malloc(sizeof(ThreadData)))) {
+	} else if (!(tdata = ft_calloc(sizeof(ThreadData), 1))) {
 		return (FALSE);
 	}
 
@@ -250,11 +250,11 @@ s32 threadHandling(void *context) {
 			tdata = chunksToLoadNearestGet(c, c->threadContext->chunksMapToLoad);
 			mtx_unlock(&c->threadContext->mtx);
 			/* Lock in this */
-			if (threadInitChunkLoad(c, &c->threadContext->mtx, tdata->chunkX, tdata->chunkZ)) {
+			if (tdata && threadInitChunkLoad(c, &c->threadContext->mtx, tdata->chunkX, tdata->chunkZ)) {
 				mtx_lock(&c->threadContext->mtx);
 				hashmap_remove_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(tdata->chunkX, tdata->chunkZ));
 				mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
-				free(tdata);
+				// free(tdata);
 				mtx_unlock(&c->threadContext->mtx);
 			}
 		} else {
