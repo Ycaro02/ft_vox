@@ -22,7 +22,15 @@
 
 #define CAM_FOV			80.0f			/* Camera field of view */
 
-#define CHUNKS_LOAD_RADIUS 1			/* Chunks load radius */
+#define CHUNKS_LOAD_RADIUS 10			/* Chunks load radius */
+
+
+#define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size */
+
+#define MAX_RENDER_DISTANCE 120.0f				/* Max render distance */
+#define TRAVEL_INCREMENT CHUNK_FLOAT_SIZE		/* Travel increment */
+
+
 
 /* Texture atlas path */
 // #define TEXTURE_ATLAS_PATH "rsc/texture/texture_atlas.bmp"

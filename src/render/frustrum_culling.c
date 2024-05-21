@@ -5,13 +5,12 @@
 
 BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize, f32 cameraHeight) {
     BoundingBox box;
-
 	(void)cameraHeight;
-
     /* Compute bot left corner */
     glm_vec3_copy((vec3){chunk->x * chunkSize, 0, chunk->z * chunkSize}, box.min);
 
     /* Compute top right corner */
+    // glm_vec3_copy((vec3){box.min[0] + chunkSize, chunkHeight, box.min[2] + chunkSize}, box.max);
     glm_vec3_copy((vec3){box.min[0] + chunkSize, 80.0f, box.min[2] + chunkSize}, box.max);
     return (box);
 }

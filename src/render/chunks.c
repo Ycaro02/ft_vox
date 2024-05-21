@@ -21,16 +21,6 @@ void chunksMapFree(void *entry) {
 	free(e); /* free the entry t_list node */
 }
 
-// void blocksMapFree(void *entry) {
-// 	HashMap_entry *e = (HashMap_entry *)entry;
-// 	if (e->value) {
-// 		// Block *block = (Block *)e->value;
-// 		free(e->value); /* free the value (allocaated ptr) */
-// 	}
-// 	free(e); /* free the entry t_list node */
-// }
-
-
 Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	Block	*block = NULL;
 	s32		blockType = AIR;

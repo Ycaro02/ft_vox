@@ -3,17 +3,32 @@
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
 
-#define MAX_RENDER_DISTANCE 120.0f
-#define TRAVEL_INCREMENT 6.0f
 
+/**
+ * @brief Check if a chunk is already in render map
+ * @param renderChunksMap Render chunks map
+ * @param chunkID Chunk ID
+ * @return 1 if chunk is already in render map, 0 otherwise
+*/
 s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
 	return (hashmap_get(renderChunksMap, chunkID) != NULL);
 }
 
+/**
+ * @brief Check if a chunk is already in chunk map
+ * @param renderChunksMap Render chunks map
+ * @param chunkID Chunk ID
+ * @return 1 if chunk is already in chunk map, 0 otherwise
+*/
 s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID) {
 	return (hashmap_get(chunksMap, chunkID) != NULL);
 }
 
+/**
+ * @brief Convert world position to chunk offset
+ * @param current Current position
+ * @param chunkOffset Chunk offset (output)
+*/
 void worldToChunksPos(vec3 current, vec3 chunkOffset) {
     f32 chunkSize = 8.0; // cubeSize is 0.5
     chunkOffset[0] = floor(current[0] / chunkSize);
@@ -21,6 +36,11 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
     chunkOffset[2] = floor(current[2] / chunkSize);
 }
 
+/**
+ * @brief Remove chunks from render map if not in frustum
+ * @param c Context
+ * @param renderChunksMap Render chunks map
+*/
 void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	RenderChunks *render = NULL;
 	HashMap_it it = hashmap_iterator(renderChunksMap);

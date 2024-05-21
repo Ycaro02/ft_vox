@@ -42,23 +42,12 @@ void display_camera_value(Context *c)
 
 }
 
-
 void updateViewVec(Camera *camera)
 {
 	camera->viewVector[0] = -camera->view[0][2];
 	camera->viewVector[1] = -camera->view[1][2];
 	camera->viewVector[2] = -camera->view[2][2];
 }
-
-// f32 clamp(f32 value, f32 min, f32 max) {
-//     if (value < min) {
-//         return min;
-//     } else if (value > max) {
-//         return max;
-//     } else {
-//         return value;
-//     }
-// }
 
 /**
  * @brief Create a new camera
@@ -105,19 +94,12 @@ void update_camera(void *context, GLuint shader_id)
 {
 	Context *c = context;
 
-	// projection[3][3] = clamp(projection[3][3], 0.0f, 0.0f);
-	
-
     /* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
 
     set_shader_var_mat4(shader_id, "view", c->cam.view);
     set_shader_var_mat4(shader_id, "projection", c->cam.projection);
 	set_shader_var_mat4(shader_id, "model", c->cube.rotation);
-
-
-
-
 	updateViewVec(&c->cam);
 
 	mtx_lock(&c->threadContext->mtx);

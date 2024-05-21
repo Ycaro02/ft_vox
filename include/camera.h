@@ -13,6 +13,9 @@ typedef struct s_chunks Chunks;
 #define CAM_UP_DOWN 0.2f			/* Move camera up/down value */
 #define ROTATE_ANGLE 2.0f			/* Rotate obj angle when arrow pressed */
 
+#define CAM_NEAR 	0.1f
+#define CAM_FAR 	100.0f
+
 #define VEC3_ROTATEX (vec3){1.0f, 0.0f, 0.0f}
 #define VEC3_ROTATEY (vec3){0.0f, 1.0f, 0.0f}
 #define VEC3_ROTATEZ (vec3){0.0f, 0.0f, 1.0f}
