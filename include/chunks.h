@@ -20,11 +20,9 @@
 /* Number of maximum cub chunks in chunks */
 #define SUB_CHUNKS_MAX (CHUNKS_HEIGHT / SUB_CHUNKS_HEIGHT)
 
-/* Just need to change it to display/fill  more subchunks */
-#define SUBCHUNKS_DISPLAY 1U
-
 typedef struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
+	s32				y;
 } SubChunks;
 
 typedef struct s_debug_perlin {
@@ -39,12 +37,12 @@ typedef struct s_debug_perlin {
 
 typedef struct s_chunks {
 	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
-	u32				nb_block;			/* nb block (outdated value total of blockmap subchunk) */
-    s32				id;     			/* Chunk Id */
-	u32				visible_block;		/* Number of visible block */
-	s32				x;					/* Chunk offset X can be negative  (relative to origine chunks) */	
-	s32				z;					/* Chunk offset Z can be negative (relative to origine chunks) */
-	DebugPerlin		**perlinVal;		/* Perlin noise value */
+	u32				nb_block;					/* nb block (outdated value total of blockmap subchunk) */
+    s32				id;     					/* Chunk Id */
+	u32				visible_block;				/* Number of visible block */
+	s32				x;							/* Chunk offset X can be negative  (relative to origine chunks) */	
+	s32				z;							/* Chunk offset Z can be negative (relative to origine chunks) */
+	DebugPerlin		**perlinVal;				/* Perlin noise value */
 } Chunks;
 
 

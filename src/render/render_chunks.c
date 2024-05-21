@@ -65,7 +65,7 @@ HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
 
 	HashMap *renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, renderChunksMapFree);
     while ((next = hashmap_next(&it))) {
-		BoundingBox box = chunkBoundingBoxGet((Chunks *)it.value, 8.0f);
+		BoundingBox box = chunkBoundingBoxGet((Chunks *)it.value, 8.0f, c->cam.position[1]);
 		if (isChunkInFrustum(&c->cam.frustum, &box)) {
 			RenderChunks *renderChunk = renderChunkCreate((Chunks *)it.value);
 			hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(renderChunk), renderChunk);

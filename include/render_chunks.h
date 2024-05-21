@@ -18,8 +18,8 @@ void			renderChunkFree(RenderChunks *render);
 
 /* Render chunks.c */
 u32				chunksCubeGet(Chunks *chunks, RenderChunks *render);
-void			chunksLoadArround(Context *c, s32 radius);
 RenderChunks 	*renderChunkCreate(Chunks *chunks);
+// void			chunksLoadArround(Context *c, s32 radius);
 
 /* render/load_chunks.c */
 s8				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);

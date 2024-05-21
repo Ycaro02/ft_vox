@@ -3,16 +3,30 @@
 #include "../../include/camera.h"
 #include "../../include/chunks.h"
 
-BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize) {
+
+f32 chunksMaxHeightGet(Chunks *chunk) {
+	f32 maxHeight = 0;
+	for (u32 i = 0; chunk->sub_chunks[i].block_map ; i++) {
+		maxHeight = i * 8.0f;
+	}
+	// ft_printf_fd(1, "Max height: %f\n", maxHeight);
+	return (maxHeight);
+
+}
+
+BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize, f32 cameraHeight) {
     BoundingBox box;
+	// f32 chunkHeight = chunksMaxHeightGet(chunk);
+
+	(void)cameraHeight;
 
     /* Compute bot left corner */
     glm_vec3_copy((vec3){chunk->x * chunkSize, 0, chunk->z * chunkSize}, box.min);
 
     /* Compute top right corner */
-    glm_vec3_copy((vec3){box.min[0] + chunkSize, chunkSize, box.min[2] + chunkSize}, box.max);
-
-    return box;
+    // glm_vec3_copy((vec3){box.min[0] + chunkSize, chunkHeight, box.min[2] + chunkSize}, box.max);
+    glm_vec3_copy((vec3){box.min[0] + chunkSize, 80.0f, box.min[2] + chunkSize}, box.max);
+    return (box);
 }
 
 
@@ -42,6 +56,9 @@ void extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view) {
         frustum->planes[i][1] /= length;
         frustum->planes[i][2] /= length;
         frustum->planes[i][3] /= length;
+		if (float_equal(length, 0.0f) == TRUE) {
+			ft_printf_fd(1, RED"\nError: frustum plane divider %d is null\n"RESET, i);
+		}
     }
 }
 

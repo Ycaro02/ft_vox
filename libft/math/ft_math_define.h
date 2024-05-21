@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_math_define.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycaro <ycaro@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 12:14:36 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/11 15:00:44 by ycaro            ###   ########.fr       */
+/*   Updated: 2024/05/21 11:55:14 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,6 @@
 #define FT_EPSILON  1e-5f
 
 
-#define VOX_EPSILON 0.05999f
+// #define VOX_EPSILON 1e-6f
 
 #endif /* FT_MATH_DEFINE */

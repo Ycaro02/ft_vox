@@ -43,7 +43,7 @@ typedef struct s_camera {
 /* Frustrum */
 s8		isChunkInFrustum(Frustum *frustum, BoundingBox *box);
 void	extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view);
-BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize);
+BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize, f32 cameraHeight);
 /* Camera */
 Camera create_camera(float fov, float aspect_ratio, float near, float far);
 void move_camera_forward(Camera* camera, float distance);
