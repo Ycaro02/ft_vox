@@ -27,7 +27,6 @@ typedef struct {
 } BoundingBox;
 
 
-
 /* Camera structure */
 typedef struct s_camera {
     vec3		position;			/* position vector */
@@ -41,9 +40,11 @@ typedef struct s_camera {
 	// mat4		view_no_translation;
 } Camera; 
 
-s8 frustrumCheck(Camera *camera, Chunks *chunk);
-Frustum calculateFrustum(Camera* camera);
-
+/* Frustrum */
+s8		isChunkInFrustum(Frustum *frustum, BoundingBox *box);
+void	extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view);
+BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize);
+/* Camera */
 Camera create_camera(float fov, float aspect_ratio, float near, float far);
 void move_camera_forward(Camera* camera, float distance);
 void move_camera_backward(Camera* camera, float distance);

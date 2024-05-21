@@ -34,13 +34,9 @@ typedef struct s_context {
 	GLuint				skyboxShaderID;		/* shader program id */
 	GLuint				skyboxVAO;			/* skybox VAO */
 	u32					renderBlock;		/* Total block to render */
-	// u8					*perlinNoise;		/* perlinNoise data */
 	ThreadContext		*threadContext;		/* Thread context */
 	s8					isPlaying;			/* Game is playing */
 	u8					**perlin2D;			/* Perlin noise 2D */
-	// Thread				threadSupervisor;	/* Thread supervisor */
-	// WorkerThread		*thread;			/* Thread structure array */
-	// Mutex				mtx;				/* Mutex */
 } Context;
 
 /* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */

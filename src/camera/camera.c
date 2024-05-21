@@ -3,94 +3,6 @@
 #include "../../include/camera.h"
 #include "../../include/chunks.h"
 
-/* frustru, start */
-
-Frustum calculateFrustum(Camera *camera) {
-    Frustum frustum;
-
-    // Combinez les matrices de vue et de projection pour obtenir la matrice de clip
-    mat4 clip;
-    glm_mat4_mul(camera->projection, camera->view, clip);
-
-    // Extraire les plans du frustum de la matrice de clip
-    glm_vec4_sub(clip[3], clip[0], frustum.planes[0]); // Droite
-    glm_vec4_add(clip[3], clip[0], frustum.planes[1]); // Gauche
-    glm_vec4_sub(clip[3], clip[1], frustum.planes[2]); // Bas
-    glm_vec4_add(clip[3], clip[1], frustum.planes[3]); // Haut
-    glm_vec4_sub(clip[3], clip[2], frustum.planes[4]); // Proche
-    glm_vec4_add(clip[3], clip[2], frustum.planes[5]); // Loin
-
-    // Normaliser les plans
-    for (int i = 0; i < 6; i++) {
-        glm_vec4_normalize(frustum.planes[i]);
-    }
-
-    // Ignorer la composante Y de la position de la caméra dans les plans
-    for (int i = 0; i < 6; i++) {
-        frustum.planes[i][1] = 0.0f;
-    }
-
-    return (frustum);
-}
-
-BoundingBox calculateBoundingBox(Chunks *chunk) {
-    BoundingBox box;
-
-    glm_vec3_copy((vec3){chunk->x * 8.0f, 0, chunk->z * 8.0f}, box.min);
-    glm_vec3_sub(box.min, (vec3){-8.0f, 0, -8.0f}, box.max);
-    return box;
-}
-
-s8 intersects(Frustum* frustum, BoundingBox* box) {
-    for (int i = 0; i < 6; i++) {
-        vec3 positiveVertex;
-        glm_vec3_copy(box->min, positiveVertex);
-
-		// if (frustum->planes[i][0] * box->max[0] >= 0) positiveVertex[0] = box->max[0]; // x 
-		// if (frustum->planes[i][1] * box->max[1] >= 0) positiveVertex[1] = box->max[1]; // y 
-		// if (frustum->planes[i][2] * box->max[2] >= 0) positiveVertex[2] = box->max[2]; // z
-        
-		if (frustum->planes[i][0] >= 0) positiveVertex[0] = box->max[0]; // x
-		if (frustum->planes[i][1] >= 0) positiveVertex[1] = box->max[1]; // y
-		if (frustum->planes[i][2] >= 0) positiveVertex[2] = box->max[2]; // z
-		// [3] == w
-		glm_normalize(positiveVertex);
-        float dotProduct = glm_dot(frustum->planes[i], positiveVertex);
-		float realDot = -fabs(dotProduct);
-
-		ft_printf_fd(1, GREEN"TEST: Dot|%f|->realDot|%f| -frust|%f|\n"RESET, dotProduct,realDot, -frustum->planes[i][3]);
-
-
-
-        if (!float_less_equal(realDot, -frustum->planes[i][3]) && !float_equal(dotProduct, 0.0f)) {
-            ft_printf_fd(1, RED"Failed i|%d|-> RealDot|%f| -frust|%f|\n", i, realDot, -frustum->planes[i][3]);
-            return (FALSE); // La boîte est en dehors de ce plan, donc elle est en dehors du frustum
-        }
-    }
-    return (TRUE); // La boîte est à l'intérieur de tous les plans, donc elle est à l'intérieur du frustum
-}
-
-s8 frustrumCheck(Camera *camera, Chunks *chunk)
-{
-	BoundingBox	box = calculateBoundingBox(chunk);
-	/* display box */
-	// ft_printf_fd(1, ORANGE"Chunk X|%d| Z|%d|\nBox min |%f| |%f| |%f|\nmax: |%f| |%f| |%f|\n"RESET,
-	// 	chunk->x, chunk->z, box.min[0], box.min[1], box.min[2], box.max[0], box.max[1], box.max[2]);
-	// 	/* display frustrum data */
-	// ft_printf_fd(1, CYAN"Frustum data\n"RESET);
-	// for (int i = 0; i < 6; i++) {
-	// 	ft_printf_fd(1, YELLOW"Plane %d: %f %f %f %f\n"RESET, i, camera->frustum.planes[i][0], camera->frustum.planes[i][1], camera->frustum.planes[i][2], camera->frustum.planes[i][3]);
-	// }
-	if (intersects(&camera->frustum, &box)) {
-		// ft_printf_fd(1, PINK"Chunk X|%d| Z|%d| is in frustum\n"RESET, chunk->x, chunk->z);
-		return (1);
-	}
-	return (0);
-}
-
-
-/* ENd frustrum */
-
 void chunkPosGet(Camera *camera)
 {
 	f32 chunkSize = 8.0; // cubeSize is 0.5
@@ -180,7 +92,7 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
 
 	updateViewVec(&camera);
 
-	camera.frustum = calculateFrustum(&camera);
+	extractFrustumPlanes(&camera.frustum, camera.projection, camera.view);
     return (camera);
 }
 
@@ -211,7 +123,7 @@ void update_camera(void *context, GLuint shader_id)
 	mtx_lock(&c->threadContext->mtx);
 	chunkPosGet(&c->cam);
 	mtx_unlock(&c->threadContext->mtx);
-	c->cam.frustum = calculateFrustum(&c->cam);
+	extractFrustumPlanes(&c->cam.frustum, c->cam.projection, c->cam.view);
 
 }
 

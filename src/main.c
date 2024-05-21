@@ -8,10 +8,13 @@
 void drawAllChunks(GLuint VAO, HashMap *renderChunksMap) {
 	HashMap_it	it = hashmap_iterator(renderChunksMap);
 	s8			next = 1;
+	u32 		chunkRenderNb = 0;
 
 	while ((next = hashmap_next(&it))) {
 		drawAllCube(VAO, (RenderChunks *)it.value);
+		chunkRenderNb++;
 	}
+	ft_printf_fd(1, RESET_LINE""PURPLE"Nb Chunk Rendered: %d"RESET, chunkRenderNb);
 }
 
 void chunksRender(Context *c, GLuint VAO, GLuint shader_id, HashMap *renderChunksMap) {

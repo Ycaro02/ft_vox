@@ -24,15 +24,15 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
 }
 
 
-void debugFrustrum(Chunks *chunk, Context *c, HashMap *renderChunksMap, BlockPos chunkID) {
-	if (chunk && !chunksIsRenderer(renderChunksMap, chunkID)) {
-		if (frustrumCheck(&c->cam, chunk)) {
-			ft_printf_fd(1, CYAN"Is in frustum\n"RESET);
-		} else {
-			ft_printf_fd(1, RED"Is not in frustum\n"RESET);
-		}
-	}
-}
+// void debugFrustrum(Chunks *chunk, Context *c, HashMap *renderChunksMap, BlockPos chunkID) {
+// 	if (chunk && !chunksIsRenderer(renderChunksMap, chunkID)) {
+// 		if (frustrumCheck(&c->cam, chunk)) {
+// 			ft_printf_fd(1, CYAN"Is in frustum\n"RESET);
+// 		} else {
+// 			ft_printf_fd(1, RED"Is not in frustum\n"RESET);
+// 		}
+// 	}
+// }
 
 void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
     vec3 start_position, ray_direction, chunk_coords, current_position, travelVector;
@@ -52,25 +52,28 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 		worldToChunksPos(current_position, chunk_coords);
 
 		BlockPos chunkID = {0, (s32)chunk_coords[0], (s32)chunk_coords[2]};
-		// mtx_lock(&c->mtx);
 		mtx_lock(&c->threadContext->mtx);
 		Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
 		mtx_unlock(&c->threadContext->mtx);
-		// mtx_unlock(&c->mtx);
 
 		// debugFrustrum(chunks, c, renderChunksMap, chunkID);
 
-		// s8 inView = chunks && frustrumCheck(&c->cam, chunks);
 
-		if (!chunksIsRenderer(renderChunksMap, chunkID) && chunks) {
+
+		s8 inView = 0;
+		
+		if (chunks) {
+			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f);
+			inView = isChunkInFrustum(&c->cam.frustum, &box);
+		}
+
+		// if (!chunksIsRenderer(renderChunksMap, chunkID) && chunks) {
+		if (!chunksIsRenderer(renderChunksMap, chunkID) && inView) {
 			RenderChunks *render = renderChunkCreate(chunks);
 			hashmap_set_entry(renderChunksMap, chunkID, render);
 		}
 
 	}
-	// ft_printf_fd(1, RED"Waiting for ThreadNb: %d\n"RESET, threadNb);
-	// threadWaitForWorker(c);
-	// ft_printf_fd(1, GREEN"After wait ThreadNb: %d\n"RESET, c->thread->current);
 }
 
 
