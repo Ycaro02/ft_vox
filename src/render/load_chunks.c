@@ -3,7 +3,7 @@
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
 
-#define MAX_RENDER_DISTANCE 40.0f
+#define MAX_RENDER_DISTANCE 120.0f
 #define TRAVEL_INCREMENT 6.0f
 
 s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
@@ -37,8 +37,11 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
 			if (!isChunkInFrustum(&c->cam.frustum, &box)) {
 				hashmap_remove_entry(renderChunksMap, chunkID);
-				// ft_printf_fd(1, RED"Remove chunk from render\n"RESET);
-				/* If we remove an entry we need to reset iterator */
+				/*	
+					If we remove an entry we need to reset iterator 
+					We can refactor this, with storing all key in a list and iterate over it
+					at the end of the loop to remove all stored entry 
+				*/
 				it = hashmap_iterator(renderChunksMap);
 			}
 		}
@@ -70,8 +73,6 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 		Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
 		mtx_unlock(&c->threadContext->mtx);
 
-		// debugFrustrum(chunks, c, renderChunksMap, chunkID);
-
 		s8 inView = 0;
 		if (chunks) {
 			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
@@ -85,6 +86,3 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 	}
 
 }
-
-
-
