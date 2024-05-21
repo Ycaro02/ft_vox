@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/15 10:02:26 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/21 09:58:01 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,35 +69,32 @@ void hashmap_destroy(HashMap *map) {
 }
 
 void *hashmap_get(HashMap *map, BlockPos p) {
-	mtx_lock(&map->mtx);
-
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
-	t_list	*entry = map->entries[index];
-	void	*value = NULL;
+	t_list	*entry =  NULL;
+	void	*ret = NULL;
 
+	mtx_lock(&map->mtx);
+	entry = map->entries[index];
 	while (entry) {
 		HashMap_entry *e = (HashMap_entry *)entry->content;
 		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
-			value = e->value;
+			ret = e->value;
 			break ;
-			// mtx_unlock(&map->mtx);
-			// return (e->value);
-
 		}
 		entry = entry->next;
 	}
 	mtx_unlock(&map->mtx);
-	return (value);
+	return (ret);
 }
 
 s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
-	mtx_lock(&map->mtx);
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
-
-	/* Check if the entry already exist */
-	t_list *current = map->entries[index];
+	t_list	*current = NULL;
+	
+	mtx_lock(&map->mtx);
+	current = map->entries[index];
 	while (current) {
 		HashMap_entry *e = (HashMap_entry *)current->content;
 		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
@@ -129,14 +126,12 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 }
 
 s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
+    u64		key = hash_block_position(p.x, p.y, p.z);
+    size_t	index = HASHMAP_INDEX(key, map->capacity);
+    t_list	*current = NULL, *prev = NULL;
+
 	mtx_lock(&map->mtx);
-
-    u64 key = hash_block_position(p.x, p.y, p.z);
-    size_t index = HASHMAP_INDEX(key, map->capacity);
-
-    t_list *current = map->entries[index];
-    t_list *prev = NULL;
-
+	current = map->entries[index];
     /* loop on linked list of the computed index */
     while (current) {
         HashMap_entry *entry = (HashMap_entry *)current->content;
@@ -167,15 +162,14 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
 
 s8 hashmap_expand(HashMap *map) 
 {
-	/* Compute new size */
+    size_t	new_capacity = 0;
+    t_list	**new_entries = NULL;
+	
 	mtx_lock(&map->mtx);
-
-    size_t new_capacity = (map->capacity * 2);
+	new_capacity = (map->capacity * 2);
 	new_capacity = GET_NEXT_PRIME(new_capacity);
-
 	/* Allocate new entries array */
-    t_list **new_entries = ft_calloc(sizeof(t_list *), new_capacity);
-    if (!new_entries) {
+    if (!(new_entries = ft_calloc(sizeof(t_list *), new_capacity))) {
         return (FALSE);
     }
 
@@ -222,8 +216,8 @@ size_t hashmap_capacity(HashMap *map) {
 
 HashMap_it hashmap_iterator(HashMap *map) {
     HashMap_it it;
-	mtx_lock(&map->mtx);
 
+	mtx_lock(&map->mtx);
     it._map = map;
     it._idx = 0;
 	it._current = NULL;
@@ -232,8 +226,8 @@ HashMap_it hashmap_iterator(HashMap *map) {
 }
 
 s8 hashmap_next(HashMap_it *it) {
-    HashMap *map = it->_map;
-	t_list *entry = NULL;
+    HashMap	*map = it->_map;
+	t_list	*entry = NULL;
 
 	mtx_lock(&map->mtx);
 

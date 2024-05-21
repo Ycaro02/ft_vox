@@ -34,15 +34,6 @@ s32 threadFreeWorkerGet (ThreadContext *threadContext) {
 	return (-1);
 }
 
-/* Tmp need to replace */
-void lst_popfront(t_list **lst) {
-	if (!*lst)
-		return ;
-	t_list *tmp = *lst;
-	*lst = (*lst)->next;
-	free(tmp);
-}
-
 /**
  * @brief Load chunks in a thread
  * @param data ThreadData
@@ -87,7 +78,7 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	tdata->threadID = threadID;
-	ft_printf_fd(1, ORANGE"Thread: %d"RESET""CYAN" create [%d][%d], size: %u\n"RESET, threadID, chunkX, chunkZ, hashmap_size(c->threadContext->chunksMapToLoad));
+	// ft_printf_fd(1, ORANGE"Thread: %d"RESET""CYAN" create [%d][%d], size: %u\n"RESET, threadID, chunkX, chunkZ, hashmap_size(c->threadContext->chunksMapToLoad));
 	c->threadContext->workerCurrent += 1;
 	c->threadContext->workers[threadID].busy = WORKER_BUSY;
 	c->threadContext->workers[threadID].data = tdata;
@@ -129,13 +120,13 @@ void supervisorWaitWorker(Context *c) {
 }
 
 /** 
+ * @brief Lock before to call this function
  * @brief Check if a worker is already loading the given chunks
  * @param c Context
  * @param chunkX Chunk X
  * @param chunkZ Chunk Z
  * @return TRUE if a worker is already loading the chunks FALSE otherwise
 */
-/* Lock before */
 s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
 	for (s32 i = 0; i < c->threadContext->workerMax; ++i) {
 		if (c->threadContext->workers[i].busy == WORKER_BUSY
@@ -148,13 +139,13 @@ s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
 }
 
 /**
+ * @brief Lock before to call this function
  * @brief Add chunks to the queue to load if not already in the queue
  * @param c Context
  * @param chunkX Chunk X
  * @param chunkZ Chunk Z
  * @return TRUE if success, FALSE if failed to add the chunks to the queue
 */
-/* Lock before to call this */
 s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
 	ThreadData *tdata = NULL;
 

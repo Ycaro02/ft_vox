@@ -167,7 +167,6 @@ void BRUT_FillChunks(Mutex *mtx, u8 **perlin2D, Chunks *chunks) {
 	}
 
 	s32 chunkMaxY = maxHeightGet(perlinVal);
-	/* CAre here */
 	if (chunkMaxY < (s32)SEA_LEVEL) {
 		chunkMaxY = (s32)SEA_LEVEL;
 	}
@@ -179,14 +178,7 @@ void BRUT_FillChunks(Mutex *mtx, u8 **perlin2D, Chunks *chunks) {
 		chunks->visible_block += checkHiddenBlock(chunks, i);
 		/* SET DEBUG VALUE HERE */
 		chunks->perlinVal = perlinVal;
-		// free(maxHeight[i]);
 	}
-
-	// free perlinVal
-	// for (u32 y = 0; y < 16; ++y) {
-	// 	free(perlinVal[y]);
-	// }
-	// free(perlinVal);
 }
 
 
