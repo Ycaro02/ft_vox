@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/22 14:04:21 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 14:06:37 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,9 @@ typedef struct s_hashmap_it {
 #define HASHMAP_UPT_ENTRY		0	/* Update hashmap entry */
 #define HASHMAP_ADD_ENTRY		1	/* Add new entry */
 #define HASHMAP_MALLOC_ERROR	2	/* Malloc error */
-#define HASHMAP_DELETE_ENTRY	3	/* Delete entry */
-#define HASHMAP_NOT_FOUND		4	/* Entry not found */
+#define HASHMAP_DATA_FREE		3	/* Data free */
+#define HASHMAP_ENTRY_FREE		4	/* Entry free */
+#define HASHMAP_NOT_FOUND		5	/* Entry not found */
 
 
 /* Hashmap remove possible value */
@@ -176,7 +177,7 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value);
  * @brief HashMap remove the entry associated with the key (x,y,z are the key)
  * @param map HashMap to remove from
  * @param x,y,z key to remove
- * @return s8 HASHMAP_DELETE_ENTRY if entry deleted, HASHMAP_NOT_FOUND if entry not found
+ * @return s8 HASHMAP_DATA_FREE if entry deleted, HASHMAP_NOT_FOUND if entry not found
 */
 s8 hashmap_remove_entry(HashMap *map, BlockPos p);
 

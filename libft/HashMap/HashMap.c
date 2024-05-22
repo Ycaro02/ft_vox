@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/21 15:54:35 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 14:23:47 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,38 +87,47 @@ void *hashmap_get(HashMap *map, BlockPos p) {
 	return (ret);
 }
 
+FT_INLINE void hashmap_entry_update(HashMap_entry *dst, BlockPos p, u64 key, void *value) {
+	dst->origin_data.x = p.x;
+	dst->origin_data.y = p.y;
+	dst->origin_data.z = p.z;
+	dst->key = key;
+	dst->value = value;
+}
+
 s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
 	t_list	*current = NULL;
-	
+	HashMap_entry *newEntry = NULL;
+
+
 	mtx_lock(&map->mtx);
 	current = map->entries[index];
 	while (current) {
-		HashMap_entry *e = (HashMap_entry *)current->content;
-		if (HASHMAP_SAME_ENTRY(e, key, p.x, p.y, p.z)) {
-			if (e->value) {
-				free(e->value);
+		HashMap_entry *entry = (HashMap_entry *)current->content;
+		if (HASHMAP_SAME_ENTRY(entry, key, p.x, p.y, p.z)) {
+			map->free_obj(entry);
+			if (!(newEntry = ft_calloc(sizeof(HashMap_entry), 1))) {
+				mtx_unlock(&map->mtx);
+				return (HASHMAP_MALLOC_ERROR);
 			}
-			e->value = value;
+			hashmap_entry_update(newEntry, p, key, value);
+			current->content = newEntry;
 			mtx_unlock(&map->mtx);
 			return (HASHMAP_UPT_ENTRY);
 		}
 		current = current->next;
 	}
 
-	t_list *entry = ft_lstnew(ft_calloc(sizeof(HashMap_entry), 1));
-	if (!entry) {
+	t_list *entryNode = ft_lstnew(ft_calloc(sizeof(HashMap_entry), 1));
+	if (!entryNode) {
 		mtx_unlock(&map->mtx);
 		return (HASHMAP_MALLOC_ERROR);
 	}
-	HashMap_entry *e = (HashMap_entry *)entry->content;
-	e->origin_data.x = p.x;
-	e->origin_data.y = p.y;
-	e->origin_data.z = p.z;
-	e->key = key;
-	e->value = value;
-	ft_lstadd_back(&map->entries[index], entry);
+	HashMap_entry *e = (HashMap_entry *)entryNode->content;
+	hashmap_entry_update(e, p, key, value);
+	ft_lstadd_back(&map->entries[index], entryNode);
 	(map->size)++;
 	mtx_unlock(&map->mtx);
 	return (HASHMAP_ADD_ENTRY);
@@ -147,7 +156,7 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
 			current = NULL;
             (map->size)--;
 			mtx_unlock(&map->mtx);
-            return (HASHMAP_DELETE_ENTRY);
+            return (HASHMAP_DATA_FREE);
         }
         prev = current;
         current = current->next;

@@ -111,10 +111,9 @@ void supervisorWaitWorker(Context *c) {
 			usleep(10000);
 			mtx_lock(&c->threadContext->mtx);
 			status = c->threadContext->workers[i].busy;
-			// ft_printf_fd(1, RED"WATING Workers Thread: "RESET""YELLOW"[%d]"RESET""RED" NOT finished: status %d\n"RESET, i, status);
 		}
 		mtx_unlock(&c->threadContext->mtx);
-		ft_printf_fd(1, ORANGE"Workers Thread: "RESET""YELLOW"[%d]"RESET""GREEN" finished: status %d\n"RESET, i, status);
+		ft_printf_fd(1, ORANGE"\nWorkers Thread: "RESET""YELLOW"[%d]"RESET""GREEN" finished: status %d"RESET, i, status);
 		++i;
 	}
 }
