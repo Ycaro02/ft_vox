@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/22 14:23:47 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 14:35:28 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	return (HASHMAP_ADD_ENTRY);
 }
 
-s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
+s8 hashmap_remove_entry(HashMap *map, BlockPos p, s8 free_data) {
     u64		key = hash_block_position(p.x, p.y, p.z);
     size_t	index = HASHMAP_INDEX(key, map->capacity);
     t_list	*current = NULL, *prev = NULL;
@@ -150,8 +150,11 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p) {
             } else { /* If is not the head of the list */
                 prev->next = current->next;
             }
-            /* free memory */
-            map->free_obj(entry);
+            /* free data (entry) */
+			if (free_data) {
+				map->free_obj(entry);
+			}
+			/* free node and set it to NULL */
 			free(current);
 			current = NULL;
             (map->size)--;

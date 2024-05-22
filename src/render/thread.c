@@ -251,7 +251,7 @@ s32 threadHandling(void *context) {
 			/* Lock in this */
 			if (tdata && threadInitChunkLoad(c, &c->threadContext->mtx, tdata->chunkX, tdata->chunkZ)) {
 				mtx_lock(&c->threadContext->mtx);
-				hashmap_remove_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(tdata->chunkX, tdata->chunkZ));
+				hashmap_remove_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(tdata->chunkX, tdata->chunkZ), HASHMAP_FREE_DATA);
 				mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
 				// free(tdata);
 				mtx_unlock(&c->threadContext->mtx);

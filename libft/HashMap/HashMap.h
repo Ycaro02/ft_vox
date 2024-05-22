@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/22 14:06:37 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 14:33:47 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,9 +177,10 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value);
  * @brief HashMap remove the entry associated with the key (x,y,z are the key)
  * @param map HashMap to remove from
  * @param x,y,z key to remove
+ * @param free_data HASHMAP_FREE_NODE to free the entry node only (not the data), HASHMAP_FREE_DATA to free the data with the given function
  * @return s8 HASHMAP_DATA_FREE if entry deleted, HASHMAP_NOT_FOUND if entry not found
 */
-s8 hashmap_remove_entry(HashMap *map, BlockPos p);
+s8 hashmap_remove_entry(HashMap *map, BlockPos p, s8 free_data);
 
 /**
  * @brief Function to get the length of the hash map

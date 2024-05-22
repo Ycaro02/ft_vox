@@ -54,7 +54,8 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		if (chunks) {
 			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
 			if (!isChunkInFrustum(&c->cam.frustum, &box)) {
-				hashmap_remove_entry(renderChunksMap, chunkID);
+				// hashmap_remove_entry(renderChunksMap, chunkID, HASHMAP_FREE_NODE);
+				hashmap_remove_entry(renderChunksMap, chunkID, HASHMAP_FREE_DATA);
 				/*	
 					If we remove an entry we need to reset iterator 
 					We can refactor this, with storing all key in a list and iterate over it
