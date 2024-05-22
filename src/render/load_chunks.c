@@ -24,6 +24,10 @@ s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID) {
 	return (hashmap_get(chunksMap, chunkID) != NULL);
 }
 
+s8 renderChunkIsCached(HashMap *renderChunksCacheMap, BlockPos chunkID) {
+	return (hashmap_get(renderChunksCacheMap, chunkID) != NULL);
+}
+
 /**
  * @brief Convert world position to chunk offset
  * @param current Current position
@@ -45,6 +49,8 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	Chunks 			*chunks = NULL;
 	HashMap_it 		it = hashmap_iterator(renderChunksMap);
 	s8 				next = TRUE;
+	t_list			*toRemoveList = NULL;
+	BlockPos		*chunkIDToRemove = NULL;
 
 	while ((next = hashmap_next(&it))) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
@@ -54,17 +60,28 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		if (chunks) {
 			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
 			if (!isChunkInFrustum(&c->cam.frustum, &box)) {
-				// hashmap_remove_entry(renderChunksMap, chunkID, HASHMAP_FREE_NODE);
-				hashmap_remove_entry(renderChunksMap, chunkID, HASHMAP_FREE_DATA);
-				/*	
-					If we remove an entry we need to reset iterator 
-					We can refactor this, with storing all key in a list and iterate over it
-					at the end of the loop to remove all stored entry 
-				*/
-				it = hashmap_iterator(renderChunksMap);
+				if (!(chunkIDToRemove = malloc(sizeof(BlockPos)))) {
+					return ;
+				}
+				ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
+				ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
 			}
 		}
 	}
+
+
+	for (t_list *current = toRemoveList; current; current = current->next) {
+		BlockPos renderChunkID = *(BlockPos *)current->content;
+		RenderChunks *renderSave = hashmap_get(renderChunksMap, renderChunkID);
+
+		hashmap_remove_entry(renderChunksMap, renderChunkID, HASHMAP_FREE_NODE);
+		if (!renderChunkIsCached(c->world->renderChunksCacheMap, renderChunkID)) {
+			hashmap_set_entry(c->world->renderChunksCacheMap, renderChunkID, renderSave);
+		}
+	}
+
+	ft_lstclear(&toRemoveList, free);
+
 }
 
 /**
@@ -109,7 +126,7 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
             }
 
             if (!chunksIsRenderer(renderChunksMap, chunkID) && inView) {
-                render = renderChunkCreate(chunks);
+                render = renderChunkCreate(c->world->renderChunksCacheMap, chunks);
                 hashmap_set_entry(renderChunksMap, chunkID, render);
             } 
         }

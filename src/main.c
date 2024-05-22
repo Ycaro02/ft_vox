@@ -5,8 +5,8 @@
 #include "../include/perlin_noise.h"
 #include "../include/thread_load.h"
 
-void drawAllChunks(Context *c, GLuint VAO, HashMap *renderChunksMap) {
-	HashMap_it	it = hashmap_iterator(renderChunksMap);
+void drawAllChunks(Context *c, GLuint VAO) {
+	HashMap_it	it = hashmap_iterator(c->world->renderChunksMap);
 	s8			next = 1;
 	u32 		chunkRenderNb = 0;
 
@@ -21,16 +21,48 @@ void drawAllChunks(Context *c, GLuint VAO, HashMap *renderChunksMap) {
 	mtx_unlock(&c->threadContext->mtx);
 }
 
-void chunksRender(Context *c, GLuint VAO, GLuint shader_id, HashMap *renderChunksMap) {
-	(void)c;
+void chunksRender(Context *c, GLuint VAO, GLuint shader_id) {
     glLoadIdentity();
 	glUseProgram(shader_id);
-	drawAllChunks(c, VAO, renderChunksMap);
+	drawAllChunks(c, VAO);
     glFlush();
 }
 
 
-void vox_destroy(Context *c, HashMap *renderChunksMap) {
+void renderChunkCacheMapDestroy(HashMap *renderChunkCache, HashMap *renderChunks) {
+	t_list *removeNodeList = NULL;
+	t_list *removeDataList = NULL;
+	HashMap_it it = hashmap_iterator(renderChunkCache);
+	s8 next = TRUE;
+	BlockPos *tmpChunkID = NULL;
+
+	while ((next = hashmap_next(&it))) {
+		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
+		tmpChunkID = malloc(sizeof(BlockPos));
+		ft_memcpy(tmpChunkID, &chunkID, sizeof(BlockPos));
+		if (chunksIsRenderer(renderChunks, chunkID)) {
+			ft_lstadd_front(&removeNodeList, ft_lstnew(tmpChunkID));
+		} else {
+			ft_lstadd_front(&removeDataList, ft_lstnew(tmpChunkID));
+		}
+	}
+
+	for (t_list *current = removeNodeList; current; current = current->next) {
+		hashmap_remove_entry(renderChunkCache, *(BlockPos *)current->content, HASHMAP_FREE_NODE);
+	}
+
+	for (t_list *current = removeDataList; current; current = current->next) {
+		hashmap_remove_entry(renderChunkCache, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
+	}
+
+
+	ft_lstclear(&removeNodeList, free);
+	ft_lstclear(&removeDataList, free);
+
+	hashmap_destroy(renderChunkCache);
+}
+
+void vox_destroy(Context *c) {
 	s32 status = 0;
 	mtx_lock(&c->threadContext->mtx);
 	c->isPlaying = FALSE;
@@ -45,7 +77,9 @@ void vox_destroy(Context *c, HashMap *renderChunksMap) {
 
 	mtx_destroy(&c->threadContext->mtx);
 
-	hashmap_destroy(renderChunksMap);
+	// hashmap_destroy(c->world->renderChunksCacheMap);
+	renderChunkCacheMapDestroy(c->world->renderChunksCacheMap, c->world->renderChunksMap);
+	hashmap_destroy(c->world->renderChunksMap);
 	hashmap_destroy(c->world->chunksMap);
 
 	// free(c->threadContext->workers);
@@ -60,22 +94,22 @@ void vox_destroy(Context *c, HashMap *renderChunksMap) {
 	glfwTerminate();
 }
 
-void main_loop(Context *context, GLuint vao, GLuint skyTexture, HashMap *renderChunksMap) {
-    while (!glfwWindowShouldClose(context->win_ptr)) {
+void main_loop(Context *c, GLuint vao, GLuint skyTexture) {
+    while (!glfwWindowShouldClose(c->win_ptr)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/* Input handling */
 		glfwPollEvents();
-        handle_input(context);
+        handle_input(c);
 		
 		/* Update data */
-		update_camera(context, context->cubeShaderID);
-		chunksViewHandling(context, renderChunksMap);
+		update_camera(c, c->cubeShaderID);
+		chunksViewHandling(c, c->world->renderChunksMap);
 
 		/* Render logic */
-        displaySkybox(context->skyboxVAO, skyTexture, context->skyboxShaderID, context->cam.projection, context->cam.view);
-        chunksRender(context, vao, context->cubeShaderID, renderChunksMap);
+        displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
+        chunksRender(c, vao, c->cubeShaderID);
 
-		glfwSwapBuffers(context->win_ptr);
+		glfwSwapBuffers(c->win_ptr);
         // display_fps();
     }
 }
@@ -111,6 +145,8 @@ int main() {
 		return (1);
 	} else if (!(context.world->chunksMap = hashmap_init(HASHMAP_SIZE_100, chunksMapFree))) {
 		return (1);
+	} else if (!(context.world->renderChunksCacheMap = hashmap_init(HASHMAP_SIZE_100, renderChunksMapFree))) {
+		return (1);
 	}
 
 	u8 *perlin1D = perlinNoiseGeneration(42); /* seed 42 */
@@ -135,7 +171,7 @@ int main() {
 	}
 	// chunksLoadArround(&context, 10);
 	GLuint cubeVAO = setupCubeVAO(&context.cube);
-	HashMap *renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
+	context.world->renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
 
 	/* Init skybox */
 	context.skyboxVAO = skyboxInit();
@@ -151,8 +187,8 @@ int main() {
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);
 
-	main_loop(&context, cubeVAO, skyTexture, renderChunksMap);
+	main_loop(&context, cubeVAO, skyTexture);
 
-    vox_destroy(&context, renderChunksMap);
+    vox_destroy(&context);
     return (0);
 }

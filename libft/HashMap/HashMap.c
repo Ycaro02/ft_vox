@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/22 14:35:28 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 16:02:25 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,8 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p, s8 free_data) {
             /* free data (entry) */
 			if (free_data) {
 				map->free_obj(entry);
+			} else {
+				free(entry); /* If we don't call the user free function we need to free the entry structure */
 			}
 			/* free node and set it to NULL */
 			free(current);

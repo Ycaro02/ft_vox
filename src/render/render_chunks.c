@@ -27,16 +27,27 @@ void renderChunksMapFree(void *entry) {
 }
 
 
-RenderChunks *renderChunkCreate(Chunks *chunks) {
+RenderChunks *renderChunkCreate(HashMap *renderChunksCacheMap, Chunks *chunks) {
     RenderChunks *render = NULL;
+	BlockPos	  chunkID;
 	
 	if (!chunks) {
 		return (NULL);
-	} else if (!(render = malloc(sizeof(RenderChunks)))) {
+	}
+	
+	chunkID = CHUNKS_MAP_ID_GET(chunks->x, chunks->z);
+
+	/* Check if renderChunk is in renderChunksCache map */
+	if ((render = hashmap_get(renderChunksCacheMap, chunkID))) {
+		return (render);
+	}
+
+
+	if (!(render = malloc(sizeof(RenderChunks)))) {
 		ft_printf_fd(2, "Failed to allocate render\n");
 		return (NULL);
 	}
-	render->chunkID = CHUNKS_MAP_ID_GET(chunks->x, chunks->z);
+	render->chunkID = chunkID;
     render->visibleBlock = chunks->visible_block;
 	if (!(render->blockTypeID = ft_calloc(sizeof(f32), render->visibleBlock))) {
 		ft_printf_fd(2, "Failed to allocate blockTypeID\n");
@@ -65,7 +76,7 @@ HashMap *chunksToRenderChunks(Context *c, HashMap *chunksMap) {
     while ((next = hashmap_next(&it))) {
 		BoundingBox box = chunkBoundingBoxGet((Chunks *)it.value, 8.0f, c->cam.position[1]);
 		if (isChunkInFrustum(&c->cam.frustum, &box)) {
-			RenderChunks *renderChunk = renderChunkCreate((Chunks *)it.value);
+			RenderChunks *renderChunk = renderChunkCreate(c->world->renderChunksCacheMap, (Chunks *)it.value);
 			hashmap_set_entry(renderChunksMap, RENDER_CHUNKS_ID(renderChunk), renderChunk);
 		}
     }
