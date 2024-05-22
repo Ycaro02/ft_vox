@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/22 14:33:47 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 16:27:28 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ typedef struct s_hashmap_it {
 #define HASHMAP_UPT_ENTRY		0	/* Update hashmap entry */
 #define HASHMAP_ADD_ENTRY		1	/* Add new entry */
 #define HASHMAP_MALLOC_ERROR	2	/* Malloc error */
-#define HASHMAP_DATA_FREE		3	/* Data free */
+#define HASHMAP_DATA_REMOVED	3	/* Data removed */
 #define HASHMAP_ENTRY_FREE		4	/* Entry free */
 #define HASHMAP_NOT_FOUND		5	/* Entry not found */
 
@@ -178,7 +178,7 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value);
  * @param map HashMap to remove from
  * @param x,y,z key to remove
  * @param free_data HASHMAP_FREE_NODE to free the entry node only (not the data), HASHMAP_FREE_DATA to free the data with the given function
- * @return s8 HASHMAP_DATA_FREE if entry deleted, HASHMAP_NOT_FOUND if entry not found
+ * @return s8 HASHMAP_DATA_REMOVED if entry deleted, HASHMAP_NOT_FOUND if entry not found
 */
 s8 hashmap_remove_entry(HashMap *map, BlockPos p, s8 free_data);
 

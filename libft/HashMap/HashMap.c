@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/22 16:02:25 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 16:29:14 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p, s8 free_data) {
     u64		key = hash_block_position(p.x, p.y, p.z);
     size_t	index = HASHMAP_INDEX(key, map->capacity);
     t_list	*current = NULL, *prev = NULL;
+	s8		ret = HASHMAP_NOT_FOUND;
 
 	mtx_lock(&map->mtx);
 	current = map->entries[index];
@@ -144,30 +145,23 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p, s8 free_data) {
     while (current) {
         HashMap_entry *entry = (HashMap_entry *)current->content;
         if (HASHMAP_SAME_ENTRY(entry, key, p.x, p.y, p.z)) {
-            /* If is the head of the list */
-            if (prev == NULL) {
-                map->entries[index] = current->next;
-            } else { /* If is not the head of the list */
-                prev->next = current->next;
-            }
-            /* free data (entry) */
-			if (free_data) {
-				map->free_obj(entry);
-			} else {
-				free(entry); /* If we don't call the user free function we need to free the entry structure */
-			}
+			/* If is the first node of list update directly map entry, otherwise update prev->next */
+			prev == NULL ? (map->entries[index] = current->next) : (prev->next = current->next); 
+			/* If free data, free it other juste free entry struct */
+			free_data == HASHMAP_FREE_DATA ? map->free_obj(entry) : free(entry);
+			ret = free_data == HASHMAP_FREE_DATA ? HASHMAP_DATA_REMOVED : HASHMAP_ENTRY_FREE;
 			/* free node and set it to NULL */
 			free(current);
 			current = NULL;
             (map->size)--;
 			mtx_unlock(&map->mtx);
-            return (HASHMAP_DATA_FREE);
+            return (ret);
         }
         prev = current;
         current = current->next;
     }
 	mtx_unlock(&map->mtx);
-	return (HASHMAP_NOT_FOUND);
+	return (ret);
 }
 
 
@@ -219,11 +213,21 @@ s8 hashmap_expand(HashMap *map)
 }
 
 size_t hashmap_size(HashMap *map) {
-    return (map->size);
+	size_t size;
+
+	mtx_lock(&map->mtx);
+    size = map->size;
+	mtx_unlock(&map->mtx);
+	return (size);
 }
 
 size_t hashmap_capacity(HashMap *map) {
-    return (map->capacity);
+	size_t capacity;
+
+	mtx_lock(&map->mtx);
+	capacity = map->capacity;
+	mtx_unlock(&map->mtx);
+	return (capacity);
 }
 
 HashMap_it hashmap_iterator(HashMap *map) {

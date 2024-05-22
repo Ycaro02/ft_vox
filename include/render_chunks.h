@@ -21,20 +21,17 @@ void			renderChunksMapFree(void *entry);
 /* Render chunks.c */
 u32				chunksCubeGet(Chunks *chunks, RenderChunks *render);
 RenderChunks 	*renderChunkCreate(HashMap *renderChunksCacheMap, Chunks *chunks);
-// void			chunksLoadArround(Context *c, s32 radius);
 
 /* render/load_chunks.c */
 s8				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 s8				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
 void			chunksViewHandling(Context *c, HashMap *renderChunksMap);
 
-
 /* render/occlusion_culling */
 u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 
 /* render/cube.c to be refact */
 void			drawAllCube(GLuint VAO, RenderChunks *render);
-
 
 /* render/loadchunks.c */
 s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
