@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/22 16:29:14 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 16:32:11 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,7 +147,7 @@ s8 hashmap_remove_entry(HashMap *map, BlockPos p, s8 free_data) {
         if (HASHMAP_SAME_ENTRY(entry, key, p.x, p.y, p.z)) {
 			/* If is the first node of list update directly map entry, otherwise update prev->next */
 			prev == NULL ? (map->entries[index] = current->next) : (prev->next = current->next); 
-			/* If free data, free it other juste free entry struct */
+			/* If free data, free it otherwise just free entry struct */
 			free_data == HASHMAP_FREE_DATA ? map->free_obj(entry) : free(entry);
 			ret = free_data == HASHMAP_FREE_DATA ? HASHMAP_DATA_REMOVED : HASHMAP_ENTRY_FREE;
 			/* free node and set it to NULL */
