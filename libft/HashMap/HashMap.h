@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/15 10:07:30 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/22 14:04:21 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,11 +94,17 @@ typedef struct s_hashmap_it {
 #define HASHMAP_SIZE_100		151U
 #define HASHMAP_SIZE_1000		1009U
 
+/* Hashmap return value */
 #define HASHMAP_UPT_ENTRY		0	/* Update hashmap entry */
 #define HASHMAP_ADD_ENTRY		1	/* Add new entry */
 #define HASHMAP_MALLOC_ERROR	2	/* Malloc error */
 #define HASHMAP_DELETE_ENTRY	3	/* Delete entry */
 #define HASHMAP_NOT_FOUND		4	/* Entry not found */
+
+
+/* Hashmap remove possible value */
+#define HASHMAP_FREE_NODE		0	/* Free the entry node only (not the data) */
+#define HASHMAP_FREE_DATA		1	/* Free the data with the given function */
 
 
 /* Hash Map entry.value is valid (not null) */

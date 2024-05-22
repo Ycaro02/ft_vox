@@ -42,14 +42,12 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
  * @param renderChunksMap Render chunks map
 */
 void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
-	RenderChunks *render = NULL;
-	HashMap_it it = hashmap_iterator(renderChunksMap);
-	s8 next = TRUE;
-	Chunks *chunks = NULL;
+	Chunks 			*chunks = NULL;
+	HashMap_it 		it = hashmap_iterator(renderChunksMap);
+	s8 				next = TRUE;
 
 	while ((next = hashmap_next(&it))) {
-		render = (RenderChunks *)it.value;
-		BlockPos chunkID = render->chunkID;
+		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		mtx_lock(&c->threadContext->mtx);
 		chunks = hashmap_get(c->world->chunksMap, chunkID);
 		mtx_unlock(&c->threadContext->mtx);
