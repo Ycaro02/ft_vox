@@ -30,11 +30,10 @@ void chunksRender(Context *c, GLuint VAO, GLuint shader_id) {
 
 
 void renderChunkCacheMapDestroy(HashMap *renderChunkCache, HashMap *renderChunks) {
-	t_list *removeNodeList = NULL;
-	t_list *removeDataList = NULL;
-	HashMap_it it = hashmap_iterator(renderChunkCache);
-	s8 next = TRUE;
-	BlockPos *tmpChunkID = NULL;
+	HashMap_it	it = hashmap_iterator(renderChunkCache);
+	t_list		*removeNodeList = NULL, *removeDataList = NULL;
+	BlockPos	*tmpChunkID = NULL;
+	s8			next = TRUE;
 
 	while ((next = hashmap_next(&it))) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
@@ -69,15 +68,14 @@ void vox_destroy(Context *c) {
 	mtx_unlock(&c->threadContext->mtx);
 	
 	thrd_join(c->threadContext->supervisor, &status);
-	ft_printf_fd(1, CYAN"Supervisor thread joined with status %d\n"RESET, status);
+	ft_printf_fd(1, PINK"\nSupervisor thread joined with status %d\n"RESET, status);
 
-	// threadWaitForWorker(c);
 	hashmap_destroy(c->threadContext->chunksMapToLoad);
 	free(c->threadContext->workers);
 
 	mtx_destroy(&c->threadContext->mtx);
 
-	// hashmap_destroy(c->world->renderChunksCacheMap);
+	/* We need special logic to destroy renderChunksCacheMap cause data store is shared with renderChunksMap */
 	renderChunkCacheMapDestroy(c->world->renderChunksCacheMap, c->world->renderChunksMap);
 	hashmap_destroy(c->world->renderChunksMap);
 	hashmap_destroy(c->world->chunksMap);
