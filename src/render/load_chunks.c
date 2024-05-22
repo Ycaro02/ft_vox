@@ -68,42 +68,53 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	}
 }
 
+/**
+ * @brief Handle chunks view, loop on camera fov and the distance to render chunks 
+ * then check if chunk is in frustum and not already in render map to add it
+ * @param c Context
+ * @param renderChunksMap Render chunks map
+*/
 void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
-	RenderChunks	*render = NULL;
-    vec3			start, rayDir, chunkPos, currPos, travelVector;
-    f32				current = 0;
+    RenderChunks    *render = NULL;
+    vec3            start, rayDir, chunkPos, currPos, travelVector;
+    f32             current = 0;
+    f32             angle;
 
     glm_vec3_copy(c->cam.position, start);
-    glm_vec3_copy(c->cam.viewVector, rayDir);
     glm_vec3_zero(chunkPos);
     glm_vec3_zero(currPos);
 
+	/* Loop on the complete camera fov */
+    for (angle = -CAM_FOV / 2; angle <= CAM_FOV / 2; angle += ANGLE_INCREMENT) {
+        glm_vec3_copy(c->cam.viewVector, rayDir);
+        glm_vec3_rotate(rayDir, glm_rad(angle), (vec3){0.0f, 1.0f, 0.0f});
 
-	while ((current += TRAVEL_INCREMENT) <= MAX_RENDER_DISTANCE) {
-		/* Scale ray dir */
-		glm_vec3_scale(rayDir, current, travelVector);
-		/* add scaled ray vector add start position in current position */
-		glm_vec3_add(start, travelVector, currPos);
-		/* Convert world coordonate to chunk offset */
-		worldToChunksPos(currPos, chunkPos);
+        current = 0;
+        while ((current += TRAVEL_INCREMENT) <= MAX_RENDER_DISTANCE) {
+            /* Scale ray dir */
+            glm_vec3_scale(rayDir, current, travelVector);
+            /* add scaled ray vector add start position in current position */
+            glm_vec3_add(start, travelVector, currPos);
+            /* Convert world coordonate to chunk offset */
+            worldToChunksPos(currPos, chunkPos);
 
-		BlockPos chunkID = {0, (s32)chunkPos[0], (s32)chunkPos[2]};
-		mtx_lock(&c->threadContext->mtx);
-		Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
-		mtx_unlock(&c->threadContext->mtx);
+            BlockPos chunkID = {0, (s32)chunkPos[0], (s32)chunkPos[2]};
+            mtx_lock(&c->threadContext->mtx);
+            Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
+            mtx_unlock(&c->threadContext->mtx);
 
-		s8 inView = 0;
-		if (chunks) {
-			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
-			inView = isChunkInFrustum(&c->cam.frustum, &box);
-		}
+            s8 inView = 0;
+            if (chunks) {
+                BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
+                inView = isChunkInFrustum(&c->cam.frustum, &box);
+            }
 
-		if (!chunksIsRenderer(renderChunksMap, chunkID) && inView) {
-			render = renderChunkCreate(chunks);
-			hashmap_set_entry(renderChunksMap, chunkID, render);
-		} 
-	}
+            if (!chunksIsRenderer(renderChunksMap, chunkID) && inView) {
+                render = renderChunkCreate(chunks);
+                hashmap_set_entry(renderChunksMap, chunkID, render);
+            } 
+        }
+    }
 
-	renderChunksFrustrumRemove(c, renderChunksMap);
-
+    renderChunksFrustrumRemove(c, renderChunksMap);
 }

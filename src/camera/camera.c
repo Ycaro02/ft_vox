@@ -97,14 +97,20 @@ void update_camera(void *context, GLuint shader_id)
     /* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
 
+	/* Update shaders variable */
     set_shader_var_mat4(shader_id, "view", c->cam.view);
     set_shader_var_mat4(shader_id, "projection", c->cam.projection);
 	set_shader_var_mat4(shader_id, "model", c->cube.rotation);
+	
+	/* Update view vector */
 	updateViewVec(&c->cam);
 
+	/* Update camera chunk position */
 	mtx_lock(&c->threadContext->mtx);
 	chunkPosGet(&c->cam);
 	mtx_unlock(&c->threadContext->mtx);
+
+	/* Extract Frustrum plane from projection and view matrix */
 	extractFrustumPlanes(&c->cam.frustum, c->cam.projection, c->cam.view);
 
 }

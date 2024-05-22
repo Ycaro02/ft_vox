@@ -22,12 +22,14 @@
 
 #define CAM_FOV			80.0f			/* Camera field of view */
 
-#define CHUNKS_LOAD_RADIUS 10			/* Chunks load radius */
+#define CHUNKS_LOAD_RADIUS 15			/* Chunks load radius */
+
+#define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
 
 
 #define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size */
 
-#define MAX_RENDER_DISTANCE 120.0f				/* Max render distance */
+#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 20.0f)				/* Max render distance */
 #define TRAVEL_INCREMENT CHUNK_FLOAT_SIZE		/* Travel increment */
 
 

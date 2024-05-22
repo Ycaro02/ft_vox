@@ -64,7 +64,7 @@ s8 isChunkInFrustum(Frustum *frustum, BoundingBox *box) {
     for (int i = 0; i < 6; i++) {
         int inCount = 0;
         for (int j = 0; j < 8; j++) {
-            if (glm_vec4_dot((vec4){corners[j][0], corners[j][1], corners[j][2], 1.0f}, frustum->planes[i]) > 0)
+            if (glm_vec4_dot((vec4){corners[j][0], corners[j][1], corners[j][2], 1.0f}, frustum->planes[i]) > 0.0f)
                 inCount++;
         }
         if (inCount == 0) // All points are outside this plane
@@ -73,7 +73,5 @@ s8 isChunkInFrustum(Frustum *frustum, BoundingBox *box) {
 
     return (TRUE);
 }
-
-
 
 /* ENd frustrum */

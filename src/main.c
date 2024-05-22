@@ -5,7 +5,7 @@
 #include "../include/perlin_noise.h"
 #include "../include/thread_load.h"
 
-void drawAllChunks(GLuint VAO, HashMap *renderChunksMap) {
+void drawAllChunks(Context *c, GLuint VAO, HashMap *renderChunksMap) {
 	HashMap_it	it = hashmap_iterator(renderChunksMap);
 	s8			next = 1;
 	u32 		chunkRenderNb = 0;
@@ -14,14 +14,18 @@ void drawAllChunks(GLuint VAO, HashMap *renderChunksMap) {
 		drawAllCube(VAO, (RenderChunks *)it.value);
 		chunkRenderNb++;
 	}
-	ft_printf_fd(1, RESET_LINE""PURPLE"Nb Chunk Rendered: %d"RESET, chunkRenderNb);
+
+	mtx_lock(&c->threadContext->mtx);
+	ft_printf_fd(1, RESET_LINE""GREEN"Nb Chunk Rendered: %d,"RESET""ORANGE" Loaded: %d, "RESET""CYAN" To load: %d"RESET
+		, chunkRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad));
+	mtx_unlock(&c->threadContext->mtx);
 }
 
 void chunksRender(Context *c, GLuint VAO, GLuint shader_id, HashMap *renderChunksMap) {
 	(void)c;
     glLoadIdentity();
 	glUseProgram(shader_id);
-	drawAllChunks(VAO, renderChunksMap);
+	drawAllChunks(c, VAO, renderChunksMap);
     glFlush();
 }
 
@@ -119,7 +123,7 @@ int main() {
 	free(perlin1D);
 
 	/* init context camera */
-	context.cam = create_camera(CAM_FOV, (f32)((f32)SCREEN_WIDTH / (f32)SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
+	context.cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(SCREEN_WIDTH, SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
     glm_mat4_identity(context.cube.rotation);
 	// display_camera_value(&context);
 
