@@ -50,6 +50,9 @@ int threadChunksLoad(void *data) {
 	return (1);
 }
 
+
+// s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
+
 /**
  * @brief Initialize a thread to load a chunk
  * @param c Context
@@ -78,7 +81,7 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	tdata->threadID = threadID;
-	// ft_printf_fd(1, ORANGE"Thread: %d"RESET""CYAN" create [%d][%d], size: %u\n"RESET, threadID, chunkX, chunkZ, hashmap_size(c->threadContext->chunksMapToLoad));
+	// ft_printf_fd(1, ORANGE"\nThread: %d"RESET""CYAN" create [%d][%d], "RESET""PINK"CamChunksPos: [%d][%d] -> Distance: |%d|"RESET, threadID, chunkX, chunkZ, c->cam.chunkPos[0], c->cam.chunkPos[2], chunkDistanceGet(c->cam.chunkPos[0], c->cam.chunkPos[2], chunkX, chunkZ));
 	c->threadContext->workerCurrent += 1;
 	c->threadContext->workers[threadID].busy = WORKER_BUSY;
 	c->threadContext->workers[threadID].data = tdata;
@@ -91,6 +94,9 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	}
 	return (TRUE);
 }
+
+
+
 
 /**
  * @brief Wait for all the worker threads to finish their job
@@ -177,8 +183,8 @@ s8 threadChunksLoadArround(Context *c, s32 radius) {
 	s32  currentX = c->cam.chunkPos[0];
 	s32  currentZ = c->cam.chunkPos[2];
 	mtx_unlock(&c->threadContext->mtx);
-	for (s32 i = -radius; i < radius; ++i) {
-		for (s32 j = -radius; j < radius; ++j) {
+	for (s32 i = -radius; i <= radius; ++i) {
+		for (s32 j = -radius; j <= radius; ++j) {
 			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
 			
 			mtx_lock(&c->threadContext->mtx);
@@ -196,6 +202,10 @@ s8 threadChunksLoadArround(Context *c, s32 radius) {
 	return (TRUE);
 }
 
+s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
+	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
+}
+
 /**
  * @brief Get the nearest chunks to load from the queue
  * @param c Context
@@ -204,7 +214,7 @@ s8 threadChunksLoadArround(Context *c, s32 radius) {
 */
 ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	ThreadData *tdata = NULL;
-	s32 distance = 0;
+	s32 distance = -1;
 	s32 tmpDistance = 0;
 	BlockPos pos = {0, 0, 0};
 	HashMap_it it = hashmap_iterator(chunksMapToLoad);
@@ -213,9 +223,9 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
-
-		tmpDistance = abs(c->cam.chunkPos[0] - pos.y) + abs(c->cam.chunkPos[2] - pos.z);
-		if (distance == 0 || tmpDistance < distance) {
+		// tmpDistance = abs(c->cam.chunkPos[0] - pos.y) + abs(c->cam.chunkPos[2] - pos.z);
+		tmpDistance = chunkDistanceGet(c->cam.chunkPos[0], c->cam.chunkPos[2], pos.y, pos.z);
+		if (distance == -1 || tmpDistance <= distance) {
 			distance = tmpDistance;
 			tdata = (ThreadData *)it.value;
 		}
