@@ -38,7 +38,7 @@ typedef struct s_context {
 	u32					renderBlock;		/* Total block to render */
 	ThreadContext		*threadContext;		/* Thread context */
 	s8					isPlaying;			/* Game is playing */
-	u8					**perlin2D;			/* Perlin noise 2D */
+	f32					**perlin2D;			/* Perlin noise 2D */
 } Context;
 
 /* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */

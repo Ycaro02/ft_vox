@@ -3,21 +3,10 @@
 
 #include "world.h"
 
-#define CHUNKS_HEIGHT   256U	/* that will be 256 */
-#define CHUNKS_WIDTH    16U
-#define CHUNKS_DEPTH    16U
-
-/* Number of maximum block in chunks */
-#define MAX_CHUNKS_BLOCK (CHUNKS_HEIGHT * CHUNKS_WIDTH * CHUNKS_DEPTH) 
-
+#define CHUNKS_HEIGHT   	256U	/* that will be 256 */
 #define SUB_CHUNKS_HEIGHT   16U
-#define SUB_CHUNKS_WIDTH    16U
-#define SUB_CHUNKS_DEPTH    16U
 
-/* Number of maximum block in sub chunks */
-#define MAX_SUB_CHUNKS_BLOCK (SUB_CHUNKS_HEIGHT * SUB_CHUNKS_WIDTH * SUB_CHUNKS_DEPTH)
-
-/* Number of maximum cub chunks in chunks */
+/* Number of subchunks in chunk  */
 #define SUB_CHUNKS_MAX (CHUNKS_HEIGHT / SUB_CHUNKS_HEIGHT)
 
 typedef struct s_sub_chunks {
@@ -48,6 +37,6 @@ typedef struct s_chunks {
 void chunksMapFree(void *entry);
 
 /* chunks */
-Chunks *chunksLoad(Mutex *mtx, u8 **perlin2D, s32 chunkX, s32 chunkZ);;
+Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ);;
 
 #endif /* HEADER_CHUNKS_H */

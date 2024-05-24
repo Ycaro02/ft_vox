@@ -32,7 +32,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 			blockType = GRASS;
 	} else if (realY < maxHeight) {
 		blockType = STONE;
-	} else if (realY < (s32)SEA_LEVEL) {
+	} else if (realY <= (s32)SEA_LEVEL - 10) {
 		blockType = WATER;
 	} else {
 		return (NULL);
@@ -110,17 +110,12 @@ s32 maxHeightGet(DebugPerlin **perlinVal) {
 	return (max);
 }
 
-
-f32 normalizeU8Tof32(u8 value, u8 start1, u8 stop1, f32 start2, f32 stop2) {
-    return start2 + (stop2 - start2) * ((value - start1) / (f32)(stop1 - start1));
-}
-
 f32 normalisef32Tof32(f32 value, f32 start1, f32 stop1, f32 start2, f32 stop2) {
 	return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
 }
 
 /* Interpolate noise value */
-f32 normaliseNoiseGet(u8 **perlinNoise, s32 x, s32 z, s32 width, s32 height, DebugPerlin *perlinVal) {
+f32 normaliseNoiseGet(f32 **perlinNoise, s32 x, s32 z, s32 width, s32 height, DebugPerlin *perlinVal) {
     s32 normX = abs(x % width);
     s32 normZ = abs(z % height);
 
@@ -131,19 +126,18 @@ f32 normaliseNoiseGet(u8 **perlinNoise, s32 x, s32 z, s32 width, s32 height, Deb
 	perlinVal->givenX = x;
 	perlinVal->givenZ = z;
 
-	return (normalizeU8Tof32(perlinNoise[normX][normZ], 0, 255, -1.0f, 1.0f));
+	// return (normalizeU8Tof32(perlinNoise[normX][normZ], 0, 255, -1.0f, 1.0f));
+	return (perlinNoise[normX][normZ]);
 }
 
-f32 perlinNoiseHeight(Mutex *mtx, u8 **perlin2D, s32 localX, s32 localZ, DebugPerlin *perlinVal) {
+f32 perlinNoiseHeight(Mutex *mtx, f32 **perlin2D, s32 localX, s32 localZ, DebugPerlin *perlinVal) {
     (void)mtx;
+    f32 scale = 60.0f;
     /* Access the interpolated noise value */
     perlinVal->val = normaliseNoiseGet(perlin2D, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal);
-    f32 scale = 60.0f;
 
     if (perlinVal->val > 0.3 && perlinVal->val <= 0.7) {
-        // scale = perlinVal->val * 100.0f;
 		f32 ret = normalisef32Tof32(perlinVal->val, 0.3, 0.7, 100.0f, 150.0f);
-		// ft_printf_fd(1, "PerlinVal scaled from %f to %f\n", perlinVal->val, ret);
 		return (ret);
 
     } else if (perlinVal->val >= 0.6999f) {
@@ -152,7 +146,7 @@ f32 perlinNoiseHeight(Mutex *mtx, u8 **perlin2D, s32 localX, s32 localZ, DebugPe
 
     perlinVal->add =  (perlinVal->val * scale);
 
-    return ((SEA_LEVEL) + (perlinVal->val * scale));
+    return ((SEA_LEVEL) + perlinVal->add);
 }
 
 
@@ -160,7 +154,7 @@ f32 perlinNoiseHeight(Mutex *mtx, u8 **perlin2D, s32 localX, s32 localZ, DebugPe
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void BRUT_FillChunks(Mutex *mtx, u8 **perlin2D, Chunks *chunks) {
+void BRUT_FillChunks(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 	DebugPerlin **perlinVal = ft_calloc(sizeof(DebugPerlin *), 16 + 1);
 
 	for (u32 x = 0; x < 16; ++x) {
@@ -228,7 +222,7 @@ s32 getChunkID() {
 	return (chunksID++);
 }
 
-Chunks *chunksLoad(Mutex *mtx, u8 **perlin2D, s32 chunkX, s32 chunkZ) {
+Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
