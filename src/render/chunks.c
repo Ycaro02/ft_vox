@@ -51,15 +51,15 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	return (block);
 }
 
-// void initializeBlockCache(Block* blockCache[16][16][16]) {
-//     for (u32 x = 0; x < 16; ++x) {
-//         for (u32 y = 0; y < 16; ++y) {
-//             for (u32 z = 0; z < 16; ++z) {
-//                 blockCache[x][y][z] = NULL;
-//             }
-//         }
-//     }
-// }
+void initializeBlockCache(Block* blockCache[16][16][16]) {
+    for (u32 x = 0; x < 16; ++x) {
+        for (u32 y = 0; y < 16; ++y) {
+            for (u32 z = 0; z < 16; ++z) {
+                blockCache[x][y][z] = NULL;
+            }
+        }
+    }
+}
 
 /**
  * @brief BRUT fill subchunks with block
@@ -72,32 +72,14 @@ size_t BRUT_fill_subchunks(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb
 	s32 startYWorld = nb * 16;
 	Block *blockCache[16][16][16];
 
-	// initializeBlockCache(blockCache);
+	initializeBlockCache(blockCache);
 
-	for (u32 x = 0; x < 16; ++x) {
-		for (u32 y = 0; y < 16; ++y) {
-			for (u32 z = 0; z < 16; ++z) {
-				blockCache[x][y][z] = NULL;
-			}
-		}
-	}
-
-	// for (u32 x = 0; x < 16; ++x) {
-	// 	for (u32 y = 0; y < 16; ++y) {
-	// 		for (u32 z = 0; z < 16; ++z) {
-	// 			if (blockCache[x][y][z] != NULL) {
-	// 				ft_printf_fd(1, "Error not null tiple pointeur\n");
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-    for (s32 i = 0; i < 16; ++i) {
-        for (s32 j = 0; j < 16; ++j) {
-            for (s32 k = 0; k < 16; ++k) {
-				if ((block = blockCreate(i ,j ,k , perlinVal[i][k].normalise, startYWorld))) {
-					hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
-					blockCache[i][j][k] = block;
+    for (s32 x = 0; x < 16; ++x) {
+        for (s32 y = 0; y < 16; ++y) {
+            for (s32 z = 0; z < 16; ++z) {
+				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld))) {
+					hashmap_set_entry(sub_chunk->block_map, (BlockPos){x, y, z}, block);
+					blockCache[x][y][z] = block;
 					updateNeighbors(block, blockCache);
 				}
             }
