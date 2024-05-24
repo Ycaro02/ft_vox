@@ -139,8 +139,8 @@ f32 normalisef32Tof32(f32 value, f32 start1, f32 stop1, f32 start2, f32 stop2) {
 
 /* Interpolate noise value */
 f32 normaliseNoiseGet(u8 **perlinNoise, s32 x, s32 z, s32 width, s32 height, DebugPerlin *perlinVal) {
-    s32 normX = x % width;
-    s32 normZ = z % height;
+    s32 normX = abs(x % width);
+    s32 normZ = abs(z % height);
 
 	perlinVal->z0 = normZ;
 	perlinVal->x0 = normX;
