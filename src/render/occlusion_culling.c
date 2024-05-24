@@ -18,11 +18,10 @@ void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
 		NEIGHBOR_BACK, NEIGHBOR_FRONT
 	};
 	u8 block_masks[6] = {
-		NEIGHBOR_RIGHT, NEIGHBOR_LEFT,
-		NEIGHBOR_TOP, NEIGHBOR_BOTTOM,
-		NEIGHBOR_FRONT, NEIGHBOR_BACK
+		NEIGHBOR_LEFT, NEIGHBOR_RIGHT,
+		NEIGHBOR_BOTTOM, NEIGHBOR_TOP,
+		NEIGHBOR_BACK, NEIGHBOR_FRONT
 	};
-
 	for (u32 i = 0; i < 6; ++i) {
 		if (pos[i].x > 0 && pos[i].x < 16 && pos[i].y > 0 && pos[i].y < 16 && pos[i].z > 0 && pos[i].z < 16) {
 			Block *neighbor = blockCache[pos[i].x][pos[i].y][pos[i].z];
@@ -44,7 +43,6 @@ u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID) {
     while (next) {
         Block *block = (Block *)it.value;
         if (allNeighborsExist(block)) {
-            // block->flag = BLOCK_HIDDEN;
             --nb_block;
         }
         next = hashmap_next(&it);

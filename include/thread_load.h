@@ -37,8 +37,11 @@ FT_INLINE s64 ThreadsAvailableGet() {
 	s64 num_threads = sysconf(_SC_NPROCESSORS_ONLN);
     if (num_threads == -1) {
         perror("sysconf");
-        return 1;
+        return (1);
     }
+	if (num_threads > 1) {
+		num_threads -= 1;
+	}
 	return (num_threads);
 }
 
