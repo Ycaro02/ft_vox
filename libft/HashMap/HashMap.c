@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/24 14:24:41 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/24 14:31:46 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,11 +254,8 @@ s8 hashmap_next(HashMap_it *it) {
     while (it->_idx < map->capacity) {
         entry_node = map->entries[it->_idx];
         if (entry_node != NULL) { /* Found a non-empty list */
-            if (it->_current == NULL) { /*  If it's the first node in the list, set it as the current node */
-                it->_current = entry_node;
-            } else { /* Otherwise, move to the next node in the list */
-                it->_current = it->_current->next;
-            }
+			/* If it's the first node in the list, set it as the current node, Otherwise, move to the next node in the list */
+			it->_current = it->_current == NULL ? entry_node : it->_current->next;
             if (it->_current != NULL) {
                 /* Go to the next entry list */
                 HashMap_entry *entry_tmp = it->_current->content;
