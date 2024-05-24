@@ -26,8 +26,7 @@ typedef struct s_sub_chunks {
 } SubChunks;
 
 typedef struct s_debug_perlin {
-	f32 n0, n1, n2, n3;
-	s32 z0, z1, x0, x1;
+	s32 z0, x0;
 	f32 val;
 	f32 add;
 	s32 normalise;

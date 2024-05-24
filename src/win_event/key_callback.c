@@ -65,8 +65,7 @@ void act_reseCamera(Context *c) {
 void displayPerlinNoise(Chunks *chunks, s32 blockX, s32 blockZ) {
 	DebugPerlin perlin = chunks->perlinVal[blockX][blockZ];
 	ft_printf_fd(1, CYAN"Block Z:|%d|, X:|%d| -> Given Z:[%d] X[%d]: \n"RESET, blockZ, blockX, perlin.givenZ, perlin.givenX);
-	ft_printf_fd(1, PINK"Perlin Idx : Z: [%d][%d] X:[%d][%d]\n"RESET, perlin.z0, perlin.z1, perlin.x0, perlin.x1);
-	ft_printf_fd(1, "Perlin Nval : [%f][%f][%f][%f]\n", perlin.n0, perlin.n1, perlin.n2, perlin.n3);
+	ft_printf_fd(1, PINK"Perlin Idx : Z:[%d] X:[%d]\n"RESET, perlin.z0, perlin.x0);
 	ft_printf_fd(1, "Val:|%f| -> ", perlin.val);
 	ft_printf_fd(1, "Add:|%f| -> ", perlin.add);
 	ft_printf_fd(1, "Normalise:|%d|\n", perlin.normalise);

@@ -44,8 +44,6 @@
 /* Sky path */
 #define TEXTURE_SKY_PATH "rsc/texture/skybox.bmp"
 
-/* Block hiden deine */
-#define BLOCK_HIDDEN 1U
 
 /* World Max size */
 #define WORLD_MAX_HEIGHT 256U
@@ -74,14 +72,25 @@
 
 #define SEA_LEVEL 80.0f
 
+/* Block hiden deine */
+// #define BLOCK_HIDDEN 1U
 
+
+#define NEIGHBOR_RIGHT  0x01
+#define NEIGHBOR_LEFT   0x02
+#define NEIGHBOR_TOP    0x04
+#define NEIGHBOR_BOTTOM 0x08
+#define NEIGHBOR_FRONT  0x10
+#define NEIGHBOR_BACK   0x20
+
+#define BLOCK_HIDDEN (NEIGHBOR_RIGHT | NEIGHBOR_LEFT | NEIGHBOR_TOP | NEIGHBOR_BOTTOM | NEIGHBOR_FRONT | NEIGHBOR_BACK)
 
 typedef struct PACKED_STRUCT s_block {
     s32 x;          /* Block x position */
     s32 y;          /* Block y position (height) */
     s32 z;          /* Block z position */
     s8	type;       /* Block type */
-	u8  flag;       /* Block flag */
+	u8  neighbors;       /* Block flag */
     // u32 chunkId;    /* Chunk ID */
 }   Block;
 

@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/22 16:27:28 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/24 11:23:20 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ typedef struct s_hashmap_it {
 /* First capacity init, prime number arround 100 or 1000*/
 #define HASHMAP_SIZE_100		151U
 #define HASHMAP_SIZE_1000		1009U
+#define HASMAP_SIZE_4000		4099U
 
 /* Hashmap return value */
 #define HASHMAP_UPT_ENTRY		0	/* Update hashmap entry */

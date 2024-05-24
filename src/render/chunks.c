@@ -46,9 +46,20 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	block->x = x;
 	block->y = y;
 	block->z = z;
-	block->flag = 0;
+	block->neighbors = 0;
+	// blockOcllusionCulling(blockMap, block);
 	return (block);
 }
+
+// void initializeBlockCache(Block* blockCache[16][16][16]) {
+//     for (u32 x = 0; x < 16; ++x) {
+//         for (u32 y = 0; y < 16; ++y) {
+//             for (u32 z = 0; z < 16; ++z) {
+//                 blockCache[x][y][z] = NULL;
+//             }
+//         }
+//     }
+// }
 
 /**
  * @brief BRUT fill subchunks with block
@@ -59,12 +70,35 @@ size_t BRUT_fill_subchunks(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb
 {
 	Block *block = NULL;
 	s32 startYWorld = nb * 16;
+	Block *blockCache[16][16][16];
+
+	// initializeBlockCache(blockCache);
+
+	for (u32 x = 0; x < 16; ++x) {
+		for (u32 y = 0; y < 16; ++y) {
+			for (u32 z = 0; z < 16; ++z) {
+				blockCache[x][y][z] = NULL;
+			}
+		}
+	}
+
+	// for (u32 x = 0; x < 16; ++x) {
+	// 	for (u32 y = 0; y < 16; ++y) {
+	// 		for (u32 z = 0; z < 16; ++z) {
+	// 			if (blockCache[x][y][z] != NULL) {
+	// 				ft_printf_fd(1, "Error not null tiple pointeur\n");
+	// 			}
+	// 		}
+	// 	}
+	// }
 
     for (s32 i = 0; i < 16; ++i) {
         for (s32 j = 0; j < 16; ++j) {
             for (s32 k = 0; k < 16; ++k) {
-				if ((block = blockCreate(i,j,k, perlinVal[i][k].normalise, startYWorld))) {
+				if ((block = blockCreate(i ,j ,k , perlinVal[i][k].normalise, startYWorld))) {
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){i, j, k}, block);
+					blockCache[i][j][k] = block;
+					updateNeighbors(block, blockCache);
 				}
             }
         }
@@ -104,39 +138,24 @@ f32 normalisef32Tof32(f32 value, f32 start1, f32 stop1, f32 start2, f32 stop2) {
 }
 
 /* Interpolate noise value */
-f32 getInterpolatedNoise(u8 **perlinNoise, s32 x, s32 z, s32 width, s32 height, DebugPerlin *perlinVal) {
-    s32 x0 = x % width;
-    s32 x1 = (x0 + 1) % width;
-    s32 z0 = z % height;
-    s32 z1 = (z0 + 1) % height;
+f32 normaliseNoiseGet(u8 **perlinNoise, s32 x, s32 z, s32 width, s32 height, DebugPerlin *perlinVal) {
+    s32 normX = x % width;
+    s32 normZ = z % height;
 
-    f32 sx = x - (s32)x;
-    f32 sz = z - (s32)z;
-
-	perlinVal->z0 = z0;
-	perlinVal->z1 = z1;
-	perlinVal->x0 = x0;
-	perlinVal->x1 = x1;
+	perlinVal->z0 = normZ;
+	perlinVal->x0 = normX;
 
 
 	perlinVal->givenX = x;
 	perlinVal->givenZ = z;
 
-	perlinVal->n0 = normalizeU8Tof32(perlinNoise[z0][x0], 0, 255, -1.0f, 1.0f);
-	perlinVal->n1 = normalizeU8Tof32(perlinNoise[z0][x1], 0, 255, -1.0f, 1.0f);
-	perlinVal->n2 = normalizeU8Tof32(perlinNoise[z1][x0], 0, 255, -1.0f, 1.0f);
-	perlinVal->n3 = normalizeU8Tof32(perlinNoise[z1][x1], 0, 255, -1.0f, 1.0f);
-
-    f32 i0 = perlinVal->n0 + sx * (perlinVal->n1 - perlinVal->n0);
-    f32 i1 = perlinVal->n2 + sx * (perlinVal->n3 - perlinVal->n2);
-
-    return (i0 + sz * (i1 - i0));
+	return (normalizeU8Tof32(perlinNoise[normX][normZ], 0, 255, -1.0f, 1.0f));
 }
 
 f32 perlinNoiseHeight(Mutex *mtx, u8 **perlin2D, s32 localX, s32 localZ, DebugPerlin *perlinVal) {
     (void)mtx;
     /* Access the interpolated noise value */
-    perlinVal->val = getInterpolatedNoise(perlin2D, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal);
+    perlinVal->val = normaliseNoiseGet(perlin2D, localX, localZ, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal);
     f32 scale = 60.0f;
 
     if (perlinVal->val > 0.3 && perlinVal->val <= 0.7) {
@@ -181,15 +200,13 @@ void BRUT_FillChunks(Mutex *mtx, u8 **perlin2D, Chunks *chunks) {
 
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
-		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_1000, hashmap_entry_free);
+		chunks->sub_chunks[i].block_map = hashmap_init(HASMAP_SIZE_4000, hashmap_entry_free);
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], perlinVal, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
 		/* SET DEBUG VALUE HERE */
 		chunks->perlinVal = perlinVal;
 	}
 }
-
-
 
 /**
  * @brief Get the block array object
@@ -208,11 +225,7 @@ u32 chunksCubeGet(Chunks *chunks, RenderChunks *render)
 		next = hashmap_next(&it);
 		while (next) {
 			Block *block = (Block *)it.value;
-			/*	Need to change world translation logic must give offset with camera position origin
-				This function can be this implementation but we need to parse chunks HashMap before to
-				give only chunks to render to this function
-			*/
-			if (block->flag != BLOCK_HIDDEN && block->type != AIR) {
+			if (block->neighbors != BLOCK_HIDDEN && block->type != AIR) {
 				render->block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
 				render->block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
 				render->block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
