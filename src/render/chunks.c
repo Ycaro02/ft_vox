@@ -25,14 +25,16 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	Block	*block = NULL;
 	s32		blockType = AIR;
 	s32		realY = startYWorld + y;
+	s32 	seaLevel = (s32)SEA_LEVEL - 30;
 
-	if (realY >=  maxHeight - 4 && realY < maxHeight) {
+
+	if (realY > seaLevel && realY >=  maxHeight - 2 && realY < maxHeight) {
 		blockType = DIRT;
 		if (realY == maxHeight - 1)
 			blockType = GRASS;
-	} else if (realY < maxHeight) {
+	} else if (realY > seaLevel && realY < maxHeight) {
 		blockType = STONE;
-	} else if (realY <= (s32)SEA_LEVEL - 20) {
+	} else if (realY <= seaLevel) {
 		blockType = WATER;
 	} else {
 		return (NULL);
