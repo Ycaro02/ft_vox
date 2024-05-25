@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/24 14:31:46 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/25 12:57:11 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,10 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
 	s8		ret = HASHMAP_NOT_FOUND;
 
+
+	// if (hashmap_capacity(map) <= hashmap_size(map)) {
+	// 	hashmap_expand(map);
+	// }
 
 	mtx_lock(&map->mtx);
 	if (( ret = hashmap_search_entry_update(map, index, key, p, value)) != HASHMAP_NOT_FOUND) {

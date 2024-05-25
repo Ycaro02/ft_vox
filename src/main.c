@@ -16,8 +16,8 @@ void drawAllChunks(Context *c, GLuint VAO) {
 	}
 
 	mtx_lock(&c->threadContext->mtx);
-	ft_printf_fd(1, RESET_LINE""GREEN"Nb Chunk Rendered: %d,"RESET""ORANGE" Loaded: %d, "RESET""CYAN" To load: %d"RESET
-		, chunkRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad));
+	ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %d,"RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
+		, chunkRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
 	mtx_unlock(&c->threadContext->mtx);
 }
 
