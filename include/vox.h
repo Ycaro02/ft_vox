@@ -86,8 +86,7 @@ typedef struct PACKED_STRUCT s_block {
     s32 y;          /* Block y position (height) */
     s32 z;          /* Block z position */
     s8	type;       /* Block type */
-	u8  neighbors;       /* Block flag */
-    // u32 chunkId;    /* Chunk ID */
+	u8  neighbors;  /* Block flag */
 }   Block;
 
 enum AtlasID {

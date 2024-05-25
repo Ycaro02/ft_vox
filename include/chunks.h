@@ -22,7 +22,6 @@ typedef struct s_debug_perlin {
 	s32 givenX, givenZ;
 } DebugPerlin;
 
-
 typedef struct s_chunks {
 	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 	u32				nb_block;					/* nb block (outdated value total of blockmap subchunk) */

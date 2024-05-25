@@ -146,9 +146,9 @@ int main() {
 
 	if (!(context.world = ft_calloc(sizeof(World), 1))) {
 		return (1);
-	} else if (!(context.world->chunksMap = hashmap_init(HASHMAP_SIZE_100, chunksMapFree))) {
+	} else if (!(context.world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree))) {
 		return (1);
-	} else if (!(context.world->renderChunksCacheMap = hashmap_init(HASHMAP_SIZE_100, renderChunksMapFree))) {
+	} else if (!(context.world->renderChunksCacheMap = hashmap_init(HASHMAP_SIZE_2000, renderChunksMapFree))) {
 		return (1);
 	}
 

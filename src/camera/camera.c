@@ -66,9 +66,9 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
 
 	ft_bzero(&camera, sizeof(Camera));
     /* init camera position */
-	glm_vec3_copy((vec3){1.0f, 10.0f, 1.0f}, camera.position);
+	glm_vec3_copy((vec3){1.0f, 50.0f, 1.0f}, camera.position);
     /* init camera target */
-	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, camera.target);
+	glm_vec3_copy((vec3){0.0f, 50.0f, 0.0f}, camera.target);
     /* init up vector */
 	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, camera.up);
 
@@ -247,9 +247,9 @@ void reseCamera(void *context)
 	Context *c = context;
 
     /* init camera position */
-	glm_vec3_copy((vec3){0.0f, 10.0f, 0.0f}, c->cam.position);
+	glm_vec3_copy((vec3){1.0f, 50.0f, 1.0f}, c->cam.position);
     /* init camera target */
-	glm_vec3_copy((vec3){1.0f, 10.0f, 1.0f}, c->cam.target);
+	glm_vec3_copy((vec3){0.0f, 50.0f, 0.0f}, c->cam.target);
     /* init up vector */
 	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, c->cam.up);
 

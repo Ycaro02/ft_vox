@@ -4,7 +4,6 @@
 #include "vox.h"
 #include "cube.h"
 
-
 typedef struct s_camera Camera;
 typedef struct s_thread_entity ThreadEntity;
 typedef mtx_t Mutex;

@@ -176,7 +176,7 @@ void BRUT_FillChunks(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
-		chunks->sub_chunks[i].block_map = hashmap_init(HASMAP_SIZE_4000, hashmap_entry_free);
+		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
 		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], perlinVal, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
 		/* SET DEBUG VALUE HERE */
