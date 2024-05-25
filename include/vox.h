@@ -22,7 +22,7 @@
 
 #define CAM_FOV			80.0f			/* Camera field of view */
 
-#define CHUNKS_LOAD_RADIUS 15			/* Chunks load radius */
+#define CHUNKS_LOAD_RADIUS 10			/* Chunks load radius */
 // #define CHUNKS_LOAD_RADIUS 1			/* Chunks load radius */
 
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
@@ -62,9 +62,12 @@
 #define TEST_CHUNK_MAX 9
 
 /* Perlin noise value generation for relief */
-#define PERLIN_OCTAVE 6
+#define PERLIN_OCTAVE 8
 #define PERLIN_PERSISTENCE 1.0
 #define PERLIN_LACUNARITY 2.0
+// #define PERLIN_OCTAVE 6
+// #define PERLIN_PERSISTENCE 1.0
+// #define PERLIN_LACUNARITY 2.0
 
 #define SEA_LEVEL 80.0f
 
