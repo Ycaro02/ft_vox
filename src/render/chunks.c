@@ -111,11 +111,11 @@ s32 maxHeightGet(DebugPerlin **perlinVal) {
 }
 
 f32 normalisef32Tof32(f32 value, f32 start1, f32 stop1, f32 start2, f32 stop2) {
-	return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
+	return (start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1)));
 }
 
 f32 perlinInterpolate(f32 a, f32 b, f32 t) {
-    return a + t * (b - a);
+    return (a + t * (b - a));
 }
 
 f32 bilinearInterpolation(f32 q11, f32 q12, f32 q21, f32 q22, f32 x, f32 z) {
