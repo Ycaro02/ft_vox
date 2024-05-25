@@ -213,13 +213,11 @@ s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
  * @return ThreadData pointer to the nearest chunks to load
 */
 ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
-	ThreadData *tdata = NULL;
-	s32 distance = -1;
-	s32 tmpDistance = 0;
-	BlockPos pos = {0, 0, 0};
-	HashMap_it it = hashmap_iterator(chunksMapToLoad);
-	s8 next = 0;
-
+	BlockPos 	pos = {0, 0, 0};
+	HashMap_it	it = hashmap_iterator(chunksMapToLoad);
+	ThreadData	*tdata = NULL;
+	s32			distance = -1, tmpDistance = 0;
+	s8 			next = 0;
 
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
