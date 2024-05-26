@@ -15,7 +15,8 @@ ALL_SRC_DIR		=	$(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_SRC_DIR))
 
 MAIN_MANDATORY 	=	main.c
 
-SRCS			=	window/openGL_glw_init.c\
+SRCS			=	context_init.c\
+					window/openGL_glw_init.c\
 					win_event/key_callback.c\
 					glad/gl.c\
 					camera/camera.c\

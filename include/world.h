@@ -31,14 +31,18 @@ typedef struct s_context {
 	Camera				cam;				/* camera structure */
     GLFWwindow			*win_ptr;			/* Window pointer */
 	ModelCube			cube;				/* Data Cube structure */
-	GLuint				cubeShaderID;		/* shader program id */
-	GLuint				skyboxShaderID;		/* shader program id */
-	GLuint				skyboxVAO;			/* skybox VAO */
 	u32					renderBlock;		/* Total block to render */
 	ThreadContext		*threadContext;		/* Thread context */
 	s8					isPlaying;			/* Game is playing */
 	f32					**perlin2D;			/* Perlin noise 2D */
 	t_list				*vboToDestroy;		/* VBO to destroy */
+	// t_list				*vboToCreate;		/* VBO to create */
+	Mutex				renderMtx;				/* Mutex to protect VBO */
+	GLuint				cubeShaderID;		/* shader program id */
+	GLuint				skyboxShaderID;		/* shader program id */
+	GLuint				skyboxVAO;			/* skybox VAO */
+	GLuint				cubeVAO;			/* cube VAO */
+	GLuint				skyTexture;			/* skybox VAO */
 } Context;
 
 /* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */
@@ -62,5 +66,13 @@ FT_INLINE s8 voxIsRunning(Context *context) {
 	mtx_unlock(&context->threadContext->mtx);
 	return (playing);
 }
+
+Context *contextInit();
+u8 *perlinNoiseGeneration(unsigned int seed);
+f32 **array1DTo2D(u8 *array, u32 height, u32 width);
+f32 normalizeU8Tof32(u8 value, u8 start1, u8 stop1, f32 start2, f32 stop2);
+
+
+s8 contextTextureInit(Context *context);
 
 #endif /* HEADER_WORLD_H */
