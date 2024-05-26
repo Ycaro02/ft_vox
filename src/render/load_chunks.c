@@ -178,6 +178,8 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 
 	/* LOCK */
 	mtx_lock(&c->threadContext->mtx);
+	// suseconds_t currentTime = get_ms_time();
+
 
 	/* Loop on the complete camera fov */
     for (f32 angle = radiusStart; angle <= radiusEnd; angle += ANGLE_INCREMENT) {
@@ -215,6 +217,7 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 
 		}
     }
+	// ft_printf_fd(1, "Time to load chunks: %u ms\n", get_ms_time() - currentTime);
 	mtx_unlock(&c->threadContext->mtx);
 	/* UNLOCK */	
 

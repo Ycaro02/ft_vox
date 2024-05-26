@@ -1,9 +1,7 @@
 #include "../include/vox.h"			/* Main project header */
 #include "../include/skybox.h"		/* skybox rendering */
-#include "../include/chunks.h"		/* Chunks */
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
-#include "../include/thread_load.h"
 
 
 void drawAllChunks(Context *c, GLuint VAO) {
