@@ -4,6 +4,10 @@
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
 
+s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
+	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
+}
+
 /* Basic function you can provide to hashmap_init */
 void chunksMapFree(void *entry) {
 	HashMap_entry *e = (HashMap_entry *)entry;

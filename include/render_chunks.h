@@ -26,6 +26,7 @@ RenderChunks 	*renderChunkCreate(Chunks *chunks);
 s8				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 s8				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
 void			chunksViewHandling(Context *c, HashMap *renderChunksMap);
+void 			renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap);
 
 /* render/occlusion_culling */
 u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);

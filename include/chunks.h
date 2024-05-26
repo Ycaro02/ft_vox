@@ -30,8 +30,8 @@ typedef struct s_chunks {
 	u32				visible_block;				/* Number of visible block */
 	s32				x;							/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;							/* Chunk offset Z can be negative (relative to origine chunks) */
+	suseconds_t		lastUpdate;					/* Last update time */
 	DebugPerlin		**perlinVal;				/* Perlin noise value */
-
 	RenderChunks 	*render;					/* RenderChunks pointer */
 } Chunks;
 
@@ -39,6 +39,8 @@ typedef struct s_chunks {
 void chunksMapFree(void *entry);
 
 /* chunks */
-Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ);;
+Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ);
+s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
+void unloadChunkHandler(Context *c);
 
 #endif /* HEADER_CHUNKS_H */

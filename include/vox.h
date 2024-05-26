@@ -176,6 +176,20 @@ void set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *
 GLuint load_cubemap(char* path, int squareHeight, int squareWidth);
 
 
+#include <sys/time.h>
+
+/**
+ * @brief Get current time in microseconds
+ * @return current time in microseconds
+*/
+FT_INLINE suseconds_t  get_ms_time(void) {
+	struct timeval  now;
+
+	if (gettimeofday(&now, NULL) != 0)
+			return (0);
+	return ((now.tv_sec * 1000000) + now.tv_usec);
+}
+
 
 #endif /* VOX_HEADER_H */
 

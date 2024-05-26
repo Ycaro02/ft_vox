@@ -5,7 +5,12 @@
 #include "../include/perlin_noise.h"
 #include "../include/thread_load.h"
 
+
+
 void drawAllChunks(Context *c, GLuint VAO) {
+	mtx_lock(&c->threadContext->mtx);
+
+
 	HashMap_it	it = hashmap_iterator(c->world->renderChunksMap);
 	s8			next = 1;
 	u32 		chunkRenderNb = 0;
@@ -15,9 +20,10 @@ void drawAllChunks(Context *c, GLuint VAO) {
 		chunkRenderNb++;
 	}
 
-	mtx_lock(&c->threadContext->mtx);
 	ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %d,"RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
 		, chunkRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
+
+
 	mtx_unlock(&c->threadContext->mtx);
 }
 
@@ -128,19 +134,16 @@ int main() {
 	/* init context camera */
 	context.cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(SCREEN_WIDTH, SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
     glm_mat4_identity(context.cube.rotation);
-	// display_camera_value(&context);
 
+	GLuint cubeVAO = setupCubeVAO(&context.cube);
+	/* Free only entry pointer cause renderChunks stored in chunks structure in chunksMap */
+	context.world->renderChunksMap = hashmap_init(HASHMAP_SIZE_2000, hashmap_free_node_only);
 
 	/* Init chunks */
 	if (!threadSupervisorInit(&context)) {
 		ft_printf_fd(2, "Error: threadSupervisorInit failed\n");
 		return (1);
 	}
-	// chunksLoadArround(&context, 10);
-	GLuint cubeVAO = setupCubeVAO(&context.cube);
-	// context.world->renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
-	/* Free only entry pointer cause renderChunks stored in chunks structure in chunksMap */
-	context.world->renderChunksMap = hashmap_init(HASHMAP_SIZE_2000, hashmap_free_node_only);
 
 	/* Init skybox */
 	context.skyboxVAO = skyboxInit();

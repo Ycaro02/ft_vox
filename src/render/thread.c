@@ -1,5 +1,6 @@
 #include "../../include/thread_load.h"
 #include "../../include/chunks.h"
+#include "../../include/render_chunks.h"
 
 /**
  * @brief Initialize the thread workers system, allocate memory for the workers based 
@@ -143,6 +144,19 @@ s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
 	return (FALSE);
 }
 
+void chunksQueueRemoveHandling(HashMap *chunksMapToLoad, s32 camChunkX, s32 camChunkZ) {
+	HashMap_it it = hashmap_iterator(chunksMapToLoad);
+	s8 next = TRUE;
+	BlockPos pos = {0, 0, 0};
+
+	while ((next = hashmap_next(&it))) {
+		pos = ((HashMap_entry *)it._current->content)->origin_data;
+		if (chunkDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_LOAD_RADIUS + 2) {
+			hashmap_remove_entry(chunksMapToLoad, pos, HASHMAP_FREE_DATA);
+		}
+	}
+}
+
 /**
  * @brief Lock before to call this function
  * @brief Add chunks to the queue to load if not already in the queue
@@ -200,10 +214,6 @@ s8 threadChunksLoadArround(Context *c, s32 radius) {
 		}
 	}
 	return (TRUE);
-}
-
-s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
-	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
 }
 
 /**
@@ -268,6 +278,11 @@ s32 threadHandling(void *context) {
 			/* If chunks queue is empty we can wait 10 milisec before rescan arround */
 			 usleep(10000);
 		}
+	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
+		unloadChunkHandler(c);
+		mtx_lock(&c->threadContext->mtx);
+		chunksQueueRemoveHandling(c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);
+		mtx_unlock(&c->threadContext->mtx);
 	}
 
 	supervisorWaitWorker(c);

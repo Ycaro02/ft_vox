@@ -7,14 +7,14 @@ GLuint setupInstanceVBOForThisChunk(vec3* block_array, u32 visibleBlock) {
 }
 
 void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
-    chunksCubeGet(chunks, render);
+	chunksCubeGet(chunks, render);
 }
 
 void renderChunkFree(RenderChunks *render) {
 	free(render->blockTypeID);
 	free(render->block_array);
-	glDeleteBuffers(1, &render->instanceVBO);
-	glDeleteBuffers(1, &render->typeBlockVBO);
+	// glDeleteBuffers(1, &render->instanceVBO);
+	// glDeleteBuffers(1, &render->typeBlockVBO);
 	free(render);
 }
 
@@ -56,5 +56,6 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
 	fillBlockArrayForChunk(render, chunks);
 	render->instanceVBO = setupInstanceVBOForThisChunk(render->block_array, render->visibleBlock); // crée un VBO pour les données d'instance de ce render
 	render->typeBlockVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->visibleBlock * sizeof(GLuint), (void *)&render->blockTypeID[0]);
+	
 	return (render);
 }
