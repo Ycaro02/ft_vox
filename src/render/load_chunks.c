@@ -162,6 +162,10 @@ void renderChunksVBODestroy(Context *c) {
  * @param renderChunksMap Render chunks map
 */
 void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
+  	/*	
+  		This func must be call by sub thread but we need to do modification before 
+		(RenderChunk init must store a list of renderChunk created to init vbo in main thread)
+	*/
     vec3            start, rayDir, chunkPos, currPos, travelVector;
     f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV - 10.0f) / 2.0f;
