@@ -16,6 +16,9 @@ void chunksMapFree(void *entry) {
 			free(chunks->perlinVal[i]);
 		}
 		free(chunks->perlinVal);
+		if (chunks->render) {
+			renderChunkFree(chunks->render);
+		}
 		free(e->value); /* free the value (allocaated ptr) */
 	}
 	free(e); /* free the entry t_list node */
@@ -49,7 +52,6 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	block->y = y;
 	block->z = z;
 	block->neighbors = 0;
-	// blockOcllusionCulling(blockMap, block);
 	return (block);
 }
 

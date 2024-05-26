@@ -71,23 +71,21 @@
 
 #define SEA_LEVEL 80.0f
 
-/* Block hiden deine */
-// #define BLOCK_HIDDEN 1U
+/* Neighbor flag value */
+#define NEIGHBOR_RIGHT  1U
+#define NEIGHBOR_LEFT   2U
+#define NEIGHBOR_TOP    4U
+#define NEIGHBOR_BOTTOM 8U
+#define NEIGHBOR_FRONT  16U
+#define NEIGHBOR_BACK   32U
 
-
-#define NEIGHBOR_RIGHT  0x01
-#define NEIGHBOR_LEFT   0x02
-#define NEIGHBOR_TOP    0x04
-#define NEIGHBOR_BOTTOM 0x08
-#define NEIGHBOR_FRONT  0x10
-#define NEIGHBOR_BACK   0x20
-
+/* If all neighnor block is hidden */
 #define BLOCK_HIDDEN (NEIGHBOR_RIGHT | NEIGHBOR_LEFT | NEIGHBOR_TOP | NEIGHBOR_BOTTOM | NEIGHBOR_FRONT | NEIGHBOR_BACK)
 
 typedef struct PACKED_STRUCT s_block {
-    s32 x;          /* Block x position */
-    s32 y;          /* Block y position (height) */
-    s32 z;          /* Block z position */
+    s8 	x;          /* Block x position */
+    s8 	y;          /* Block y position (height) */
+    s8 	z;          /* Block z position */
     s8	type;       /* Block type */
 	u8  neighbors;  /* Block flag */
 }   Block;

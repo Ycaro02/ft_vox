@@ -14,6 +14,14 @@ s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
 	return (hashmap_get(renderChunksMap, chunkID) != NULL);
 }
 
+s8 chunksRenderIsLoaded(Chunks *chunk) {
+	if (chunk) {
+		return (chunk->render != NULL);
+	}
+	return (FALSE);
+}
+
+
 /**
  * @brief Check if a chunk is already in chunk map
  * @param renderChunksMap Render chunks map
@@ -24,9 +32,9 @@ s8 chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID) {
 	return (hashmap_get(chunksMap, chunkID) != NULL);
 }
 
-s8 renderChunkIsCached(HashMap *renderChunksCacheMap, BlockPos chunkID) {
-	return (hashmap_get(renderChunksCacheMap, chunkID) != NULL);
-}
+// s8 renderChunkIsCached(HashMap *renderChunksCacheMap, BlockPos chunkID) {
+// 	return (hashmap_get(renderChunksCacheMap, chunkID) != NULL);
+// }
 
 /**
  * @brief Convert world position to chunk offset
@@ -72,12 +80,12 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 
 	for (t_list *current = toRemoveList; current; current = current->next) {
 		BlockPos renderChunkID = *(BlockPos *)current->content;
-		RenderChunks *renderSave = hashmap_get(renderChunksMap, renderChunkID);
+		// RenderChunks *renderSave = hashmap_get(renderChunksMap, renderChunkID);
 
 		hashmap_remove_entry(renderChunksMap, renderChunkID, HASHMAP_FREE_NODE);
-		if (!renderChunkIsCached(c->world->renderChunksCacheMap, renderChunkID)) {
-			hashmap_set_entry(c->world->renderChunksCacheMap, renderChunkID, renderSave);
-		}
+		// if (!renderChunkIsCached(c->world->renderChunksCacheMap, renderChunkID)) {
+		// 	hashmap_set_entry(c->world->renderChunksCacheMap, renderChunkID, renderSave);
+		// }
 	}
 
 	ft_lstclear(&toRemoveList, free);
@@ -91,17 +99,18 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
  * @param renderChunksMap Render chunks map
 */
 void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
-    RenderChunks    *render = NULL;
     vec3            start, rayDir, chunkPos, currPos, travelVector;
     f32             current = 0;
-    f32             angle;
+	f32 			radiusMinusDiv2 = (-CAM_FOV - 10.0f) / 2.0f;
+	f32 			radiusPlusDiv2 = (CAM_FOV + 10.0f) / 2.0f;
 
     glm_vec3_copy(c->cam.position, start);
     glm_vec3_zero(chunkPos);
     glm_vec3_zero(currPos);
 
+
 	/* Loop on the complete camera fov */
-    for (angle = -CAM_FOV / 2; angle <= CAM_FOV / 2; angle += ANGLE_INCREMENT) {
+    for (f32 angle = radiusMinusDiv2; angle <= radiusPlusDiv2; angle += ANGLE_INCREMENT) {
         glm_vec3_copy(c->cam.viewVector, rayDir);
         glm_vec3_rotate(rayDir, glm_rad(angle), (vec3){0.0f, 1.0f, 0.0f});
 
@@ -125,11 +134,15 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
                 inView = isChunkInFrustum(&c->cam.frustum, &box);
             }
 
-            if (!chunksIsRenderer(renderChunksMap, chunkID) && inView) {
-                render = renderChunkCreate(c->world->renderChunksCacheMap, chunks);
-                hashmap_set_entry(renderChunksMap, chunkID, render);
-            } 
-        }
+			if (inView) {
+				if (!chunksRenderIsLoaded(chunks)) {
+					chunks->render = renderChunkCreate(chunks);
+				} else if (!chunksIsRenderer(renderChunksMap, chunkID)) {
+                	hashmap_set_entry(renderChunksMap, chunkID, chunks->render);
+				}
+			}
+		
+		}
     }
 
     renderChunksFrustrumRemove(c, renderChunksMap);

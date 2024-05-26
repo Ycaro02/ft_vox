@@ -9,9 +9,10 @@
 /* Number of subchunks in chunk  */
 #define SUB_CHUNKS_MAX (CHUNKS_HEIGHT / SUB_CHUNKS_HEIGHT)
 
+typedef struct s_render_chunks RenderChunks;
+
 typedef struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
-	s32				y;
 } SubChunks;
 
 typedef struct s_debug_perlin {
@@ -30,6 +31,8 @@ typedef struct s_chunks {
 	s32				x;							/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;							/* Chunk offset Z can be negative (relative to origine chunks) */
 	DebugPerlin		**perlinVal;				/* Perlin noise value */
+
+	RenderChunks 	*render;					/* RenderChunks pointer */
 } Chunks;
 
 

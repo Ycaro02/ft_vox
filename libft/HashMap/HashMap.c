@@ -6,12 +6,16 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/25 12:57:11 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/26 11:24:00 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HashMap.h"
 #include "primeNumber.h"
+
+void hashmap_free_node_only(void *entry) {
+	free(entry);
+}
 
 /* Basic function you can provide to hashmap_init */
 void hashmap_entry_free(void *entry) {

@@ -35,7 +35,7 @@ void extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view) {
 
     /* Normalize planes */
     for (int i = 0; i < 6; i++) {
-        float length = sqrtf(frustum->planes[i][0] * frustum->planes[i][0] +
+        f32 length = sqrtf(frustum->planes[i][0] * frustum->planes[i][0] +
                              frustum->planes[i][1] * frustum->planes[i][1] +
                              frustum->planes[i][2] * frustum->planes[i][2]);
         frustum->planes[i][0] /= length;
@@ -61,9 +61,9 @@ s8 isChunkInFrustum(Frustum *frustum, BoundingBox *box) {
     glm_vec3_copy((vec3){box->max[0], box->max[1], box->max[2]}, corners[7]);
 
     // Check each plane
-    for (int i = 0; i < 6; i++) {
-        int inCount = 0;
-        for (int j = 0; j < 8; j++) {
+    for (s32 i = 0; i < 6; i++) {
+        s32 inCount = 0;
+        for (s32 j = 0; j < 8; j++) {
             if (glm_vec4_dot((vec4){corners[j][0], corners[j][1], corners[j][2], 1.0f}, frustum->planes[i]) > 0.0f)
                 inCount++;
         }

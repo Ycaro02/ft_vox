@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/25 14:54:17 by nfour            ###   ########.fr       */
+/*   Updated: 2024/05/26 11:24:16 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,7 @@ HashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj));
  * @param entry entry to free
 */
 void hashmap_entry_free(void *entry);
+void hashmap_free_node_only(void *entry);
 
 /**
  * @brief HashMap destroy the map and free all the memory

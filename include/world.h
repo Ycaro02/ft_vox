@@ -13,7 +13,7 @@ typedef struct s_world {
 	u64				seed;					/* World seed */
 	HashMap			*chunksMap;				/* Chunks hashmap */
 	HashMap			*renderChunksMap;		/* Render chunks map */
-	HashMap			*renderChunksCacheMap;	/* Cache of renderchunks to avoid multiple creation/destroy of VBO */
+	// HashMap			*renderChunksCacheMap;	/* Cache of renderchunks to avoid multiple creation/destroy of VBO */
 } World;
 
 typedef struct s_thread_context {

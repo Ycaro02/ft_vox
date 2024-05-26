@@ -28,39 +28,6 @@ void chunksRender(Context *c, GLuint VAO, GLuint shader_id) {
     glFlush();
 }
 
-
-void renderChunkCacheMapDestroy(HashMap *renderChunkCache, HashMap *renderChunks) {
-	HashMap_it	it = hashmap_iterator(renderChunkCache);
-	t_list		*removeNodeList = NULL, *removeDataList = NULL;
-	BlockPos	*tmpChunkID = NULL;
-	s8			next = TRUE;
-
-	while ((next = hashmap_next(&it))) {
-		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
-		tmpChunkID = malloc(sizeof(BlockPos));
-		ft_memcpy(tmpChunkID, &chunkID, sizeof(BlockPos));
-		if (chunksIsRenderer(renderChunks, chunkID)) {
-			ft_lstadd_front(&removeNodeList, ft_lstnew(tmpChunkID));
-		} else {
-			ft_lstadd_front(&removeDataList, ft_lstnew(tmpChunkID));
-		}
-	}
-
-	for (t_list *current = removeNodeList; current; current = current->next) {
-		hashmap_remove_entry(renderChunkCache, *(BlockPos *)current->content, HASHMAP_FREE_NODE);
-	}
-
-	for (t_list *current = removeDataList; current; current = current->next) {
-		hashmap_remove_entry(renderChunkCache, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
-	}
-
-
-	ft_lstclear(&removeNodeList, free);
-	ft_lstclear(&removeDataList, free);
-
-	hashmap_destroy(renderChunkCache);
-}
-
 void vox_destroy(Context *c) {
 	s32 status = 0;
 	mtx_lock(&c->threadContext->mtx);
@@ -75,8 +42,7 @@ void vox_destroy(Context *c) {
 
 	mtx_destroy(&c->threadContext->mtx);
 
-	/* We need special logic to destroy renderChunksCacheMap cause data store is shared with renderChunksMap */
-	renderChunkCacheMapDestroy(c->world->renderChunksCacheMap, c->world->renderChunksMap);
+
 	hashmap_destroy(c->world->renderChunksMap);
 	hashmap_destroy(c->world->chunksMap);
 
@@ -148,9 +114,7 @@ int main() {
 		return (1);
 	} else if (!(context.world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree))) {
 		return (1);
-	} else if (!(context.world->renderChunksCacheMap = hashmap_init(HASHMAP_SIZE_2000, renderChunksMapFree))) {
-		return (1);
-	}
+	} 
 
 	u8 *perlin1D = perlinNoiseGeneration(42); /* seed 42 */
 	if (!perlin1D) {
@@ -174,7 +138,9 @@ int main() {
 	}
 	// chunksLoadArround(&context, 10);
 	GLuint cubeVAO = setupCubeVAO(&context.cube);
-	context.world->renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
+	// context.world->renderChunksMap = chunksToRenderChunks(&context, context.world->chunksMap);
+	/* Free only entry pointer cause renderChunks stored in chunks structure in chunksMap */
+	context.world->renderChunksMap = hashmap_init(HASHMAP_SIZE_2000, hashmap_free_node_only);
 
 	/* Init skybox */
 	context.skyboxVAO = skyboxInit();
@@ -195,3 +161,38 @@ int main() {
     vox_destroy(&context);
     return (0);
 }
+
+
+
+
+/* We need special logic to destroy renderChunksCacheMap cause data store is shared with renderChunksMap */
+// renderChunkCacheMapDestroy(c->world->renderChunksCacheMap, c->world->renderChunksMap);
+// void renderChunkCacheMapDestroy(HashMap *renderChunkCache, HashMap *renderChunks) {
+// 	HashMap_it	it = hashmap_iterator(renderChunkCache);
+// 	t_list		*removeNodeList = NULL, *removeDataList = NULL;
+// 	BlockPos	*tmpChunkID = NULL;
+// 	s8			next = TRUE;
+
+// 	while ((next = hashmap_next(&it))) {
+// 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
+// 		tmpChunkID = malloc(sizeof(BlockPos));
+// 		ft_memcpy(tmpChunkID, &chunkID, sizeof(BlockPos));
+// 		if (chunksIsRenderer(renderChunks, chunkID)) {
+// 			ft_lstadd_front(&removeNodeList, ft_lstnew(tmpChunkID));
+// 		} else {
+// 			ft_lstadd_front(&removeDataList, ft_lstnew(tmpChunkID));
+// 		}
+// 	}
+
+// 	for (t_list *current = removeNodeList; current; current = current->next) {
+// 		hashmap_remove_entry(renderChunkCache, *(BlockPos *)current->content, HASHMAP_FREE_NODE);
+// 	}
+
+// 	for (t_list *current = removeDataList; current; current = current->next) {
+// 		hashmap_remove_entry(renderChunkCache, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
+// 	}
+// 	ft_lstclear(&removeNodeList, free);
+// 	ft_lstclear(&removeDataList, free);
+
+// 	hashmap_destroy(renderChunkCache);
+// }
