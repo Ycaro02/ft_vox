@@ -13,6 +13,7 @@ void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
 void renderChunkFree(RenderChunks *render) {
 	free(render->blockTypeID);
 	free(render->block_array);
+	/* Care here we can't destroy VBO in sub thread */
 	// glDeleteBuffers(1, &render->instanceVBO);
 	// glDeleteBuffers(1, &render->typeBlockVBO);
 	free(render);
