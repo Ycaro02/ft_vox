@@ -78,6 +78,7 @@ void unloadChunkHandler(Context *c) {
 				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 					ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
 					ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
+					/* We need to store vbo to destroy in list to give to main thread */
 					if (chunk->render) {
 						if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
 							*instanceVBO = chunk->render->instanceVBO;
@@ -108,38 +109,50 @@ void unloadChunkHandler(Context *c) {
  * @param renderChunksMap Render chunks map
 */
 void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
-	Chunks 			*chunks = NULL;
 	s8 				next = TRUE;
 	t_list			*toRemoveList = NULL;
 	BlockPos		*chunkIDToRemove = NULL;
-
+	HashMap_it 		it;
+	Chunks 			*chunks;
+	
 	mtx_lock(&c->threadContext->mtx);
-	HashMap_it 		it = hashmap_iterator(renderChunksMap);
+	/* LOCK */
+	it = hashmap_iterator(renderChunksMap);
 	
 	while ((next = hashmap_next(&it))) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		chunks = hashmap_get(c->world->chunksMap, chunkID);
-		// mtx_unlock(&c->threadContext->mtx);
 		if (chunks) {
 			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
 			if (!isChunkInFrustum(&c->cam.frustum, &box)) {
-				if (!(chunkIDToRemove = malloc(sizeof(BlockPos)))) {
-					return ;
+				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
+					ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
+					ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
 				}
-				ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
-				ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
 			}
 		}
 	}
 
-	// mtx_lock(&c->threadContext->mtx);
 	for (t_list *current = toRemoveList; current; current = current->next) {
 		hashmap_remove_entry(renderChunksMap, *(BlockPos *)current->content, HASHMAP_FREE_NODE);
 	}
 	mtx_unlock(&c->threadContext->mtx);
+	/* UNLOCK */
 
 	ft_lstclear(&toRemoveList, free);
 
+}
+
+
+void renderChunksVBODestroy(Context *c) {
+	mtx_lock(&c->threadContext->mtx);
+	for (t_list *current = c->vboToDestroy; current; current = current->next) {
+		GLuint *vbo = (GLuint *)current->content;
+		glDeleteBuffers(1, vbo);
+		// free(vbo);
+	}
+	ft_lstclear(&c->vboToDestroy, free);
+	mtx_unlock(&c->threadContext->mtx);
 }
 
 /**
@@ -201,12 +214,5 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 	mtx_unlock(&c->threadContext->mtx);
 	/* UNLOCK */	
 
-    // renderChunksFrustrumRemove(c, renderChunksMap);
-
-	for (t_list *current = c->vboToDestroy; current; current = current->next) {
-		GLuint *vbo = (GLuint *)current->content;
-		glDeleteBuffers(1, vbo);
-		// free(vbo);
-	}
-	ft_lstclear(&c->vboToDestroy, free);
+	renderChunksVBODestroy(c);
 }

@@ -144,17 +144,21 @@ s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
 	return (FALSE);
 }
 
-void chunksQueueRemoveHandling(HashMap *chunksMapToLoad, s32 camChunkX, s32 camChunkZ) {
-	HashMap_it it = hashmap_iterator(chunksMapToLoad);
+void chunksQueueRemoveHandling(Mutex *mtx, HashMap *chunksMapToLoad, s32 camChunkX, s32 camChunkZ) {
+	HashMap_it it;
 	s8 next = TRUE;
 	BlockPos pos = {0, 0, 0};
 
+	mtx_lock(mtx); /* LOCK */
+	it = hashmap_iterator(chunksMapToLoad);
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
 		if (chunkDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_LOAD_RADIUS + 2) {
 			hashmap_remove_entry(chunksMapToLoad, pos, HASHMAP_FREE_DATA);
 		}
 	}
+	mtx_unlock(mtx); /* UNLOCK */
+
 }
 
 /**
@@ -250,6 +254,7 @@ s32 threadHandling(void *context) {
 	Context *c = (Context *)context;
 	ThreadData *tdata = NULL;
 	size_t mapSize = 0;
+	Mutex *mtx = &c->threadContext->mtx;
 
 
 	if (!threadWorkersInit(c)) {
@@ -259,20 +264,20 @@ s32 threadHandling(void *context) {
 
 	while (voxIsRunning(c)) {
 		threadChunksLoadArround(c, CHUNKS_LOAD_RADIUS);
-		mtx_lock(&c->threadContext->mtx);
+		mtx_lock(mtx);
 		mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
-		mtx_unlock(&c->threadContext->mtx);
+		mtx_unlock(mtx);
 		if (mapSize > 0) {
-			mtx_lock(&c->threadContext->mtx);
+			mtx_lock(mtx);
 			tdata = chunksToLoadNearestGet(c, c->threadContext->chunksMapToLoad);
-			mtx_unlock(&c->threadContext->mtx);
+			mtx_unlock(mtx);
 			/* Lock in this */
-			if (tdata && threadInitChunkLoad(c, &c->threadContext->mtx, tdata->chunkX, tdata->chunkZ)) {
-				mtx_lock(&c->threadContext->mtx);
+			if (tdata && threadInitChunkLoad(c, mtx, tdata->chunkX, tdata->chunkZ)) {
+				mtx_lock(mtx);
 				hashmap_remove_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(tdata->chunkX, tdata->chunkZ), HASHMAP_FREE_DATA);
 				mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
 				// free(tdata);
-				mtx_unlock(&c->threadContext->mtx);
+				mtx_unlock(mtx);
 			}
 		} else {
 			/* If chunks queue is empty we can wait 10 milisec before rescan arround */
@@ -280,9 +285,7 @@ s32 threadHandling(void *context) {
 		}
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
-		mtx_lock(&c->threadContext->mtx);
-		chunksQueueRemoveHandling(c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);
-		mtx_unlock(&c->threadContext->mtx);
+		chunksQueueRemoveHandling(&c->threadContext->mtx , c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);
 	}
 
 	supervisorWaitWorker(c);

@@ -55,7 +55,12 @@ RenderChunks *renderChunkCreate(Chunks *chunks) {
 		return (NULL);
 	}
 	fillBlockArrayForChunk(render, chunks);
-	render->instanceVBO = setupInstanceVBOForThisChunk(render->block_array, render->visibleBlock); // crée un VBO pour les données d'instance de ce render
+	/*	
+		Instead of create VBO here we can build a list of BlockPos,
+		represent render chunk just created
+		On main thread iter on this list an create vbo
+	*/
+	render->instanceVBO = setupInstanceVBOForThisChunk(render->block_array, render->visibleBlock);
 	render->typeBlockVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->visibleBlock * sizeof(GLuint), (void *)&render->blockTypeID[0]);
 	
 	return (render);
