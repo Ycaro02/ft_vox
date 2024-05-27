@@ -56,8 +56,21 @@ Context *contextInit() {
 	Context *context;
 
 
-	if (!(context = ft_calloc(sizeof(Context), 1))
-		|| (!(context->world = ft_calloc(sizeof(World), 1)))
+	if (!(context = ft_calloc(sizeof(Context), 1))) {
+		return (NULL);
+	}
+
+	mtx_init(&context->renderMtx, mtx_plain);
+	mtx_init(&context->gameMtx, mtx_plain);
+
+	mtx_lock(&context->gameMtx);
+	context->isPlaying = TRUE;
+	context->cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(SCREEN_WIDTH, SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
+	mtx_unlock(&context->gameMtx);
+	extractFrustumPlanes(&context->gameMtx ,&context->cam.frustum, context->cam.projection, context->cam.view);
+
+
+	if (!(context->world = ft_calloc(sizeof(World), 1))
 		|| (!(context->win_ptr = init_openGL_context()))
 		|| (!(context->world = ft_calloc(sizeof(World), 1)))
 		|| (!(context->cubeVAO = setupCubeVAO(&context->cube)))
@@ -70,13 +83,11 @@ Context *contextInit() {
 	} 
 
 	/* init context camera */
-	context->cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(SCREEN_WIDTH, SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
     glm_mat4_identity(context->cube.rotation);
-	context->isPlaying = TRUE;
+
 
 	initSkyBox(context);
 	initAtlasTexture(context);
 
-	// mtx_init(&context->renderMtx, mtx_plain);
 	return (context);
 }

@@ -9,7 +9,7 @@ void drawAllChunks(Context *c, GLuint VAO) {
 	u32 		chunkRenderNb = 0;
 	HashMap_it	it;
 	
-	mtx_lock(&c->threadContext->mtx);
+	mtx_lock(&c->renderMtx);
 	it = hashmap_iterator(c->world->renderChunksMap);
 	while ((next = hashmap_next(&it))) {
 		drawAllCube(VAO, (RenderChunks *)it.value);
@@ -17,7 +17,7 @@ void drawAllChunks(Context *c, GLuint VAO) {
 	}
 	ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %d,"RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
 		, chunkRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
-	mtx_unlock(&c->threadContext->mtx);
+	mtx_unlock(&c->renderMtx);
 }
 
 void chunksRender(Context *c, GLuint VAO, GLuint shader_id) {
@@ -29,9 +29,9 @@ void chunksRender(Context *c, GLuint VAO, GLuint shader_id) {
 
 void vox_destroy(Context *c) {
 	s32 status = 0;
-	mtx_lock(&c->threadContext->mtx);
+	mtx_lock(&c->gameMtx);
 	c->isPlaying = FALSE;
-	mtx_unlock(&c->threadContext->mtx);
+	mtx_unlock(&c->gameMtx);
 	
 	thrd_join(c->threadContext->supervisor, &status);
 	ft_printf_fd(1, PINK"\nSupervisor thread joined with status %d\n"RESET, status);
@@ -39,7 +39,9 @@ void vox_destroy(Context *c) {
 	hashmap_destroy(c->threadContext->chunksMapToLoad);
 	free(c->threadContext->workers);
 
-	mtx_destroy(&c->threadContext->mtx);
+	mtx_destroy(&c->threadContext->chunkMtx);
+	mtx_destroy(&c->renderMtx);
+	mtx_destroy(&c->gameMtx);
 
 
 	hashmap_destroy(c->world->renderChunksMap);
@@ -76,8 +78,6 @@ void main_loop(Context *c, GLuint vao, GLuint skyTexture) {
 		glfwSwapBuffers(c->win_ptr);
     }
 }
-
-
 
 int main() {
     Context *context;

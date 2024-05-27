@@ -2,6 +2,30 @@
 #include "../../include/chunks.h"
 #include "../../include/render_chunks.h"
 
+s8 chunkIsInQueue(HashMap *chunksMapToLoad, BlockPos chunkID) {
+	return (hashmap_get(chunksMapToLoad, chunkID) != NULL);
+}
+
+/** 
+ * @brief Lock before to call this function
+ * @brief Check if a worker is already loading the given chunks
+ * @param c Context
+ * @param chunkX Chunk X
+ * @param chunkZ Chunk Z
+ * @return TRUE if a worker is already loading the chunks FALSE otherwise
+*/
+s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
+	for (s32 i = 0; i < c->threadContext->workerMax; ++i) {
+		if (c->threadContext->workers[i].busy == WORKER_BUSY
+			&& c->threadContext->workers[i].data->chunkX == chunkX
+			&& c->threadContext->workers[i].data->chunkZ == chunkZ) {
+			return (TRUE);
+		}
+	}
+	return (FALSE);
+}
+
+
 /**
  * @brief Initialize the thread workers system, allocate memory for the workers based 
  * on the number of threads available on the system
@@ -42,11 +66,14 @@ s32 threadFreeWorkerGet (ThreadContext *threadContext) {
 */
 int threadChunksLoad(void *data) {
 	ThreadData *t = (ThreadData *)data;
-	Chunks *chunks = chunksLoad(t->mtx, t->c->perlin2D, t->chunkX, t->chunkZ);
-	mtx_lock(t->mtx);
+	Chunks *chunks = chunksLoad(t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ);
+	mtx_lock(t->chunkMtx);
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunks);
+	mtx_unlock(t->chunkMtx);
+
+	mtx_lock(&t->c->threadContext->threadMtx);
 	t->c->threadContext->workers[t->threadID].busy = WORKER_FREE;
-	mtx_unlock(t->mtx);
+	mtx_unlock(&t->c->threadContext->threadMtx);
 	free(data); /* tocheck*/
 	return (1);
 }
@@ -62,23 +89,23 @@ int threadChunksLoad(void *data) {
  * @param chunkZ Chunk Z
  * @return 1 if success, 0 if failed to init the thread (cause thread are all busy)
 */
-s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
+s8 threadInitChunkLoad(Context *c, s32 chunkX, s32 chunkZ) {
 	ThreadData	*tdata;
 	s32			threadID = -1; 
 
 
-	mtx_lock(mtx);
+	mtx_lock(&c->threadContext->threadMtx);
 	if ((threadID = threadFreeWorkerGet(c->threadContext)) == -1) {
 		// ft_printf_fd(1, RED"Thread is full\n"RESET, hashmap_size(c->threadContext->chunksMapToLoad));
-		mtx_unlock(mtx);
+		mtx_unlock(&c->threadContext->threadMtx);
 		return (FALSE);
 	} else if (!(tdata = malloc(sizeof(ThreadData)))) {
 		ft_printf_fd(2, "Error: threadInitChunkLoad: malloc failed\n");
-		mtx_unlock(mtx);
+		mtx_unlock(&c->threadContext->threadMtx);
 		return (FALSE);
 	}
 	tdata->c = c;
-	tdata->mtx = mtx;
+	tdata->chunkMtx = &c->threadContext->chunkMtx;
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	tdata->threadID = threadID;
@@ -86,7 +113,7 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 	c->threadContext->workerCurrent += 1;
 	c->threadContext->workers[threadID].busy = WORKER_BUSY;
 	c->threadContext->workers[threadID].data = tdata;
-	mtx_unlock(mtx);
+	mtx_unlock(&c->threadContext->threadMtx);
 
 	thrd_create(&c->threadContext->workers[threadID].thread, threadChunksLoad, tdata);
 	if (!thrd_detach(c->threadContext->workers[threadID].thread)) {
@@ -106,57 +133,49 @@ s8 threadInitChunkLoad(Context *c, Mutex *mtx, s32 chunkX, s32 chunkZ) {
 void supervisorWaitWorker(Context *c) {
 	s64 i = 0, max = 0;
 	s32 status = 0;
-	mtx_lock(&c->threadContext->mtx);
+	mtx_lock(&c->threadContext->threadMtx);
 	max = c->threadContext->workerMax;
-	mtx_unlock(&c->threadContext->mtx);
+	mtx_unlock(&c->threadContext->threadMtx);
 
 	while (i < max) {
-		mtx_lock(&c->threadContext->mtx);
+		mtx_lock(&c->threadContext->threadMtx);
 		status = c->threadContext->workers[i].busy;
 		while (status == WORKER_BUSY) {
-			mtx_unlock(&c->threadContext->mtx);
+			mtx_unlock(&c->threadContext->threadMtx);
 			usleep(10000);
-			mtx_lock(&c->threadContext->mtx);
+			mtx_lock(&c->threadContext->threadMtx);
 			status = c->threadContext->workers[i].busy;
 		}
-		mtx_unlock(&c->threadContext->mtx);
+		mtx_unlock(&c->threadContext->threadMtx);
 		ft_printf_fd(1, ORANGE"\nWorkers Thread: "RESET""YELLOW"[%d]"RESET""GREEN" finished: status %d"RESET, i, status);
 		++i;
 	}
 }
 
-/** 
- * @brief Lock before to call this function
- * @brief Check if a worker is already loading the given chunks
- * @param c Context
- * @param chunkX Chunk X
- * @param chunkZ Chunk Z
- * @return TRUE if a worker is already loading the chunks FALSE otherwise
-*/
-s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
-	for (s32 i = 0; i < c->threadContext->workerMax; ++i) {
-		if (c->threadContext->workers[i].busy == WORKER_BUSY
-			&& c->threadContext->workers[i].data->chunkX == chunkX
-			&& c->threadContext->workers[i].data->chunkZ == chunkZ) {
-			return (TRUE);
-		}
-	}
-	return (FALSE);
-}
 
 void chunksQueueRemoveHandling(Mutex *mtx, HashMap *chunksMapToLoad, s32 camChunkX, s32 camChunkZ) {
 	HashMap_it it;
 	s8 next = TRUE;
 	BlockPos pos = {0, 0, 0};
+	t_list *toRemoveList = NULL;
+	BlockPos *chunkIDToRemove = NULL;
 
 	mtx_lock(mtx); /* LOCK */
 	it = hashmap_iterator(chunksMapToLoad);
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
-		if (chunkDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_LOAD_RADIUS + 2) {
-			hashmap_remove_entry(chunksMapToLoad, pos, HASHMAP_FREE_DATA);
+		if (chunkDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_UNLOAD_MAX) {
+			if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
+				*chunkIDToRemove = pos;
+				ft_lstadd_back(&toRemoveList, ft_lstnew(chunkIDToRemove));
+			}
 		}
 	}
+
+	for (t_list *current = toRemoveList; current; current = current->next) {
+		hashmap_remove_entry(chunksMapToLoad, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
+	}
+	ft_lstclear(&toRemoveList, free);
 	mtx_unlock(mtx); /* UNLOCK */
 
 }
@@ -170,21 +189,27 @@ void chunksQueueRemoveHandling(Mutex *mtx, HashMap *chunksMapToLoad, s32 camChun
  * @return TRUE if success, FALSE if failed to add the chunks to the queue
 */
 s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
-	ThreadData *tdata = NULL;
+	ThreadData	*tdata = NULL;
+	BlockPos 	chunkID = CHUNKS_MAP_ID_GET(chunkX, chunkZ);
 
-	if (hashmap_get(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ))\
+	mtx_lock(&c->threadContext->threadMtx);
+	if (chunkIsLoaded(c->world->chunksMap, chunkID)\
+		|| chunkIsInQueue(c->threadContext->chunksMapToLoad, chunkID)\
 		|| workerIsLoadingChunks(c, chunkX, chunkZ)) {
+		mtx_unlock(&c->threadContext->threadMtx);
 		return (TRUE);
 	} else if (!(tdata = ft_calloc(sizeof(ThreadData), 1))) {
+		mtx_unlock(&c->threadContext->threadMtx);
 		return (FALSE);
 	}
 
 	tdata->c = c;
-	tdata->mtx = &c->threadContext->mtx;
+	tdata->chunkMtx = &c->threadContext->chunkMtx;
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	/* If chunks not in chunksMapToload */
-	hashmap_set_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(chunkX, chunkZ), tdata);
+	hashmap_set_entry(c->threadContext->chunksMapToLoad, chunkID, tdata);
+	mtx_unlock(&c->threadContext->threadMtx);
 	return (TRUE);
 }
 
@@ -197,24 +222,24 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
  * @param radius The radius around the player to scan
 */
 s8 threadChunksLoadArround(Context *c, s32 radius) {
-	mtx_lock(&c->threadContext->mtx);
+	mtx_lock(&c->gameMtx);
 	s32  currentX = c->cam.chunkPos[0];
 	s32  currentZ = c->cam.chunkPos[2];
-	mtx_unlock(&c->threadContext->mtx);
+	mtx_unlock(&c->gameMtx);
 	for (s32 i = -radius; i <= radius; ++i) {
 		for (s32 j = -radius; j <= radius; ++j) {
 			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
 			
-			mtx_lock(&c->threadContext->mtx);
+			mtx_lock(&c->threadContext->chunkMtx);
 			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
 			if (!chunks) {
 				if (!chunksQueueHandling(c, pos.y, pos.z)) {
 					ft_printf_fd(2, "Error: threadChunksLoadArround: chunksQueueHandling failed\n");
-					mtx_unlock(&c->threadContext->mtx);
+					mtx_unlock(&c->threadContext->chunkMtx);
 					return (FALSE);
 				}
 			}
-			mtx_unlock(&c->threadContext->mtx);
+			mtx_unlock(&c->threadContext->chunkMtx);
 		}
 	}
 	return (TRUE);
@@ -228,20 +253,28 @@ s8 threadChunksLoadArround(Context *c, s32 radius) {
 */
 ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	BlockPos 	pos = {0, 0, 0};
-	HashMap_it	it = hashmap_iterator(chunksMapToLoad);
+	HashMap_it	it = {};
 	ThreadData	*tdata = NULL;
 	s32			distance = -1, tmpDistance = 0;
 	s8 			next = 0;
 
+	mtx_lock(&c->gameMtx);
+	s32 camChunkX = c->cam.chunkPos[0];
+	s32 camChunkZ = c->cam.chunkPos[2];
+	mtx_unlock(&c->gameMtx);
+
+	mtx_lock(&c->threadContext->threadMtx);
+	it = hashmap_iterator(chunksMapToLoad);
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
 		// tmpDistance = abs(c->cam.chunkPos[0] - pos.y) + abs(c->cam.chunkPos[2] - pos.z);
-		tmpDistance = chunkDistanceGet(c->cam.chunkPos[0], c->cam.chunkPos[2], pos.y, pos.z);
+		tmpDistance = chunkDistanceGet(camChunkX, camChunkZ, pos.y, pos.z);
 		if (distance == -1 || tmpDistance <= distance) {
 			distance = tmpDistance;
 			tdata = (ThreadData *)it.value;
 		}
 	}
+	mtx_unlock(&c->threadContext->threadMtx);
 	return (tdata);
 }
 
@@ -254,7 +287,6 @@ s32 threadHandling(void *context) {
 	Context *c = (Context *)context;
 	ThreadData *tdata = NULL;
 	size_t mapSize = 0;
-	Mutex *mtx = &c->threadContext->mtx;
 
 
 	if (!threadWorkersInit(c)) {
@@ -264,20 +296,18 @@ s32 threadHandling(void *context) {
 
 	while (voxIsRunning(c)) {
 		threadChunksLoadArround(c, CHUNKS_LOAD_RADIUS);
-		mtx_lock(mtx);
+		mtx_lock(&c->threadContext->threadMtx);
 		mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
-		mtx_unlock(mtx);
+		mtx_unlock(&c->threadContext->threadMtx);
 		if (mapSize > 0) {
-			mtx_lock(mtx);
 			tdata = chunksToLoadNearestGet(c, c->threadContext->chunksMapToLoad);
-			mtx_unlock(mtx);
 			/* Lock in this */
-			if (tdata && threadInitChunkLoad(c, mtx, tdata->chunkX, tdata->chunkZ)) {
-				mtx_lock(mtx);
+			if (tdata && threadInitChunkLoad(c, tdata->chunkX, tdata->chunkZ)) {
+				mtx_lock(&c->threadContext->threadMtx);
 				hashmap_remove_entry(c->threadContext->chunksMapToLoad, CHUNKS_MAP_ID_GET(tdata->chunkX, tdata->chunkZ), HASHMAP_FREE_DATA);
 				mapSize = hashmap_size(c->threadContext->chunksMapToLoad);
 				// free(tdata);
-				mtx_unlock(mtx);
+				mtx_unlock(&c->threadContext->threadMtx);
 			}
 		} else {
 			/* If chunks queue is empty we can wait 10 milisec before rescan arround */
@@ -285,7 +315,7 @@ s32 threadHandling(void *context) {
 		}
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
-		chunksQueueRemoveHandling(&c->threadContext->mtx , c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);
+		chunksQueueRemoveHandling(&c->threadContext->threadMtx , c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);
 	}
 
 	supervisorWaitWorker(c);
@@ -308,7 +338,8 @@ s8 threadSupervisorInit(Context *c) {
 		ft_printf_fd(2, "Error: threadSupervisorInit: hashmap_init failed\n");
 		return (FALSE);
 	}
-	mtx_init(&c->threadContext->mtx, mtx_plain);
+	mtx_init(&c->threadContext->threadMtx, mtx_plain);
+	mtx_init(&c->threadContext->chunkMtx, mtx_plain);
 	thrd_create(&c->threadContext->supervisor, threadHandling, c);
 
 	return (TRUE);

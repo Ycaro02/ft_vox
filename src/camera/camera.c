@@ -49,21 +49,21 @@ void updateViewVec(Camera *camera)
 	camera->viewVector[2] = -camera->view[2][2];
 }
 
-/**
- * @brief Create a new camera
+/** 
+ * @brief Create a new camera Lock before call this function
  * @param fov field of view
  * @param aspect_ratio aspect ratio
  * @param near near plane
  * @param far far plane
  * @return new camera
 */
-Camera create_camera(float fov, float aspect_ratio, float near, float far)
+Camera create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far)
 {
     Camera camera;
 
 
+	
 	ft_printf_fd(1, CYAN"fov: %f\naspect_ratio: %f\nnear: %f\nfar: %f\n"RESET, fov, aspect_ratio, near, far);
-
 	ft_bzero(&camera, sizeof(Camera));
     /* init camera position */
 	glm_vec3_copy((vec3){1.0f, 50.0f, 1.0f}, camera.position);
@@ -78,10 +78,8 @@ Camera create_camera(float fov, float aspect_ratio, float near, float far)
 
     /* Compute projection matrice */
 	glm_perspective(glm_rad(fov), aspect_ratio, near, far, camera.projection);
-
 	updateViewVec(&camera);
-
-	extractFrustumPlanes(&camera.frustum, camera.projection, camera.view);
+	chunkPosGet(&camera);
     return (camera);
 }
 
@@ -94,6 +92,7 @@ void update_camera(void *context, GLuint shader_id)
 {
 	Context *c = context;
 
+	mtx_lock(&c->gameMtx);
     /* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
 
@@ -106,12 +105,11 @@ void update_camera(void *context, GLuint shader_id)
 	updateViewVec(&c->cam);
 
 	/* Update camera chunk position */
-	mtx_lock(&c->threadContext->mtx);
 	chunkPosGet(&c->cam);
-	mtx_unlock(&c->threadContext->mtx);
 
 	/* Extract Frustrum plane from projection and view matrix */
-	extractFrustumPlanes(&c->cam.frustum, c->cam.projection, c->cam.view);
+	mtx_unlock(&c->gameMtx);
+	extractFrustumPlanes(&c->gameMtx, &c->cam.frustum, c->cam.projection, c->cam.view);
 
 }
 

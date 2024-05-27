@@ -161,6 +161,8 @@ void handle_input(void *context)
 	s32				state = GLFW_RELEASE;
  	Context 		*c = context;
 
+	mtx_lock(&c->gameMtx);
+
 	for (u32 i = 0; i < max; i++) {
         state = glfwGetKey(c->win_ptr, key_actions[i].key);
 
@@ -174,4 +176,6 @@ void handle_input(void *context)
 		}
         previous_state[key_actions[i].key] = state;
 	}
+
+	mtx_unlock(&c->gameMtx);
 }

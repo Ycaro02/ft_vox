@@ -16,9 +16,12 @@ BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize, f32 cameraHeight) 
 }
 
 
-void extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view) {
+void extractFrustumPlanes(Mutex *gameMtx, Frustum *frustum, mat4 projection, mat4 view) {
     mat4 viewProjection;
-    glm_mat4_mul(projection, view, viewProjection);
+    
+	mtx_lock(gameMtx);
+
+	glm_mat4_mul(projection, view, viewProjection);
 
 	/* Left plane */
 	glm_vec4_copy((vec4) {viewProjection[0][3] + viewProjection[0][0], viewProjection[1][3] + viewProjection[1][0], viewProjection[2][3] + viewProjection[2][0], viewProjection[3][3] + viewProjection[3][0]}, frustum->planes[0]);
@@ -46,9 +49,10 @@ void extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view) {
 			ft_printf_fd(1, RED"\nError: frustum plane divider %d is null\n"RESET, i);
 		}
     }
+	mtx_unlock(gameMtx);
 }
 
-s8 isChunkInFrustum(Frustum *frustum, BoundingBox *box) {
+s8 isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box) {
     // Calculate the 8 corners of the bounding box
     vec3 corners[8];
     glm_vec3_copy((vec3){box->min[0], box->min[1], box->min[2]}, corners[0]);
@@ -60,6 +64,8 @@ s8 isChunkInFrustum(Frustum *frustum, BoundingBox *box) {
     glm_vec3_copy((vec3){box->min[0], box->max[1], box->max[2]}, corners[6]);
     glm_vec3_copy((vec3){box->max[0], box->max[1], box->max[2]}, corners[7]);
 
+	mtx_lock(gameMtx);
+
     // Check each plane
     for (s32 i = 0; i < 6; i++) {
         s32 inCount = 0;
@@ -67,10 +73,13 @@ s8 isChunkInFrustum(Frustum *frustum, BoundingBox *box) {
             if (glm_vec4_dot((vec4){corners[j][0], corners[j][1], corners[j][2], 1.0f}, frustum->planes[i]) > 0.0f)
                 inCount++;
         }
-        if (inCount == 0) // All points are outside this plane
+        if (inCount == 0) {
+			mtx_unlock(gameMtx);
             return (FALSE);
+		}
     }
 
+	mtx_unlock(gameMtx);
     return (TRUE);
 }
 

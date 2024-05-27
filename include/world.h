@@ -18,7 +18,8 @@ typedef struct s_world {
 
 typedef struct s_thread_context {
 	Thread			supervisor;		/* Thread supervisor */
-	Mutex 			mtx;			/* Mutex to protect data */
+	Mutex 			chunkMtx;			/* Mutex to protect data, used for chunks hashmap  */
+	Mutex 			threadMtx;			/* Mutex to protect thread, used for thread status and chunk queue loading */
 	HashMap 		*chunksMapToLoad;	/* Chunks queue to load, (for now contain ThreadData struct) */
     ThreadEntity	*workers;		/* Worker thread array */
 	s64         	workerMax;		/* Maximum of worker thread (size of workers array) */
@@ -37,7 +38,8 @@ typedef struct s_context {
 	f32					**perlin2D;			/* Perlin noise 2D */
 	t_list				*vboToDestroy;		/* VBO to destroy */
 	// t_list				*vboToCreate;		/* VBO to create */
-	Mutex				renderMtx;				/* Mutex to protect VBO */
+	Mutex				renderMtx;				/* Mutex to protect VBO, used for renderChunks map */
+	Mutex				gameMtx;				/* Mutex to protect game, used for game boolean and cam chunk Pos */
 	GLuint				cubeShaderID;		/* shader program id */
 	GLuint				skyboxShaderID;		/* shader program id */
 	GLuint				skyboxVAO;			/* skybox VAO */
@@ -61,9 +63,9 @@ void display_camera_value(Context *context);
 
 FT_INLINE s8 voxIsRunning(Context *context) {
 	s8 playing = TRUE;
-	mtx_lock(&context->threadContext->mtx);
+	mtx_lock(&context->gameMtx);
 	playing = context->isPlaying;
-	mtx_unlock(&context->threadContext->mtx);
+	mtx_unlock(&context->gameMtx);
 	return (playing);
 }
 

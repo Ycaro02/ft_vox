@@ -58,27 +58,30 @@ void unloadChunkHandler(Context *c) {
 	BlockPos 	*chunkIDToRemove = NULL;
 	// suseconds_t currentTime = get_ms_time();
 	s32			camChunkX = 0, camChunkZ = 0;
-	s32 		renderDistance = (CHUNKS_LOAD_RADIUS + 2);
+	s32 		maxChunkLoad = CHUNKS_UNLOAD_MAX;
 
 	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
 
-	mtx_lock(&c->threadContext->mtx);
-	/*LOCK*/
-
-	it = hashmap_iterator(c->world->chunksMap);
+	mtx_lock(&c->gameMtx);
 	camChunkX = c->cam.chunkPos[0];
 	camChunkZ = c->cam.chunkPos[2];
+	mtx_unlock(&c->gameMtx);
+
+	mtx_lock(&c->renderMtx);
+	/*LOCK*/
+	it = hashmap_iterator(c->world->chunksMap);
+
 
 	while ((next = hashmap_next(&it))) {
 		chunk = (Chunks *)it.value;
 		if (chunk) {
 			s32 distance = chunkDistanceGet(camChunkX, camChunkZ, chunk->x, chunk->z);
 			BlockPos chunkID = CHUNKS_MAP_ID_GET(chunk->x, chunk->z);
-			if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && distance > renderDistance) {
+			if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && distance > maxChunkLoad) {
 				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 					ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
 					ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
-					/* We need to store vbo to destroy in list to give to main thread */
+					/* We need to store vbo to destroy in list to give it to main thread */
 					if (chunk->render) {
 						if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
 							*instanceVBO = chunk->render->instanceVBO;
@@ -96,7 +99,7 @@ void unloadChunkHandler(Context *c) {
 		hashmap_remove_entry(c->world->chunksMap, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
 	}
 
-	mtx_unlock(&c->threadContext->mtx);
+	mtx_unlock(&c->renderMtx);
 	/*UNLOCK*/
 
 	ft_lstclear(&toRemoveList, free);
@@ -115,7 +118,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	HashMap_it 		it;
 	Chunks 			*chunks;
 	
-	mtx_lock(&c->threadContext->mtx);
+	mtx_lock(&c->renderMtx);
 	/* LOCK */
 	it = hashmap_iterator(renderChunksMap);
 	
@@ -124,7 +127,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		chunks = hashmap_get(c->world->chunksMap, chunkID);
 		if (chunks) {
 			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
-			if (!isChunkInFrustum(&c->cam.frustum, &box)) {
+			if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
 				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 					ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
 					ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
@@ -136,7 +139,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	for (t_list *current = toRemoveList; current; current = current->next) {
 		hashmap_remove_entry(renderChunksMap, *(BlockPos *)current->content, HASHMAP_FREE_NODE);
 	}
-	mtx_unlock(&c->threadContext->mtx);
+	mtx_unlock(&c->renderMtx);
 	/* UNLOCK */
 
 	ft_lstclear(&toRemoveList, free);
@@ -145,14 +148,12 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 
 
 void renderChunksVBODestroy(Context *c) {
-	mtx_lock(&c->threadContext->mtx);
+	mtx_lock(&c->renderMtx);
 	for (t_list *current = c->vboToDestroy; current; current = current->next) {
-		GLuint *vbo = (GLuint *)current->content;
-		glDeleteBuffers(1, vbo);
-		// free(vbo);
+		glDeleteBuffers(1, (GLuint *)current->content);
 	}
 	ft_lstclear(&c->vboToDestroy, free);
-	mtx_unlock(&c->threadContext->mtx);
+	mtx_unlock(&c->renderMtx);
 }
 
 /**
@@ -177,7 +178,7 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 
 
 	/* LOCK */
-	mtx_lock(&c->threadContext->mtx);
+	mtx_lock(&c->renderMtx);
 	// suseconds_t currentTime = get_ms_time();
 
 
@@ -196,13 +197,11 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
             worldToChunksPos(currPos, chunkPos);
 
             BlockPos chunkID = {0, (s32)chunkPos[0], (s32)chunkPos[2]};
-
-
             Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
             s8 inView = 0;
             if (chunks) {
                 BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
-                inView = isChunkInFrustum(&c->cam.frustum, &box);
+                inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
             }
 
 			if (inView) {
@@ -218,7 +217,7 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 		}
     }
 	// ft_printf_fd(1, "Time to load chunks: %u ms\n", get_ms_time() - currentTime);
-	mtx_unlock(&c->threadContext->mtx);
+	mtx_unlock(&c->renderMtx);
 	/* UNLOCK */	
 
 	renderChunksVBODestroy(c);

@@ -12,7 +12,7 @@ typedef mtx_t Mutex;
 /* Thread data */
 typedef struct s_thread_data {
 	Context *c;
-	Mutex	*mtx;
+	Mutex	*chunkMtx;
 	s32 	chunkX;
 	s32 	chunkZ;
 	s8		threadID;
