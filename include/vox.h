@@ -25,7 +25,7 @@
 #define CHUNKS_LOAD_RADIUS 10			/* Chunks load radius */
 // #define CHUNKS_LOAD_RADIUS 1			/* Chunks load radius */
 
-#define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 2)	/* Chunks render radius */
+#define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 4)	/* Chunks render radius */
 
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
 

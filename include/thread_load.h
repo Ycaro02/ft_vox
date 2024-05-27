@@ -35,7 +35,7 @@ typedef struct s_thread_entity {
 */
 FT_INLINE s64 ThreadsAvailableGet() {
 	s64 num_threads = sysconf(_SC_NPROCESSORS_ONLN);
-	s64 decrease_thread = 2;
+	s64 decrease_thread = 4;
     if (num_threads == -1) {
         perror("sysconf");
         return (1);

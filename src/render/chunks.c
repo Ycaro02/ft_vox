@@ -4,8 +4,12 @@
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
 
+// s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
+// 	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
+// }
+
 s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
-	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
+    return ((s32)floor(sqrt(pow(camChunkX - chunkX, 2) + pow(camChunkZ - chunkZ, 2))));
 }
 
 /* Basic function you can provide to hashmap_init */
