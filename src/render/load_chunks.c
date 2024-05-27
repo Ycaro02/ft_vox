@@ -20,6 +20,7 @@ s8 chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID) {
  * @return 1 if chunk render is loaded, 0 otherwise
 */
 s8 chunksRenderIsLoaded(Chunks *chunk) {
+	/* Must change name here to chunk render data is load != chunkrenderLoad (VBO loaded by main thread (instanceVBO != 0))*/
 	if (chunk) {
 		return (chunk->render != NULL);
 	}
@@ -148,12 +149,10 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 
 
 void renderChunksVBODestroy(Context *c) {
-	mtx_lock(&c->renderMtx);
 	for (t_list *current = c->vboToDestroy; current; current = current->next) {
 		glDeleteBuffers(1, (GLuint *)current->content);
 	}
 	ft_lstclear(&c->vboToDestroy, free);
-	mtx_unlock(&c->renderMtx);
 }
 
 /**
@@ -167,10 +166,18 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
   		This func must be call by sub thread but we need to do modification before 
 		(RenderChunk init must store a list of renderChunk created to init vbo in main thread)
 	*/
+	(void)renderChunksMap;
     vec3            start, rayDir, chunkPos, currPos, travelVector;
     f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV - 10.0f) / 2.0f;
 	f32 			radiusEnd = (CAM_FOV + 10.0f) / 2.0f;
+	vec3 			camViewVector;
+	f32 			camYposition;
+	Chunks *chunks = NULL;
+	BlockPos chunkID;
+	s8 inView = 0;
+	
+
 
     glm_vec3_copy(c->cam.position, start);
     glm_vec3_zero(chunkPos);
@@ -178,13 +185,19 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 
 
 	/* LOCK */
-	mtx_lock(&c->renderMtx);
+	// mtx_lock(&c->renderMtx);
 	// suseconds_t currentTime = get_ms_time();
 
 
 	/* Loop on the complete camera fov */
     for (f32 angle = radiusStart; angle <= radiusEnd; angle += ANGLE_INCREMENT) {
-        glm_vec3_copy(c->cam.viewVector, rayDir);
+		
+		mtx_lock(&c->gameMtx);
+		camYposition = c->cam.position[1];
+		glm_vec3_copy(c->cam.viewVector, camViewVector);
+		mtx_unlock(&c->gameMtx);
+
+        glm_vec3_copy(camViewVector, rayDir);
         glm_vec3_rotate(rayDir, glm_rad(angle), (vec3){0.0f, 1.0f, 0.0f});
 
         current = 0;
@@ -195,30 +208,36 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
             glm_vec3_add(start, travelVector, currPos);
             /* Convert world coordonate to chunk offset */
             worldToChunksPos(currPos, chunkPos);
+            chunkID = CHUNKS_MAP_ID_GET(chunkPos[0], chunkPos[2]);
 
-            BlockPos chunkID = {0, (s32)chunkPos[0], (s32)chunkPos[2]};
-            Chunks *chunks = hashmap_get(c->world->chunksMap, chunkID);
-            s8 inView = 0;
-            if (chunks) {
-                BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
+			mtx_lock(&c->threadContext->chunkMtx);
+            chunks = hashmap_get(c->world->chunksMap, chunkID);
+            mtx_unlock(&c->threadContext->chunkMtx);
+
+			if (chunks) {
+				mtx_lock(&c->renderMtx);
+				
+                BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, camYposition);
+				s8 chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
+				if (inView) {
+					if (!chunksRenderIsload) {
+						chunks->render = renderChunkCreate(c, chunks);
+					} else if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && chunksRenderIsload && chunks->render->instanceVBO != 0) {
+						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
+					}
+					chunks->lastUpdate = get_ms_time();
+				}
+			
+				mtx_unlock(&c->renderMtx);
+
             }
 
-			if (inView) {
-				if (!chunksRenderIsLoaded(chunks)) {
-					chunks->render = renderChunkCreate(chunks);
-				}
-				if (!chunksIsRenderer(renderChunksMap, chunkID)) {
-                	hashmap_set_entry(renderChunksMap, chunkID, chunks->render);
-				}
-				chunks->lastUpdate = get_ms_time();
-			}
 
 		}
     }
 	// ft_printf_fd(1, "Time to load chunks: %u ms\n", get_ms_time() - currentTime);
-	mtx_unlock(&c->renderMtx);
+	// mtx_unlock(&c->renderMtx);
 	/* UNLOCK */	
 
-	renderChunksVBODestroy(c);
 }

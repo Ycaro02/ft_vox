@@ -309,10 +309,9 @@ s32 threadHandling(void *context) {
 				// free(tdata);
 				mtx_unlock(&c->threadContext->threadMtx);
 			}
-		} else {
-			/* If chunks queue is empty we can wait 10 milisec before rescan arround */
-			 usleep(10000);
 		}
+		chunksViewHandling(c, c->world->renderChunksMap);
+
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
 		chunksQueueRemoveHandling(&c->threadContext->threadMtx , c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);

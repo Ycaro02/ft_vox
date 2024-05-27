@@ -60,6 +60,25 @@ void vox_destroy(Context *c) {
 	glfwTerminate();
 }
 
+void renderChunksLoadNewVBO(Context *c) {
+	RenderChunks *render = NULL;
+
+
+	mtx_lock(&c->renderMtx);
+	
+	for (t_list *current = c->vboToCreate; current; current = current->next) {
+		BlockPos chunkID = *(BlockPos *)current->content;
+		render = renderChunkCreateVBO(&c->threadContext->chunkMtx, c->world->chunksMap, chunkID);
+		if (render) {
+			hashmap_set_entry(c->world->renderChunksMap, chunkID, render);
+		}
+		
+	}
+	renderChunksVBODestroy(c);
+	ft_lstclear(&c->vboToCreate, free);
+	mtx_unlock(&c->renderMtx);
+}
+
 void main_loop(Context *c, GLuint vao, GLuint skyTexture) {
     while (!glfwWindowShouldClose(c->win_ptr)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -69,8 +88,9 @@ void main_loop(Context *c, GLuint vao, GLuint skyTexture) {
 		
 		/* Update data */
 		update_camera(c, c->cubeShaderID);
-		chunksViewHandling(c, c->world->renderChunksMap);
-
+		// chunksViewHandling(c, c->world->renderChunksMap);
+		renderChunksLoadNewVBO(c);
+		
 		/* Render logic */
         displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
         chunksRender(c, vao, c->cubeShaderID);

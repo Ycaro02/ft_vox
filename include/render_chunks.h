@@ -20,7 +20,8 @@ void			renderChunksMapFree(void *entry);
 
 /* Render chunks.c */
 u32				chunksCubeGet(Chunks *chunks, RenderChunks *render);
-RenderChunks 	*renderChunkCreate(Chunks *chunks);
+RenderChunks 	*renderChunkCreate(Context *c, Chunks *chunks);
+RenderChunks	*renderChunkCreateVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID);
 
 /* render/load_chunks.c */
 s8				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
@@ -39,5 +40,7 @@ void			drawAllCube(GLuint VAO, RenderChunks *render);
 s8 				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
 s8 				chunksRenderIsLoaded(Chunks *chunk);
 s8 				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
+
+void renderChunksVBODestroy(Context *c);
 
 #endif /* HEADER_RENDER_CHUNKS_H */

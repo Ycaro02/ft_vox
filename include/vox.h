@@ -21,19 +21,21 @@
 #define SCREEN_HEIGHT	1080			/* Screen height */
 
 #define CAM_FOV			80.0f			/* Camera field of view */
-
-#define CHUNKS_LOAD_RADIUS 10			/* Chunks load radius */
-// #define CHUNKS_LOAD_RADIUS 1			/* Chunks load radius */
-
-#define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 4)	/* Chunks render radius */
-
+#define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size */
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
 
-
-#define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size */
-
-// #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 2.0f)				/* Max render distance */
+/* Basic value */
+#define CHUNKS_LOAD_RADIUS 10			/* Chunks load radius */
+#define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 4)	/* Chunks render radius */
 #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 10.0f)				/* Max render distance */
+
+/* DEBUG VAL */
+// #define CHUNKS_LOAD_RADIUS 1			/* Chunks load radius */
+// #define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 2)	/* Chunks render radius */
+// #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 2.0f)				/* Max render distance */
+
+
+
 #define TRAVEL_INCREMENT CHUNK_FLOAT_SIZE							/* Travel increment */
 
 /* Texture atlas path */

@@ -3,8 +3,8 @@ include rsc/mk/source.mk
 
 NAME			=	ft_vox
 CC				=	gcc
-CFLAGS			=	-Wall -Wextra -Werror -O3 -g
-# CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=address
+# CFLAGS			=	-Wall -Wextra -Werror -O3 -g
+CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=address
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
 
@@ -77,6 +77,6 @@ test: $(NAME)
 vtest: $(NAME)
 	@valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
 
-re:			clean_lib fclean all
+re: fclean $(NAME)
 
 .PHONY:		all clean fclean re bonus
