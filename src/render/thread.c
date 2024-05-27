@@ -222,9 +222,11 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
  * @param radius The radius around the player to scan
 */
 s8 threadChunksLoadArround(Context *c, s32 radius) {
+	s32 currentX, currentZ;
+	
 	mtx_lock(&c->gameMtx);
-	s32  currentX = c->cam.chunkPos[0];
-	s32  currentZ = c->cam.chunkPos[2];
+	currentX = c->cam.chunkPos[0];
+	currentZ = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 	for (s32 i = -radius; i <= radius; ++i) {
 		for (s32 j = -radius; j <= radius; ++j) {
@@ -255,12 +257,12 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	BlockPos 	pos = {0, 0, 0};
 	HashMap_it	it = {};
 	ThreadData	*tdata = NULL;
-	s32			distance = -1, tmpDistance = 0;
+	s32			distance = -1, tmpDistance = 0, camChunkX, camChunkZ;
 	s8 			next = 0;
 
 	mtx_lock(&c->gameMtx);
-	s32 camChunkX = c->cam.chunkPos[0];
-	s32 camChunkZ = c->cam.chunkPos[2];
+	camChunkX = c->cam.chunkPos[0];
+	camChunkZ = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
 	mtx_lock(&c->threadContext->threadMtx);
@@ -311,7 +313,6 @@ s32 threadHandling(void *context) {
 			}
 		}
 		chunksViewHandling(c, c->world->renderChunksMap);
-
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
 		chunksQueueRemoveHandling(&c->threadContext->threadMtx , c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);
