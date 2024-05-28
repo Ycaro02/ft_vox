@@ -41,20 +41,6 @@ void drawAllCube(GLuint VAO, RenderChunks *render) {
 }
 
 /**
- * @brief Get the offset of the block array
- * @param visible_block_array array of visible block
- * @param chunk_id chunk id
- * @return offset of the block array
-*/
-u32 blockArrayOffsetGet(u32 *visible_block_array, u32 chunk_id) {
-	u32 offset = 0;
-	for (u32 i = 0; i < chunk_id; ++i) {
-		offset += visible_block_array[i];
-	}
-	return (offset);
-}
-
-/**
  * @brief Create VBO
  * @param size size of the buffer
  * @param data data to fill the buffer
@@ -92,14 +78,14 @@ GLuint setupCubeVAO(ModelCube *cube) {
 	};
 
     static u32 v_size = sizeof(vertex) / sizeof(VertexTexture);
-    
-	if (!cube->vertex) {
-		cube->vertex = malloc(sizeof(VertexTexture) * v_size);
-		ft_memcpy(cube->vertex, vertex, sizeof(VertexTexture) * v_size);
-		cube->v_size = v_size;
-	}
-
     GLuint VAO;
+    
+	if (!(cube->vertex = malloc(sizeof(VertexTexture) * v_size))) {
+		return (0);
+	}
+	ft_memcpy(cube->vertex, vertex, sizeof(VertexTexture) * v_size);
+	cube->v_size = v_size;
+
 
     /* Generate vertex array object (VAO) */
     glGenVertexArrays(1, &VAO);
@@ -122,4 +108,47 @@ GLuint setupCubeVAO(ModelCube *cube) {
     glBindVertexArray(0);
     return (VAO);
 
+}
+
+FaceCubeModel *cubeFaceVAOinit() {
+	FaceCubeModel *cubeFace = NULL;
+    static const VertexTexture backFace[] = { CUBE_BACK_FACE_VERTEX };
+    static const VertexTexture frontFace[] = { CUBE_FRONT_FACE_VERTEX };
+    static const VertexTexture leftFace[] = { CUBE_LEFT_FACE_VERTEX };
+    static const VertexTexture rightFace[] = { CUBE_RIGHT_FACE_VERTEX };
+    static const VertexTexture bottomFace[] = { CUBE_BOTTOM_FACE_VERTEX };
+    static const VertexTexture topFace[] = { CUBE_TOP_FACE_VERTEX };
+
+    static const vec3_u32 backIndices[] = { CUBE_BACK_FACE(0, 1, 2, 3) };
+    static const vec3_u32 frontIndices[] = { CUBE_FRONT_FACE(0, 1, 2, 3) };
+    static const vec3_u32 leftIndices[] = { CUBE_LEFT_FACE(0, 1, 2, 3) };
+    static const vec3_u32 rightIndices[] = { CUBE_RIGHT_FACE(0, 1, 2, 3) };
+    static const vec3_u32 bottomIndices[] = { CUBE_BOTTOM_FACE(0, 1, 2, 3) };
+    static const vec3_u32 topIndices[] = { CUBE_TOP_FACE(0, 1, 2, 3) };
+
+    const VertexTexture *faces[] = { backFace, frontFace, leftFace, rightFace, bottomFace, topFace };
+    const vec3_u32 *indices[] = { backIndices, frontIndices, leftIndices, rightIndices, bottomIndices, topIndices };
+    size_t vertexSizes[] = { sizeof(backFace), sizeof(frontFace), sizeof(leftFace), sizeof(rightFace), sizeof(bottomFace), sizeof(topFace) };
+    size_t indexSizes[] = { sizeof(backIndices), sizeof(frontIndices), sizeof(leftIndices), sizeof(rightIndices), sizeof(bottomIndices), sizeof(topIndices) };
+
+	if (!(cubeFace = malloc(sizeof(FaceCubeModel) * FACE_VERTEX_ARRAY_SIZE))) {
+		return (NULL);
+	}
+
+    for (int i = 0; i < FACE_VERTEX_ARRAY_SIZE; ++i) {
+        glGenVertexArrays(1, &cubeFace[i].VAO);
+        glBindVertexArray(cubeFace[i].VAO);
+
+        cubeFace[i].VBO = bufferGlCreate(GL_ARRAY_BUFFER, vertexSizes[i], (void*)faces[i]);
+        cubeFace[i].EBO = bufferGlCreate(GL_ELEMENT_ARRAY_BUFFER, indexSizes[i], (void*)indices[i]);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)sizeof(vec3));
+        glEnableVertexAttribArray(2);
+
+        glBindVertexArray(0);
+    }
+	return (cubeFace);
 }

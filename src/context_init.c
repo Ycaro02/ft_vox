@@ -89,5 +89,11 @@ Context *contextInit() {
 	initSkyBox(context);
 	initAtlasTexture(context);
 
+
+	if (!cubeFaceVAOinit()) {
+		ft_printf_fd(1, "Error: cubeFaceVAOInit\n");
+		return (NULL);
+	}
+
 	return (context);
 }

@@ -15,7 +15,19 @@ typedef struct s_modelCube {
 	mat4			rotation;		/* rotation matrix */
 }	ModelCube;
 
+#define FACE_VERTEX_ARRAY_SIZE 6
+
+typedef struct s_faceCubeModel {
+	VertexTexture	*vertex;
+	vec3_u32		*indices;
+	GLuint			VAO;
+	GLuint			VBO;
+	GLuint			EBO;
+} FaceCubeModel;
+
 /* render/cube.c */
 GLuint	setupCubeVAO(ModelCube *cube);
+
+FaceCubeModel *cubeFaceVAOinit(void);
 
 #endif /* HEADER_CUBE_H */
