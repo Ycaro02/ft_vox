@@ -4,10 +4,11 @@
 #include "chunks.h"
 
 typedef struct s_render_chunks {
-    vec3		*block_array;		/* Block array (VBO data represent block instance position) */
-    GLuint		instanceVBO;		/* Instance VBO */
-	GLuint  	typeBlockVBO;		/* Type VBO */
-	f32			*blockTypeID;		/* Block type ID */
+    // vec3		*block_array;		/* Block array (VBO data represent block instance position) */
+    // GLuint		instanceVBO;		/* Instance VBO */
+	// GLuint  	typeBlockVBO;		/* Type VBO */
+	// f32			*blockTypeID;		/* Block type ID */
+
     u32			visibleBlock;		/* Number of visible block in this chunks */
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
 
@@ -48,5 +49,13 @@ s8 				chunksRenderIsLoaded(Chunks *chunk);
 s8 				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 
 void renderChunksVBODestroy(Context *c);
+
+
+/* render/cube_face_build.c */
+s8				faceVisible(u8 neighbors, u8 face);
+void			chunksCubeFaceGet(Chunks *chunks, RenderChunks *render);
+GLuint			faceInstanceVBOCreate(vec3 *faceArray, u32 visibleBlock);
+RenderChunks	*renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID);
+void			drawAllChunksByFace(Context *c);
 
 #endif /* HEADER_RENDER_CHUNKS_H */

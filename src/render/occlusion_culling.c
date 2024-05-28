@@ -1,44 +1,27 @@
 #include "../../include/world.h"
 #include "../../include/chunks.h"
 
-// void flagSet(u8 *flags, u8 flag_val)
-// {
-//     if (flags)
-//         *flags |= flag_val;
-// }
-
-// void flagUnset(u8 *flags, u8 flag_val)
-// {
-//     if (flags)
-//         *flags &= ~flag_val;
-// }
-
-
-// s8 flagIsSet(u8 flags, u8 flag_val) {
-//    return ((flags & flag_val) == flag_val);
-// }
-
 s8 allNeighborsExist(Block *block) {
 	return (block->neighbors == BLOCK_HIDDEN);
 }
 
 void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
     BlockPos pos[6] = {
+        {block->x, block->y, block->z + 1}, {block->x, block->y, block->z - 1},
         {block->x + 1, block->y, block->z}, {block->x - 1, block->y, block->z},
         {block->x, block->y + 1, block->z}, {block->x, block->y - 1, block->z},
-        {block->x, block->y, block->z + 1}, {block->x, block->y, block->z - 1}
     };
     // These masks are for updating the neighbors of the current block
-    u8 neighbor_masks[6] = {
+    u8 block_masks[6] = {
+        NEIGHBOR_FRONT, NEIGHBOR_BACK,
         NEIGHBOR_RIGHT, NEIGHBOR_LEFT,
         NEIGHBOR_TOP, NEIGHBOR_BOTTOM,
-        NEIGHBOR_FRONT, NEIGHBOR_BACK
     };
     // These masks are for updating the current block
-    u8 block_masks[6] = {
+    u8 neighbor_masks[6] = {
+        NEIGHBOR_BACK, NEIGHBOR_FRONT,
         NEIGHBOR_LEFT, NEIGHBOR_RIGHT,
         NEIGHBOR_BOTTOM, NEIGHBOR_TOP,
-        NEIGHBOR_BACK, NEIGHBOR_FRONT
     };
 
     for (u32 i = 0; i < 6; ++i) {
@@ -51,7 +34,6 @@ void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
         }
     }
 }
-
 
 u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID) {
     s8 next = TRUE;

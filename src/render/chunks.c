@@ -237,26 +237,26 @@ void chunkBuild(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
  * @param chunkID Chunk ID [in]
  * @return u32 Number of visible block
 */
-void chunksCubeGet(Chunks *chunks, RenderChunks *render)
-{
-    s8 next = TRUE;
-	u32 idx = 0;
+// void chunksCubeGet(Chunks *chunks, RenderChunks *render)
+// {
+//     s8 next = TRUE;
+// 	u32 idx = 0;
 
-	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
-		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
-		while ((next = hashmap_next(&it))) {
-			Block *block = (Block *)it.value;
-			if (block->neighbors != BLOCK_HIDDEN && block->type != AIR) {
-				render->block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
-				render->block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
-				render->block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
-				render->blockTypeID[idx] = (f32)block->type;
-				++idx;
-				// ft_printf_fd(1, "Block %d = %f\n", block->type, render->blockTypeID[idx]);
-			}
-		}
-	}
-}
+// 	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
+// 		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
+// 		while ((next = hashmap_next(&it))) {
+// 			Block *block = (Block *)it.value;
+// 			if (block->neighbors != BLOCK_HIDDEN && block->type != AIR) {
+// 				render->block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
+// 				render->block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
+// 				render->block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
+// 				render->blockTypeID[idx] = (f32)block->type;
+// 				++idx;
+// 				// ft_printf_fd(1, "Block %d = %f\n", block->type, render->blockTypeID[idx]);
+// 			}
+// 		}
+// 	}
+// }
 
 Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);

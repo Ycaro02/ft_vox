@@ -7,8 +7,13 @@ GLuint setupInstanceVBOForThisChunk(vec3* block_array, u32 visibleBlock) {
 }
 
 void renderChunkFree(RenderChunks *render) {
-	free(render->blockTypeID);
-	free(render->block_array);
+	// free(render->blockTypeID);
+	// free(render->block_array);
+	free(render->faceCount);
+	for (u8 i = 0; i < 6; ++i) {
+		free(render->faceArray[i]);
+		free(render->faceTypeID[i]);
+	}
 	/* Care here we can't destroy VBO in sub thread */
 	free(render);
 }
@@ -21,25 +26,25 @@ void renderChunksMapFree(void *entry) {
 	free(e); /* free the entry t_list node */
 }
 
-RenderChunks *renderChunkCreateVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID) {
-	/* Create VBO */
-	Chunks 			*chunks = NULL; 
-	RenderChunks 	*render = NULL; 
+// RenderChunks *renderChunkCreateVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID) {
+// 	/* Create VBO */
+// 	Chunks 			*chunks = NULL; 
+// 	RenderChunks 	*render = NULL; 
 
 
-	mtx_lock(chunkMtx);
-	chunks = hashmap_get(chunksMap, chunkID);
+// 	mtx_lock(chunkMtx);
+// 	chunks = hashmap_get(chunksMap, chunkID);
 	
-	if (chunks) {
-		render = chunks->render;
-		if (render) {
-			render->instanceVBO = setupInstanceVBOForThisChunk(render->block_array, render->visibleBlock);
-			render->typeBlockVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->visibleBlock * sizeof(GLuint), (void *)&render->blockTypeID[0]);
-		}
-	}
-	mtx_unlock(chunkMtx);
-	return (render);
-}
+// 	if (chunks) {
+// 		render = chunks->render;
+// 		if (render) {
+// 			render->instanceVBO = setupInstanceVBOForThisChunk(render->block_array, render->visibleBlock);
+// 			render->typeBlockVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->visibleBlock * sizeof(GLuint), (void *)&render->blockTypeID[0]);
+// 		}
+// 	}
+// 	mtx_unlock(chunkMtx);
+// 	return (render);
+// }
 
 RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
     RenderChunks *render = NULL;
@@ -59,17 +64,18 @@ RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
 	}
 	render->chunkID = chunkID;
     render->visibleBlock = chunks->visible_block;
-	if (!(render->blockTypeID = ft_calloc(sizeof(f32), render->visibleBlock))) {
-		ft_printf_fd(2, "Failed to allocate blockTypeID\n");
-		free(render);
-		return (NULL);
-	} else if (!(render->block_array = ft_calloc(sizeof(vec3), render->visibleBlock))) {
-		ft_printf_fd(2, "Failed to allocate block_array\n");
-		free(render->blockTypeID);
-		free(render);
-		return (NULL);
-	}
-	chunksCubeGet(chunks, render);
+	// if (!(render->blockTypeID = ft_calloc(sizeof(f32), render->visibleBlock))) {
+	// 	ft_printf_fd(2, "Failed to allocate blockTypeID\n");
+	// 	free(render);
+	// 	return (NULL);
+	// } else if (!(render->block_array = ft_calloc(sizeof(vec3), render->visibleBlock))) {
+	// 	ft_printf_fd(2, "Failed to allocate block_array\n");
+	// 	free(render->blockTypeID);
+	// 	free(render);
+	// 	return (NULL);
+	// }
+	// chunksCubeGet(chunks, render);
+	chunksCubeFaceGet(chunks, render);
 
 	/* We need to store vbo to create in list to give it to main thread */
 	if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {

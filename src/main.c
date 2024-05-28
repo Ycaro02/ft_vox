@@ -3,43 +3,44 @@
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
 
-u32 countChunksBlock(BlockPos chunkID, HashMap *chunksMap, Mutex *chunkMtx) {
-	u32 totalBlock = 0;
-	Chunks *chunks = NULL;
+// u32 countChunksBlock(BlockPos chunkID, HashMap *chunksMap, Mutex *chunkMtx) {
+// 	u32 totalBlock = 0;
+// 	Chunks *chunks = NULL;
 
-	mtx_lock(chunkMtx);
-	chunks = hashmap_get(chunksMap, chunkID);
-	if (chunks) {
-		totalBlock = chunks->nb_block;
-	}
-	mtx_unlock(chunkMtx);
-	return (totalBlock);
-}
+// 	mtx_lock(chunkMtx);
+// 	chunks = hashmap_get(chunksMap, chunkID);
+// 	if (chunks) {
+// 		totalBlock = chunks->nb_block;
+// 	}
+// 	mtx_unlock(chunkMtx);
+// 	return (totalBlock);
+// }
 
 
-void drawAllChunks(Context *c, GLuint VAO) {
-	s8			next = TRUE;
-	u32 		chunkRenderNb = 0, blockRenderNb = 0;
-	HashMap_it	it;
+// void drawAllChunks(Context *c, GLuint VAO) {
+// 	s8			next = TRUE;
+// 	u32 		chunkRenderNb = 0, blockRenderNb = 0;
+// 	HashMap_it	it;
 	
-	mtx_lock(&c->renderMtx);
-	it = hashmap_iterator(c->world->renderChunksMap);
-	while ((next = hashmap_next(&it))) {
-		RenderChunks *render = (RenderChunks *)it.value;
-		drawAllCube(VAO, render);
-		chunkRenderNb++;
-		blockRenderNb += render->visibleBlock;
-		// realTotalBlock += countChunksBlock(render->chunkID, c->world->chunksMap, &c->threadContext->chunkMtx);
-	}
-	ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "YELLOW"Visible Block: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
-	, chunkRenderNb, blockRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
-	mtx_unlock(&c->renderMtx);
-}
+// 	mtx_lock(&c->renderMtx);
+// 	it = hashmap_iterator(c->world->renderChunksMap);
+// 	while ((next = hashmap_next(&it))) {
+// 		RenderChunks *render = (RenderChunks *)it.value;
+// 		drawAllCube(VAO, render);
+// 		chunkRenderNb++;
+// 		blockRenderNb += render->visibleBlock;
+// 		// realTotalBlock += countChunksBlock(render->chunkID, c->world->chunksMap, &c->threadContext->chunkMtx);
+// 	}
+// 	ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "YELLOW"Visible Block: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
+// 	, chunkRenderNb, blockRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
+// 	mtx_unlock(&c->renderMtx);
+// }
 
-void chunksRender(Context *c, GLuint VAO, GLuint shader_id) {
+void chunksRender(Context *c, GLuint shader_id) {
     glLoadIdentity();
 	glUseProgram(shader_id);
-	drawAllChunks(c, VAO);
+	// drawAllChunks(c, VAO);
+	drawAllChunksByFace(c);
     glFlush();
 }
 
@@ -66,7 +67,7 @@ void vox_destroy(Context *c) {
 	// free(c->threadContext->workers);
 	free(c->threadContext);
 	free(c->world);
-	free(c->cube.vertex);
+	// free(c->cube.vertex);
 	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; ++i) {
 		free(c->perlin2D[i]);
 	}
@@ -84,7 +85,7 @@ void renderChunksLoadNewVBO(Context *c) {
 	
 	for (t_list *current = c->vboToCreate; current; current = current->next) {
 		BlockPos chunkID = *(BlockPos *)current->content;
-		render = renderChunkCreateVBO(&c->threadContext->chunkMtx, c->world->chunksMap, chunkID);
+		render = renderChunkCreateFaceVBO(&c->threadContext->chunkMtx, c->world->chunksMap, chunkID);
 		if (render) {
 			hashmap_set_entry(c->world->renderChunksMap, chunkID, render);
 		}
@@ -95,7 +96,7 @@ void renderChunksLoadNewVBO(Context *c) {
 	mtx_unlock(&c->renderMtx);
 }
 
-void main_loop(Context *c, GLuint vao, GLuint skyTexture) {
+void main_loop(Context *c, GLuint skyTexture) {
     while (!glfwWindowShouldClose(c->win_ptr)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/* Input handling */
@@ -109,7 +110,7 @@ void main_loop(Context *c, GLuint vao, GLuint skyTexture) {
 		
 		/* Render logic */
         displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
-        chunksRender(c, vao, c->cubeShaderID);
+        chunksRender(c, c->cubeShaderID);
 
 		glfwSwapBuffers(c->win_ptr);
     }
@@ -125,7 +126,8 @@ int main() {
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);
 
-	main_loop(context, context->cubeVAO, context->skyTexture);
+	// main_loop(context, context->cubeVAO, context->skyTexture);
+	main_loop(context, context->skyTexture);
     vox_destroy(context);
     return (0);
 }

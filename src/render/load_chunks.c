@@ -84,11 +84,13 @@ void unloadChunkHandler(Context *c) {
 					ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
 					/* We need to store vbo to destroy in list to give it to main thread */
 					if (chunk->render) {
-						if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
-							*instanceVBO = chunk->render->instanceVBO;
-							*typeBlockVBO = chunk->render->typeBlockVBO;
-							ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
-							ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
+						for (u32 i = 0; i < 6; ++i) {
+							if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
+								*instanceVBO = chunk->render->faceVBO[i];
+								*typeBlockVBO = chunk->render->faceTypeVBO[i];
+								ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
+								ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
+							}
 						}
 					}
 				}
@@ -223,7 +225,7 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 				if (inView) {
 					if (!chunksRenderIsload) {
 						chunks->render = renderChunkCreate(c, chunks);
-					} else if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && chunksRenderIsload && chunks->render->instanceVBO != 0) {
+					} else if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
 						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
 					}
 					chunks->lastUpdate = get_ms_time();

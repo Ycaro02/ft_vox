@@ -76,12 +76,12 @@
 #define SEA_LEVEL 80.0f
 
 /* Neighbor flag value */
-#define NEIGHBOR_RIGHT  1U
-#define NEIGHBOR_LEFT   2U
-#define NEIGHBOR_TOP    4U
-#define NEIGHBOR_BOTTOM 8U
-#define NEIGHBOR_FRONT  16U
-#define NEIGHBOR_BACK   32U
+#define NEIGHBOR_BACK  	1U
+#define NEIGHBOR_FRONT  2U
+#define NEIGHBOR_LEFT   4U
+#define NEIGHBOR_RIGHT 	8U
+#define NEIGHBOR_BOTTOM 16U
+#define NEIGHBOR_TOP 	32U
 
 /* If all neighnor block is hidden */
 #define BLOCK_HIDDEN (NEIGHBOR_RIGHT | NEIGHBOR_LEFT | NEIGHBOR_TOP | NEIGHBOR_BOTTOM | NEIGHBOR_FRONT | NEIGHBOR_BACK)
