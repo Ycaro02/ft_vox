@@ -76,7 +76,7 @@ void unloadChunkHandler(Context *c) {
 	while ((next = hashmap_next(&it))) {
 		chunk = (Chunks *)it.value;
 		if (chunk) {
-			s32 distance = chunkDistanceGet(camChunkX, camChunkZ, chunk->x, chunk->z);
+			s32 distance = chunksEuclideanDistanceGet(camChunkX, camChunkZ, chunk->x, chunk->z);
 			BlockPos chunkID = CHUNKS_MAP_ID_GET(chunk->x, chunk->z);
 			if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && distance > maxChunkLoad) {
 				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {

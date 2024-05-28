@@ -13,7 +13,6 @@ typedef struct s_render_chunks {
 } RenderChunks;
 
 /* render/render_chunks.c */
-HashMap			*chunksToRenderChunks(Context *c, HashMap *chunksMap);
 void			renderChunkFree(RenderChunks *render);
 /* Function to provide at hashmap init for renderChunks map */
 void			renderChunksMapFree(void *entry);

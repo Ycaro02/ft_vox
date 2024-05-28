@@ -52,6 +52,7 @@
 		"type_traits": "c",
 		"utility": "c",
 		"time.h": "c",
-		"struct_timeval.h": "c"
+		"struct_timeval.h": "c",
+		"cmath": "c"
 	}
 }

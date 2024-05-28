@@ -1,37 +1,57 @@
 #include "../../include/world.h"
 #include "../../include/chunks.h"
 
+// void flagSet(u8 *flags, u8 flag_val)
+// {
+//     if (flags)
+//         *flags |= flag_val;
+// }
+
+// void flagUnset(u8 *flags, u8 flag_val)
+// {
+//     if (flags)
+//         *flags &= ~flag_val;
+// }
+
+
+// s8 flagIsSet(u8 flags, u8 flag_val) {
+//    return ((flags & flag_val) == flag_val);
+// }
 
 s8 allNeighborsExist(Block *block) {
 	return (block->neighbors == BLOCK_HIDDEN);
 }
 
 void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
-	BlockPos pos[6] = {
-		{block->x + 1, block->y, block->z}, {block->x - 1, block->y, block->z},
-		{block->x, block->y + 1, block->z}, {block->x, block->y - 1, block->z},
-		{block->x, block->y, block->z + 1}, {block->x, block->y, block->z - 1}
-	};
-	u8 masks[6] = {
-		NEIGHBOR_LEFT, NEIGHBOR_RIGHT,
-		NEIGHBOR_BOTTOM, NEIGHBOR_TOP,
-		NEIGHBOR_BACK, NEIGHBOR_FRONT
-	};
-	u8 block_masks[6] = {
-		NEIGHBOR_LEFT, NEIGHBOR_RIGHT,
-		NEIGHBOR_BOTTOM, NEIGHBOR_TOP,
-		NEIGHBOR_BACK, NEIGHBOR_FRONT
-	};
-	for (u32 i = 0; i < 6; ++i) {
-		if (pos[i].x > 0 && pos[i].x < 16 && pos[i].y > 0 && pos[i].y < 16 && pos[i].z > 0 && pos[i].z < 16) {
-			Block *neighbor = blockCache[pos[i].x][pos[i].y][pos[i].z];
-			if (neighbor != NULL) {
-				neighbor->neighbors |= masks[i];
-				block->neighbors |= block_masks[i];
-			}
-		}
-	}
+    BlockPos pos[6] = {
+        {block->x + 1, block->y, block->z}, {block->x - 1, block->y, block->z},
+        {block->x, block->y + 1, block->z}, {block->x, block->y - 1, block->z},
+        {block->x, block->y, block->z + 1}, {block->x, block->y, block->z - 1}
+    };
+    // These masks are for updating the neighbors of the current block
+    u8 neighbor_masks[6] = {
+        NEIGHBOR_RIGHT, NEIGHBOR_LEFT,
+        NEIGHBOR_TOP, NEIGHBOR_BOTTOM,
+        NEIGHBOR_FRONT, NEIGHBOR_BACK
+    };
+    // These masks are for updating the current block
+    u8 block_masks[6] = {
+        NEIGHBOR_LEFT, NEIGHBOR_RIGHT,
+        NEIGHBOR_BOTTOM, NEIGHBOR_TOP,
+        NEIGHBOR_BACK, NEIGHBOR_FRONT
+    };
+
+    for (u32 i = 0; i < 6; ++i) {
+        if (pos[i].x >= 0 && pos[i].x < 16 && pos[i].y >= 0 && pos[i].y < 16 && pos[i].z >= 0 && pos[i].z < 16) {
+            Block *neighbor = blockCache[pos[i].x][pos[i].y][pos[i].z];
+            if (neighbor != NULL) {
+                neighbor->neighbors |= neighbor_masks[i];
+                block->neighbors |= block_masks[i];
+            }
+        }
+    }
 }
+
 
 u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID) {
     s8 next = TRUE;

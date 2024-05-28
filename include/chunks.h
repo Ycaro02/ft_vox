@@ -26,7 +26,6 @@ typedef struct s_debug_perlin {
 typedef struct s_chunks {
 	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 	u32				nb_block;					/* nb block (outdated value total of blockmap subchunk) */
-    s32				id;     					/* Chunk Id */
 	u32				visible_block;				/* Number of visible block */
 	s32				x;							/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;							/* Chunk offset Z can be negative (relative to origine chunks) */
@@ -40,7 +39,7 @@ void chunksMapFree(void *entry);
 
 /* chunks */
 Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ);
-s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
+s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
 void unloadChunkHandler(Context *c);
 
 #endif /* HEADER_CHUNKS_H */

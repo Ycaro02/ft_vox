@@ -1,14 +1,15 @@
 #include "../../include/vox.h"			/* Main project header */
-#include "../../include/chunks.h"		/* Main project header */
-#include "../../include/perlin_noise.h"	/* Main project header */
+#include "../../include/chunks.h"
+#include "../../include/perlin_noise.h"
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
 
-// s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
+// s32 chunksManhattanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
 // 	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
 // }
 
-s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
+
+s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
     return ((s32)floor(sqrt(pow(camChunkX - chunkX, 2) + pow(camChunkZ - chunkZ, 2))));
 }
 
@@ -263,21 +264,12 @@ u32 chunksCubeGet(Chunks *chunks, RenderChunks *render)
     return (idx);
 }
 
-s32 getChunkID() {
-	static s32 chunksID = 0;
-	return (chunksID++);
-}
-
 Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
 		return (NULL);
 	}
-
-	mtx_lock(mtx);
-	chunks->id = getChunkID();
-	mtx_unlock(mtx);
 
 	chunks->x = chunkX;
 	chunks->z = chunkZ;

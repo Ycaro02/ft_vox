@@ -79,7 +79,7 @@ int threadChunksLoad(void *data) {
 }
 
 
-// s32 chunkDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
+// s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
 
 /**
  * @brief Initialize a thread to load a chunk
@@ -109,7 +109,7 @@ s8 threadInitChunkLoad(Context *c, s32 chunkX, s32 chunkZ) {
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 	tdata->threadID = threadID;
-	// ft_printf_fd(1, ORANGE"\nThread: %d"RESET""CYAN" create [%d][%d], "RESET""PINK"CamChunksPos: [%d][%d] -> Distance: |%d|"RESET, threadID, chunkX, chunkZ, c->cam.chunkPos[0], c->cam.chunkPos[2], chunkDistanceGet(c->cam.chunkPos[0], c->cam.chunkPos[2], chunkX, chunkZ));
+	// ft_printf_fd(1, ORANGE"\nThread: %d"RESET""CYAN" create [%d][%d], "RESET""PINK"CamChunksPos: [%d][%d] -> Distance: |%d|"RESET, threadID, chunkX, chunkZ, c->cam.chunkPos[0], c->cam.chunkPos[2], chunksEuclideanDistanceGet(c->cam.chunkPos[0], c->cam.chunkPos[2], chunkX, chunkZ));
 	c->threadContext->workerCurrent += 1;
 	c->threadContext->workers[threadID].busy = WORKER_BUSY;
 	c->threadContext->workers[threadID].data = tdata;
@@ -164,7 +164,7 @@ void chunksQueueRemoveHandling(Mutex *mtx, HashMap *chunksMapToLoad, s32 camChun
 	it = hashmap_iterator(chunksMapToLoad);
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
-		if (chunkDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_UNLOAD_MAX) {
+		if (chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_UNLOAD_MAX) {
 			if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 				*chunkIDToRemove = pos;
 				ft_lstadd_back(&toRemoveList, ft_lstnew(chunkIDToRemove));
@@ -270,7 +270,7 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
 		// tmpDistance = abs(c->cam.chunkPos[0] - pos.y) + abs(c->cam.chunkPos[2] - pos.z);
-		tmpDistance = chunkDistanceGet(camChunkX, camChunkZ, pos.y, pos.z);
+		tmpDistance = chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos.y, pos.z);
 		if (distance == -1 || tmpDistance <= distance) {
 			distance = tmpDistance;
 			tdata = (ThreadData *)it.value;

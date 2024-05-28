@@ -3,20 +3,36 @@
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
 
+u32 countChunksBlock(BlockPos chunkID, HashMap *chunksMap, Mutex *chunkMtx) {
+	u32 totalBlock = 0;
+	Chunks *chunks = NULL;
+
+	mtx_lock(chunkMtx);
+	chunks = hashmap_get(chunksMap, chunkID);
+	if (chunks) {
+		totalBlock = chunks->nb_block;
+	}
+	mtx_unlock(chunkMtx);
+	return (totalBlock);
+}
+
 
 void drawAllChunks(Context *c, GLuint VAO) {
 	s8			next = TRUE;
-	u32 		chunkRenderNb = 0;
+	u32 		chunkRenderNb = 0, blockRenderNb = 0;
 	HashMap_it	it;
 	
 	mtx_lock(&c->renderMtx);
 	it = hashmap_iterator(c->world->renderChunksMap);
 	while ((next = hashmap_next(&it))) {
-		drawAllCube(VAO, (RenderChunks *)it.value);
+		RenderChunks *render = (RenderChunks *)it.value;
+		drawAllCube(VAO, render);
 		chunkRenderNb++;
+		blockRenderNb += render->visibleBlock;
+		// realTotalBlock += countChunksBlock(render->chunkID, c->world->chunksMap, &c->threadContext->chunkMtx);
 	}
-	ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %d,"RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
-		, chunkRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
+	ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "YELLOW"Visible Block: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
+	, chunkRenderNb, blockRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
 	mtx_unlock(&c->renderMtx);
 }
 
