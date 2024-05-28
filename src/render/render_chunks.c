@@ -6,10 +6,6 @@ GLuint setupInstanceVBOForThisChunk(vec3* block_array, u32 visibleBlock) {
     return (bufferGlCreate(GL_ARRAY_BUFFER, visibleBlock * sizeof(vec3), (void *)block_array[0]));
 }
 
-void fillBlockArrayForChunk(RenderChunks *render, Chunks *chunks) {
-	chunksCubeGet(chunks, render);
-}
-
 void renderChunkFree(RenderChunks *render) {
 	free(render->blockTypeID);
 	free(render->block_array);
@@ -24,7 +20,6 @@ void renderChunksMapFree(void *entry) {
 	}
 	free(e); /* free the entry t_list node */
 }
-
 
 RenderChunks *renderChunkCreateVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID) {
 	/* Create VBO */
@@ -74,7 +69,7 @@ RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
 		free(render);
 		return (NULL);
 	}
-	fillBlockArrayForChunk(render, chunks);
+	chunksCubeGet(chunks, render);
 
 	/* We need to store vbo to create in list to give it to main thread */
 	if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {

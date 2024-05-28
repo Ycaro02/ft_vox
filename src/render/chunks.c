@@ -79,7 +79,7 @@ void initializeBlockCache(Block* blockCache[16][16][16]) {
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t BRUT_fill_subchunks(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb)
+size_t subchunksInit(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb)
 {
 	Block *block = NULL;
 	s32 startYWorld = nb * 16;
@@ -201,7 +201,7 @@ f32 perlinNoiseHeight(Mutex *mtx, f32 **perlin2D, s32 localX, s32 localZ, DebugP
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void BRUT_FillChunks(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
+void chunkBuild(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 	DebugPerlin **perlinVal = ft_calloc(sizeof(DebugPerlin *), 16 + 1);
 
 	for (u32 x = 0; x < 16; ++x) {
@@ -221,10 +221,9 @@ void BRUT_FillChunks(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 		chunkMaxY = (s32)SEA_LEVEL;
 	}
 
-
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
 		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
-		chunks->nb_block += BRUT_fill_subchunks(&chunks->sub_chunks[i], perlinVal, i);
+		chunks->nb_block += subchunksInit(&chunks->sub_chunks[i], perlinVal, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
 		/* SET DEBUG VALUE HERE */
 		chunks->perlinVal = perlinVal;
@@ -238,30 +237,25 @@ void BRUT_FillChunks(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
  * @param chunkID Chunk ID [in]
  * @return u32 Number of visible block
 */
-u32 chunksCubeGet(Chunks *chunks, RenderChunks *render)
+void chunksCubeGet(Chunks *chunks, RenderChunks *render)
 {
     s8 next = TRUE;
 	u32 idx = 0;
 
 	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
 		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
-		next = hashmap_next(&it);
-		while (next) {
+		while ((next = hashmap_next(&it))) {
 			Block *block = (Block *)it.value;
 			if (block->neighbors != BLOCK_HIDDEN && block->type != AIR) {
 				render->block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
 				render->block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
 				render->block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
 				render->blockTypeID[idx] = (f32)block->type;
-				// ft_printf_fd(1, "Block %d = %f\n", block->type, render->blockTypeID[idx]);
 				++idx;
+				// ft_printf_fd(1, "Block %d = %f\n", block->type, render->blockTypeID[idx]);
 			}
-			next = hashmap_next(&it);
 		}
 	}
-
-    // ft_printf_fd(1, GREEN"Renderer Cube %u\n"RESET, idx);
-    return (idx);
 }
 
 Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
@@ -273,6 +267,6 @@ Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
 
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
-	BRUT_FillChunks(mtx, perlin2D, chunks);
+	chunkBuild(mtx, perlin2D, chunks);
 	return (chunks);
 }

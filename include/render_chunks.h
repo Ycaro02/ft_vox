@@ -10,6 +10,13 @@ typedef struct s_render_chunks {
 	f32			*blockTypeID;		/* Block type ID */
     u32			visibleBlock;		/* Number of visible block in this chunks */
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
+
+
+	vec3		*faceArray[6];
+	f32			*faceTypeID[6];
+	GLuint		faceVBO[6];
+	GLuint		faceTypeVBO[6];
+	u32			*faceCount;
 } RenderChunks;
 
 /* render/render_chunks.c */
@@ -18,7 +25,7 @@ void			renderChunkFree(RenderChunks *render);
 void			renderChunksMapFree(void *entry);
 
 /* Render chunks.c */
-u32				chunksCubeGet(Chunks *chunks, RenderChunks *render);
+void			chunksCubeGet(Chunks *chunks, RenderChunks *render);
 RenderChunks 	*renderChunkCreate(Context *c, Chunks *chunks);
 RenderChunks	*renderChunkCreateVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID);
 

@@ -10,6 +10,15 @@
 #define BOTTOM_FACE 4.0f
 #define TOP_FACE 5.0f
 
+enum cubeFaceIndex {
+	BACK_FACE_IDX=0,
+	FRONT_FACE_IDX,
+	LEFT_FACE_IDX,
+	RIGHT_FACE_IDX,
+	BOTTOM_FACE_IDX,
+	TOP_FACE_IDX
+};
+
 /* Define cube face vertex */
 /* bl-> tr -> br -> tl */
 #define CUBE_BACK_FACE_VERTEX \
