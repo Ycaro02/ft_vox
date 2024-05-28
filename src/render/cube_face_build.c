@@ -112,18 +112,6 @@ void drawFace(GLuint VAO, RenderChunks *render, u32 vertex_nb, u32 faceNb, u8 fa
 	// glBindVertexArray(0);
 }
 
-
-void drawAllFace(FaceCubeModel *faceCube, RenderChunks *render) {
-	u32 faceNb = 0, faceVertexNb = 0;
-
-	for (u8 i = 0; i < 6; ++i) {
-		faceNb = render->faceCount[i];
-		faceVertexNb = (faceNb * 4U);
-		drawFace(faceCube[i].VAO, render, faceVertexNb, faceNb, i);
-	}
-}
-
-
 u32 countChunksBlock(BlockPos chunkID, HashMap *chunksMap, Mutex *chunkMtx) {
 	u32 totalBlock = 0;
 	Chunks *chunks = NULL;
@@ -152,8 +140,8 @@ void drawAllChunksByFace(Context *c) {
         while ((next = hashmap_next(&it))) {
             RenderChunks *render = (RenderChunks *)it.value;
             u32 faceNb = render->faceCount[i];
-            u32 faceVertexNb = (faceNb * 4U);
-            drawFace(c->faceCube[i].VAO, render, faceVertexNb, faceNb, i);
+            // u32 faceVertexNb = (faceNb * 4U);
+            drawFace(c->faceCube[i].VAO, render, 6U, faceNb, i);
             chunkRenderNb++;
             blockRenderNb += render->visibleBlock;
 			faceRendernb += faceNb;
