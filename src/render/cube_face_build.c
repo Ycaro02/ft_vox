@@ -5,7 +5,7 @@
 #include "../../include/thread_load.h"
 
 s8 faceHidden(u8 neighbors, u8 face) {
-	return (neighbors & (1 << face));
+	return (neighbors & (1U << face));
 }
 
 u32 *faceVisibleCount(Chunks *chunks) {
@@ -91,7 +91,8 @@ RenderChunks *renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, Bloc
 /* NEW draw logic */
 
 void drawFace(GLuint VAO, RenderChunks *render, u32 vertex_nb, u32 faceNb, u8 faceIdx) {
-	glBindVertexArray(VAO);
+	// glBindVertexArray(VAO);
+	(void)VAO;
 
 	/* Bind Block instance VBO */
 	glBindBuffer(GL_ARRAY_BUFFER, render->faceVBO[faceIdx]);
@@ -108,7 +109,7 @@ void drawFace(GLuint VAO, RenderChunks *render, u32 vertex_nb, u32 faceNb, u8 fa
 
 	glDrawElementsInstanced(GL_TRIANGLES, vertex_nb, GL_UNSIGNED_INT, 0, faceNb);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	// glBindVertexArray(0);
 }
 
 
@@ -122,22 +123,46 @@ void drawAllFace(FaceCubeModel *faceCube, RenderChunks *render) {
 	}
 }
 
+
+u32 countChunksBlock(BlockPos chunkID, HashMap *chunksMap, Mutex *chunkMtx) {
+	u32 totalBlock = 0;
+	Chunks *chunks = NULL;
+
+	mtx_lock(chunkMtx);
+	chunks = hashmap_get(chunksMap, chunkID);
+	if (chunks) {
+		totalBlock = chunks->nb_block;
+	}
+	mtx_unlock(chunkMtx);
+	return (totalBlock);
+}
+
+
 /* TO CALL in chunksRender in main  -> DONE */
 void drawAllChunksByFace(Context *c) {
-	s8			next = TRUE;
-	u32 		chunkRenderNb = 0, blockRenderNb = 0;
-	HashMap_it	it;
-	
-	mtx_lock(&c->renderMtx);
-	it = hashmap_iterator(c->world->renderChunksMap);
-	while ((next = hashmap_next(&it))) {
-		RenderChunks *render = (RenderChunks *)it.value;
-		drawAllFace(c->faceCube, render);
-		chunkRenderNb++;
-		blockRenderNb += render->visibleBlock;
-		// realTotalBlock += countChunksBlock(render->chunkID, c->world->chunksMap, &c->threadContext->chunkMtx);
+    s8			next = TRUE;
+    u32 		chunkRenderNb = 0, blockRenderNb = 0, faceRendernb = 0, totalBlock = 0;
+    HashMap_it	it;
+    
+    mtx_lock(&c->renderMtx);
+    for (u8 i = 0; i < 6; ++i) {
+		glBindVertexArray(c->faceCube[i].VAO);
+
+        it = hashmap_iterator(c->world->renderChunksMap);
+        while ((next = hashmap_next(&it))) {
+            RenderChunks *render = (RenderChunks *)it.value;
+            u32 faceNb = render->faceCount[i];
+            u32 faceVertexNb = (faceNb * 4U);
+            drawFace(c->faceCube[i].VAO, render, faceVertexNb, faceNb, i);
+            chunkRenderNb++;
+            blockRenderNb += render->visibleBlock;
+			faceRendernb += faceNb;
+			totalBlock += countChunksBlock(render->chunkID, c->world->chunksMap, &c->threadContext->chunkMtx);
+        }
+		glBindVertexArray(0);
+    
 	}
-	ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "YELLOW"Visible Block: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
-	, chunkRenderNb, blockRenderNb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
-	mtx_unlock(&c->renderMtx);
+    ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "RED"Total Block: %u "RESET" "YELLOW"Visible Block: %u, Face: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
+    , chunkRenderNb / 6, totalBlock / 6, blockRenderNb / 6, faceRendernb, hashmap_size(c->world->chunksMap), hashmap_size(c->threadContext->chunksMapToLoad), fpsGet());
+    mtx_unlock(&c->renderMtx);
 }
