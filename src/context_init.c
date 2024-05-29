@@ -73,7 +73,6 @@ Context *contextInit() {
 
 	if (!(context->world = ft_calloc(sizeof(World), 1))
 		|| (!(context->win_ptr = init_openGL_context()))
-		|| (!(context->world = ft_calloc(sizeof(World), 1)))
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
 		|| (!(context->perlin2D = perlin2DInit(42U)))

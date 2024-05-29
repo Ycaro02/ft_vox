@@ -1,9 +1,7 @@
 #include "../../include/world.h"
 #include "../../include/chunks.h"
 
-s8 allNeighborsExist(Block *block) {
-	return (block->neighbors == BLOCK_HIDDEN);
-}
+/* Occlusion Culling Strategy */
 
 void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
     BlockPos pos[6] = {
@@ -35,14 +33,6 @@ void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
     }
 }
 
-// void blockOneLayerCacheInit(Block *blockCache[16][16]) {
-// 	for (u32 x = 0; x < 16; ++x) {
-// 		for (u32 y = 0; y < 16; ++y) {
-// 			blockCache[x][y] = NULL;
-// 		}
-// 	}
-// }
-
 void blockOneLayerCacheLoad(Block *blockCache[16][16], SubChunks *subChunk, u32 layer) {
 	for (u32 x = 0; x < 16; ++x) {
 		for (u32 z = 0; z < 16; ++z) {
@@ -59,7 +49,6 @@ void blockOneLayerCacheLoad(Block *blockCache[16][16], SubChunks *subChunk, u32 
 void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]) {
 	Block *botBlockCache[16][16];
 
-	// blockOneLayerCacheInit(botBlockCache);
 	blockOneLayerCacheLoad(botBlockCache, botSubChunk, 16 - 1);
 
 	for (u32 x = 0; x < 16; ++x) {
@@ -75,26 +64,31 @@ void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][
 }
 
 /* Not mandatory now, we check face instead of block, but maybe good to check only no hidden block for perf */
-u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID) {
-    s8 next = TRUE;
-    HashMap *block_map = chunks->sub_chunks[subChunksID].block_map;
-    HashMap_it it = hashmap_iterator(block_map);
-    next = hashmap_next(&it);
-    u32 nb_block = hashmap_size(block_map);
 
-    while (next) {
-        Block *block = (Block *)it.value;
-        if (allNeighborsExist(block)) {
-            --nb_block;
-        }
-        next = hashmap_next(&it);
-    }
-    return (nb_block);
-}
+// s8 allNeighborsExist(Block *block) {
+// 	return (block->neighbors == BLOCK_HIDDEN);
+// }
+
+// u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID) {
+//     s8 next = TRUE;
+//     HashMap *block_map = chunks->sub_chunks[subChunksID].block_map;
+//     HashMap_it it = hashmap_iterator(block_map);
+//     next = hashmap_next(&it);
+//     u32 nb_block = hashmap_size(block_map);
+
+//     while (next) {
+//         Block *block = (Block *)it.value;
+//         if (allNeighborsExist(block)) {
+//             --nb_block;
+//         }
+//         next = hashmap_next(&it);
+//     }
+//     return (nb_block);
+// }
 
 
 
-/* Occlusion Culling Strategy */
+/* OLD Occlusion Culling Strategy */
 
 
 /**

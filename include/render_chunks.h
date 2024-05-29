@@ -8,8 +8,7 @@ typedef struct s_render_chunks {
     // GLuint		instanceVBO;		/* Instance VBO */
 	// GLuint  	typeBlockVBO;		/* Type VBO */
 	// f32			*blockTypeID;		/* Block type ID */
-
-    u32			visibleBlock;		/* Number of visible block in this chunks */
+    // u32			visibleBlock;		/* Number of visible block in this chunks */
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
 
 
@@ -56,7 +55,7 @@ void renderChunksVBODestroy(Context *c);
 /* render/cube_face_build.c */
 s8				faceVisible(u8 neighbors, u8 face);
 void			chunksCubeFaceGet(Chunks *chunks, RenderChunks *render);
-GLuint			faceInstanceVBOCreate(vec3 *faceArray, u32 visibleBlock);
+GLuint			faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb);
 RenderChunks	*renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID);
 void			drawAllChunksByFace(Context *c);
 

@@ -26,7 +26,7 @@ typedef struct s_debug_perlin {
 typedef struct s_chunks {
 	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 	u32				nb_block;					/* nb block (outdated value total of blockmap subchunk) */
-	u32				visible_block;				/* Number of visible block */
+	// u32				visible_block;				/* Number of visible block */
 	s32				x;							/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;							/* Chunk offset Z can be negative (relative to origine chunks) */
 	suseconds_t		lastUpdate;					/* Last update time */
