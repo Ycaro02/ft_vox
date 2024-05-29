@@ -153,14 +153,20 @@ void supervisorWaitWorker(Context *c) {
 }
 
 
-void chunksQueueRemoveHandling(Mutex *mtx, HashMap *chunksMapToLoad, s32 camChunkX, s32 camChunkZ) {
+void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, HashMap *chunksMapToLoad) {
 	HashMap_it it;
 	s8 next = TRUE;
 	BlockPos pos = {0, 0, 0};
 	t_list *toRemoveList = NULL;
 	BlockPos *chunkIDToRemove = NULL;
+	s32 camChunkX, camChunkZ;
 
-	mtx_lock(mtx); /* LOCK */
+	mtx_lock(gameMtx);
+	camChunkX = c->cam.chunkPos[0];
+	camChunkZ = c->cam.chunkPos[2];
+	mtx_unlock(gameMtx);
+
+	mtx_lock(threadMtx); /* LOCK */
 	it = hashmap_iterator(chunksMapToLoad);
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
@@ -176,7 +182,7 @@ void chunksQueueRemoveHandling(Mutex *mtx, HashMap *chunksMapToLoad, s32 camChun
 		hashmap_remove_entry(chunksMapToLoad, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
 	}
 	ft_lstclear(&toRemoveList, free);
-	mtx_unlock(mtx); /* UNLOCK */
+	mtx_unlock(threadMtx); /* UNLOCK */
 
 }
 
@@ -315,7 +321,7 @@ s32 threadHandling(void *context) {
 		chunksViewHandling(c);
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
-		chunksQueueRemoveHandling(&c->threadContext->threadMtx , c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);
+		chunksQueueRemoveHandling(c, &c->threadContext->threadMtx, &c->gameMtx, c->threadContext->chunksMapToLoad);
 	}
 
 	supervisorWaitWorker(c);

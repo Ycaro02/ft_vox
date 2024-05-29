@@ -9,8 +9,7 @@ GLFWwindow *window_create(int width, int height, const char *title)
         return (NULL);
 	}
 
-	/* Enable 8x antialiasing */
-    glfwWindowHint(GLFW_SAMPLES, 8);
+
 
 	// GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	// win = glfwCreateWindow(width, height, title, monitor, NULL);
@@ -54,6 +53,9 @@ GLFWwindow *init_openGL_context()
         return (NULL);
     }
 
+	/* Enable 8x antialiasing */
+    glfwWindowHint(GLFW_SAMPLES, 8);
+
 	/* Enable multisampling for antialiasing */
     glEnable(GL_MULTISAMPLE);
 	
@@ -63,9 +65,9 @@ GLFWwindow *init_openGL_context()
 	/* Enable face culling */
 	// glEnable(GL_CULL_FACE);
 
-	/* Enable blending */
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	/* Enable blending, make water transparent but we need to do occlusion culling between chunks */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Set the viewport */
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
