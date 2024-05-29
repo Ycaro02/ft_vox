@@ -67,6 +67,7 @@ s32 threadFreeWorkerGet (ThreadContext *threadContext) {
 int threadChunksLoad(void *data) {
 	ThreadData *t = (ThreadData *)data;
 
+	/* Big block cache to avoid multiple call to hashmap_get for this chunk */
 	Block *chunkBlockCache[16][16][16][16];
 
 	Chunks *chunks = chunksLoad(chunkBlockCache, t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ);
