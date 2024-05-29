@@ -51,6 +51,19 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
 }
 
 
+void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
+	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
+	
+	for (u32 i = 0; i < 6; ++i) {
+	if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
+		*instanceVBO = chunk->render->faceVBO[i];
+		*typeBlockVBO = chunk->render->faceTypeVBO[i];
+		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
+		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
+	}
+}
+}
+
 void unloadChunkHandler(Context *c) {
 	Chunks 		*chunk = NULL;
 	HashMap_it 	it = {};
@@ -60,7 +73,7 @@ void unloadChunkHandler(Context *c) {
 	s32			camChunkX = 0, camChunkZ = 0;
 	s32 		maxChunkLoad = CHUNKS_UNLOAD_MAX;
 
-	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
+	// GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
 
 	mtx_lock(&c->gameMtx);
 	camChunkX = c->cam.chunkPos[0];
@@ -83,14 +96,7 @@ void unloadChunkHandler(Context *c) {
 					ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
 					/* We need to store vbo to destroy in list to give it to main thread */
 					if (chunk->render) {
-						for (u32 i = 0; i < 6; ++i) {
-							if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
-								*instanceVBO = chunk->render->faceVBO[i];
-								*typeBlockVBO = chunk->render->faceTypeVBO[i];
-								ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
-								ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
-							}
-						}
+						renderChunksVBODestroyListBuild(c, chunk);
 					}
 				}
 			}
@@ -170,7 +176,7 @@ void chunksViewHandling(Context *c) {
 	f32 			radiusEnd = (CAM_FOV + 10.0f) / 2.0f;
 	Chunks 			*chunks = NULL;
 	BlockPos 		chunkID;
-	s8 				inView = 0, chunksRenderIsload = 0;
+	s8 				inView = 0, chunksRenderIsload = 0, chunkUpdated = 0, chunkInRenderMap = 0;
 
     glm_vec3_copy(c->cam.position, start);
     glm_vec3_zero(chunkPos);
@@ -208,13 +214,26 @@ void chunksViewHandling(Context *c) {
                 box = chunkBoundingBoxGet(chunks, 8.0f, camYposition);
 				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
+				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
+				if (chunksRenderIsload) {
+					chunkUpdated = chunks->lastUpdate > chunks->render->lastUpdate;
+				}
 				if (inView) {
 					if (!chunksRenderIsload) {
 						chunks->render = renderChunkCreate(c, chunks);
-					} else if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
+					} else if (chunkUpdated) {
+						/* Need to free opengl buffer too*/
+						if (chunkInRenderMap) {
+							hashmap_remove_entry(c->world->renderChunksMap, chunkID, HASHMAP_FREE_NODE);
+						}
+						if (chunks->render->faceTypeVBO[0] != 0) {
+							renderChunksVBODestroyListBuild(c, chunks);
+						}
+						renderChunkFree(chunks->render);
+						chunks->render = renderChunkCreate(c, chunks);
+					} else if (!chunkInRenderMap && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
 						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
 					}
-					chunks->lastUpdate = get_ms_time();
 				}
 			
 				mtx_unlock(&c->renderMtx);

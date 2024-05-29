@@ -10,7 +10,7 @@ typedef struct s_render_chunks {
 	// f32			*blockTypeID;		/* Block type ID */
     // u32			visibleBlock;		/* Number of visible block in this chunks */
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
-
+	suseconds_t lastUpdate;			/* Last update time */
 
 	vec3		*faceArray[6];
 	f32			*faceTypeID[6];
@@ -34,12 +34,14 @@ s8				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 s8				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
 void			chunksViewHandling(Context *c);
 void 			renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap);
+void 			renderChunksVBODestroyListBuild(Context *c, Chunks *chunk);
 
 /* render/occlusion_culling */
-u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
+// u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 void			updateNeighbors(Block *block, Block *blockCache[16][16][16]);
+void			updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]);
 
-void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]);
+void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16]);
 
 /* render/cube.c to be refact */
 void			drawAllCube(GLuint VAO, RenderChunks *render);

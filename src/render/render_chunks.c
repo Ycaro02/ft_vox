@@ -47,5 +47,7 @@ RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
 
 	(void)c;
 
+	render->lastUpdate = get_ms_time();
+
 	return (render);
 }

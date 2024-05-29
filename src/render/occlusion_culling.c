@@ -33,7 +33,7 @@ void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
     }
 }
 
-void blockOneLayerCacheLoad(Block *blockCache[16][16], SubChunks *subChunk, u32 layer) {
+void blockYLayerCacheLoad(Block *blockCache[16][16], SubChunks *subChunk, u32 layer) {
 	for (u32 x = 0; x < 16; ++x) {
 		for (u32 z = 0; z < 16; ++z) {
 			blockCache[x][z] = hashmap_get(subChunk->block_map, (BlockPos){x, layer, z});
@@ -49,7 +49,7 @@ void blockOneLayerCacheLoad(Block *blockCache[16][16], SubChunks *subChunk, u32 
 void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]) {
 	Block *botBlockCache[16][16];
 
-	blockOneLayerCacheLoad(botBlockCache, botSubChunk, 16 - 1);
+	blockYLayerCacheLoad(botBlockCache, botSubChunk, 16 - 1);
 
 	for (u32 x = 0; x < 16; ++x) {
 		for (u32 z = 0; z < 16; ++z) {
@@ -62,6 +62,102 @@ void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][
 		}
 	}
 }
+
+Chunks *getChunkAt(Context *c, s32 x, s32 z) {
+	return (hashmap_get(c->world->chunksMap, (BlockPos){0, x, z}));
+}
+
+Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
+	(void)y;
+	// return (hashmap_get(chunk->sub_chunks[y / 16].block_map, (BlockPos){x, y % 16, z}));
+	return (hashmap_get(chunk->sub_chunks[subChunkID].block_map, (BlockPos){x, y, z}));
+}
+
+u32 subChunksMaxGet(Chunks *chunk) {
+	u32 subChunksMax = 0;
+
+	while (chunk->sub_chunks[subChunksMax].block_map != NULL) {
+		++subChunksMax;
+	}
+	--subChunksMax;
+	return (subChunksMax);
+}
+
+void logBlockNeighbors(Block *block, const char *position, char *color) {
+    ft_printf_fd(1, "%s Block at %s: neighbors mask = %d\n"RESET,color,  position, block->neighbors);
+}
+
+void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16]) {
+    u32 subChunksMax = subChunksMaxGet(chunk);
+	// s32 camChunkX = 0, camChunkZ = 0;
+	// mtx_lock(&c->gameMtx);
+	// camChunkX = c->cam.chunkPos[0];
+	// camChunkZ = c->cam.chunkPos[2];
+	// mtx_unlock(&c->gameMtx);
+    BlockPos pos[4] = {
+        {chunk->x, 0, chunk->z + 1}, // front
+        {chunk->x, 0, chunk->z - 1}, // back
+        {chunk->x + 1, 0, chunk->z}, // right
+        {chunk->x - 1, 0, chunk->z}, // left
+    };
+
+    u8 block_masks[4] = {
+        NEIGHBOR_FRONT, NEIGHBOR_BACK,
+        NEIGHBOR_RIGHT, NEIGHBOR_LEFT,
+    };
+
+    u8 neighbor_masks[4] = {
+        NEIGHBOR_BACK, NEIGHBOR_FRONT,
+        NEIGHBOR_LEFT, NEIGHBOR_RIGHT,
+    };
+
+    for (u32 i = 0; i < 4; ++i) {
+		// if (chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos[i].x, pos[i].z) >= CHUNKS_LOAD_RADIUS) { continue ;}
+		mtx_lock(&c->threadContext->chunkMtx);
+		Chunks *neighborChunk = getChunkAt(c, pos[i].x, pos[i].z);
+		mtx_unlock(&c->threadContext->chunkMtx);
+		if (!neighborChunk) { continue; }
+		u32 neighborSubChunksMax = subChunksMaxGet(neighborChunk);
+		for (u32 subChunkID = 0; subChunkID <= subChunksMax && subChunkID <= neighborSubChunksMax; ++subChunkID) {
+			for (u32 y = 0; y < 16; ++y) {
+				for (u32 x = 0; x < 16; ++x) {
+					for (u32 z = 0; z < 16; ++z) {
+						// Block *block = getBlockAt(chunk, x, y, z, subChunkID);
+						Block *block = chunkBlockCache[subChunkID][x][y][z];
+						Block *neighborBlock = NULL;
+
+						switch (i) {
+							case 0: // front
+								if (z == 15)
+									neighborBlock = getBlockAt(neighborChunk, x, y, 0, subChunkID);
+								break;
+							case 1: // back
+								if (z == 0)
+									neighborBlock = getBlockAt(neighborChunk, x, y, 15, subChunkID);
+								break;
+							case 2: // right
+								if (x == 15)
+									neighborBlock = getBlockAt(neighborChunk, 0, y, z, subChunkID);
+								break;
+							case 3: // left
+								if (x == 0)
+									neighborBlock = getBlockAt(neighborChunk, 15, y, z, subChunkID);
+								break;
+						}
+
+						if (block != NULL && neighborBlock != NULL) {
+							block->neighbors |= block_masks[i];
+							neighborBlock->neighbors |= neighbor_masks[i];
+						}
+					} /* for z */
+				} 	/* for x */
+			}	/* for y */
+		} /* for subChunkID */
+		neighborChunk->lastUpdate = get_ms_time();
+    } /* for i (direction )*/
+    chunk->lastUpdate = get_ms_time();
+}
+
 
 /* Not mandatory now, we check face instead of block, but maybe good to check only no hidden block for perf */
 

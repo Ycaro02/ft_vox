@@ -66,10 +66,15 @@ s32 threadFreeWorkerGet (ThreadContext *threadContext) {
 */
 int threadChunksLoad(void *data) {
 	ThreadData *t = (ThreadData *)data;
-	Chunks *chunks = chunksLoad(t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ);
+
+	Block *chunkBlockCache[16][16][16][16];
+
+	Chunks *chunks = chunksLoad(chunkBlockCache, t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ);
 	mtx_lock(t->chunkMtx);
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunks);
 	mtx_unlock(t->chunkMtx);
+
+	updateChunkNeighbors(t->c, chunks, chunkBlockCache);
 
 	mtx_lock(&t->c->threadContext->threadMtx);
 	t->c->threadContext->workers[t->threadID].busy = WORKER_FREE;

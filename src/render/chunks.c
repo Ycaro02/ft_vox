@@ -77,28 +77,27 @@ void blockCacheInit(Block* blockCache[16][16][16]) {
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t subchunksInit(Chunks *chunk, SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 layer)
+size_t subchunksInit(Block *chunkBlockCache[16][16][16][16], Chunks *chunk, SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 layer)
 {
 	Block *block = NULL;
 	s32 startYWorld = layer * 16;
-	Block *blockCache[16][16][16];
 
-	blockCacheInit(blockCache);
+	blockCacheInit(chunkBlockCache[layer]);
 
     for (s32 x = 0; x < 16; ++x) {
         for (s32 y = 0; y < 16; ++y) {
             for (s32 z = 0; z < 16; ++z) {
 				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld))) {
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){x, y, z}, block);
-					blockCache[x][y][z] = block;
-					updateNeighbors(block, blockCache);
+					chunkBlockCache[layer][x][y][z] = block;
+					updateNeighbors(block, chunkBlockCache[layer]);
 				}
             }
         }
     }
 
 	if (layer != 0) {
-		updateTopBotNeighbors(&chunk->sub_chunks[layer - 1], blockCache);
+		updateTopBotNeighbors(&chunk->sub_chunks[layer - 1], chunkBlockCache[layer]);
 	}
 
 	return (hashmap_size(sub_chunk->block_map));
@@ -204,7 +203,7 @@ f32 perlinNoiseHeight(Mutex *mtx, f32 **perlin2D, s32 localX, s32 localZ, DebugP
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void chunkBuild(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
+void chunkBuild(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 	DebugPerlin **perlinVal = ft_calloc(sizeof(DebugPerlin *), 16 + 1);
 
 	for (u32 x = 0; x < 16; ++x) {
@@ -226,14 +225,14 @@ void chunkBuild(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
 		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
-		chunks->nb_block += subchunksInit(chunks, &chunks->sub_chunks[i], perlinVal, i);
+		chunks->nb_block += subchunksInit(chunkBlockCache, chunks, &chunks->sub_chunks[i], perlinVal, i);
 		// chunks->visible_block += checkHiddenBlock(chunks, i);
 		/* SET DEBUG VALUE HERE */
 		chunks->perlinVal = perlinVal;
 	}
 }
 
-Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
+Chunks *chunksLoad(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
@@ -242,6 +241,7 @@ Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
 
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
-	chunkBuild(mtx, perlin2D, chunks);
+	chunkBuild(chunkBlockCache, mtx, perlin2D, chunks);
+	chunks->lastUpdate = get_ms_time();
 	return (chunks);
 }

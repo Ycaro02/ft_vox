@@ -38,7 +38,7 @@ typedef struct s_chunks {
 void chunksMapFree(void *entry);
 
 /* chunks */
-Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ);
+Chunks *chunksLoad(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ);
 s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
 void unloadChunkHandler(Context *c);
 
