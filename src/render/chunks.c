@@ -38,18 +38,17 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	s32		realY = startYWorld + y;
 	s32 	seaLevel = (s32)SEA_LEVEL - 30;
 
-
-	if (realY >=  maxHeight - 2 && realY < maxHeight)  {
-		blockType = DIRT;
-		if (realY == maxHeight - 1) { blockType = GRASS; }
-	} else if (realY < maxHeight)  {
+	if (realY < maxHeight - 2 && maxHeight > seaLevel) {
 		blockType = STONE;
 	} else if (realY >= maxHeight && realY <= seaLevel) {
 		blockType = WATER;
+	} else if (realY >= maxHeight - 2 && realY < maxHeight)  {
+		blockType = DIRT;
+		if (realY == maxHeight - 1) { blockType = GRASS; }
 	} else  {
 		return (NULL);
 	}
-		
+
 	if (!(block = malloc(sizeof(Block)))) {
 		ft_printf_fd(2, "Failed to allocate block\n");
 		return (NULL);

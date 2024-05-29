@@ -69,8 +69,6 @@ Context *contextInit() {
 	mtx_unlock(&context->gameMtx);
 	extractFrustumPlanes(&context->gameMtx ,&context->cam.frustum, context->cam.projection, context->cam.view);
 
-	// || (!(context->cubeVAO = setupCubeVAO(&context->cube)))
-
 	if (!(context->world = ft_calloc(sizeof(World), 1))
 		|| (!(context->win_ptr = init_openGL_context()))
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))

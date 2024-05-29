@@ -32,7 +32,7 @@ RenderChunks	*renderChunkCreateVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos
 /* render/load_chunks.c */
 s8				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 s8				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
-void			chunksViewHandling(Context *c, HashMap *renderChunksMap);
+void			chunksViewHandling(Context *c);
 void 			renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap);
 
 /* render/occlusion_culling */

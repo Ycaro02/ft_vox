@@ -312,7 +312,7 @@ s32 threadHandling(void *context) {
 				mtx_unlock(&c->threadContext->threadMtx);
 			}
 		}
-		chunksViewHandling(c, c->world->renderChunksMap);
+		chunksViewHandling(c);
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
 		chunksQueueRemoveHandling(&c->threadContext->threadMtx , c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);

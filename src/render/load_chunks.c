@@ -57,7 +57,6 @@ void unloadChunkHandler(Context *c) {
 	s8 			next = TRUE;
 	t_list 		*toRemoveList = NULL;
 	BlockPos 	*chunkIDToRemove = NULL;
-	// suseconds_t currentTime = get_ms_time();
 	s32			camChunkX = 0, camChunkZ = 0;
 	s32 		maxChunkLoad = CHUNKS_UNLOAD_MAX;
 
@@ -163,32 +162,19 @@ void renderChunksVBODestroy(Context *c) {
  * @param c Context
  * @param renderChunksMap Render chunks map
 */
-void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
-  	/*	
-  		This func must be call by sub thread but we need to do modification before 
-		(RenderChunk init must store a list of renderChunk created to init vbo in main thread)
-	*/
-	(void)renderChunksMap;
-    vec3            start, rayDir, chunkPos, currPos, travelVector;
-    f32             current = 0;
+void chunksViewHandling(Context *c) {
+	BoundingBox 	box;
+    vec3            start, rayDir, chunkPos, currPos, travelVector, camViewVector;
+    f32             current = 0, camYposition = 0;
 	f32 			radiusStart = (-CAM_FOV - 10.0f) / 2.0f;
 	f32 			radiusEnd = (CAM_FOV + 10.0f) / 2.0f;
-	vec3 			camViewVector;
-	f32 			camYposition;
-	Chunks *chunks = NULL;
-	BlockPos chunkID;
-	s8 inView = 0;
-	
-
+	Chunks 			*chunks = NULL;
+	BlockPos 		chunkID;
+	s8 				inView = 0, chunksRenderIsload = 0;
 
     glm_vec3_copy(c->cam.position, start);
     glm_vec3_zero(chunkPos);
     glm_vec3_zero(currPos);
-
-
-	/* LOCK */
-	// mtx_lock(&c->renderMtx);
-	// suseconds_t currentTime = get_ms_time();
 
 
 	/* Loop on the complete camera fov */
@@ -219,8 +205,8 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 			if (chunks) {
 				mtx_lock(&c->renderMtx);
 				
-                BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, camYposition);
-				s8 chunksRenderIsload = chunksRenderIsLoaded(chunks);
+                box = chunkBoundingBoxGet(chunks, 8.0f, camYposition);
+				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
 				if (inView) {
 					if (!chunksRenderIsload) {
@@ -238,8 +224,4 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
 
 		}
     }
-	// ft_printf_fd(1, "Time to load chunks: %u ms\n", get_ms_time() - currentTime);
-	// mtx_unlock(&c->renderMtx);
-	/* UNLOCK */	
-
 }
