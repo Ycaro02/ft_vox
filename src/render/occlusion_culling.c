@@ -35,6 +35,46 @@ void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
     }
 }
 
+// void blockOneLayerCacheInit(Block *blockCache[16][16]) {
+// 	for (u32 x = 0; x < 16; ++x) {
+// 		for (u32 y = 0; y < 16; ++y) {
+// 			blockCache[x][y] = NULL;
+// 		}
+// 	}
+// }
+
+void blockOneLayerCacheLoad(Block *blockCache[16][16], SubChunks *subChunk, u32 layer) {
+	for (u32 x = 0; x < 16; ++x) {
+		for (u32 z = 0; z < 16; ++z) {
+			blockCache[x][z] = hashmap_get(subChunk->block_map, (BlockPos){x, layer, z});
+		}
+	}
+}
+
+/* 
+	@brief We need to update top of botSubChunk accordate with top blockCache
+	@param botSubChunk the bottom subchunk to update (maybe we can give the last layer of the top subchunk loaded in cache)
+	@param topBlockCache the top block cache 
+*/
+void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]) {
+	Block *botBlockCache[16][16];
+
+	// blockOneLayerCacheInit(botBlockCache);
+	blockOneLayerCacheLoad(botBlockCache, botSubChunk, 16 - 1);
+
+	for (u32 x = 0; x < 16; ++x) {
+		for (u32 z = 0; z < 16; ++z) {
+			Block *botBlock = botBlockCache[x][z];
+			Block *topBlock = topBlockCache[x][0][z];
+			if (botBlock && topBlock) {
+				botBlock->neighbors |= NEIGHBOR_TOP;
+				topBlock->neighbors |= NEIGHBOR_BOTTOM;
+			}
+		}
+	}
+}
+
+/* Not mandatory now, we check face instead of block, but maybe good to check only no hidden block for perf */
 u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID) {
     s8 next = TRUE;
     HashMap *block_map = chunks->sub_chunks[subChunksID].block_map;

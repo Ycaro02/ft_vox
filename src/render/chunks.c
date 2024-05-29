@@ -8,7 +8,6 @@
 // 	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
 // }
 
-
 s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
     return ((s32)floor(sqrt(pow(camChunkX - chunkX, 2) + pow(camChunkZ - chunkZ, 2))));
 }
@@ -40,15 +39,14 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	s32 	seaLevel = (s32)SEA_LEVEL - 30;
 
 
-	if (realY > seaLevel && realY >=  maxHeight - 2 && realY < maxHeight) {
+	if (realY >=  maxHeight - 2 && realY < maxHeight)  {
 		blockType = DIRT;
-		if (realY == maxHeight - 1)
-			blockType = GRASS;
-	} else if (realY > seaLevel && realY < maxHeight) {
+		if (realY == maxHeight - 1) { blockType = GRASS; }
+	} else if (realY < maxHeight)  {
 		blockType = STONE;
-	} else if (realY <= seaLevel) {
+	} else if (realY >= maxHeight && realY <= seaLevel) {
 		blockType = WATER;
-	} else {
+	} else  {
 		return (NULL);
 	}
 		
@@ -64,7 +62,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	return (block);
 }
 
-void initializeBlockCache(Block* blockCache[16][16][16]) {
+void blockCacheInit(Block* blockCache[16][16][16]) {
     for (u32 x = 0; x < 16; ++x) {
         for (u32 y = 0; y < 16; ++y) {
             for (u32 z = 0; z < 16; ++z) {
@@ -79,13 +77,13 @@ void initializeBlockCache(Block* blockCache[16][16][16]) {
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t subchunksInit(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb)
+size_t subchunksInit(Chunks *chunk, SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 layer)
 {
 	Block *block = NULL;
-	s32 startYWorld = nb * 16;
+	s32 startYWorld = layer * 16;
 	Block *blockCache[16][16][16];
 
-	initializeBlockCache(blockCache);
+	blockCacheInit(blockCache);
 
     for (s32 x = 0; x < 16; ++x) {
         for (s32 y = 0; y < 16; ++y) {
@@ -98,6 +96,11 @@ size_t subchunksInit(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb)
             }
         }
     }
+
+	if (layer != 0) {
+		updateTopBotNeighbors(&chunk->sub_chunks[layer - 1], blockCache);
+	}
+
 	return (hashmap_size(sub_chunk->block_map));
 }
 
@@ -223,7 +226,7 @@ void chunkBuild(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
 		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
-		chunks->nb_block += subchunksInit(&chunks->sub_chunks[i], perlinVal, i);
+		chunks->nb_block += subchunksInit(chunks, &chunks->sub_chunks[i], perlinVal, i);
 		chunks->visible_block += checkHiddenBlock(chunks, i);
 		/* SET DEBUG VALUE HERE */
 		chunks->perlinVal = perlinVal;

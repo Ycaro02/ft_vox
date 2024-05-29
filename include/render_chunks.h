@@ -40,6 +40,8 @@ void 			renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap);
 u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 void			updateNeighbors(Block *block, Block *blockCache[16][16][16]);
 
+void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]);
+
 /* render/cube.c to be refact */
 void			drawAllCube(GLuint VAO, RenderChunks *render);
 

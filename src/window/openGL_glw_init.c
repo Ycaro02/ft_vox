@@ -61,7 +61,7 @@ GLFWwindow *init_openGL_context()
 	glEnable(GL_DEPTH_TEST);
 
 	/* Enable face culling */
-	glEnable(GL_CULL_FACE);
+	// glEnable(GL_CULL_FACE);
 
 	/* Enable blending */
     // glEnable(GL_BLEND);
