@@ -3,9 +3,8 @@
 #include "../../include/camera.h"
 #include "../../include/chunks.h"
 
-BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize, f32 cameraHeight) {
+BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize) {
     BoundingBox box;
-	(void)cameraHeight;
     /* Compute bot left corner */
     glm_vec3_copy((vec3){chunk->x * chunkSize, 0, chunk->z * chunkSize}, box.min);
 

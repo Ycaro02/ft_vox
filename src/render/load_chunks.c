@@ -134,7 +134,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		chunks = hashmap_get(c->world->chunksMap, chunkID);
 		if (chunks) {
-			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
+			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f);
 			if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
 				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 					ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
@@ -171,14 +171,16 @@ void renderChunksVBODestroy(Context *c) {
 void chunksViewHandling(Context *c) {
 	BoundingBox 	box;
     vec3            start, rayDir, chunkPos, currPos, travelVector, camViewVector;
-    f32             current = 0, camYposition = 0;
+    f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV - 10.0f) / 2.0f;
 	f32 			radiusEnd = (CAM_FOV + 10.0f) / 2.0f;
 	Chunks 			*chunks = NULL;
 	BlockPos 		chunkID;
 	s8 				inView = 0, chunksRenderIsload = 0, chunkUpdated = 0, chunkInRenderMap = 0;
 
+	mtx_lock(&c->gameMtx);
     glm_vec3_copy(c->cam.position, start);
+	mtx_unlock(&c->gameMtx);
     glm_vec3_zero(chunkPos);
     glm_vec3_zero(currPos);
 
@@ -187,7 +189,6 @@ void chunksViewHandling(Context *c) {
     for (f32 angle = radiusStart; angle <= radiusEnd; angle += ANGLE_INCREMENT) {
 		
 		mtx_lock(&c->gameMtx);
-		camYposition = c->cam.position[1];
 		glm_vec3_copy(c->cam.viewVector, camViewVector);
 		mtx_unlock(&c->gameMtx);
 
@@ -211,7 +212,7 @@ void chunksViewHandling(Context *c) {
 			if (chunks) {
 				mtx_lock(&c->renderMtx);
 				
-                box = chunkBoundingBoxGet(chunks, 8.0f, camYposition);
+                box = chunkBoundingBoxGet(chunks, 8.0f);
 				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
