@@ -75,7 +75,7 @@ int threadChunksLoad(void *data) {
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunks);
 	mtx_unlock(t->chunkMtx);
 
-	updateChunkNeighbors(t->c, chunks, chunkBlockCache);
+	// updateChunkNeighbors(t->c, chunks, chunkBlockCache);
 
 	mtx_lock(&t->c->threadContext->threadMtx);
 	t->c->threadContext->workers[t->threadID].busy = WORKER_FREE;

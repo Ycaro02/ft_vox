@@ -3,8 +3,9 @@ include rsc/mk/source.mk
 
 NAME			=	ft_vox
 CC				=	gcc
-CFLAGS			=	-Wall -Wextra -Werror -O3 -g
+# CFLAGS			=	-Wall -Wextra -Werror -O3 -g
 # CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=address
+CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=thread
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
 
