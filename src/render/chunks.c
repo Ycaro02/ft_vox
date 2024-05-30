@@ -72,6 +72,10 @@ void blockCacheInit(Block* blockCache[16][16][16]) {
     }
 }
 
+Chunks *getChunkAt(Context *c, s32 x, s32 z) {
+	return (hashmap_get(c->world->chunksMap, (BlockPos){0, x, z}));
+}
+
 /**
  * @brief BRUT fill subchunks with block
  * @param sub_chunk Subchunk pointer

@@ -37,7 +37,7 @@ RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
 		return (NULL);
 	}
 	render->chunkID = chunkID;
-	chunksCubeFaceGet(chunks, render);
+	chunksCubeFaceGet(&c->threadContext->chunkMtx, chunks, render);
 
 	/* We need to store vbo to create in list to give it to main thread */
 	if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {

@@ -40,11 +40,8 @@ void 			renderChunksVBODestroyListBuild(Context *c, Chunks *chunk);
 // u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 void			updateNeighbors(Block *block, Block *blockCache[16][16][16]);
 void			updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]);
-
-void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16]);
-
-/* render/cube.c to be refact */
-void			drawAllCube(GLuint VAO, RenderChunks *render);
+s8 allNeighborsChunksExist(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]);
+void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16], Chunks *neighborChunksCache[4]);
 
 /* render/loadchunks.c */
 s8 				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
@@ -56,7 +53,7 @@ void renderChunksVBODestroy(Context *c);
 
 /* render/cube_face_build.c */
 s8				faceVisible(u8 neighbors, u8 face);
-void			chunksCubeFaceGet(Chunks *chunks, RenderChunks *render);
+void			chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render);
 GLuint			faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb);
 RenderChunks	*renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID);
 void			drawAllChunksByFace(Context *c);

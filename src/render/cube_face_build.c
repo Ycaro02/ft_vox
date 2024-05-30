@@ -27,12 +27,14 @@ u32 *faceVisibleCount(Chunks *chunks) {
 }
 
 /* To call in create render chunk -> DONE */
-void chunksCubeFaceGet(Chunks *chunks, RenderChunks *render)
+void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 {
 	u32 idx[6] = {0};
     s8	next = TRUE;
 
 	ft_bzero(idx, sizeof(u32) * 6);
+
+	mtx_lock(chunkMtx);
 
 	render->faceCount = faceVisibleCount(chunks);
 	for (u8 i = 0; i < 6; ++i) {
@@ -56,6 +58,8 @@ void chunksCubeFaceGet(Chunks *chunks, RenderChunks *render)
 			}
 		}
 	}
+	mtx_unlock(chunkMtx);
+
 }
 
 

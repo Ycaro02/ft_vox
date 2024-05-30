@@ -36,6 +36,7 @@ typedef struct s_chunks {
 
 
 void chunksMapFree(void *entry);
+Chunks *getChunkAt(Context *c, s32 x, s32 z);
 
 /* chunks */
 Chunks *chunksLoad(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ);

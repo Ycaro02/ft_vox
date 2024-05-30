@@ -63,10 +63,6 @@ void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][
 	}
 }
 
-Chunks *getChunkAt(Context *c, s32 x, s32 z) {
-	return (hashmap_get(c->world->chunksMap, (BlockPos){0, x, z}));
-}
-
 Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
 	(void)y;
 	// return (hashmap_get(chunk->sub_chunks[y / 16].block_map, (BlockPos){x, y % 16, z}));
@@ -87,19 +83,45 @@ void logBlockNeighbors(Block *block, const char *position, char *color) {
     ft_printf_fd(1, "%s Block at %s: neighbors mask = %d\n"RESET,color,  position, block->neighbors);
 }
 
-void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16]) {
+s8 allNeighborsChunksExist(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]) {
+	u32 count = 0;
+
+	BlockPos pos[4] = {
+        {chunk->x, 0, chunk->z + 1}, // front
+        {chunk->x, 0, chunk->z - 1}, // back
+        {chunk->x + 1, 0, chunk->z}, // right
+        {chunk->x - 1, 0, chunk->z}, // left
+    };
+
+	for (u32 i = 0; i < 4; ++i) {
+		mtx_lock(&c->threadContext->chunkMtx);
+		neighborChunksCache[i] = getChunkAt(c, pos[i].x, pos[i].z);
+		mtx_unlock(&c->threadContext->chunkMtx);
+		if (neighborChunksCache[i]) {
+			++count;
+		}
+	}
+	if (count != 4) {
+		// ft_printf_fd(1, RED"Error: count = %d\n"RESET, count);
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16], Chunks *neighborChunksCache[4]) {
     u32 subChunksMax = subChunksMaxGet(chunk);
 	// s32 camChunkX = 0, camChunkZ = 0;
 	// mtx_lock(&c->gameMtx);
 	// camChunkX = c->cam.chunkPos[0];
 	// camChunkZ = c->cam.chunkPos[2];
 	// mtx_unlock(&c->gameMtx);
-    BlockPos pos[4] = {
-        {chunk->x, 0, chunk->z + 1}, // front
-        {chunk->x, 0, chunk->z - 1}, // back
-        {chunk->x + 1, 0, chunk->z}, // right
-        {chunk->x - 1, 0, chunk->z}, // left
-    };
+    // BlockPos pos[4] = {
+    //     {chunk->x, 0, chunk->z + 1}, // front
+    //     {chunk->x, 0, chunk->z - 1}, // back
+    //     {chunk->x + 1, 0, chunk->z}, // right
+    //     {chunk->x - 1, 0, chunk->z}, // left
+    // };
+	(void)c;
 
     u8 block_masks[4] = {
         NEIGHBOR_FRONT, NEIGHBOR_BACK,
@@ -112,10 +134,7 @@ void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][
     };
 
     for (u32 i = 0; i < 4; ++i) {
-		// if (chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos[i].x, pos[i].z) >= CHUNKS_LOAD_RADIUS) { continue ;}
-		mtx_lock(&c->threadContext->chunkMtx);
-		Chunks *neighborChunk = getChunkAt(c, pos[i].x, pos[i].z);
-		mtx_unlock(&c->threadContext->chunkMtx);
+		Chunks *neighborChunk = neighborChunksCache[i];
 		if (!neighborChunk) { continue; }
 		u32 neighborSubChunksMax = subChunksMaxGet(neighborChunk);
 		for (u32 subChunkID = 0; subChunkID <= subChunksMax && subChunkID <= neighborSubChunksMax; ++subChunkID) {

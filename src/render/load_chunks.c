@@ -217,7 +217,9 @@ void chunksViewHandling(Context *c) {
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
 				if (chunksRenderIsload) {
+					mtx_lock(&c->threadContext->chunkMtx);
 					chunkUpdated = chunks->lastUpdate > chunks->render->lastUpdate;
+					mtx_unlock(&c->threadContext->chunkMtx);
 				}
 				if (inView) {
 					if (!chunksRenderIsload) {
