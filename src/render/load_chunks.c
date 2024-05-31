@@ -176,7 +176,7 @@ void chunksViewHandling(Context *c) {
 	f32 			radiusEnd = (CAM_FOV + 10.0f) / 2.0f;
 	Chunks 			*chunks = NULL;
 	BlockPos 		chunkID;
-	s8 				inView = 0, chunksRenderIsload = 0, chunkUpdated = 0, chunkInRenderMap = 0;
+	s8 				inView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;
 
 	mtx_lock(&c->gameMtx);
     glm_vec3_copy(c->cam.position, start);
@@ -184,6 +184,7 @@ void chunksViewHandling(Context *c) {
     glm_vec3_zero(chunkPos);
     glm_vec3_zero(currPos);
 
+	u8 neightborChunkLoaded = 0;
 
 	/* Loop on the complete camera fov */
     for (f32 angle = radiusStart; angle <= radiusEnd; angle += ANGLE_INCREMENT) {
@@ -209,32 +210,20 @@ void chunksViewHandling(Context *c) {
             chunks = hashmap_get(c->world->chunksMap, chunkID);
             mtx_unlock(&c->threadContext->chunkMtx);
 
+
 			if (chunks) {
 				mtx_lock(&c->renderMtx);
-				
                 box = chunkBoundingBoxGet(chunks, 8.0f);
 				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
-				if (chunksRenderIsload) {
-					mtx_lock(&c->threadContext->chunkMtx);
-					chunkUpdated = chunks->lastUpdate > chunks->render->lastUpdate;
-					mtx_unlock(&c->threadContext->chunkMtx);
-				}
 				if (inView) {
-					if (!chunksRenderIsload) {
+					chunkNeighborMaskUpdate(c, chunks);
+					neightborChunkLoaded = chunks->neighbors == CHUNKS_NEIGHBOR_LOADED;
+					if (!chunksRenderIsload && neightborChunkLoaded) {
 						chunks->render = renderChunkCreate(c, chunks);
-					} else if (chunkUpdated) {
-						/* Need to free opengl buffer too*/
-						if (chunkInRenderMap) {
-							hashmap_remove_entry(c->world->renderChunksMap, chunkID, HASHMAP_FREE_NODE);
-						}
-						if (chunks->render->faceTypeVBO[0] != 0) {
-							renderChunksVBODestroyListBuild(c, chunks);
-						}
-						renderChunkFree(chunks->render);
-						chunks->render = renderChunkCreate(c, chunks);
-					} else if (!chunkInRenderMap && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
+					} 
+					else if (!chunkInRenderMap && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
 						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
 					}
 				}

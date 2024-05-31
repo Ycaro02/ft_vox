@@ -42,6 +42,8 @@ void			updateNeighbors(Block *block, Block *blockCache[16][16][16]);
 void			updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]);
 void			chunkNeighborsGet(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]);
 void			updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16], Chunks *neighborChunksCache[4]);
+void			chunkNeighborMaskUpdate(Context *c, Chunks *chunk);
+
 
 /* render/loadchunks.c */
 s8 				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);

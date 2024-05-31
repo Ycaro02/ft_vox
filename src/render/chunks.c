@@ -100,6 +100,7 @@ size_t subchunksInit(Block *chunkBlockCache[16][16][16][16], Chunks *chunk, SubC
         }
     }
 
+
 	if (layer != 0) {
 		updateTopBotNeighbors(&chunk->sub_chunks[layer - 1], chunkBlockCache[layer]);
 	}

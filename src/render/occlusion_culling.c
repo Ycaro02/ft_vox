@@ -91,19 +91,39 @@ void chunkNeighborsGet(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]
         {chunk->x - 1, 0, chunk->z}, // left
     };
 
+	for (u32 i = 0; i < 4; ++i) {
+		mtx_lock(&c->threadContext->chunkMtx);
+		neighborChunksCache[i] = getChunkAt(c, pos[i].x, pos[i].z);
+		mtx_unlock(&c->threadContext->chunkMtx);
+	}
+}
+
+void chunkNeighborMaskUpdate(Context *c, Chunks *chunk) {
+	BlockPos pos[4] = {
+		{chunk->x, 0, chunk->z + 1}, // front
+        {chunk->x, 0, chunk->z - 1}, // back
+        {chunk->x + 1, 0, chunk->z}, // right
+        {chunk->x - 1, 0, chunk->z}, // left
+    };
+
 	u8 chunkMask[4] = {
 		NEIGHBOR_FRONT, NEIGHBOR_BACK,
 		NEIGHBOR_RIGHT, NEIGHBOR_LEFT,
 	};
 
+	Chunks *neightborsChunk = NULL;
+
 	for (u32 i = 0; i < 4; ++i) {
-		mtx_lock(&c->threadContext->chunkMtx);
-		neighborChunksCache[i] = getChunkAt(c, pos[i].x, pos[i].z);
-		mtx_unlock(&c->threadContext->chunkMtx);
-		if (neighborChunksCache[i]) {
+		if (!(chunk->neighbors & chunkMask[i])) {
+			mtx_lock(&c->threadContext->chunkMtx);
+			neightborsChunk = getChunkAt(c, pos[i].x, pos[i].z);
+			mtx_unlock(&c->threadContext->chunkMtx);
+		}
+		if (neightborsChunk) {
 			chunk->neighbors |= chunkMask[i];
 		}
 	}
+
 }
 
 void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16], Chunks *neighborChunksCache[4]) {
