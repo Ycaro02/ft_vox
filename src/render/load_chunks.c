@@ -206,13 +206,10 @@ void chunksViewHandling(Context *c) {
             worldToChunksPos(currPos, chunkPos);
             chunkID = CHUNKS_MAP_ID_GET(chunkPos[0], chunkPos[2]);
 
-			mtx_lock(&c->threadContext->chunkMtx);
             chunks = hashmap_get(c->world->chunksMap, chunkID);
-            mtx_unlock(&c->threadContext->chunkMtx);
 
 
 			if (chunks) {
-				mtx_lock(&c->renderMtx);
                 box = chunkBoundingBoxGet(chunks, 8.0f);
 				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
@@ -220,19 +217,16 @@ void chunksViewHandling(Context *c) {
 				if (inView) {
 					chunkNeighborMaskUpdate(c, chunks);
 					neightborChunkLoaded = chunks->neighbors == CHUNKS_NEIGHBOR_LOADED;
+					mtx_lock(&c->renderMtx);
 					if (!chunksRenderIsload && neightborChunkLoaded) {
 						chunks->render = renderChunkCreate(c, chunks);
 					} 
 					else if (!chunkInRenderMap && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
 						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
 					}
+					mtx_unlock(&c->renderMtx);
 				}
-			
-				mtx_unlock(&c->renderMtx);
-
             }
-
-
 		}
     }
 }

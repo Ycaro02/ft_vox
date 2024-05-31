@@ -97,7 +97,7 @@ int main() {
 	}
 
 	/* Disable VSync to avoid fps locking */
-	glfwSwapInterval(0);
+	glfwSwapInterval(1);
 
 	main_loop(context, context->skyTexture);
     vox_destroy(context);
