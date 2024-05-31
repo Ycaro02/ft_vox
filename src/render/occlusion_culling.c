@@ -10,13 +10,13 @@ void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
         {block->x, block->y + 1, block->z}, {block->x, block->y - 1, block->z},
     };
     // These masks are for updating the neighbors of the current block
-    u8 block_masks[6] = {
+    u8 blockMasks[6] = {
         NEIGHBOR_FRONT, NEIGHBOR_BACK,
         NEIGHBOR_RIGHT, NEIGHBOR_LEFT,
         NEIGHBOR_TOP, NEIGHBOR_BOTTOM,
     };
     // These masks are for updating the current block
-    u8 neighbor_masks[6] = {
+    u8 neighborMasks[6] = {
         NEIGHBOR_BACK, NEIGHBOR_FRONT,
         NEIGHBOR_LEFT, NEIGHBOR_RIGHT,
         NEIGHBOR_BOTTOM, NEIGHBOR_TOP,
@@ -26,8 +26,8 @@ void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
         if (pos[i].x >= 0 && pos[i].x < 16 && pos[i].y >= 0 && pos[i].y < 16 && pos[i].z >= 0 && pos[i].z < 16) {
             Block *neighbor = blockCache[pos[i].x][pos[i].y][pos[i].z];
             if (neighbor != NULL) {
-                neighbor->neighbors |= neighbor_masks[i];
-                block->neighbors |= block_masks[i];
+                neighbor->neighbors |= neighborMasks[i];
+                block->neighbors |= blockMasks[i];
             }
         }
     }
@@ -83,9 +83,7 @@ void logBlockNeighbors(Block *block, const char *position, char *color) {
     ft_printf_fd(1, "%s Block at %s: neighbors mask = %d\n"RESET,color,  position, block->neighbors);
 }
 
-s8 allNeighborsChunksExist(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]) {
-	u32 count = 0;
-
+void chunkNeighborsGet(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]) {
 	BlockPos pos[4] = {
         {chunk->x, 0, chunk->z + 1}, // front
         {chunk->x, 0, chunk->z - 1}, // back
@@ -93,19 +91,19 @@ s8 allNeighborsChunksExist(Context *c, Chunks *chunk, Chunks *neighborChunksCach
         {chunk->x - 1, 0, chunk->z}, // left
     };
 
+	u8 chunkMask[4] = {
+		NEIGHBOR_FRONT, NEIGHBOR_BACK,
+		NEIGHBOR_RIGHT, NEIGHBOR_LEFT,
+	};
+
 	for (u32 i = 0; i < 4; ++i) {
 		mtx_lock(&c->threadContext->chunkMtx);
 		neighborChunksCache[i] = getChunkAt(c, pos[i].x, pos[i].z);
 		mtx_unlock(&c->threadContext->chunkMtx);
 		if (neighborChunksCache[i]) {
-			++count;
+			chunk->neighbors |= chunkMask[i];
 		}
 	}
-	if (count != 4) {
-		// ft_printf_fd(1, RED"Error: count = %d\n"RESET, count);
-		return (FALSE);
-	}
-	return (TRUE);
 }
 
 void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16], Chunks *neighborChunksCache[4]) {
@@ -123,12 +121,12 @@ void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][
     // };
 	(void)c;
 
-    u8 block_masks[4] = {
+    u8 blockMasks[4] = {
         NEIGHBOR_FRONT, NEIGHBOR_BACK,
         NEIGHBOR_RIGHT, NEIGHBOR_LEFT,
     };
 
-    u8 neighbor_masks[4] = {
+    u8 neighborMasks[4] = {
         NEIGHBOR_BACK, NEIGHBOR_FRONT,
         NEIGHBOR_LEFT, NEIGHBOR_RIGHT,
     };
@@ -146,27 +144,27 @@ void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][
 						Block *neighborBlock = NULL;
 
 						switch (i) {
-							case 0: // front
+							case CHUNK_FRONT: // front
 								if (z == 15)
 									neighborBlock = getBlockAt(neighborChunk, x, y, 0, subChunkID);
 								break;
-							case 1: // back
+							case CHUNK_BACK: // back
 								if (z == 0)
 									neighborBlock = getBlockAt(neighborChunk, x, y, 15, subChunkID);
 								break;
-							case 2: // right
+							case CHUNK_RIGHT: // right
 								if (x == 15)
 									neighborBlock = getBlockAt(neighborChunk, 0, y, z, subChunkID);
 								break;
-							case 3: // left
+							case CHUNK_LEFT: // left
 								if (x == 0)
 									neighborBlock = getBlockAt(neighborChunk, 15, y, z, subChunkID);
 								break;
 						}
 
 						if (block != NULL && neighborBlock != NULL) {
-							block->neighbors |= block_masks[i];
-							neighborBlock->neighbors |= neighbor_masks[i];
+							block->neighbors |= blockMasks[i];
+							neighborBlock->neighbors |= neighborMasks[i];
 						}
 					} /* for z */
 				} 	/* for x */

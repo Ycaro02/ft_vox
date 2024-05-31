@@ -32,6 +32,7 @@ typedef struct s_chunks {
 	suseconds_t		lastUpdate;					/* Last update time */
 	DebugPerlin		**perlinVal;				/* Perlin noise value */
 	RenderChunks 	*render;					/* RenderChunks pointer */
+	u8				neighbors;					/* Neighbors */
 } Chunks;
 
 

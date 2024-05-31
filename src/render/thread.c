@@ -80,7 +80,7 @@ int threadChunksLoad(void *data) {
 	Chunks *neighborChunksCache[4] = {NULL, NULL, NULL, NULL};
 	
 	
-	allNeighborsChunksExist(t->c, chunks, neighborChunksCache);
+	chunkNeighborsGet(t->c, chunks, neighborChunksCache);
 
 	mtx_lock(t->chunkMtx);
 	updateChunkNeighbors(t->c, chunks, chunkBlockCache, neighborChunksCache);
