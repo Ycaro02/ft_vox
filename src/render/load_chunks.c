@@ -80,14 +80,11 @@ void unloadChunkHandler(Context *c) {
 	camChunkZ = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
-	mtx_lock(&c->renderMtx);
-	/*LOCK*/
 	it = hashmap_iterator(c->world->chunksMap);
-
-
 	while ((next = hashmap_next(&it))) {
 		chunk = (Chunks *)it.value;
 		if (chunk) {
+			mtx_lock(&c->renderMtx);
 			s32 distance = chunksEuclideanDistanceGet(camChunkX, camChunkZ, chunk->x, chunk->z);
 			BlockPos chunkID = CHUNKS_MAP_ID_GET(chunk->x, chunk->z);
 			if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && distance > maxChunkLoad) {
@@ -100,15 +97,15 @@ void unloadChunkHandler(Context *c) {
 					}
 				}
 			}
+			mtx_unlock(&c->renderMtx);
 		}
 	}
 
 	for (t_list *current = toRemoveList; current; current = current->next) {
+		mtx_lock(&c->renderMtx);
 		hashmap_remove_entry(c->world->chunksMap, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
+		mtx_unlock(&c->renderMtx);
 	}
-
-	mtx_unlock(&c->renderMtx);
-	/*UNLOCK*/
 
 	ft_lstclear(&toRemoveList, free);
 
@@ -127,9 +124,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	Chunks 			*chunks;
 	
 	mtx_lock(&c->renderMtx);
-	/* LOCK */
 	it = hashmap_iterator(renderChunksMap);
-	
 	while ((next = hashmap_next(&it))) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		chunks = hashmap_get(c->world->chunksMap, chunkID);
@@ -143,12 +138,13 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 			}
 		}
 	}
+	mtx_unlock(&c->renderMtx);
 
 	for (t_list *current = toRemoveList; current; current = current->next) {
+		mtx_lock(&c->renderMtx);
 		hashmap_remove_entry(renderChunksMap, *(BlockPos *)current->content, HASHMAP_FREE_NODE);
+		mtx_unlock(&c->renderMtx);
 	}
-	mtx_unlock(&c->renderMtx);
-	/* UNLOCK */
 
 	ft_lstclear(&toRemoveList, free);
 

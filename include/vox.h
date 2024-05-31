@@ -25,9 +25,9 @@
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
 
 /* Basic value */
-#define CHUNKS_LOAD_RADIUS 10			/* Chunks load radius */
-#define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 4)	/* Chunks render radius */
-#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 10.0f)				/* Max render distance */
+#define CHUNKS_LOAD_RADIUS 12							/* Chunks load radius */
+#define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 4)		/* Chunks unload max radius */
+#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 10.0f)	/* Max render distance */
 
 /* DEBUG VAL */
 // #define CHUNKS_LOAD_RADIUS 1			/* Chunks load radius */

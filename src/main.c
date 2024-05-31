@@ -6,7 +6,6 @@
 void chunksRender(Context *c, GLuint shader_id) {
     glLoadIdentity();
 	glUseProgram(shader_id);
-	// drawAllChunks(c, VAO);
 	drawAllChunksByFace(c);
     glFlush();
 }
@@ -70,9 +69,8 @@ void renderChunksLoadNewVBO(Context *c) {
 	mtx_unlock(&c->renderMtx);
 }
 
-void main_loop(Context *c, GLuint skyTexture) {
-    while (!glfwWindowShouldClose(c->win_ptr)) {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+void updateGame(Context *c) {
 		/* Input handling */
 		glfwPollEvents();
         handle_input(c);
@@ -80,14 +78,63 @@ void main_loop(Context *c, GLuint skyTexture) {
 		/* Update data */
 		update_camera(c, c->cubeShaderID);
 		renderChunksLoadNewVBO(c);
-		
+}
+
+void renderGame(Context *c, GLuint skyTexture) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/* Render logic */
-        displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
-        chunksRender(c, c->cubeShaderID);
+		displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
+		chunksRender(c, c->cubeShaderID);
 
 		glfwSwapBuffers(c->win_ptr);
+}
+
+
+
+void main_loop(Context *c, GLuint skyTexture) {
+    while (!glfwWindowShouldClose(c->win_ptr)) {
+		updateGame(c);
+		renderGame(c, skyTexture);	
     }
 }
+
+
+
+// void testUpdateLogic(Context *c, GLuint skyTexture) {
+//     double lastTime = glfwGetTime();
+//     double timer = lastTime;
+//     double deltaTime = 0;
+//     double nowTime = 0;
+//     int frames = 0;
+//     int updates = 0;
+
+//     double limitFPS = 60.0;
+
+//     while (!glfwWindowShouldClose(c->win_ptr)) {
+//         nowTime = glfwGetTime();
+//         deltaTime += (nowTime - lastTime) * limitFPS; // Multiply instead of divide
+//         lastTime = nowTime;
+//         // Input, AI, Physics, etc.
+//         while (deltaTime >= 1.0) {
+//             updateGame(c); // Update game logic here
+//             updates++;
+//             deltaTime--;
+//         }
+//         // Rendering
+//         renderGame(c, skyTexture); // Render game here
+//         frames++;
+
+//         // Reset after one second
+//         if (glfwGetTime() - timer > 1.0) {
+//             timer++;
+//             printf("FPS: %d, Updates: %d\n", frames, updates);
+//             (void)frames, (void)updates;
+//             updates = 0;
+//             frames = 0;
+//         }
+//     }
+// }
+
 
 int main() {
     Context *context;
@@ -97,12 +144,14 @@ int main() {
 	}
 
 	/* Disable VSync to avoid fps locking */
-	glfwSwapInterval(1);
+	// glfwSwapInterval(0);
+	// testUpdateLogic(context, context->skyTexture);
 
 	main_loop(context, context->skyTexture);
     vox_destroy(context);
     return (0);
 }
+
 
 
 
