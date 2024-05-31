@@ -69,12 +69,10 @@ Context *contextInit() {
 	mtx_unlock(&context->gameMtx);
 	extractFrustumPlanes(&context->gameMtx ,&context->cam.frustum, context->cam.projection, context->cam.view);
 
-
 	if (!(context->world = ft_calloc(sizeof(World), 1))
 		|| (!(context->win_ptr = init_openGL_context()))
-		|| (!(context->world = ft_calloc(sizeof(World), 1)))
-		|| (!(context->cubeVAO = setupCubeVAO(&context->cube)))
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
+		|| (!(context->faceCube = cubeFaceVAOinit()))
 		|| (!(context->perlin2D = perlin2DInit(42U)))
 		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_2000, hashmap_free_node_only)))
 		|| (!threadSupervisorInit(context))) 
@@ -83,17 +81,10 @@ Context *contextInit() {
 	} 
 
 	/* init context camera */
-    glm_mat4_identity(context->cube.rotation);
+    glm_mat4_identity(context->rotation);
 
 
 	initSkyBox(context);
 	initAtlasTexture(context);
-
-
-	if (!cubeFaceVAOinit()) {
-		ft_printf_fd(1, "Error: cubeFaceVAOInit\n");
-		return (NULL);
-	}
-
 	return (context);
 }

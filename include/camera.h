@@ -22,11 +22,11 @@ typedef struct s_chunks Chunks;
 #define VEC3_ROTATEY (vec3){0.0f, 1.0f, 0.0f}
 #define VEC3_ROTATEZ (vec3){0.0f, 0.0f, 1.0f}
 
-typedef struct {
+typedef struct s_frustrum {
     vec4 planes[6]; // Les plans du frustum : 0=droite, 1=gauche, 2=bas, 3=haut, 4=proche, 5=loin
 } Frustum;
 
-typedef struct {
+typedef struct s_bounding_box {
     vec3 min; // Le coin inférieur gauche de la boîte
     vec3 max; // Le coin supérieur droit de la boîte
 } BoundingBox;
@@ -47,7 +47,7 @@ typedef struct s_camera {
 /* Frustrum */
 s8			isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box);
 void		extractFrustumPlanes(Mutex *gameMtx,Frustum *frustum, mat4 projection, mat4 view);
-BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize, f32 cameraHeight);
+BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize);
 
 /* Camera */
 Camera		create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far);

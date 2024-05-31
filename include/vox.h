@@ -31,7 +31,7 @@
 
 /* DEBUG VAL */
 // #define CHUNKS_LOAD_RADIUS 1			/* Chunks load radius */
-// #define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 2)	/* Chunks render radius */
+// #define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 5)	/* Chunks render radius */
 // #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 2.0f)				/* Max render distance */
 
 
@@ -75,13 +75,20 @@
 
 #define SEA_LEVEL 80.0f
 
+#define CHUNK_FRONT 0
+#define CHUNK_BACK 1
+#define CHUNK_RIGHT 2
+#define CHUNK_LEFT 3
+
 /* Neighbor flag value */
-#define NEIGHBOR_RIGHT  1U
-#define NEIGHBOR_LEFT   2U
-#define NEIGHBOR_TOP    4U
-#define NEIGHBOR_BOTTOM 8U
-#define NEIGHBOR_FRONT  16U
-#define NEIGHBOR_BACK   32U
+#define NEIGHBOR_BACK  	1U
+#define NEIGHBOR_FRONT  2U
+#define NEIGHBOR_LEFT   4U
+#define NEIGHBOR_RIGHT 	8U
+#define NEIGHBOR_BOTTOM 16U
+#define NEIGHBOR_TOP 	32U
+
+#define CHUNKS_NEIGHBOR_LOADED (NEIGHBOR_BACK | NEIGHBOR_FRONT | NEIGHBOR_LEFT | NEIGHBOR_RIGHT)
 
 /* If all neighnor block is hidden */
 #define BLOCK_HIDDEN (NEIGHBOR_RIGHT | NEIGHBOR_LEFT | NEIGHBOR_TOP | NEIGHBOR_BOTTOM | NEIGHBOR_FRONT | NEIGHBOR_BACK)

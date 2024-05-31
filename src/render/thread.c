@@ -66,10 +66,26 @@ s32 threadFreeWorkerGet (ThreadContext *threadContext) {
 */
 int threadChunksLoad(void *data) {
 	ThreadData *t = (ThreadData *)data;
-	Chunks *chunks = chunksLoad(t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ);
+
+	/* Big block cache to avoid multiple call to hashmap_get for this chunk */
+	Block *chunkBlockCache[16][16][16][16];
+
+	Chunks *chunks = chunksLoad(chunkBlockCache, t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ);
+	
+	
 	mtx_lock(t->chunkMtx);
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunks);
 	mtx_unlock(t->chunkMtx);
+
+	Chunks *neighborChunksCache[4] = {NULL, NULL, NULL, NULL};
+	
+	
+	chunkNeighborsGet(t->c, chunks, neighborChunksCache);
+
+	mtx_lock(t->chunkMtx);
+	updateChunkNeighbors(t->c, chunks, chunkBlockCache, neighborChunksCache);
+	mtx_unlock(t->chunkMtx);
+
 
 	mtx_lock(&t->c->threadContext->threadMtx);
 	t->c->threadContext->workers[t->threadID].busy = WORKER_FREE;
@@ -153,14 +169,20 @@ void supervisorWaitWorker(Context *c) {
 }
 
 
-void chunksQueueRemoveHandling(Mutex *mtx, HashMap *chunksMapToLoad, s32 camChunkX, s32 camChunkZ) {
+void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, HashMap *chunksMapToLoad) {
 	HashMap_it it;
 	s8 next = TRUE;
 	BlockPos pos = {0, 0, 0};
 	t_list *toRemoveList = NULL;
 	BlockPos *chunkIDToRemove = NULL;
+	s32 camChunkX, camChunkZ;
 
-	mtx_lock(mtx); /* LOCK */
+	mtx_lock(gameMtx);
+	camChunkX = c->cam.chunkPos[0];
+	camChunkZ = c->cam.chunkPos[2];
+	mtx_unlock(gameMtx);
+
+	mtx_lock(threadMtx); /* LOCK */
 	it = hashmap_iterator(chunksMapToLoad);
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
@@ -176,7 +198,7 @@ void chunksQueueRemoveHandling(Mutex *mtx, HashMap *chunksMapToLoad, s32 camChun
 		hashmap_remove_entry(chunksMapToLoad, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
 	}
 	ft_lstclear(&toRemoveList, free);
-	mtx_unlock(mtx); /* UNLOCK */
+	mtx_unlock(threadMtx); /* UNLOCK */
 
 }
 
@@ -312,10 +334,10 @@ s32 threadHandling(void *context) {
 				mtx_unlock(&c->threadContext->threadMtx);
 			}
 		}
-		chunksViewHandling(c, c->world->renderChunksMap);
+		chunksViewHandling(c);
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
-		chunksQueueRemoveHandling(&c->threadContext->threadMtx , c->threadContext->chunksMapToLoad, c->cam.chunkPos[0], c->cam.chunkPos[2]);
+		chunksQueueRemoveHandling(c, &c->threadContext->threadMtx, &c->gameMtx, c->threadContext->chunksMapToLoad);
 	}
 
 	supervisorWaitWorker(c);

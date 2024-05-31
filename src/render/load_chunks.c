@@ -51,17 +51,29 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
 }
 
 
+void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
+	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
+	
+	for (u32 i = 0; i < 6; ++i) {
+	if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
+		*instanceVBO = chunk->render->faceVBO[i];
+		*typeBlockVBO = chunk->render->faceTypeVBO[i];
+		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
+		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
+	}
+}
+}
+
 void unloadChunkHandler(Context *c) {
 	Chunks 		*chunk = NULL;
 	HashMap_it 	it = {};
 	s8 			next = TRUE;
 	t_list 		*toRemoveList = NULL;
 	BlockPos 	*chunkIDToRemove = NULL;
-	// suseconds_t currentTime = get_ms_time();
 	s32			camChunkX = 0, camChunkZ = 0;
 	s32 		maxChunkLoad = CHUNKS_UNLOAD_MAX;
 
-	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
+	// GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
 
 	mtx_lock(&c->gameMtx);
 	camChunkX = c->cam.chunkPos[0];
@@ -84,12 +96,7 @@ void unloadChunkHandler(Context *c) {
 					ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
 					/* We need to store vbo to destroy in list to give it to main thread */
 					if (chunk->render) {
-						if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
-							*instanceVBO = chunk->render->instanceVBO;
-							*typeBlockVBO = chunk->render->typeBlockVBO;
-							ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
-							ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
-						}
+						renderChunksVBODestroyListBuild(c, chunk);
 					}
 				}
 			}
@@ -127,7 +134,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		chunks = hashmap_get(c->world->chunksMap, chunkID);
 		if (chunks) {
-			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, c->cam.position[1]);
+			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f);
 			if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
 				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 					ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
@@ -161,39 +168,28 @@ void renderChunksVBODestroy(Context *c) {
  * @param c Context
  * @param renderChunksMap Render chunks map
 */
-void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
-  	/*	
-  		This func must be call by sub thread but we need to do modification before 
-		(RenderChunk init must store a list of renderChunk created to init vbo in main thread)
-	*/
-	(void)renderChunksMap;
-    vec3            start, rayDir, chunkPos, currPos, travelVector;
+void chunksViewHandling(Context *c) {
+	BoundingBox 	box;
+    vec3            start, rayDir, chunkPos, currPos, travelVector, camViewVector;
     f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV - 10.0f) / 2.0f;
 	f32 			radiusEnd = (CAM_FOV + 10.0f) / 2.0f;
-	vec3 			camViewVector;
-	f32 			camYposition;
-	Chunks *chunks = NULL;
-	BlockPos chunkID;
-	s8 inView = 0;
-	
+	Chunks 			*chunks = NULL;
+	BlockPos 		chunkID;
+	s8 				inView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;
 
-
+	mtx_lock(&c->gameMtx);
     glm_vec3_copy(c->cam.position, start);
+	mtx_unlock(&c->gameMtx);
     glm_vec3_zero(chunkPos);
     glm_vec3_zero(currPos);
 
-
-	/* LOCK */
-	// mtx_lock(&c->renderMtx);
-	// suseconds_t currentTime = get_ms_time();
-
+	u8 neightborChunkLoaded = 0;
 
 	/* Loop on the complete camera fov */
     for (f32 angle = radiusStart; angle <= radiusEnd; angle += ANGLE_INCREMENT) {
 		
 		mtx_lock(&c->gameMtx);
-		camYposition = c->cam.position[1];
 		glm_vec3_copy(c->cam.viewVector, camViewVector);
 		mtx_unlock(&c->gameMtx);
 
@@ -210,34 +206,27 @@ void chunksViewHandling(Context *c, HashMap *renderChunksMap) {
             worldToChunksPos(currPos, chunkPos);
             chunkID = CHUNKS_MAP_ID_GET(chunkPos[0], chunkPos[2]);
 
-			mtx_lock(&c->threadContext->chunkMtx);
             chunks = hashmap_get(c->world->chunksMap, chunkID);
-            mtx_unlock(&c->threadContext->chunkMtx);
+
 
 			if (chunks) {
-				mtx_lock(&c->renderMtx);
-				
-                BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f, camYposition);
-				s8 chunksRenderIsload = chunksRenderIsLoaded(chunks);
+                box = chunkBoundingBoxGet(chunks, 8.0f);
+				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
+				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
 				if (inView) {
-					if (!chunksRenderIsload) {
+					chunkNeighborMaskUpdate(c, chunks);
+					neightborChunkLoaded = chunks->neighbors == CHUNKS_NEIGHBOR_LOADED;
+					mtx_lock(&c->renderMtx);
+					if (!chunksRenderIsload && neightborChunkLoaded) {
 						chunks->render = renderChunkCreate(c, chunks);
-					} else if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && chunksRenderIsload && chunks->render->instanceVBO != 0) {
+					} 
+					else if (!chunkInRenderMap && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
 						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
 					}
-					chunks->lastUpdate = get_ms_time();
+					mtx_unlock(&c->renderMtx);
 				}
-			
-				mtx_unlock(&c->renderMtx);
-
             }
-
-
 		}
     }
-	// ft_printf_fd(1, "Time to load chunks: %u ms\n", get_ms_time() - currentTime);
-	// mtx_unlock(&c->renderMtx);
-	/* UNLOCK */	
-
 }

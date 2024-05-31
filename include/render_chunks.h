@@ -4,13 +4,13 @@
 #include "chunks.h"
 
 typedef struct s_render_chunks {
-    vec3		*block_array;		/* Block array (VBO data represent block instance position) */
-    GLuint		instanceVBO;		/* Instance VBO */
-	GLuint  	typeBlockVBO;		/* Type VBO */
-	f32			*blockTypeID;		/* Block type ID */
-    u32			visibleBlock;		/* Number of visible block in this chunks */
+    // vec3		*block_array;		/* Block array (VBO data represent block instance position) */
+    // GLuint		instanceVBO;		/* Instance VBO */
+	// GLuint  	typeBlockVBO;		/* Type VBO */
+	// f32			*blockTypeID;		/* Block type ID */
+    // u32			visibleBlock;		/* Number of visible block in this chunks */
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
-
+	suseconds_t lastUpdate;			/* Last update time */
 
 	vec3		*faceArray[6];
 	f32			*faceTypeID[6];
@@ -32,15 +32,18 @@ RenderChunks	*renderChunkCreateVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos
 /* render/load_chunks.c */
 s8				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 s8				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
-void			chunksViewHandling(Context *c, HashMap *renderChunksMap);
+void			chunksViewHandling(Context *c);
 void 			renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap);
+void 			renderChunksVBODestroyListBuild(Context *c, Chunks *chunk);
 
 /* render/occlusion_culling */
-u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
+// u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 void			updateNeighbors(Block *block, Block *blockCache[16][16][16]);
+void			updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]);
+void			chunkNeighborsGet(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]);
+void			updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16], Chunks *neighborChunksCache[4]);
+void			chunkNeighborMaskUpdate(Context *c, Chunks *chunk);
 
-/* render/cube.c to be refact */
-void			drawAllCube(GLuint VAO, RenderChunks *render);
 
 /* render/loadchunks.c */
 s8 				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
@@ -48,5 +51,13 @@ s8 				chunksRenderIsLoaded(Chunks *chunk);
 s8 				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 
 void renderChunksVBODestroy(Context *c);
+
+
+/* render/cube_face_build.c */
+s8				faceVisible(u8 neighbors, u8 face);
+void			chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render);
+GLuint			faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb);
+RenderChunks	*renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID);
+void			drawAllChunksByFace(Context *c);
 
 #endif /* HEADER_RENDER_CHUNKS_H */

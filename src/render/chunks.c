@@ -8,7 +8,6 @@
 // 	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
 // }
 
-
 s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
     return ((s32)floor(sqrt(pow(camChunkX - chunkX, 2) + pow(camChunkZ - chunkZ, 2))));
 }
@@ -40,18 +39,17 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	s32 	seaLevel = (s32)SEA_LEVEL - 30;
 
 
-	if (realY > seaLevel && realY >=  maxHeight - 2 && realY < maxHeight) {
+	if (realY < maxHeight - 2) {
+    	blockType = STONE;
+	} else if (realY <= maxHeight) {
 		blockType = DIRT;
-		if (realY == maxHeight - 1)
-			blockType = GRASS;
-	} else if (realY > seaLevel && realY < maxHeight) {
-		blockType = STONE;
-	} else if (realY <= seaLevel) {
+		if (realY == maxHeight) { blockType = GRASS; }
+	} else if (realY >= maxHeight && realY <= seaLevel) {
 		blockType = WATER;
 	} else {
 		return (NULL);
 	}
-		
+
 	if (!(block = malloc(sizeof(Block)))) {
 		ft_printf_fd(2, "Failed to allocate block\n");
 		return (NULL);
@@ -64,7 +62,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	return (block);
 }
 
-void initializeBlockCache(Block* blockCache[16][16][16]) {
+void blockCacheInit(Block* blockCache[16][16][16]) {
     for (u32 x = 0; x < 16; ++x) {
         for (u32 y = 0; y < 16; ++y) {
             for (u32 z = 0; z < 16; ++z) {
@@ -74,30 +72,39 @@ void initializeBlockCache(Block* blockCache[16][16][16]) {
     }
 }
 
+Chunks *getChunkAt(Context *c, s32 x, s32 z) {
+	return (hashmap_get(c->world->chunksMap, (BlockPos){0, x, z}));
+}
+
 /**
  * @brief BRUT fill subchunks with block
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t subchunksInit(SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 nb)
+size_t subchunksInit(Block *chunkBlockCache[16][16][16][16], Chunks *chunk, SubChunks *sub_chunk, DebugPerlin **perlinVal, s32 layer)
 {
 	Block *block = NULL;
-	s32 startYWorld = nb * 16;
-	Block *blockCache[16][16][16];
+	s32 startYWorld = layer * 16;
 
-	initializeBlockCache(blockCache);
+	blockCacheInit(chunkBlockCache[layer]);
 
     for (s32 x = 0; x < 16; ++x) {
         for (s32 y = 0; y < 16; ++y) {
             for (s32 z = 0; z < 16; ++z) {
 				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld))) {
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){x, y, z}, block);
-					blockCache[x][y][z] = block;
-					updateNeighbors(block, blockCache);
+					chunkBlockCache[layer][x][y][z] = block;
+					updateNeighbors(block, chunkBlockCache[layer]);
 				}
             }
         }
     }
+
+
+	if (layer != 0) {
+		updateTopBotNeighbors(&chunk->sub_chunks[layer - 1], chunkBlockCache[layer]);
+	}
+
 	return (hashmap_size(sub_chunk->block_map));
 }
 
@@ -201,7 +208,7 @@ f32 perlinNoiseHeight(Mutex *mtx, f32 **perlin2D, s32 localX, s32 localZ, DebugP
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void chunkBuild(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
+void chunkBuild(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 	DebugPerlin **perlinVal = ft_calloc(sizeof(DebugPerlin *), 16 + 1);
 
 	for (u32 x = 0; x < 16; ++x) {
@@ -223,42 +230,14 @@ void chunkBuild(Mutex *mtx, f32 **perlin2D, Chunks *chunks) {
 
 	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
 		chunks->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
-		chunks->nb_block += subchunksInit(&chunks->sub_chunks[i], perlinVal, i);
-		chunks->visible_block += checkHiddenBlock(chunks, i);
+		chunks->nb_block += subchunksInit(chunkBlockCache, chunks, &chunks->sub_chunks[i], perlinVal, i);
+		// chunks->visible_block += checkHiddenBlock(chunks, i);
 		/* SET DEBUG VALUE HERE */
 		chunks->perlinVal = perlinVal;
 	}
 }
 
-/**
- * @brief Get the block array object
- * @param chunks Chunks pointer (data to parse)
- * @param block_array Block array pointer (output)
- * @param chunkID Chunk ID [in]
- * @return u32 Number of visible block
-*/
-void chunksCubeGet(Chunks *chunks, RenderChunks *render)
-{
-    s8 next = TRUE;
-	u32 idx = 0;
-
-	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
-		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
-		while ((next = hashmap_next(&it))) {
-			Block *block = (Block *)it.value;
-			if (block->neighbors != BLOCK_HIDDEN && block->type != AIR) {
-				render->block_array[idx][0] = (f32)block->x + (f32)(chunks->x * 16);
-				render->block_array[idx][1] = (f32)block->y + (f32)(subID * 16);
-				render->block_array[idx][2] = (f32)block->z + (f32)(chunks->z * 16);
-				render->blockTypeID[idx] = (f32)block->type;
-				++idx;
-				// ft_printf_fd(1, "Block %d = %f\n", block->type, render->blockTypeID[idx]);
-			}
-		}
-	}
-}
-
-Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
+Chunks *chunksLoad(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
@@ -267,6 +246,7 @@ Chunks *chunksLoad(Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ) {
 
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
-	chunkBuild(mtx, perlin2D, chunks);
+	chunkBuild(chunkBlockCache, mtx, perlin2D, chunks);
+	chunks->lastUpdate = get_ms_time();
 	return (chunks);
 }

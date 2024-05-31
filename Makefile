@@ -2,9 +2,11 @@ include libft/rsc/mk/color.mk
 include rsc/mk/source.mk
 
 NAME			=	ft_vox
-CC				=	gcc
-CFLAGS			=	-Wall -Wextra -Werror -O3 -g
+# CC				=	gcc
+CC				=	clang
+CFLAGS			=	-Wall -Wextra -Werror -O3
 # CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=address
+# CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=thread
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
 
@@ -77,6 +79,6 @@ test: $(NAME)
 vtest: $(NAME)
 	@valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
 
-re: fclean $(NAME)
+re: clean $(NAME)
 
 .PHONY:		all clean fclean re bonus

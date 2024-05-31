@@ -32,7 +32,7 @@ void display_camera_value(Context *c)
 
 	ft_printf_fd(1, RESET"Model matrix: \n");
 	for (u32 i = 0; i < 4; i++) {
-		ft_printf_fd(1, "%f %f %f %f\n", c->cube.rotation[i][0], c->cube.rotation[i][1], c->cube.rotation[i][2], c->cube.rotation[i][3]);
+		ft_printf_fd(1, "%f %f %f %f\n", c->rotation[i][0], c->rotation[i][1], c->rotation[i][2], c->rotation[i][3]);
 	}
 	ft_printf_fd(1, RESET"View vector: %f %f %f\n", c->cam.viewVector[0], c->cam.viewVector[1], c->cam.viewVector[2]);
 	ft_printf_fd(1, ORANGE"Frustum: \n"RESET);
@@ -99,7 +99,7 @@ void update_camera(void *context, GLuint shader_id)
 	/* Update shaders variable */
     set_shader_var_mat4(shader_id, "view", c->cam.view);
     set_shader_var_mat4(shader_id, "projection", c->cam.projection);
-	set_shader_var_mat4(shader_id, "model", c->cube.rotation);
+	set_shader_var_mat4(shader_id, "model", c->rotation);
 	
 	/* Update view vector */
 	updateViewVec(&c->cam);
@@ -253,5 +253,5 @@ void reseCamera(void *context)
 
 	/* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
-	glm_mat4_identity(c->cube.rotation);
+	glm_mat4_identity(c->rotation);
 }
