@@ -80,11 +80,13 @@ void unloadChunkHandler(Context *c) {
 	camChunkZ = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
+	mtx_lock(&c->renderMtx);
+	mtx_lock(&c->threadContext->chunkMtx);
+
 	it = hashmap_iterator(c->world->chunksMap);
 	while ((next = hashmap_next(&it))) {
 		chunk = (Chunks *)it.value;
 		if (chunk) {
-			mtx_lock(&c->renderMtx);
 			s32 distance = chunksEuclideanDistanceGet(camChunkX, camChunkZ, chunk->x, chunk->z);
 			BlockPos chunkID = CHUNKS_MAP_ID_GET(chunk->x, chunk->z);
 			if (!chunksIsRenderer(c->world->renderChunksMap, chunkID) && distance > maxChunkLoad) {
@@ -97,14 +99,17 @@ void unloadChunkHandler(Context *c) {
 					}
 				}
 			}
-			mtx_unlock(&c->renderMtx);
 		}
 	}
 
+	mtx_unlock(&c->renderMtx);
+	mtx_unlock(&c->threadContext->chunkMtx);
+
+
 	for (t_list *current = toRemoveList; current; current = current->next) {
-		mtx_lock(&c->renderMtx);
+		mtx_lock(&c->threadContext->chunkMtx);
 		hashmap_remove_entry(c->world->chunksMap, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
-		mtx_unlock(&c->renderMtx);
+		mtx_unlock(&c->threadContext->chunkMtx);
 	}
 
 	ft_lstclear(&toRemoveList, free);

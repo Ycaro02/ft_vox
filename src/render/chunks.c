@@ -31,35 +31,36 @@ void chunksMapFree(void *entry) {
 	}
 	free(e); /* free the entry t_list node */
 }
-
 Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
-	Block	*block = NULL;
-	s32		blockType = AIR;
-	s32		realY = startYWorld + y;
-	s32 	seaLevel = (s32)SEA_LEVEL - 30;
-
+    Block   *block = NULL;
+    s32     blockType = AIR;
+    s32     realY = startYWorld + y;
+    s32     seaLevel = (s32)SEA_LEVEL - 30;
 
 	if (realY < maxHeight - 2) {
-    	blockType = STONE;
-	} else if (realY <= maxHeight) {
+		blockType = STONE;
+	} 
+	else if (!(realY == seaLevel && realY <= maxHeight) && realY == seaLevel) {
+		blockType = WATER;
+	} 
+	else if (realY <= maxHeight) {
 		blockType = DIRT;
 		if (realY == maxHeight) { blockType = GRASS; }
-	} else if (realY >= maxHeight && realY <= seaLevel) {
-		blockType = WATER;
-	} else {
+	} 
+	else {
 		return (NULL);
 	}
 
-	if (!(block = malloc(sizeof(Block)))) {
-		ft_printf_fd(2, "Failed to allocate block\n");
-		return (NULL);
-	}
-	block->type = blockType;
-	block->x = x;
-	block->y = y;
-	block->z = z;
-	block->neighbors = 0;
-	return (block);
+    if (!(block = malloc(sizeof(Block)))) {
+        ft_printf_fd(2, "Failed to allocate block\n");
+        return (NULL);
+    }
+    block->type = blockType;
+    block->x = x;
+    block->y = y;
+    block->z = z;
+    block->neighbors = 0;
+    return (block);
 }
 
 void blockCacheInit(Block* blockCache[16][16][16]) {
