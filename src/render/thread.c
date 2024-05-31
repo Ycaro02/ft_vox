@@ -82,9 +82,9 @@ int threadChunksLoad(void *data) {
 	
 	chunkNeighborsGet(t->c, chunks, neighborChunksCache);
 
-	// mtx_lock(t->chunkMtx);
-	// updateChunkNeighbors(t->c, chunks, chunkBlockCache, neighborChunksCache);
-	// mtx_unlock(t->chunkMtx);
+	mtx_lock(t->chunkMtx);
+	updateChunkNeighbors(t->c, chunks, chunkBlockCache, neighborChunksCache);
+	mtx_unlock(t->chunkMtx);
 
 
 	mtx_lock(&t->c->threadContext->threadMtx);

@@ -31,6 +31,7 @@ void chunksMapFree(void *entry) {
 	}
 	free(e); /* free the entry t_list node */
 }
+
 Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
     Block   *block = NULL;
     s32     blockType = AIR;
@@ -40,12 +41,12 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	if (realY < maxHeight - 2) {
 		blockType = STONE;
 	} 
-	else if (!(realY == seaLevel && realY <= maxHeight) && realY == seaLevel) {
+	else if (realY <= seaLevel && realY > maxHeight) {
 		blockType = WATER;
 	} 
 	else if (realY <= maxHeight) {
 		blockType = DIRT;
-		if (realY == maxHeight) { blockType = GRASS; }
+		if (realY == maxHeight || realY == maxHeight - 1) { blockType = GRASS;}
 	} 
 	else {
 		return (NULL);
@@ -101,7 +102,7 @@ size_t subchunksInit(Block *chunkBlockCache[16][16][16][16], Chunks *chunk, SubC
         }
     }
 
-
+	(void)chunk; 
 	if (layer != 0) {
 		updateTopBotNeighbors(&chunk->sub_chunks[layer - 1], chunkBlockCache[layer]);
 	}
