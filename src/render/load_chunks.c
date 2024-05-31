@@ -168,8 +168,10 @@ void chunksViewHandling(Context *c) {
 	BoundingBox 	box;
     vec3            start, rayDir, chunkPos, currPos, travelVector, camViewVector;
     f32             current = 0;
-	f32 			radiusStart = (-CAM_FOV - 10.0f) / 2.0f;
-	f32 			radiusEnd = (CAM_FOV + 10.0f) / 2.0f;
+	// f32 			radiusStart = (-CAM_FOV) / 2.0f;
+	// f32 			radiusEnd = (CAM_FOV) / 2.0f;
+	f32 			radiusStart = (-CAM_FOV);
+	f32 			radiusEnd = (CAM_FOV);
 	Chunks 			*chunks = NULL;
 	BlockPos 		chunkID;
 	s8 				inView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;

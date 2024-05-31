@@ -135,9 +135,9 @@ void drawAllChunksByFace(Context *c) {
     HashMap_it	it;
     s8			next = TRUE;
 
-    // u32 		chunkRenderNb = 0, faceRendernb = 0, totalBlock = 0, chunksLoaded = 0, chunksLoading = 0;
-	// chunksLoaded = hashmap_size(c->world->chunksMap);
-	// chunksLoading = hashmap_size(c->threadContext->chunksMapToLoad);
+    u32 		chunkRenderNb = 0, faceRendernb = 0, totalBlock = 0, chunksLoaded = 0, chunksLoading = 0;
+	chunksLoaded = hashmap_size(c->world->chunksMap);
+	chunksLoading = hashmap_size(c->threadContext->chunksMapToLoad);
     
     mtx_lock(&c->renderMtx);
     for (u8 i = 0; i < 6; ++i) {
@@ -149,7 +149,7 @@ void drawAllChunksByFace(Context *c) {
             u32 faceNb = render->faceCount[i];
             // u32 faceVertexNb = (faceNb * 4U);
             drawFace(c->faceCube[i].VAO, render, 6U, faceNb, i);
-            // chunkRenderNb++;
+            chunkRenderNb++;
 			// faceRendernb += faceNb;
 			// totalBlock += countChunksBlock(render->chunkID, c->world->chunksMap, &c->threadContext->chunkMtx);
         }
@@ -157,6 +157,6 @@ void drawAllChunksByFace(Context *c) {
     
 	}
     mtx_unlock(&c->renderMtx);
-    // ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "RED"Total Block: %u "RESET" "YELLOW"Visible Face: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
-    // , chunkRenderNb / 6, totalBlock / 6, faceRendernb, chunksLoaded, chunksLoading, fpsGet());
+    ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "RED"Total Block: %u "RESET" "YELLOW"Visible Face: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
+    , chunkRenderNb / 6, totalBlock / 6, faceRendernb, chunksLoaded, chunksLoading, fpsGet());
 }

@@ -69,7 +69,7 @@ s8 isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box) {
     for (s32 i = 0; i < 6; i++) {
         s32 inCount = 0;
         for (s32 j = 0; j < 8; j++) {
-            if (glm_vec4_dot((vec4){corners[j][0], corners[j][1], corners[j][2], 1.0f}, frustum->planes[i]) > 0.0f)
+            if (glm_vec4_dot((vec4){corners[j][0], corners[j][1], corners[j][2], 1.0f}, frustum->planes[i]) > 0.1f)
                 inCount++;
         }
         if (inCount == 0) {
