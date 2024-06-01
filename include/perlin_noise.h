@@ -33,6 +33,8 @@ FT_INLINE int randomGenerationGet() {
 */
 u8 *perlinImageGet(unsigned int seed, int width, int height, int octaves, f32 persistence, f32 lacurarity);
 
+/* To call after seed generated */
+u8 *perlinImageGetWithoutSeed(int width, int height, int octaves, f32 persistence, f32 lacurarity);
 
 /**
  * perlin_noise.c *

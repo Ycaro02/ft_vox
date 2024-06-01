@@ -37,6 +37,7 @@ typedef struct s_context {
 	ThreadContext		*threadContext;		/* Thread context */
 	s8					isPlaying;			/* Game is playing */
 	f32					**perlin2D;			/* Perlin noise 2D */
+	f32					**cavePerlin2D;		/* Perlin noise 2D for cave */
 	t_list				*vboToDestroy;		/* VBO to destroy */
 	t_list				*vboToCreate;		/* VBO to create */
 	Mutex				renderMtx;				/* Mutex to protect VBO, used for renderChunks map */

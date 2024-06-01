@@ -25,6 +25,11 @@ u8 *perlinNoiseGeneration(unsigned int seed) {
 	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
 }
 
+u8 *perlinNoiseGenerationWithoutSeed() {
+	return (perlinImageGetWithoutSeed(PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
+}
+
+
 void initSkyBox(Context *c) {
 	c->skyboxVAO = skyboxInit();
 	c->skyboxShaderID = load_shader(SKY_VERTEX_SHADER, SKY_FRAGMENT_SHADER);
@@ -42,6 +47,19 @@ void initAtlasTexture(Context *c) {
 f32 **perlin2DInit(u32 seed) {
 	f32 **perlin2D = NULL;
 	u8 *perlin1D = perlinNoiseGeneration(seed); /* seed 42 */
+	if (!perlin1D) {
+		ft_printf_fd(1, "Error: perlinNoise error\n");
+		return (NULL);
+	}
+	/* Transform 1D array to 2D array */
+	perlin2D = array1DTo2D(perlin1D, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH);
+	free(perlin1D);
+	return (perlin2D);
+}
+
+f32 **perlinCave2DGet() {
+	f32 **perlin2D = NULL;
+	u8 *perlin1D = perlinNoiseGenerationWithoutSeed(); /* seed 42 */
 	if (!perlin1D) {
 		ft_printf_fd(1, "Error: perlinNoise error\n");
 		return (NULL);
@@ -74,6 +92,7 @@ Context *contextInit() {
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
 		|| (!(context->perlin2D = perlin2DInit(42U)))
+		|| (!(context->cavePerlin2D = perlinCave2DGet()))
 		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_2000, hashmap_free_node_only)))
 		|| (!threadSupervisorInit(context))) 
 	{

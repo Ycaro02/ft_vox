@@ -76,11 +76,9 @@ int threadChunksLoad(void *data) {
 	chunk = chunksLoad(chunkBlockCache, t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ);
 	
 	
-	// mtx_lock(t->chunkMtx);
+	mtx_lock(t->chunkMtx);
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunk);
-	// mtx_unlock(t->chunkMtx);
-
-	
+	mtx_unlock(t->chunkMtx);
 	
 	chunkNeighborsGet(t->c, chunk, neighborChunksCache);
 
