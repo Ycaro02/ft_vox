@@ -6,24 +6,28 @@ void act_escape(Context *c) {
     glfwSetWindowShouldClose(c->win_ptr, GL_TRUE);
 }
 
+void act_change_cam_speed(Context *c) {
+	c->cam.camSpeed = (c->cam.camSpeed == ONE_BLOCK_PER_SEC) ? (ONE_BLOCK_PER_SEC * 20.0f) : ONE_BLOCK_PER_SEC;
+}
+
 /* Zoom : W */
 void act_zoom(Context *c) {
-    move_camera_forward(&c->cam, 0.2f);
+    move_camera_forward(&c->cam, c->cam.camSpeed);
 }
 
 /* Unzoom : S */
 void act_unzoom(Context *c) {
-    move_camera_backward(&c->cam, 0.2f);
+    move_camera_backward(&c->cam, c->cam.camSpeed);
 }
 
 /* Unzoom: D */
 void act_move_right(Context *c) {
-	straf_camera(&c->cam, 0.1f, DIR_RIGHT);
+	straf_camera(&c->cam, c->cam.camSpeed, DIR_RIGHT);
 }
 
 /* Unzoom: A */
 void act_move_left(Context *c) {
-	straf_camera(&c->cam, 0.1f, DIR_LEFT);
+	straf_camera(&c->cam, c->cam.camSpeed, DIR_LEFT);
 }
 
 /* Rotate camera left : LEFT */
@@ -156,6 +160,7 @@ void handle_input(void *context)
 		{GLFW_KEY_ENTER, act_reseCamera, SINGLE_PRESS},
 		{GLFW_KEY_C, act_display_camera_value, SINGLE_PRESS},
 		{GLFW_KEY_E, testChunksExist, SINGLE_PRESS},
+		{GLFW_KEY_L, act_change_cam_speed, SINGLE_PRESS},
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(KeyAction));
 	s32				state = GLFW_RELEASE;

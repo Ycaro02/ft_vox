@@ -76,6 +76,9 @@ Camera create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far)
     /* Look at view */
 	glm_lookat(camera.position, camera.target, camera.up, camera.view);
 
+	camera.camSpeed = ONE_BLOCK_PER_SEC;
+	// camera.camSpeed = (ONE_BLOCK_PER_SEC * 20.0f);
+
     /* Compute projection matrice */
 	glm_perspective(glm_rad(fov), aspect_ratio, near, far, camera.projection);
 	updateViewVec(&camera);

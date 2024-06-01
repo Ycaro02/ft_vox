@@ -8,6 +8,8 @@
 typedef struct s_chunks Chunks;
 
 
+#define ONE_BLOCK_PER_SEC 0.133333f /* 1 block per sec, 0.1333 * 60 = 8.0f */
+
 #define CAM_ZOOM 0.3f				/* Zoom/Unzoom value */
 #define CAM_MOVE_HORIZONTAL 1.0f	/* Move camera horizontal value */
 #define CAM_UP_DOWN 0.2f			/* Move camera up/down value */
@@ -41,6 +43,7 @@ typedef struct s_camera {
 	vec3		viewVector;			/* view vector */
     vec3_s32    chunkPos;          /* Chunk position */
 	Frustum		frustum;			/* Frustum */
+	f32			camSpeed;			/* Camera speed */
 	// mat4		view_no_translation;
 } Camera; 
 
