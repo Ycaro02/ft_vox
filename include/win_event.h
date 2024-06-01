@@ -9,9 +9,9 @@ typedef struct s_context Context;
 
 /* Key action structure */
 typedef struct s_key_action {
-    int key;			/* key code */
+    int key;					/* key code */
     void (*action)(Context *c);	/* action to do, function ptr void (t_obj_model *model)*/
-	u8	repeat;			/* auto repeat until key release */
+	u8	repeat;					/* auto repeat until key release */
 } KeyAction;
 
 void handle_input(void *context);

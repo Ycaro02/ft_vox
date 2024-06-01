@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/26 11:24:00 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/01 16:39:27 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,19 +97,18 @@ FT_INLINE void hashmap_entry_update(HashMap_entry *dst, BlockPos p, u64 key, voi
 FT_INLINE s8 hashmap_search_entry_update(HashMap *map, size_t index, u64 key, BlockPos p, void *value) {
 	t_list			*current = NULL;
 	HashMap_entry	*new_entry = NULL;
+	HashMap_entry	*entry = NULL;
 
 	current = map->entries[index];
 	while (current) {
-		HashMap_entry *entry = (HashMap_entry *)current->content;
+		entry = current->content;
 		if (HASHMAP_SAME_ENTRY(entry, key, p.x, p.y, p.z)) {
 			map->free_obj(entry);
 			if (!(new_entry = ft_calloc(sizeof(HashMap_entry), 1))) {
-				// mtx_unlock(&map->mtx);
 				return (HASHMAP_MALLOC_ERROR);
 			}
 			hashmap_entry_update(new_entry, p, key, value);
 			current->content = new_entry;
-			// mtx_unlock(&map->mtx);
 			return (HASHMAP_UPT_ENTRY);
 		}
 		current = current->next;
@@ -138,7 +137,7 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	}
 	// HashMap_entry *e = (HashMap_entry *)entry_node->content;
 	hashmap_entry_update((HashMap_entry *)entry_node->content, p, key, value);
-	ft_lstadd_back(&map->entries[index], entry_node);
+	ft_lstadd_front(&map->entries[index], entry_node);
 	(map->size)++;
 	mtx_unlock(&map->mtx);
 	return (HASHMAP_ADD_ENTRY);
@@ -204,7 +203,7 @@ s8 hashmap_expand(HashMap *map)
 				mtx_unlock(&map->mtx);
                 return (FALSE);
             }
-            ft_lstadd_back(&new_entries[new_index], new_entry);
+            ft_lstadd_front(&new_entries[new_index], new_entry);
             current = current->next;
         }
     }

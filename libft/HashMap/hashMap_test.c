@@ -172,12 +172,12 @@ void hashmap_iterator_test() {
 
     // Test iterating through entries
     assert(hashmap_next(&it)); // Move to the first entry
-    assert(it.key == hash_block_position(1, 2, 3));
-    assert(strcmp((char *)it.value, "Value1") == 0);
-
-    assert(hashmap_next(&it)); // Move to the first entry
     assert(it.key == hash_block_position(4, 5, 6));
     assert(strcmp((char *)it.value, "Value2") == 0);
+
+    assert(hashmap_next(&it)); // Move to the first entry
+    assert(it.key == hash_block_position(1, 2, 3));
+    assert(strcmp((char *)it.value, "Value1") == 0);
 
     assert(hashmap_next(&it)); // Move to the third entry
 	assert(it.key == hash_block_position(7, 8, 9));

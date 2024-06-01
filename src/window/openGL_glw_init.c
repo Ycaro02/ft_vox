@@ -11,9 +11,9 @@ GLFWwindow *window_create(int width, int height, const char *title)
 
 
 
-	// GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	// win = glfwCreateWindow(width, height, title, monitor, NULL);
-	win = glfwCreateWindow(width, height, title, NULL, NULL);
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	win = glfwCreateWindow(width, height, title, monitor, NULL);
+	// win = glfwCreateWindow(width, height, title, NULL, NULL);
     if (!win) {
 		ft_printf_fd(2, "Error: Failed to create GLFW window\n");
 		glfwTerminate();
