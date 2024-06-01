@@ -272,6 +272,17 @@ s8 threadChunksLoadArround(Context *c, s32 radius) {
 	return (TRUE);
 }
 
+void chunksToLoadPrioritySet(Context *c, BlockPos chunkID, u8 priority) {
+	ThreadData 		*tdata = NULL;
+
+	mtx_lock(&c->threadContext->threadMtx);
+	tdata = hashmap_get(c->threadContext->chunksMapToLoad, chunkID);
+	if (tdata) {
+		tdata->priority = priority;
+	}
+	mtx_unlock(&c->threadContext->threadMtx);
+}
+
 /**
  * @brief Get the nearest chunks to load from the queue
  * @param c Context

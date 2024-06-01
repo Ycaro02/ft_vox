@@ -127,6 +127,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	BlockPos		*chunkIDToRemove = NULL;
 	HashMap_it 		it;
 	Chunks 			*chunks;
+	BlockPos 		tmpChunkID;
 	
 	mtx_lock(&c->renderMtx);
 	it = hashmap_iterator(renderChunksMap);
@@ -146,9 +147,11 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	mtx_unlock(&c->renderMtx);
 
 	for (t_list *current = toRemoveList; current; current = current->next) {
+		tmpChunkID = *(BlockPos *)current->content;
 		mtx_lock(&c->renderMtx);
-		hashmap_remove_entry(renderChunksMap, *(BlockPos *)current->content, HASHMAP_FREE_NODE);
+		hashmap_remove_entry(renderChunksMap, tmpChunkID, HASHMAP_FREE_NODE);
 		mtx_unlock(&c->renderMtx);
+		chunksToLoadPrioritySet(c, tmpChunkID, LOAD_PRIORITY_HIGH);
 	}
 
 	ft_lstclear(&toRemoveList, free);
@@ -183,7 +186,8 @@ void chunksViewHandling(Context *c) {
 	mtx_lock(&c->gameMtx);
     glm_vec3_copy(c->cam.position, start);
 	mtx_unlock(&c->gameMtx);
-    glm_vec3_zero(chunkPos);
+    
+	glm_vec3_zero(chunkPos);
     glm_vec3_zero(currPos);
 
 
@@ -206,7 +210,6 @@ void chunksViewHandling(Context *c) {
             /* Convert world coordonate to chunk offset */
             worldToChunksPos(currPos, chunkPos);
             chunkID = CHUNKS_MAP_ID_GET(chunkPos[0], chunkPos[2]);
-
             chunks = hashmap_get(c->world->chunksMap, chunkID);
 
 
@@ -215,25 +218,21 @@ void chunksViewHandling(Context *c) {
 				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
-				if (inView) {
+				if (inView) { /* If chunk is in frustum */
 					chunkNeighborMaskUpdate(c, chunks);
 					neightborChunkLoaded = chunks->neighbors == CHUNKS_NEIGHBOR_LOADED;
 					mtx_lock(&c->renderMtx);
+					/* If chunk->render is not load and all nearby chunk are loaded (to wait full ocllusion culling)*/
 					if (!chunksRenderIsload && neightborChunkLoaded) {
 						chunks->render = renderChunkCreate(c, chunks);
-					} 
+					} /* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
 					else if (!chunkInRenderMap && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
 						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
 					}
 					mtx_unlock(&c->renderMtx);
 				}
             } else {
-				mtx_lock(&c->threadContext->threadMtx);
-				ThreadData *data = hashmap_get(c->threadContext->chunksMapToLoad, chunkID);
-				if (data) {
-					data->priority = LOAD_PRIORITY_HIGH;
-				}
-				mtx_unlock(&c->threadContext->threadMtx);
+				chunksToLoadPrioritySet(c, chunkID, LOAD_PRIORITY_HIGH);
 			}
 
 		}

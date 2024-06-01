@@ -53,6 +53,7 @@ FT_INLINE s64 ThreadsAvailableGet() {
 }
 
 /* Supervisor now init workers */
-s8 threadSupervisorInit(Context *c);
+s8		threadSupervisorInit(Context *c);
+void	chunksToLoadPrioritySet(Context *c, BlockPos chunkID, u8 priority);
 
 #endif /* HEADER_THREAD_LOAD_H */
