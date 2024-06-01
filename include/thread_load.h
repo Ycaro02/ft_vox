@@ -9,6 +9,10 @@
 typedef thrd_t Thread;
 typedef mtx_t Mutex;
 
+
+#define LOAD_PRIORITY_LOW 		0U
+#define LOAD_PRIORITY_HIGH 		1U
+
 /* Thread data */
 typedef struct s_thread_data {
 	Context *c;
@@ -16,6 +20,7 @@ typedef struct s_thread_data {
 	s32 	chunkX;
 	s32 	chunkZ;
 	s8		threadID;
+	u8 		priority;
 } ThreadData;
 
 /* Workers status */

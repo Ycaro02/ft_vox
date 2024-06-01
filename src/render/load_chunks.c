@@ -172,14 +172,13 @@ void renderChunksVBODestroy(Context *c) {
 void chunksViewHandling(Context *c) {
 	BoundingBox 	box;
     vec3            start, rayDir, chunkPos, currPos, travelVector, camViewVector;
+	BlockPos 		chunkID;
+	Chunks 			*chunks = NULL;
     f32             current = 0;
-	// f32 			radiusStart = (-CAM_FOV) / 2.0f;
-	// f32 			radiusEnd = (CAM_FOV) / 2.0f;
 	f32 			radiusStart = (-CAM_FOV);
 	f32 			radiusEnd = (CAM_FOV);
-	Chunks 			*chunks = NULL;
-	BlockPos 		chunkID;
 	s8 				inView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;
+	u8				neightborChunkLoaded = 0;
 
 	mtx_lock(&c->gameMtx);
     glm_vec3_copy(c->cam.position, start);
@@ -187,7 +186,6 @@ void chunksViewHandling(Context *c) {
     glm_vec3_zero(chunkPos);
     glm_vec3_zero(currPos);
 
-	u8 neightborChunkLoaded = 0;
 
 	/* Loop on the complete camera fov */
     for (f32 angle = radiusStart; angle <= radiusEnd; angle += ANGLE_INCREMENT) {
@@ -229,7 +227,15 @@ void chunksViewHandling(Context *c) {
 					}
 					mtx_unlock(&c->renderMtx);
 				}
-            }
+            } else {
+				mtx_lock(&c->threadContext->threadMtx);
+				ThreadData *data = hashmap_get(c->threadContext->chunksMapToLoad, chunkID);
+				if (data) {
+					data->priority = LOAD_PRIORITY_HIGH;
+				}
+				mtx_unlock(&c->threadContext->threadMtx);
+			}
+
 		}
     }
 }
