@@ -92,7 +92,7 @@ Context *contextInit() {
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
 		|| (!(context->perlin2D = perlin2DInit(42U)))
-		|| (!(context->cavePerlin2D = perlinCave2DGet()))
+		|| (!(context->perlinCaveNoise = perlinCave2DGet()))
 		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_2000, hashmap_free_node_only)))
 		|| (!threadSupervisorInit(context))) 
 	{

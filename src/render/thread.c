@@ -73,7 +73,7 @@ int threadChunksLoad(void *data) {
 
 	Chunks 		*chunk = NULL;
 	
-	chunk = chunksLoad(chunkBlockCache, t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ);
+	chunk = chunksLoad(chunkBlockCache, t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ, t->c->perlinCaveNoise);
 	
 	
 	mtx_lock(t->chunkMtx);

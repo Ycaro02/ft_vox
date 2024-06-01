@@ -15,13 +15,13 @@ typedef struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
 } SubChunks;
 
-typedef struct s_debug_perlin {
+typedef struct s_perlin_data {
 	s32 z0, x0;
 	f32 val;
 	f32 add;
 	s32 normalise;
 	s32 givenX, givenZ;
-} DebugPerlin;
+} PerlinData;
 
 typedef struct s_chunks {
 	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
@@ -30,7 +30,7 @@ typedef struct s_chunks {
 	s32				x;							/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;							/* Chunk offset Z can be negative (relative to origine chunks) */
 	suseconds_t		lastUpdate;					/* Last update time */
-	DebugPerlin		**perlinVal;				/* Perlin noise value */
+	PerlinData		**perlinVal;				/* Perlin noise value */
 	RenderChunks 	*render;					/* RenderChunks pointer */
 	u8				neighbors;					/* Neighbors */
 } Chunks;
@@ -40,7 +40,7 @@ void chunksMapFree(void *entry);
 Chunks *getChunkAt(Context *c, s32 x, s32 z);
 
 /* chunks */
-Chunks *chunksLoad(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ);
+Chunks *chunksLoad(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ, f32 **perlinCavenoise);
 s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
 void unloadChunkHandler(Context *c);
 

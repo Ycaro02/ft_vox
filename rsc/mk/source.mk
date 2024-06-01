@@ -34,6 +34,7 @@ SRCS			=	context_init.c\
 					perlin_noise/perlin_noise.c\
 					perlin_noise/noise_utils.c\
 					perlin_noise/noise_image.c\
+					perlin_noise/noise_interpolate_utils.c\
 					tinycthread/tinycthread.c\
 
 # SRCS_BONUS		=	main_bonus.c
