@@ -6,21 +6,6 @@
 #include "../include/thread_load.h"
 
 
-f32 normalizeU8Tof32(u8 value, u8 start1, u8 stop1, f32 start2, f32 stop2) {
-    return start2 + (stop2 - start2) * ((value - start1) / (f32)(stop1 - start1));
-}
-
-f32 **array1DTo2D(u8 *array, u32 height, u32 width) {
-	f32 **perlin2D = ft_calloc(height, sizeof(f32 *));
-	for (u32 i = 0; i < height; ++i) {
-		perlin2D[i] = ft_calloc(width, sizeof(f32));
-		for (u32 j = 0; j < width; ++j) {
-			perlin2D[i][j] = normalizeU8Tof32(array[i * width + j], 0, 255, -1.0f, 1.0f);
-		}
-	}
-	return (perlin2D);
-}
-
 u8 *perlinNoiseGeneration(unsigned int seed) {
 	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
 }

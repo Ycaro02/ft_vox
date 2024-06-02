@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/06/02 12:16:55 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/02 15:23:33 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ s8 hashmap_search_entry_update(HashMap *map, size_t index, u64 key, BlockPos p, 
 		entry = current->content;
 		if (HASHMAP_SAME_ENTRY(entry, key, p.x, p.y, p.z)) {
 			map->free_obj(entry);
-			if (!(new_entry = ft_calloc(sizeof(HashMap_entry), 1))) {
+			if (!(new_entry = malloc(sizeof(HashMap_entry)))) {
 				return (HASHMAP_MALLOC_ERROR);
 			}
 			hashmap_entry_update(new_entry, p, key, value);
@@ -132,7 +132,7 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	if (( ret = hashmap_search_entry_update(map, index, key, p, value)) != HASHMAP_NOT_FOUND) {
 		mtx_unlock(&map->mtx);
 		return (ret);
-	} else if (!(entry_node = ft_lstnew(ft_calloc(sizeof(HashMap_entry), 1)))) {
+	} else if (!(entry_node = ft_lstnew(malloc(sizeof(HashMap_entry))))) {
 		mtx_unlock(&map->mtx);
 		return (HASHMAP_MALLOC_ERROR);
 	}

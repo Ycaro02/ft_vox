@@ -74,9 +74,6 @@ FT_INLINE s8 voxIsRunning(Context *context) {
 
 Context *contextInit();
 u8 *perlinNoiseGeneration(unsigned int seed);
-f32 **array1DTo2D(u8 *array, u32 height, u32 width);
-f32 normalizeU8Tof32(u8 value, u8 start1, u8 stop1, f32 start2, f32 stop2);
-
 
 // s8 contextTextureInit(Context *context);
 #endif /* HEADER_WORLD_H */

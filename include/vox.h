@@ -62,16 +62,24 @@
 #define DIR_RIGHT 0
 #define DIR_LEFT 1
 
-/* HARDCOED CHUNK NUMBER */
-#define TEST_CHUNK_MAX 9
-
 /* Perlin noise value generation for relief */
 #define PERLIN_OCTAVE 8
 #define PERLIN_PERSISTENCE 1.0
 #define PERLIN_LACUNARITY 2.0
-// #define PERLIN_OCTAVE 6
-// #define PERLIN_PERSISTENCE 1.0
-// #define PERLIN_LACUNARITY 2.0
+
+
+/* Perlin generation value for continental noise */
+#define PERLIN_CONTINENTAL_OCTAVE 6
+#define PERLIN_CONTINENTAL_PERSISTENCE 0.8f
+#define PERLIN_CONTINENTAL_LACUNARITY 2.0f
+
+/* Perlin generation value for picks and valley noise */
+#define PERLIN_PICKS_VALLEY_OCTAVE 10
+#define PERLIN_PICKS_VALLEY_PERSISTENCE 2.0f
+#define PERLIN_PICKS_VALLEY_LACUNARITY 1.5f
+
+
+
 
 #define SEA_LEVEL 80.0f
 

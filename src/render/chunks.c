@@ -83,7 +83,7 @@ void chunksMapFree(void *entry) {
 		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
-		for (u32 i = 0; chunks->perlinVal[i]; ++i) {
+		for (u32 i = 0; i < 16; ++i) {
 			free(chunks->perlinVal[i]);
 		}
 		free(chunks->perlinVal);
@@ -171,10 +171,10 @@ f32 perlinNoiseHeight(Mutex *mtx, f32 **perlin2D, s32 localX, s32 localZ, Perlin
  * @param chunks Chunks array pointer
 */
 void chunkBuild(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, Chunks *chunks, f32 **perlinCaveNoise) {
-	PerlinData **perlinVal = ft_calloc(sizeof(PerlinData *), 16 + 1);
+	PerlinData **perlinVal = malloc(sizeof(PerlinData *) * 16);
 
 	for (u32 x = 0; x < 16; ++x) {
-		perlinVal[x] = ft_calloc(sizeof(PerlinData), 16);
+		perlinVal[x] = malloc(sizeof(PerlinData) * 16);
 		for (u32 z = 0; z < 16; ++z) {
 			s32 localX = blockLocalToPerlinPos(chunks->x, x);
 			s32 localZ = blockLocalToPerlinPos(chunks->z, z);
