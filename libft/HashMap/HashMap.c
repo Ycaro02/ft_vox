@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/06/01 16:39:27 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/02 12:16:55 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,16 @@ void hashmap_entry_free(void *entry) {
 	free(e); /* free the entry t_list node */
 }
 
-u64 hash_block_position(s32 x, s32 y, s32 z) {
-    u64 key = ((u64)x << 42) | ((u64)y << 21) | (u64)z;
-    
-	return (key);
+u64 hash_block_position(int x, int y, int z) {
+    const u64 prime1 = 73856093;
+    const u64 prime2 = 19349663;
+    const u64 prime3 = 83492791;
+
+    u64 hash = x * prime1 ^ y * prime2 ^ z * prime3;
+    hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
+    hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
+    hash = (hash >> 16) ^ hash;
+    return hash;
 }
 
 HashMap *hashmap_init(size_t capacity, void (*free_obj)(void *obj)) {
@@ -94,7 +100,7 @@ FT_INLINE void hashmap_entry_update(HashMap_entry *dst, BlockPos p, u64 key, voi
 	dst->value = value;
 }
 
-FT_INLINE s8 hashmap_search_entry_update(HashMap *map, size_t index, u64 key, BlockPos p, void *value) {
+s8 hashmap_search_entry_update(HashMap *map, size_t index, u64 key, BlockPos p, void *value) {
 	t_list			*current = NULL;
 	HashMap_entry	*new_entry = NULL;
 	HashMap_entry	*entry = NULL;
@@ -122,11 +128,6 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 	size_t	index = HASHMAP_INDEX(key, map->capacity);
 	s8		ret = HASHMAP_NOT_FOUND;
 
-
-	// if (hashmap_capacity(map) <= hashmap_size(map)) {
-	// 	hashmap_expand(map);
-	// }
-
 	mtx_lock(&map->mtx);
 	if (( ret = hashmap_search_entry_update(map, index, key, p, value)) != HASHMAP_NOT_FOUND) {
 		mtx_unlock(&map->mtx);
@@ -135,7 +136,6 @@ s8 hashmap_set_entry(HashMap *map, BlockPos p, void *value) {
 		mtx_unlock(&map->mtx);
 		return (HASHMAP_MALLOC_ERROR);
 	}
-	// HashMap_entry *e = (HashMap_entry *)entry_node->content;
 	hashmap_entry_update((HashMap_entry *)entry_node->content, p, key, value);
 	ft_lstadd_front(&map->entries[index], entry_node);
 	(map->size)++;

@@ -17,6 +17,10 @@ int compare_values(void *value1, void *value2) {
     return ft_strcmp((char *)value1, (char *)value2) == 0;
 }
 
+int compare_keys(u64 key1, u64 key2) {
+	return key1 == key2;
+}
+
 // Test function for the hashmap
 void hashmap_test() {
     // Initialize the hashmap
@@ -155,10 +159,36 @@ void hashmap_size_test() {
     hashmap_destroy(map);
 }
 
+void search_val_in_lst(t_list *keyCachelst, t_list *valueCachelst, u64 key, char *value) {
+	t_list *keyCache = keyCachelst;
+	t_list *valueCache = valueCachelst;
+	while (keyCache && valueCache) {
+		if (compare_values(valueCache->content, value)) {
+			assert(compare_keys(*(u64 *)keyCache->content, key));
+		}
+		keyCache = keyCache->next;
+		valueCache = valueCache->next;
+	}
+}
+
+void store_data_in_lst(t_list **keyCachelst, t_list **valueCachelst, u64 key, char *value) {
+	u64	*tmp_key = NULL;
+	char	*tmp_value = NULL;
+	tmp_key = (u64 *)malloc(sizeof(u64));
+	ft_memcpy(tmp_key, &key, sizeof(u64));
+	ft_lstadd_front(keyCachelst, ft_lstnew(tmp_key));
+	tmp_value = ft_strdup(value);
+	ft_lstadd_front(valueCachelst, ft_lstnew(tmp_value));
+}
+
 // Test function for hashmap_iterator and hashmap_next
 void hashmap_iterator_test() {
     HashMap *map = hashmap_init(8, hashmap_entry_free);
-    assert(map != NULL);
+	t_list 	*keyCachelst = NULL;
+	t_list	*valueCachelst = NULL;
+	u64		*tmp_key = NULL;
+    char	*tmp_value = NULL;
+	assert(map != NULL);
 
     hashmap_set_entry(map, (BlockPos){1, 2, 3}, ft_strdup("Value1"));
     hashmap_set_entry(map, (BlockPos){4, 5, 6}, ft_strdup("Value2"));
@@ -172,20 +202,40 @@ void hashmap_iterator_test() {
 
     // Test iterating through entries
     assert(hashmap_next(&it)); // Move to the first entry
-    assert(it.key == hash_block_position(4, 5, 6));
-    assert(strcmp((char *)it.value, "Value2") == 0);
+	store_data_in_lst(&keyCachelst, &valueCachelst, it.key, it.value);
+    
+	
+	assert(hashmap_next(&it)); // Move to the second entry
+	store_data_in_lst(&keyCachelst, &valueCachelst, it.key, it.value);
 
-    assert(hashmap_next(&it)); // Move to the first entry
-    assert(it.key == hash_block_position(1, 2, 3));
-    assert(strcmp((char *)it.value, "Value1") == 0);
+    
+	assert(hashmap_next(&it)); // Move to the third entry
+	store_data_in_lst(&keyCachelst, &valueCachelst, it.key, it.value);
 
-    assert(hashmap_next(&it)); // Move to the third entry
-	assert(it.key == hash_block_position(7, 8, 9));
-    assert(strcmp((char *)it.value, "Value3") == 0);
+
+	search_val_in_lst(keyCachelst, valueCachelst, hash_block_position(1, 2, 3), "Value1");
+	search_val_in_lst(keyCachelst, valueCachelst, hash_block_position(4, 5, 6), "Value2");
+	search_val_in_lst(keyCachelst, valueCachelst, hash_block_position(7, 8, 9), "Value3");
 
     assert(!hashmap_next(&it)); // No more entries
 
+	ft_lstclear(&keyCachelst, free);
+	ft_lstclear(&valueCachelst, free);
+
     hashmap_destroy(map);
+}
+
+void dumbTestHashFunct() {
+
+
+	for (s32 x = 0; x < 2; x++) {
+		for (s32 y = 0; y < 2; y++) {
+			for (s32 z = 0; z < 2; z++) {
+				printf(ORANGE"BlockPos |%d|%d||%d|"RESET" "ORANGE"hash: %lu"RESET" "RED"idx: %lu\n"RESET, x, y, z, hash_block_position(x, y, z), HASHMAP_INDEX(hash_block_position(x, y, z), HASHMAP_SIZE_4000));
+			}
+		}
+	}
+
 }
 
 int main() {
@@ -199,5 +249,6 @@ int main() {
 	printf(GREEN"hashmap_size_test passed successfully!\n"RESET);
 	hashmap_iterator_test();
 	printf(GREEN"hashmap_iterator_test passed successfully!\n"RESET);
+	dumbTestHashFunct();
     return 0;
 }

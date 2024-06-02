@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/26 11:24:16 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/02 12:21:58 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,8 @@ typedef struct s_hashmap_it {
 #define HASHMAP_SAME_KEY(entry, key_cmp) (entry.key == key_cmp)
 
 /* Get hashmap index by key and capacity */
-#define HASHMAP_INDEX(key, capacity) (size_t)(key & (u64)(capacity - 1))
+
+#define HASHMAP_INDEX(key, capacity) (size_t)(key % (size_t)(capacity))
 
 /* HashMap function API */
 
