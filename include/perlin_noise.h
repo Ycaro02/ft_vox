@@ -132,7 +132,28 @@ f32 **array1DTo2D(u8 *array, u32 height, u32 width);
 f32 normalizeU8Tof32(u8 value, u8 start1, u8 stop1, f32 start2, f32 stop2);
 
 
+/*
+Sure, here's what each of these variables does in the context of Perlin noise:
 
+`PERLIN_OCTAVE`: This defines the number of octaves to be used in the Perlin noise generation.
+An octave in Perlin noise refers to a layer of noise. Each additional octave adds a finer-grained level of detail to the noise.
+The higher the number of octaves, the more detailed and complex the resulting noise will be.
+However, adding more octaves also increases the computation time.
+
+`PERLIN_PERSISTENCE`: This controls the amplitude of each octave of noise.
+It's usually a value between 0 and 1. A higher persistence value means that each octave
+will contribute more to the final noise value, making the noise more detailed.
+A lower persistence value means that each octave contributes less, making the noise smoother.
+Persistence can be thought of as the roughness or choppiness of the noise.
+
+`PERLIN_LACUNARITY`: This controls the frequency of each octave of noise.
+The frequency determines how quickly the noise values change. A higher lacunarity value will make the noise change more rapidly,
+resulting in a more "zoomed out" or "small-scale" noise. A lower lacunarity value will make the noise change more slowly,
+resulting in a more "zoomed in" or "large-scale" noise.
+
+These three variables together control the level of detail, roughness,
+and scale of the Perlin noise. By adjusting these values, you can generate a wide variety of noise patterns.
+*/
 
 /* mlx init for display */
 //int8_t init_mlx(int width, int height, u8 **perlinData);

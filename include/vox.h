@@ -20,14 +20,16 @@
 #define SCREEN_WIDTH	1920			/* Screen width */
 #define SCREEN_HEIGHT	1080			/* Screen height */
 
+
 #define CAM_FOV			80.0f			/* Camera field of view */
-#define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size */
+#define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size, cause one block is 0.5, 0.5 * 16 = 8.0f */
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
 
 /* Basic value */
-#define CHUNKS_LOAD_RADIUS 15							/* Chunks load radius */
+#define CHUNKS_LOAD_RADIUS 16							/* Chunks load radius */
 #define CHUNKS_UNLOAD_MAX (CHUNKS_LOAD_RADIUS + 6)		/* Chunks unload max radius */
 #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 10.0f)	/* Max render distance */
+// #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 14.0f)	/* Max render distance */
 
 /* DEBUG VAL */
 // #define CHUNKS_LOAD_RADIUS 1	
@@ -67,18 +69,21 @@
 #define PERLIN_PERSISTENCE 1.0
 #define PERLIN_LACUNARITY 2.0
 
-
+// https://dawnosaur.substack.com/p/how-minecraft-generates-worlds-you Explain how minecraft generate world with different noise
 /* Perlin generation value for continental noise */
 #define PERLIN_CONTINENTAL_OCTAVE 6
 #define PERLIN_CONTINENTAL_PERSISTENCE 0.8f
 #define PERLIN_CONTINENTAL_LACUNARITY 2.0f
 
+/* Perlin generation value for erosion noise */
+#define PERLIN_EROSION_OCTAVE 6 // 6 or 8
+#define PERLIN_EROSION_PERSISTENCE 0.7f
+#define PERLIN_EROSION_LACUNARITY 1.6f
+
 /* Perlin generation value for picks and valley noise */
 #define PERLIN_PICKS_VALLEY_OCTAVE 10
 #define PERLIN_PICKS_VALLEY_PERSISTENCE 2.0f
-#define PERLIN_PICKS_VALLEY_LACUNARITY 1.5f
-
-
+#define PERLIN_PICKS_VALLEY_LACUNARITY 1.4f
 
 
 #define SEA_LEVEL 80.0f
