@@ -17,13 +17,12 @@ typedef struct s_world {
 } World;
 
 typedef struct s_thread_context {
-	Thread			supervisor;		/* Thread supervisor */
+	Thread			supervisor;			/* Thread supervisor */
 	Mutex 			chunkMtx;			/* Mutex to protect data, used for chunks hashmap  */
 	Mutex 			threadMtx;			/* Mutex to protect thread, used for thread status and chunk queue loading */
 	HashMap 		*chunksMapToLoad;	/* Chunks queue to load, (for now contain ThreadData struct) */
-    ThreadEntity	*workers;		/* Worker thread array */
-	s64         	workerMax;		/* Maximum of worker thread (size of workers array) */
-    s64         	workerCurrent;	/* Current busy worker thread */
+    ThreadEntity	*workers;			/* Worker thread array */
+	s64         	workerMax;			/* Maximum of worker thread (size of workers array) */
 } ThreadContext;
 
 /* Context structure */

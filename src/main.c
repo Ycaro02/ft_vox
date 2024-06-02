@@ -101,6 +101,22 @@ void main_loop(Context *c, GLuint skyTexture) {
 }
 
 
+int main() {
+    Context *context;
+
+	if (!(context = contextInit())) {
+		return (1);
+	}
+
+	/* Disable VSync to avoid fps locking */
+	// glfwSwapInterval(0);
+	// testUpdateLogic(context, context->skyTexture);
+
+	main_loop(context, context->skyTexture);
+    vox_destroy(context);
+    return (0);
+}
+
 
 // void testUpdateLogic(Context *c, GLuint skyTexture) {
 //     double lastTime = glfwGetTime();
@@ -136,24 +152,6 @@ void main_loop(Context *c, GLuint skyTexture) {
 //         }
 //     }
 // }
-
-
-int main() {
-    Context *context;
-
-	if (!(context = contextInit())) {
-		return (1);
-	}
-
-	/* Disable VSync to avoid fps locking */
-	// glfwSwapInterval(0);
-	// testUpdateLogic(context, context->skyTexture);
-
-	main_loop(context, context->skyTexture);
-    vox_destroy(context);
-    return (0);
-}
-
 
 
 

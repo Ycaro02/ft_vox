@@ -36,7 +36,7 @@ typedef struct s_thread_entity {
 
 /**
  * @brief Get the number of threads available on the system
- * @return The number of threads available on the system
+ * @return The number of threads available on the system minus 4 if possible else return one
 */
 FT_INLINE s64 ThreadsAvailableGet() {
 	s64 num_threads = sysconf(_SC_NPROCESSORS_ONLN);

@@ -35,7 +35,6 @@ s8 workerIsLoadingChunks (Context *c, s32 chunkX, s32 chunkZ) {
 s8 threadWorkersInit(Context *c) {
 
 	c->threadContext->workerMax = ThreadsAvailableGet();
-	c->threadContext->workerCurrent = 0;
 	c->threadContext->workers = ft_calloc(sizeof(ThreadEntity), c->threadContext->workerMax);
 	if (!c->threadContext->workers) {
 		ft_printf_fd(2, "Error: threadWorkersInit: malloc failed\n");
@@ -86,16 +85,17 @@ int threadChunksLoad(void *data) {
 	updateChunkNeighbors(t->c, chunk, chunkBlockCache, neighborChunksCache);
 	mtx_unlock(t->chunkMtx);
 
-
+	/*	- Here instead of set thread busy to free we can check
+		if vox is running call get nearest chunk and call threadChunksLoad again 
+		(care about big cache need to encaptulate this in a function to destroy it at the end of each call ) 
+	*/
 	mtx_lock(&t->c->threadContext->threadMtx);
 	t->c->threadContext->workers[t->threadID].busy = WORKER_FREE;
 	mtx_unlock(&t->c->threadContext->threadMtx);
-	free(data);
+	free(data); /* Free the thread data (t here )*/
 	return (1);
 }
 
-
-// s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
 
 /**
  * @brief Initialize a thread to load a chunk
@@ -126,7 +126,6 @@ s8 threadInitChunkLoad(Context *c, s32 chunkX, s32 chunkZ) {
 	tdata->chunkZ = chunkZ;
 	tdata->threadID = threadID;
 	// ft_printf_fd(1, ORANGE"\nThread: %d"RESET""CYAN" create [%d][%d], "RESET""PINK"CamChunksPos: [%d][%d] -> Distance: |%d|"RESET, threadID, chunkX, chunkZ, c->cam.chunkPos[0], c->cam.chunkPos[2], chunksEuclideanDistanceGet(c->cam.chunkPos[0], c->cam.chunkPos[2], chunkX, chunkZ));
-	c->threadContext->workerCurrent += 1;
 	c->threadContext->workers[threadID].busy = WORKER_BUSY;
 	c->threadContext->workers[threadID].data = tdata;
 	mtx_unlock(&c->threadContext->threadMtx);
