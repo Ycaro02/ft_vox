@@ -87,7 +87,6 @@ Context *contextInit() {
 	/* init context camera */
     glm_mat4_identity(context->rotation);
 
-
 	initSkyBox(context);
 	initAtlasTexture(context);
 	return (context);

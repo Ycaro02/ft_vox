@@ -18,6 +18,12 @@ void set_shader_var_float(GLuint shader_id, char *name, float value)
 	glUniform1f(loc, value);
 }
 
+void set_shader_var_vec3(GLuint shader_id, char *name, vec3 vec)
+{
+	GLint loc = glGetUniformLocation(shader_id, name);
+	glUniform3f(loc, vec[0], vec[1], vec[2]);
+}
+
 char *load_shader_file(char *path)
 {
 	char **file = sstring_load_file(path);
