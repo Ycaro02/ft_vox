@@ -27,7 +27,8 @@ SRCS			=	context_init.c\
 					render/render_chunks.c\
 					render/skybox.c\
 					render/load_chunks.c\
-					render/thread.c\
+					render/thread_supervisor.c\
+					render/thread_workers.c\
 					render/frustrum_culling.c\
 					render/cube_face_build.c\
 					texture/load_texture.c\

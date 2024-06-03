@@ -12,9 +12,9 @@ void chunksRender(Context *c, GLuint shader_id) {
 
 void vox_destroy(Context *c) {
 	s32 status = 0;
-	mtx_lock(&c->gameMtx);
+	mtx_lock(&c->isRunningMtx);
 	c->isPlaying = FALSE;
-	mtx_unlock(&c->gameMtx);
+	mtx_unlock(&c->isRunningMtx);
 	
 	thrd_join(c->threadContext->supervisor, &status);
 	hashmap_destroy(c->threadContext->chunksMapToLoad);

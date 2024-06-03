@@ -138,6 +138,6 @@ void drawAllChunksByFace(Context *c) {
     
 	}
     mtx_unlock(&c->renderMtx);
-    ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "YELLOW"Visible Face: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
+    VOX_PROTECTED_LOG(c, RESET_LINE""GREEN"Chunk Rendered: %u -> "YELLOW"Visible Face: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
     , chunkRenderNb / 6, faceRendernb, chunksLoaded, chunksLoading, fpsGet());
 }

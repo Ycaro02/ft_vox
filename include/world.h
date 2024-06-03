@@ -20,6 +20,7 @@ typedef struct s_thread_context {
 	Thread			supervisor;			/* Thread supervisor */
 	Mutex 			chunkMtx;			/* Mutex to protect data, used for chunks hashmap  */
 	Mutex 			threadMtx;			/* Mutex to protect thread, used for thread status and chunk queue loading */
+	Mutex			logMtx;
 	HashMap 		*chunksMapToLoad;	/* Chunks queue to load, (for now contain ThreadData struct) */
     ThreadEntity	*workers;			/* Worker thread array */
 	s64         	workerMax;			/* Maximum of worker thread (size of workers array) */
@@ -41,6 +42,7 @@ typedef struct s_context {
 	t_list				*vboToCreate;		/* VBO to create */
 	Mutex				renderMtx;				/* Mutex to protect VBO, used for renderChunks map */
 	Mutex				gameMtx;				/* Mutex to protect game, used for game boolean and cam chunk Pos */
+	Mutex				isRunningMtx;		/* Mutex to protect isRunning */
 	GLuint				cubeShaderID;		/* shader program id */
 	GLuint				skyboxShaderID;		/* shader program id */
 	GLuint				skyboxVAO;			/* skybox VAO */
@@ -65,9 +67,9 @@ void display_camera_value(Context *context);
 
 FT_INLINE s8 voxIsRunning(Context *context) {
 	s8 playing = TRUE;
-	mtx_lock(&context->gameMtx);
+	mtx_lock(&context->isRunningMtx);
 	playing = context->isPlaying;
-	mtx_unlock(&context->gameMtx);
+	mtx_unlock(&context->isRunningMtx);
 	return (playing);
 }
 

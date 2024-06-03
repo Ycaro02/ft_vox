@@ -67,9 +67,13 @@ Context *contextInit() {
 
 	mtx_init(&context->renderMtx, mtx_plain);
 	mtx_init(&context->gameMtx, mtx_plain);
+	mtx_init(&context->isRunningMtx, mtx_plain);
+
+	mtx_lock(&context->isRunningMtx);
+	context->isPlaying = TRUE;
+	mtx_unlock(&context->isRunningMtx);
 
 	mtx_lock(&context->gameMtx);
-	context->isPlaying = TRUE;
 	context->cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(SCREEN_WIDTH, SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
 	mtx_unlock(&context->gameMtx);
 	extractFrustumPlanes(&context->gameMtx ,&context->cam.frustum, context->cam.projection, context->cam.view);
