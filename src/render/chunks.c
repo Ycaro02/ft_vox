@@ -151,11 +151,11 @@ f32 perlinNoiseHeight(Mutex *mtx, f32 **perlin2D, s32 localX, s32 localZ, Perlin
     /* Access the interpolated noise value */
     perlinVal->val = normaliseNoiseGet(perlin2D, localX, localZ, perlinVal);
 
-    if (perlinVal->val > 0.2 && perlinVal->val <= 0.5) {
-		f32 ret = normalisef32Tof32(perlinVal->val, 0.2, 0.5, 100.0f, 150.0f);
+    if (perlinVal->val > 0.3 && perlinVal->val <= 0.4) {
+		f32 ret = normalisef32Tof32(perlinVal->val, 0.3, 0.4, 100.0f, 150.0f);
 		return (ret);
 
-    } else if (perlinVal->val >= 0.4999f) {
+    } else if (perlinVal->val >= 0.3999f) {
         return (150.0f);
     }
 
