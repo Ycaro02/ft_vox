@@ -6,8 +6,8 @@ in vec3 TexCoord;
 
 uniform sampler3D textureAtlas;
 
-const float fogStart = 120.0;
-const float fogEnd = 160.0;
+const float fogStart = 160.0;
+const float fogEnd = 180.0;
 const vec3 fogColor = vec3(0.5, 0.5, 0.5);
 
 void main()

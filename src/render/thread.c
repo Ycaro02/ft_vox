@@ -185,7 +185,7 @@ void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, Has
 	it = hashmap_iterator(chunksMapToLoad);
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
-		if (chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_UNLOAD_MAX) {
+		if (chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_UNLOAD_RADIUS) {
 			if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 				*chunkIDToRemove = pos;
 				ft_lstadd_back(&toRemoveList, ft_lstnew(chunkIDToRemove));

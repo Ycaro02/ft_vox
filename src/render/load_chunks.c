@@ -71,7 +71,7 @@ void unloadChunkHandler(Context *c) {
 	t_list 		*toRemoveList = NULL;
 	BlockPos 	*chunkIDToRemove = NULL;
 	s32			camChunkX = 0, camChunkZ = 0;
-	s32 		maxChunkLoad = CHUNKS_UNLOAD_MAX;
+	s32 		maxChunkLoad = CHUNKS_UNLOAD_RADIUS;
 
 	// GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
 
