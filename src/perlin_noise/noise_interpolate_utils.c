@@ -1,8 +1,4 @@
-#include "../../include/vox.h"			/* Main project header */
-#include "../../include/chunks.h"
 #include "../../include/perlin_noise.h"
-#include "../../include/render_chunks.h"
-#include "../../include/thread_load.h"
 
 f32 normalisef32Tof32(f32 value, f32 start1, f32 stop1, f32 start2, f32 stop2) {
 	return (start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1)));
@@ -27,12 +23,12 @@ f32 getInterpolatedPerlinNoise(f32 **perlinNoise, f32 x, f32 z, f32 scale, s32 w
     s32 z0 = scaledZ;
     s32 z1 = z0 + 1;
 
-    if (x1 >= width) x1 = x0;
-    if (z1 >= height) z1 = z0;
+    if (x1 >= width) x1 = abs(x0 -1);
+    if (z1 >= height) z1 = abs(z0 - 1);
 
 	/* set Perlin Debug val here */
-	perlinVal->x0 = x0;
-	perlinVal->z0 = z0;
+	perlinVal->x0 = x0 % width;
+	perlinVal->z0 = z0 % height;
 
     f32 q11 = perlinNoise[x0 % width][z0 % height];
     f32 q12 = perlinNoise[x0 % width][z1 % height];
@@ -54,7 +50,7 @@ f32 normaliseNoiseGet(f32 **perlinNoise, s32 x, s32 z, PerlinData *perlinVal) {
 	perlinVal->givenZ = z;
 
 	// return (perlinNoise[normX][normZ]);
-	// return (getInterpolatedPerlinNoise(perlinNoise, x, z, 8.0f, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal));
+	// return (getInterpolatedPerlinNoise(perlinNoise, x, z, 2.0f, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal));
 	return (getInterpolatedPerlinNoise(perlinNoise, x, z, 4.0f, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal));
 }
 
@@ -70,5 +66,13 @@ f32 **array1DTo2D(u8 *array, u32 height, u32 width) {
 			perlin2D[i][j] = normalizeU8Tof32(array[i * width + j], 0, 255, -1.0f, 1.0f);
 		}
 	}
+	return (perlin2D);
+}
+
+f32 **perlin2DFloatGet(u8 *perlin1D) {
+	f32 **perlin2D = NULL;
+	/* Transform 1D array to 2D array */
+	perlin2D = array1DTo2D(perlin1D, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH);
+	free(perlin1D);
 	return (perlin2D);
 }

@@ -27,7 +27,7 @@
 
 /* Basic value */
 #define CHUNKS_LOAD_RADIUS 20							/* Chunks load radius */
-#define CHUNKS_UNLOAD_RADIUSIUS (CHUNKS_LOAD_RADIUS + 8)		/* Chunks unload max radius */
+#define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 8)		/* Chunks unload max radius */
 // #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 10.0f)	/* Max render distance */
 #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 14.0f)	/* Max render distance */
 

@@ -15,13 +15,7 @@ typedef struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
 } SubChunks;
 
-typedef struct s_perlin_data {
-	s32 z0, x0;
-	f32 val;
-	f32 add;
-	s32 normalise;
-	s32 givenX, givenZ;
-} PerlinData;
+typedef struct s_perlin_data PerlinData;
 
 typedef struct s_chunks {
 	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */

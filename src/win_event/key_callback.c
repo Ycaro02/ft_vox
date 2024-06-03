@@ -1,5 +1,6 @@
 #include "../../include/world.h"
 #include "../../include/chunks.h"
+#include "../../include/perlin_noise.h"
 
 /* Escapte Key : ESC */
 void act_escape(Context *c) {
