@@ -7,20 +7,6 @@ s8 chunkIsInQueue(HashMap *chunksMapToLoad, BlockPos chunkID) {
 }
 
 /**
- * @brief Get the first free worker thread (Mtx locked when called)
- * @param c Context
- * @return The index of the first free worker thread, -1 if no worker is free
-*/
-s32 threadFreeWorkerGet (ThreadContext *threadContext) {
-	for (s32 i = 0; i < threadContext->workerMax ; ++i) {
-		if (threadContext->workers[i].busy == WORKER_FREE) {
-			return (i);
-		}
-	}
-	return (-1);
-}
-
-/**
  * @brief Load chunks in a thread
  * @param data ThreadData
  * @return 1 (int function required by thrd_create)
@@ -46,60 +32,8 @@ int threadChunksLoad(void *data) {
 	mtx_lock(t->chunkMtx);
 	updateChunkNeighbors(t->c, chunk, chunkBlockCache, neighborChunksCache);
 	mtx_unlock(t->chunkMtx);
-
-	/*	- Here instead of set thread busy to free we can check
-		if vox is running call get nearest chunk and call threadChunksLoad again 
-		(care about big cache need to encaptulate this in a function to destroy it at the end of each call ) 
-	*/
-	// mtx_lock(&t->c->threadContext->threadMtx);
-	// t->c->threadContext->workers[t->threadID].busy = WORKER_FREE;
-	// mtx_unlock(&t->c->threadContext->threadMtx);
-	// free(data); /* Free the thread data (t here )*/
 	return (1);
 }
-
-
-/**
- * @brief Initialize a thread to load a chunk
- * @param c Context
- * @param mtx Mutex
- * @param chunkX Chunk X
- * @param chunkZ Chunk Z
- * @return 1 if success, 0 if failed to init the thread (cause thread are all busy)
-*/
-s8 threadInitChunkLoad(Context *c, s32 chunkX, s32 chunkZ) {
-	ThreadData	*tdata;
-	s32			threadID = -1; 
-
-
-	mtx_lock(&c->threadContext->threadMtx);
-	if ((threadID = threadFreeWorkerGet(c->threadContext)) == -1) {
-		// ft_printf_fd(1, RED"Thread is full\n"RESET, hashmap_size(c->threadContext->chunksMapToLoad));
-		mtx_unlock(&c->threadContext->threadMtx);
-		return (FALSE);
-	} else if (!(tdata = malloc(sizeof(ThreadData)))) {
-		ft_printf_fd(2, "Error: threadInitChunkLoad: malloc failed\n");
-		mtx_unlock(&c->threadContext->threadMtx);
-		return (FALSE);
-	}
-	tdata->c = c;
-	tdata->chunkMtx = &c->threadContext->chunkMtx;
-	tdata->chunkX = chunkX;
-	tdata->chunkZ = chunkZ;
-	tdata->threadID = threadID;
-	// ft_printf_fd(1, ORANGE"\nThread: %d"RESET""CYAN" create [%d][%d], "RESET""PINK"CamChunksPos: [%d][%d] -> Distance: |%d|"RESET, threadID, chunkX, chunkZ, c->cam.chunkPos[0], c->cam.chunkPos[2], chunksEuclideanDistanceGet(c->cam.chunkPos[0], c->cam.chunkPos[2], chunkX, chunkZ));
-	c->threadContext->workers[threadID].busy = WORKER_BUSY;
-	c->threadContext->workers[threadID].data = tdata;
-	mtx_unlock(&c->threadContext->threadMtx);
-
-	thrd_create(&c->threadContext->workers[threadID].thread, threadChunksLoad, tdata);
-	if (!thrd_detach(c->threadContext->workers[threadID].thread)) {
-		ft_printf_fd(2, "Error: threadInitChunkLoad: thrd_detach failed\n");
-		return (FALSE);
-	}
-	return (TRUE);
-}
-
 
 
 /**

@@ -68,6 +68,7 @@ Context *contextInit() {
 	mtx_init(&context->renderMtx, mtx_plain);
 	mtx_init(&context->gameMtx, mtx_plain);
 	mtx_init(&context->isRunningMtx, mtx_plain);
+	mtx_init(&context->vboToDestroyMtx, mtx_plain);
 
 	mtx_lock(&context->isRunningMtx);
 	context->isPlaying = TRUE;

@@ -3,7 +3,6 @@
 #include "../../include/render_chunks.h"
 
 s32 workersThreadRoutine(void *data) {
-	(void)data;
 	ThreadData *inputData = (ThreadData *)data;
 	ThreadData *tmp = NULL;
 

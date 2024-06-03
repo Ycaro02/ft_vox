@@ -29,6 +29,8 @@ void vox_destroy(Context *c) {
 
 	mtx_destroy(&c->renderMtx);
 	mtx_destroy(&c->gameMtx);
+	mtx_destroy(&c->isRunningMtx);
+	mtx_destroy(&c->vboToDestroyMtx);
 
 
 
@@ -66,9 +68,9 @@ void renderChunksLoadNewVBO(Context *c) {
 		}
 		
 	}
-	renderChunksVBODestroy(c);
 	ft_lstclear(&c->vboToCreate, free);
 	mtx_unlock(&c->renderMtx);
+	renderChunksVBODestroy(c);
 }
 
 

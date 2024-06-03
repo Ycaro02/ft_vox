@@ -43,6 +43,7 @@ typedef struct s_context {
 	Mutex				renderMtx;				/* Mutex to protect VBO, used for renderChunks map */
 	Mutex				gameMtx;				/* Mutex to protect game, used for game boolean and cam chunk Pos */
 	Mutex				isRunningMtx;		/* Mutex to protect isRunning */
+	Mutex				vboToDestroyMtx;	/* Mutex to protect vboToDestroy list */
 	GLuint				cubeShaderID;		/* shader program id */
 	GLuint				skyboxShaderID;		/* shader program id */
 	GLuint				skyboxVAO;			/* skybox VAO */

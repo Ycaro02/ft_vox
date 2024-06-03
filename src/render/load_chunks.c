@@ -55,13 +55,13 @@ void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
 	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
 	
 	for (u32 i = 0; i < 6; ++i) {
-	if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
-		*instanceVBO = chunk->render->faceVBO[i];
-		*typeBlockVBO = chunk->render->faceTypeVBO[i];
-		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
-		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
+		if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
+			*instanceVBO = chunk->render->faceVBO[i];
+			*typeBlockVBO = chunk->render->faceTypeVBO[i];
+			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
+			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
+		}
 	}
-}
 }
 
 void unloadChunkHandler(Context *c) {
@@ -73,14 +73,12 @@ void unloadChunkHandler(Context *c) {
 	s32			camChunkX = 0, camChunkZ = 0;
 	s32 		maxChunkLoad = CHUNKS_UNLOAD_RADIUS;
 
-	// GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
-
 	mtx_lock(&c->gameMtx);
 	camChunkX = c->cam.chunkPos[0];
 	camChunkZ = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
-	mtx_lock(&c->renderMtx);
+	mtx_lock(&c->vboToDestroyMtx);
 	mtx_lock(&c->threadContext->chunkMtx);
 
 	it = hashmap_iterator(c->world->chunksMap);
@@ -102,7 +100,7 @@ void unloadChunkHandler(Context *c) {
 		}
 	}
 
-	mtx_unlock(&c->renderMtx);
+	mtx_unlock(&c->vboToDestroyMtx);
 	mtx_unlock(&c->threadContext->chunkMtx);
 
 
@@ -160,10 +158,13 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 
 
 void renderChunksVBODestroy(Context *c) {
+	mtx_lock(&c->vboToDestroyMtx);
 	for (t_list *current = c->vboToDestroy; current; current = current->next) {
 		glDeleteBuffers(1, (GLuint *)current->content);
 	}
 	ft_lstclear(&c->vboToDestroy, free);
+	mtx_unlock(&c->vboToDestroyMtx);
+	
 }
 
 /**
