@@ -302,7 +302,7 @@ s32 threadHandling(void *context) {
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
 		chunksQueueRemoveHandling(c, &c->threadContext->threadMtx, &c->gameMtx, c->threadContext->chunksMapToLoad);
-		usleep(1000);
+		// usleep(1000);
 	}
 
 	supervisorWaitWorker(c);
