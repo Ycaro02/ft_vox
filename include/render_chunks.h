@@ -50,8 +50,6 @@ s8 				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
 s8 				chunksRenderIsLoaded(Chunks *chunk);
 s8 				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 
-void renderChunksVBODestroy(Context *c);
-
 
 /* render/cube_face_build.c */
 s8				faceVisible(u8 neighbors, u8 face);

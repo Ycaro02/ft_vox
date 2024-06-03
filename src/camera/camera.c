@@ -108,8 +108,8 @@ void update_camera(void *context, GLuint shader_id)
 	chunkPosGet(&c->cam);
 
 	/* Extract Frustrum plane from projection and view matrix */
+	extractFrustumPlanes(&c->cam.frustum, c->cam.projection, c->cam.view);
 	mtx_unlock(&c->gameMtx);
-	extractFrustumPlanes(&c->gameMtx, &c->cam.frustum, c->cam.projection, c->cam.view);
 
 }
 

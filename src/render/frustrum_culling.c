@@ -14,11 +14,9 @@ BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize) {
     return (box);
 }
 
-
-void extractFrustumPlanes(Mutex *gameMtx, Frustum *frustum, mat4 projection, mat4 view) {
+/* Locked before in update camera and context init */
+void extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view) {
     mat4 viewProjection;
-    
-	mtx_lock(gameMtx);
 	glm_mat4_mul(projection, view, viewProjection);
 
 	/* Left plane */
@@ -47,7 +45,6 @@ void extractFrustumPlanes(Mutex *gameMtx, Frustum *frustum, mat4 projection, mat
 			ft_printf_fd(1, RED"\nError: frustum plane divider %d is null\n"RESET, i);
 		}
     }
-	mtx_unlock(gameMtx);
 }
 
 s8 isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box) {

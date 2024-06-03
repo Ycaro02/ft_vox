@@ -156,17 +156,6 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 
 }
 
-
-void renderChunksVBODestroy(Context *c) {
-	mtx_lock(&c->vboToDestroyMtx);
-	for (t_list *current = c->vboToDestroy; current; current = current->next) {
-		glDeleteBuffers(1, (GLuint *)current->content);
-	}
-	ft_lstclear(&c->vboToDestroy, free);
-	mtx_unlock(&c->vboToDestroyMtx);
-	
-}
-
 /**
  * @brief Handle chunks view, loop on camera fov and the distance to render chunks 
  * then check if chunk is in frustum and not already in render map to add it
