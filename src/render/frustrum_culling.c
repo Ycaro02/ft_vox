@@ -20,7 +20,6 @@ void extractFrustumPlanes(Mutex *gameMtx, Frustum *frustum, mat4 projection, mat
     
 	mtx_lock(gameMtx);
 	glm_mat4_mul(projection, view, viewProjection);
-	mtx_unlock(gameMtx);
 
 	/* Left plane */
 	glm_vec4_copy((vec4) {viewProjection[0][3] + viewProjection[0][0], viewProjection[1][3] + viewProjection[1][0], viewProjection[2][3] + viewProjection[2][0], viewProjection[3][3] + viewProjection[3][0]}, frustum->planes[0]);
@@ -35,7 +34,6 @@ void extractFrustumPlanes(Mutex *gameMtx, Frustum *frustum, mat4 projection, mat
 	/* Far plane */
 	glm_vec4_copy((vec4) {viewProjection[0][3] - viewProjection[0][2], viewProjection[1][3] - viewProjection[1][2], viewProjection[2][3] - viewProjection[2][2], viewProjection[3][3] - viewProjection[3][2]}, frustum->planes[5]);
 
-	mtx_lock(gameMtx);
     /* Normalize planes */
     for (int i = 0; i < 6; i++) {
         f32 length = sqrtf(frustum->planes[i][0] * frustum->planes[i][0] +

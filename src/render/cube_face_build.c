@@ -67,7 +67,7 @@ GLuint faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb) {
     return (bufferGlCreate(GL_ARRAY_BUFFER, faceNb * sizeof(vec3), (void *)faceArray[0]));
 }
 
-/* TO CALL in main thread -> DONE */
+/* TO CALL in main thread -> DONE Maybe remove return */
 RenderChunks *renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID) {
 	/* Create VBO */
 	Chunks 			*chunks = NULL; 

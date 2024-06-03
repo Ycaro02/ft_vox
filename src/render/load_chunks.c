@@ -178,11 +178,13 @@ void chunksViewHandling(Context *c) {
     vec3            start, rayDir, chunkPos, currPos, travelVector, camViewVector;
 	BlockPos 		chunkID;
 	Chunks 			*chunks = NULL;
+	RenderChunks 	*renderChunk = NULL;
     f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV);
 	f32 			radiusEnd = (CAM_FOV);
 	s8 				inView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;
 	u8				neightborChunkLoaded = 0;
+	s8				renderVBOisLoaded = FALSE;
 
 	mtx_lock(&c->gameMtx);
     glm_vec3_copy(c->cam.position, start);
@@ -222,19 +224,24 @@ void chunksViewHandling(Context *c) {
 				if (inView) { /* If chunk is in frustum */
 					chunkNeighborMaskUpdate(c, chunks);
 					neightborChunkLoaded = chunks->neighbors == CHUNKS_NEIGHBOR_LOADED;
-					mtx_lock(&c->renderMtx);
-					/*	
-						Maybe we can reduce the lock time here store renderChunks pointer 
-						in local var and lock just to asign it to chunk->render
-						and create separate Mutex for VBO list create in renderchunk create*/
 					/* If chunk->render is not load and all nearby chunk are loaded (to wait full ocllusion culling)*/
 					if (!chunksRenderIsload && neightborChunkLoaded) {
-						chunks->render = renderChunkCreate(c, chunks);
+						renderChunk = renderChunkCreate(c, chunks);
+						mtx_lock(&c->renderMtx);
+						chunks->render = renderChunk;
+						mtx_unlock(&c->renderMtx);
 					} /* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
-					else if (!chunkInRenderMap && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
-						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
+					if (!chunkInRenderMap && chunksRenderIsload) {
+						mtx_lock(&c->vboToCreateMtx);
+						renderVBOisLoaded = chunks->render->faceTypeVBO[5] != 0;
+						mtx_unlock(&c->vboToCreateMtx);
+						if (renderVBOisLoaded) {
+							mtx_lock(&c->renderMtx);
+							hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
+							mtx_unlock(&c->renderMtx);
+						}
 					}
-					mtx_unlock(&c->renderMtx);
+					// mtx_unlock(&c->renderMtx);
 				}
             } else {
 				chunksToLoadPrioritySet(c, chunkID, LOAD_PRIORITY_HIGH);

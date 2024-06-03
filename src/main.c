@@ -56,20 +56,20 @@ void vox_destroy(Context *c) {
 
 void renderChunksLoadNewVBO(Context *c) {
 	RenderChunks *render = NULL;
+	(void)render;
 
-
-	mtx_lock(&c->renderMtx);
+	mtx_lock(&c->vboToCreateMtx);
 	
 	for (t_list *current = c->vboToCreate; current; current = current->next) {
 		BlockPos chunkID = *(BlockPos *)current->content;
 		render = renderChunkCreateFaceVBO(&c->threadContext->chunkMtx, c->world->chunksMap, chunkID);
-		if (render) {
-			hashmap_set_entry(c->world->renderChunksMap, chunkID, render);
-		}
+		// if (render) {
+		// 	hashmap_set_entry(c->world->renderChunksMap, chunkID, render);
+		// }
 		
 	}
 	ft_lstclear(&c->vboToCreate, free);
-	mtx_unlock(&c->renderMtx);
+	mtx_unlock(&c->vboToCreateMtx);
 	renderChunksVBODestroy(c);
 }
 

@@ -40,10 +40,12 @@ RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
 	chunksCubeFaceGet(&c->threadContext->chunkMtx, chunks, render);
 
 	/* We need to store vbo to create in list to give it to main thread */
+	mtx_lock(&c->vboToCreateMtx);
 	if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {
 		ft_memcpy(chunkIDVBOtoCreate, &chunkID, sizeof(BlockPos));
 		ft_lstadd_back(&c->vboToCreate, ft_lstnew(chunkIDVBOtoCreate));
 	}
+	mtx_unlock(&c->vboToCreateMtx);
 
 	(void)c;
 
