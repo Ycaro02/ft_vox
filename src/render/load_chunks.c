@@ -223,6 +223,10 @@ void chunksViewHandling(Context *c) {
 					chunkNeighborMaskUpdate(c, chunks);
 					neightborChunkLoaded = chunks->neighbors == CHUNKS_NEIGHBOR_LOADED;
 					mtx_lock(&c->renderMtx);
+					/*	
+						Maybe we can reduce the lock time here store renderChunks pointer 
+						in local var and lock just to asign it to chunk->render
+						and create separate Mutex for VBO list create in renderchunk create*/
 					/* If chunk->render is not load and all nearby chunk are loaded (to wait full ocllusion culling)*/
 					if (!chunksRenderIsload && neightborChunkLoaded) {
 						chunks->render = renderChunkCreate(c, chunks);
