@@ -24,12 +24,15 @@
 #define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size, cause one block is 0.5, 0.5 * 16 = 8.0f */
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
 
-/* Basic value */
+/* Bonus value */
 #define CHUNKS_LOAD_RADIUS 20							/* Chunks load radius */
 #define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 8)		/* Chunks unload max radius */
-// #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 10.0f)	/* Max render distance */
-#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 14.0f)	/* Max render distance */
+// #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 14.0f)	/* Max render distance */
 
+/* Basic Value */
+// #define CHUNKS_LOAD_RADIUS 20								/* Chunks load radius */
+// #define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 8)		/* Chunks unload max radius */
+#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 10.0f)		/* Max render distance */
 
 /* DEBUG VAL */
 // #define CHUNKS_LOAD_RADIUS 1	

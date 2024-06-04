@@ -31,15 +31,21 @@ void add_ms_to_timespec(struct timespec *ts, int ms) {
 
 
 void renderChunksLoadNewVBO(Context *c) {
-	// if (mtx_trylock(&c->threadContext->chunkMtx) != thrd_success) {
-		// return;
-	// }
-	TimeSpec current;
-	add_ms_to_timespec(&current, 10);
-	/* LOCK chunk MTX */
-	if (mtx_timedlock(&c->threadContext->chunkMtx, &current) != thrd_success) {
-		return;
+
+	// /* LOCK chunk MTX */
+	if (mtx_trylock(&c->threadContext->chunkMtx) != thrd_success) {
+		renderNeedDataSet(c, TRUE);
+		TimeSpec current;
+		add_ms_to_timespec(&current, 10);
+		if (mtx_timedlock(&c->threadContext->chunkMtx, &current) != thrd_success) {
+			renderNeedDataSet(c, TRUE);
+			return;
+		}
 	}
+
+
+	renderNeedDataSet(c, FALSE);
+
 
 	c->chunkLoadedNb = hashmap_size(c->world->chunksMap);
 
@@ -59,36 +65,9 @@ void renderChunksLoadNewVBO(Context *c) {
 }
 
 
-// void destroySingleRenderChunksVBO(Context *c){
-// 	mtx_lock(&c->vboToDestroyMtx);
-// 	t_list *current = c->vboToDestroy;
-// 	if (current) {
-// 		glDeleteBuffers(1, (GLuint *)current->content);
-// 		ft_lstpop(&c->vboToDestroy, free);
-// 	}
-// 	mtx_unlock(&c->vboToDestroyMtx);
-// }
-
-// void loadSingleRenderChunksVBO(Context *c) {
-// 	mtx_lock(&c->vboToCreateMtx);
-// 	t_list *current = c->vboToCreate;
-// 	s8		renderLoaded = FALSE;
-// 	if (current) {
-// 		renderLoaded = renderChunkCreateFaceVBO(&c->threadContext->chunkMtx, c->world->chunksMap, *(BlockPos *)current->content);
-// 		if (renderLoaded) {
-// 			ft_lstpop(&c->vboToCreate, free);
-// 		}
-// 	}
-// 	mtx_unlock(&c->vboToCreateMtx);
-// }
-
-
-
 void renderChunksVBOhandling(Context *c) {
 	renderChunksLoadNewVBO(c);
 	renderChunksVBODestroy(c);
-	// loadSingleRenderChunksVBO(c);
-	// destroySingleRenderChunksVBO(c);
 }
 
 void vox_destroy(Context *c) {
@@ -112,6 +91,8 @@ void vox_destroy(Context *c) {
 	mtx_destroy(&c->gameMtx);
 	mtx_destroy(&c->isRunningMtx);
 	mtx_destroy(&c->vboToDestroyMtx);
+	mtx_destroy(&c->vboToCreateMtx);
+	mtx_destroy(&c->renderDataNeededMtx);
 
 
 	hashmap_destroy(c->world->renderChunksMap);

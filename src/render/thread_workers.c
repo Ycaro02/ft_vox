@@ -11,6 +11,10 @@ s32 workersThreadRoutine(void *data) {
 	mtx_unlock(&inputData->c->threadContext->threadMtx);
 
 	while (1) {
+		while (renderNeedDataGet(inputData->c)) {
+			usleep(500);
+		}
+
 		mtx_lock(&inputData->c->threadContext->threadMtx);
 		tmp = chunksToLoadNearestGet(inputData->c, inputData->c->threadContext->chunksMapToLoad);
 		if (tmp) {

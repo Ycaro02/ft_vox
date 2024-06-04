@@ -216,7 +216,7 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
  * @param context Context
  * @return TRUE if success, FALSE if failed
 */
-s32 threadHandling(void *context) {
+s32 supervisorThreadRoutine(void *context) {
 	Context		*c = (Context *)context;
 
 	if (!threadWorkersInit(c)) {
@@ -225,6 +225,9 @@ s32 threadHandling(void *context) {
 	}
 
 	while (voxIsRunning(c)) {
+		while (renderNeedDataGet(c)) {
+			usleep(500);
+		}
 		supervisorLoadChunksArround(c, CHUNKS_LOAD_RADIUS);
 		chunksViewHandling(c);
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
@@ -256,7 +259,7 @@ s8 threadSupervisorInit(Context *c) {
 	mtx_init(&c->threadContext->threadMtx, mtx_plain);
 	mtx_init(&c->threadContext->chunkMtx, mtx_plain);
 	mtx_init(&c->threadContext->logMtx, mtx_plain);
-	thrd_create(&c->threadContext->supervisor, threadHandling, c);
+	thrd_create(&c->threadContext->supervisor, supervisorThreadRoutine, c);
 
 	return (TRUE);
 }

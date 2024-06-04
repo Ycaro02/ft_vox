@@ -13,7 +13,6 @@ typedef struct s_world {
 	u64				seed;					/* World seed */
 	HashMap			*chunksMap;				/* Chunks hashmap */
 	HashMap			*renderChunksMap;		/* Render chunks map */
-	// HashMap			*renderChunksCacheMap;	/* Cache of renderchunks to avoid multiple creation/destroy of VBO */
 } World;
 
 typedef struct s_thread_context {
@@ -51,22 +50,40 @@ typedef struct s_context {
 	ThreadContext		*threadContext;		/* Thread context */
 	s8					isPlaying;			/* Game is playing */
 	f32					**perlin2D;			/* Perlin noise 2D */
-	f32					**perlinCaveNoise;		/* Perlin noise 2D for cave */
+	f32					**perlinCaveNoise;	/* Perlin noise 2D for cave */
 	t_list				*vboToDestroy;		/* VBO to destroy */
 	t_list				*vboToCreate;		/* VBO to create */
-	Mutex				renderMtx;				/* Mutex to protect VBO, used for renderChunks map */
-	Mutex				gameMtx;				/* Mutex to protect game, used for game boolean and cam chunk Pos */
+	Mutex				renderMtx;			/* Mutex to protect VBO, used for renderChunks map */
+	Mutex				gameMtx;			/* Mutex to protect game, used for game boolean and cam chunk Pos */
 	Mutex				isRunningMtx;		/* Mutex to protect isRunning */
 	Mutex				vboToDestroyMtx;	/* Mutex to protect vboToDestroy list */
 	Mutex				vboToCreateMtx;		/* Mutex to protect vboToCreate list */
+	Mutex				renderDataNeededMtx; /* Mutex to protect renderDataNeeded */
 	GLuint				cubeShaderID;		/* shader program id */
 	GLuint				skyboxShaderID;		/* shader program id */
 	GLuint				skyboxVAO;			/* skybox VAO */
 	GLuint				skyTexture;			/* skybox VAO */
-	mat4				rotation;		/* rotation matrix */
-	u32					chunkLoadedNb;	/* Chunk loaded */
+	mat4				rotation;			/* rotation matrix */
+	u32					chunkLoadedNb;		/* Chunk loaded */
+	u8					renderDataNeeded; 	/* Render need data, bool to specify render want to lock data (chunkMtx) */
 	// MutexTime			mtxTime;		/* Mutex time */
 } Context;
+
+
+FT_INLINE void renderNeedDataSet(Context *c, u8 value) {
+	mtx_lock(&c->renderDataNeededMtx);
+	c->renderDataNeeded = value;
+	mtx_unlock(&c->renderDataNeededMtx);
+}
+
+FT_INLINE s8 renderNeedDataGet(Context *c) {
+	s8 value = FALSE;
+
+	mtx_lock(&c->renderDataNeededMtx);
+	value = c->renderDataNeeded;
+	mtx_unlock(&c->renderDataNeededMtx);
+	return (value);
+}
 
 
 #define VOX_PROTECTED_LOG(c, msg, ...) \
@@ -79,7 +96,7 @@ typedef struct s_context {
 
 // FT_INLINE void computeTimeSpend(TimeSpec *start, TimeSpec *end, f64 *time) {
 // 	*time = (f64)(end->tv_sec - start->tv_sec) + (f64)(end->tv_nsec - start->tv_nsec) / 1e9;
-}
+// }
 
 // FT_INLINE void mtxLockUpdateTime(Context *c, Mutex *mtx, TimeSpec *start, TimeSpec *end, f64 *time, char *mtxName) {
 // 	mtx_lock(mtx);
