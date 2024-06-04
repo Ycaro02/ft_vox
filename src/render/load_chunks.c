@@ -133,7 +133,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		chunks = hashmap_get(c->world->chunksMap, chunkID);
 		if (chunks) {
-			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f);
+			BoundingBox box = chunkBoundingBoxGet(chunks->x, chunks->z, 8.0f);
 			if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
 				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 					ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
@@ -149,7 +149,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		mtx_lock(&c->renderMtx);
 		hashmap_remove_entry(renderChunksMap, tmpChunkID, HASHMAP_FREE_NODE);
 		mtx_unlock(&c->renderMtx);
-		chunksToLoadPrioritySet(c, tmpChunkID, LOAD_PRIORITY_HIGH);
+		// chunksToLoadPrioritySet(c, tmpChunkID, LOAD_PRIORITY_HIGH);
 	}
 
 	ft_lstclear(&toRemoveList, free);
@@ -206,7 +206,7 @@ void chunksViewHandling(Context *c) {
 
 
 			if (chunks) {
-                box = chunkBoundingBoxGet(chunks, 8.0f);
+                box = chunkBoundingBoxGet(chunks->x, chunks->z, 8.0f);
 				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
@@ -216,9 +216,10 @@ void chunksViewHandling(Context *c) {
 					/* If chunk->render is not load and all nearby chunk are loaded (to wait full ocllusion culling)*/
 					if (!chunksRenderIsload && neightborChunkLoaded) {
 						renderChunk = renderChunkCreate(c, chunks);
-						mtx_lock(&c->renderMtx);
+						mtx_lock(&c->vboToCreateMtx);
 						chunks->render = renderChunk;
-						mtx_unlock(&c->renderMtx);
+						mtx_unlock(&c->vboToCreateMtx);
+						chunksRenderIsload = TRUE;
 					} 
 					/* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
 					if (!chunkInRenderMap && chunksRenderIsload) {
@@ -229,11 +230,13 @@ void chunksViewHandling(Context *c) {
 							mtx_lock(&c->renderMtx);
 							hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
 							mtx_unlock(&c->renderMtx);
-						}
+						} 
+						// else {
+						// 	addRenderToVBOCreate(c, chunkID);
+						// }
 					}
-					// mtx_unlock(&c->renderMtx);
 				}
-            } else {
+            } else { /* If chunk not event load and is in frustrum */
 				chunksToLoadPrioritySet(c, chunkID, LOAD_PRIORITY_HIGH);
 			}
 

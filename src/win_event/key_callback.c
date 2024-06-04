@@ -1,6 +1,7 @@
 #include "../../include/world.h"
 #include "../../include/chunks.h"
 #include "../../include/perlin_noise.h"
+#include "../../include/render_chunks.h"
 
 /* Escapte Key : ESC */
 void act_escape(Context *c) {
@@ -8,7 +9,7 @@ void act_escape(Context *c) {
 }
 
 void act_change_cam_speed(Context *c) {
-	c->cam.camSpeed = (c->cam.camSpeed == ONE_BLOCK_PER_SEC) ? (ONE_BLOCK_PER_SEC * 20.0f) : ONE_BLOCK_PER_SEC;
+	c->cam.camSpeed = (c->cam.camSpeed == CAM_BASE_SPEED) ? (CAM_HIGHT_SPEED) : CAM_BASE_SPEED;
 }
 
 /* Zoom : W */
@@ -77,6 +78,27 @@ void displayPerlinNoise(Chunks *chunks, s32 blockX, s32 blockZ) {
 	ft_printf_fd(1, "Normalise:|%d|\n", perlin.normalise);
 }
 
+
+void displayChunkData(Context *c, Chunks *chunk){
+	RenderChunks *renderChunk = chunk->render;
+	ft_printf_fd(1, CYAN"Chunk data:\n-----------------\n"RESET);
+	if (renderChunk) {
+		char *isRender = (chunksIsRenderer(c->world->renderChunksMap, renderChunk->chunkID)) ? GREEN"YES"RESET : RED"NO"RESET;
+		ft_printf_fd(1, YELLOW"Is in render map == "RESET"%s\n", isRender);
+		for (u32 i = 0; i < 6; ++i) {
+			ft_printf_fd(1, YELLOW"Face:|%u| Count %u-> "RESET, i, renderChunk->faceCount[i]);
+			ft_printf_fd(1, ORANGE"Face VBO %u, TypeVBO %u\n"RESET, renderChunk->faceVBO[i], renderChunk->faceTypeVBO[i]);
+		}
+		ft_printf_fd(1, GREEN"Last update %u\n"RESET, renderChunk->lastUpdate);
+	} else {
+		ft_printf_fd(1, RED"Render chunk is NULL\n"RESET);
+	}
+	ft_printf_fd(1, CYAN"Chunk End :\n-----------------\n"RESET);
+
+}
+
+
+
 void testChunksExist(Context *c) {
 	BlockPos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
 	ft_printf_fd(1, "Cam position: X|%f, Y:%f Z:|%f, \n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
@@ -89,7 +111,11 @@ void testChunksExist(Context *c) {
 		s32 blockZ = (((s32)floor(c->cam.position[2] * 2.0)) % 16);
 		if (blockX < 0) { blockX *= -1; }
 		if (blockZ < 0) { blockZ *= -1; }
-		displayPerlinNoise(chunks, blockX , blockZ);
+		Chunks *chunk = hashmap_get(c->world->chunksMap, pos);
+		mtx_lock(&c->vboToCreateMtx);
+		displayChunkData(c, chunk);
+		mtx_unlock(&c->vboToCreateMtx);
+		// displayPerlinNoise(chunks, blockX , blockZ);
 	} else {
 		ft_printf_fd(1, RED"Chunk not exist\n"RESET);
 	}

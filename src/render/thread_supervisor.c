@@ -123,7 +123,16 @@ s8 chunksQueueHandling(Context *c, s32 chunkX, s32 chunkZ) {
 	tdata->chunkMtx = &c->threadContext->chunkMtx;
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
-	tdata->priority = LOAD_PRIORITY_LOW; /* Need to detect hight priority (chunk is in frustrum)*/
+
+	BoundingBox box = {};
+	box = chunkBoundingBoxGet(chunkX, chunkZ, 8.0f);
+	if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
+		tdata->priority = LOAD_PRIORITY_LOW;
+	} else {
+		tdata->priority = LOAD_PRIORITY_HIGH;
+	}
+
+	// tdata->priority = LOAD_PRIORITY_LOW; /* Need to detect hight priority (chunk is in frustrum)*/
 	/* If chunks not in chunksMapToload */
 	hashmap_set_entry(c->threadContext->chunksMapToLoad, chunkID, tdata);
 	mtx_unlock(&c->threadContext->threadMtx);
@@ -189,7 +198,6 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	camChunkZ = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
-	// mtx_lock(&c->threadContext->threadMtx);
 	it = hashmap_iterator(chunksMapToLoad);
 	while ((next = hashmap_next(&it))) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
@@ -207,7 +215,6 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	} else {
 		current = NULL;
 	}
-	// mtx_unlock(&c->threadContext->threadMtx);
 	return (current);
 }
 

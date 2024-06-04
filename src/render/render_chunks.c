@@ -20,10 +20,22 @@ void renderChunksMapFree(void *entry) {
 	free(e); /* free the entry t_list node */
 }
 
+
+void addRenderToVBOCreate(Context *c, BlockPos chunkID) {
+	BlockPos	  *chunkIDVBOtoCreate = NULL;
+	
+	mtx_lock(&c->vboToCreateMtx);
+	if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {
+		ft_memcpy(chunkIDVBOtoCreate, &chunkID, sizeof(BlockPos));
+		ft_lstadd_back(&c->vboToCreate, ft_lstnew(chunkIDVBOtoCreate));
+	}
+	mtx_unlock(&c->vboToCreateMtx);
+}
+
 RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
     RenderChunks *render = NULL;
 	BlockPos	  chunkID;
-	BlockPos	  *chunkIDVBOtoCreate = NULL;
+	// BlockPos	  *chunkIDVBOtoCreate = NULL;
 
 
 	if (!chunks) {
@@ -40,14 +52,15 @@ RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
 	chunksCubeFaceGet(&c->threadContext->chunkMtx, chunks, render);
 
 	/* We need to store vbo to create in list to give it to main thread */
-	mtx_lock(&c->vboToCreateMtx);
-	if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {
-		ft_memcpy(chunkIDVBOtoCreate, &chunkID, sizeof(BlockPos));
-		ft_lstadd_back(&c->vboToCreate, ft_lstnew(chunkIDVBOtoCreate));
-	}
-	mtx_unlock(&c->vboToCreateMtx);
+	// mtx_lock(&c->vboToCreateMtx);
+	// if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {
+	// 	ft_memcpy(chunkIDVBOtoCreate, &chunkID, sizeof(BlockPos));
+	// 	ft_lstadd_back(&c->vboToCreate, ft_lstnew(chunkIDVBOtoCreate));
+	// }
+	// mtx_unlock(&c->vboToCreateMtx);
+	addRenderToVBOCreate(c, chunkID);
 
-	(void)c;
+	// (void)c;
 
 	render->lastUpdate = get_ms_time();
 

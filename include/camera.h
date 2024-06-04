@@ -8,13 +8,17 @@
 typedef struct s_chunks Chunks;
 
 
-#define ONE_BLOCK_PER_SEC 0.133333f /* 1 block per sec, 0.1333 * 60 = 8.0f */
+#define ONE_CHUNK_PER_SEC 0.133333f /* 1 chunk per sec, 0.1333 * 60 = 8.0f */
+#define ONE_BLOCK_PER_SEC 0.008333f /* 1 block per sec, 008333f * 60 = 0.5f */
 
-#define CAM_ZOOM 0.3f				/* Zoom/Unzoom value */
-#define CAM_MOVE_HORIZONTAL 1.0f	/* Move camera horizontal value */
+#define TWO_BLOCK_PER_SEC 0.016666f /* 2 block per sec, 016666f * 60 = 1.0f */
+
+#define CAM_BASE_SPEED TWO_BLOCK_PER_SEC	/* Camera move speed */
+
+/* Camera move speed (40 block per sec) */
+#define CAM_HIGHT_SPEED (TWO_BLOCK_PER_SEC * 20.0f) 
+
 #define CAM_UP_DOWN 0.2f			/* Move camera up/down value */
-#define ROTATE_ANGLE 2.0f			/* Rotate obj angle when arrow pressed */
-
 #define CAM_NEAR 	0.1f
 #define CAM_FAR 	1000.0f
 
@@ -50,7 +54,7 @@ typedef struct s_camera {
 /* Frustrum */
 s8			isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box);
 void		extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view);
-BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize);
+BoundingBox chunkBoundingBoxGet(s32 chunkX, s32 chunkZ, f32 chunkSize);
 
 /* Camera */
 Camera		create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far);

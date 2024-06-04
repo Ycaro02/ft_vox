@@ -20,7 +20,7 @@ void renderChunksVBODestroy(Context *c) {
 	mtx_unlock(&c->vboToDestroyMtx);
 }
 
-void add_ms_to_timespec(struct timespec *ts, int ms) {
+void timespecMSAdd(struct timespec *ts, int ms) {
     clock_gettime(CLOCK_REALTIME, ts);
     ts->tv_nsec += ms * 1000000; // convert ms to ns
     if (ts->tv_nsec >= 1000000000) {
@@ -35,31 +35,24 @@ void renderChunksLoadNewVBO(Context *c) {
 	// /* LOCK chunk MTX */
 	if (mtx_trylock(&c->threadContext->chunkMtx) != thrd_success) {
 		renderNeedDataSet(c, TRUE);
-		TimeSpec current;
-		add_ms_to_timespec(&current, 10);
-		if (mtx_timedlock(&c->threadContext->chunkMtx, &current) != thrd_success) {
-			renderNeedDataSet(c, TRUE);
-			return;
-		}
+		// TimeSpec current;
+		// timespecMSAdd(&current, 10);
+		// if (mtx_timedlock(&c->threadContext->chunkMtx, &current) != thrd_success) {
+		// 	renderNeedDataSet(c, TRUE);
+		// 	return;
+		// }
+		return ;
 	}
-
-
 	renderNeedDataSet(c, FALSE);
 
-
 	c->chunkLoadedNb = hashmap_size(c->world->chunksMap);
-
 	mtx_lock(&c->vboToCreateMtx);
 	for (t_list *current = c->vboToCreate; current; current = current->next) {
 		BlockPos chunkID = *(BlockPos *)current->content;
 		renderChunkCreateFaceVBO(c->world->chunksMap, chunkID);
 	}
-	
 	/* UNLOCK chunk MTX */
 	mtx_unlock(&c->threadContext->chunkMtx);
-
-	// mtx_unlock(&c->renderMtx);
-	
 	ft_lstclear(&c->vboToCreate, free);
 	mtx_unlock(&c->vboToCreateMtx);
 }
@@ -76,6 +69,8 @@ void vox_destroy(Context *c) {
 	c->isPlaying = FALSE;
 	mtx_unlock(&c->isRunningMtx);
 	
+	renderNeedDataSet(c, FALSE);
+
 	thrd_join(c->threadContext->supervisor, &status);
 	hashmap_destroy(c->threadContext->chunksMapToLoad);
 	free(c->threadContext->workers);

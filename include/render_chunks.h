@@ -18,6 +18,8 @@ void			renderChunkFree(RenderChunks *render);
 /* Function to provide at hashmap init for renderChunks map */
 void			renderChunksMapFree(void *entry);
 
+void addRenderToVBOCreate(Context *c, BlockPos chunkID);
+
 /* Render chunks.c */
 void			chunksCubeGet(Chunks *chunks, RenderChunks *render);
 RenderChunks 	*renderChunkCreate(Context *c, Chunks *chunks);
