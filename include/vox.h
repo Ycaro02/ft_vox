@@ -20,7 +20,6 @@
 #define SCREEN_WIDTH	1920			/* Screen width */
 #define SCREEN_HEIGHT	1080			/* Screen height */
 
-
 #define CAM_FOV			80.0f			/* Camera field of view */
 #define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size, cause one block is 0.5, 0.5 * 16 = 8.0f */
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */

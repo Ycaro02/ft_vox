@@ -21,22 +21,51 @@ void renderChunksVBODestroy(Context *c) {
 
 
 void renderChunksLoadNewVBO(Context *c) {
-
+	if (mtx_trylock(&c->threadContext->chunkMtx) != thrd_success) {
+		return;
+	}
+	// mtx_lock(&c->threadContext->chunkMtx);
 	mtx_lock(&c->vboToCreateMtx);
-
 	for (t_list *current = c->vboToCreate; current; current = current->next) {
 		BlockPos chunkID = *(BlockPos *)current->content;
-		renderChunkCreateFaceVBO(&c->threadContext->chunkMtx, c->world->chunksMap, chunkID);
-		// render = renderChunkCreateFaceVBO(&c->threadContext->chunkMtx, c->world->chunksMap, chunkID);
+		renderChunkCreateFaceVBO(c->world->chunksMap, chunkID);
 	}
+	mtx_unlock(&c->threadContext->chunkMtx);
 	ft_lstclear(&c->vboToCreate, free);
 	mtx_unlock(&c->vboToCreateMtx);
-	// renderChunksVBODestroy(c);
 }
+
+
+// void destroySingleRenderChunksVBO(Context *c){
+// 	mtx_lock(&c->vboToDestroyMtx);
+// 	t_list *current = c->vboToDestroy;
+// 	if (current) {
+// 		glDeleteBuffers(1, (GLuint *)current->content);
+// 		ft_lstpop(&c->vboToDestroy, free);
+// 	}
+// 	mtx_unlock(&c->vboToDestroyMtx);
+// }
+
+// void loadSingleRenderChunksVBO(Context *c) {
+// 	mtx_lock(&c->vboToCreateMtx);
+// 	t_list *current = c->vboToCreate;
+// 	s8		renderLoaded = FALSE;
+// 	if (current) {
+// 		renderLoaded = renderChunkCreateFaceVBO(&c->threadContext->chunkMtx, c->world->chunksMap, *(BlockPos *)current->content);
+// 		if (renderLoaded) {
+// 			ft_lstpop(&c->vboToCreate, free);
+// 		}
+// 	}
+// 	mtx_unlock(&c->vboToCreateMtx);
+// }
+
+
 
 void renderChunksVBOhandling(Context *c) {
 	renderChunksLoadNewVBO(c);
 	renderChunksVBODestroy(c);
+	// loadSingleRenderChunksVBO(c);
+	// destroySingleRenderChunksVBO(c);
 }
 
 void vox_destroy(Context *c) {
@@ -53,20 +82,13 @@ void vox_destroy(Context *c) {
 
 	ft_printf_fd(1, PINK"\nSupervisor thread joined with status %d\n"RESET, status);
 
-	/* START */
 	renderChunksVBODestroy(c);
-	// for (t_list *current = c->vboToDestroy; current; current = current->next) {
-	// 	glDeleteBuffers(1, (GLuint *)current->content);
-	// }
-	// ft_lstclear(&c->vboToDestroy, free);
-	/* END */
 	ft_lstclear(&c->vboToCreate, free);
 
 	mtx_destroy(&c->renderMtx);
 	mtx_destroy(&c->gameMtx);
 	mtx_destroy(&c->isRunningMtx);
 	mtx_destroy(&c->vboToDestroyMtx);
-
 
 
 	hashmap_destroy(c->world->renderChunksMap);
@@ -90,46 +112,17 @@ void vox_destroy(Context *c) {
 }
 
 
-
-
-// void ft_lst_pop(t_list **lst, void (*del)(void *)) {
-// 	t_list *tmp = *lst;
-
-// 	if (!lst || !(*lst))
-// 		return ;
-// 	*lst = (*lst)->next;
-// 	del(tmp->content);
-// 	free(tmp);
-// }
-
-// void destroySingleRenderChunksVBO(Context *c){
-// 	mtx_lock(&c->vboToDestroyMtx);
-// 	t_list *current = c->vboToDestroy;
-// 	if (current) {
-// 		glDeleteBuffers(1, (GLuint *)current->content);
-// 		ft_lst_pop(&c->vboToDestroy, free);
-// 	}
-// 	mtx_unlock(&c->vboToDestroyMtx);
-// }
-
-// void loadSingleRenderChunksVBO(Context *c) {
-// 	mtx_lock(&c->vboToCreateMtx);
-// 	t_list *current = c->vboToCreate;
-// 	if (current) {
-// 		renderChunkCreateFaceVBO(&c->threadContext->chunkMtx, c->world->chunksMap, *(BlockPos *)current->content);
-// 		ft_lst_pop(&c->vboToCreate, free);
-// 	}
-// 	mtx_unlock(&c->vboToCreateMtx);
-// }
-
-
 void updateGame(Context *c) {
 		/* Input handling */
 		glfwPollEvents();
-        handle_input(c);
-		
+
 		/* Update data */
+		mtx_lock(&c->gameMtx);
+        handle_input(c);
 		update_camera(c, c->cubeShaderID);
+		mtx_unlock(&c->gameMtx);
+
+		/* Update render */
 		renderChunksVBOhandling(c);
 }
 
@@ -160,7 +153,7 @@ int main() {
 	}
 
 	/* Disable VSync to avoid fps locking */
-	// glfwSwapInterval(0);
+	// glfwSwapInterval(2);
 	// testUpdateLogic(context, context->skyTexture);
 
 	main_loop(context, context->skyTexture);

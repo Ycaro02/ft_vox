@@ -74,6 +74,14 @@ void			ft_lstclear(t_list **lst, void (*del)(void*));
 */
 void			ft_lstiter(t_list *lst, void (*f)(void *));
 
+
+/**
+ * @brief Delete the first node of the list
+ * @param lst pointer to the first node of the list
+ * @param del function to delete the content of the node
+*/
+void			ft_lstpop(t_list **lst, void (*del)(void *));
+
 /**
  * @brief Apply a function to each node of the list and create a new list
  * @param lst pointer to the first node of the list

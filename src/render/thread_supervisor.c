@@ -148,17 +148,11 @@ s8 supervisorLoadChunksArround(Context *c, s32 radius) {
 	for (s32 i = -radius; i <= radius; ++i) {
 		for (s32 j = -radius; j <= radius; ++j) {
 			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
-			
-			mtx_lock(&c->threadContext->chunkMtx);
-			Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
-			if (!chunks) {
-				if (!chunksQueueHandling(c, pos.y, pos.z)) {
-					ft_printf_fd(2, "Error: supervisorLoadChunksArround: chunksQueueHandling failed\n");
-					mtx_unlock(&c->threadContext->chunkMtx);
-					return (FALSE);
-				}
+			if (!chunksQueueHandling(c, pos.y, pos.z)) {
+				ft_printf_fd(2, "Error: supervisorLoadChunksArround: chunksQueueHandling failed\n");
+				mtx_unlock(&c->threadContext->chunkMtx);
+				return (FALSE);
 			}
-			mtx_unlock(&c->threadContext->chunkMtx);
 		}
 	}
 	return (TRUE);

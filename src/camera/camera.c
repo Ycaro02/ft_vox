@@ -91,7 +91,7 @@ void update_camera(void *context, GLuint shader_id)
 {
 	Context *c = context;
 
-	mtx_lock(&c->gameMtx);
+	// mtx_lock(&c->gameMtx);
     /* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
 
@@ -109,7 +109,7 @@ void update_camera(void *context, GLuint shader_id)
 
 	/* Extract Frustrum plane from projection and view matrix */
 	extractFrustumPlanes(&c->cam.frustum, c->cam.projection, c->cam.view);
-	mtx_unlock(&c->gameMtx);
+	// mtx_unlock(&c->gameMtx);
 
 }
 

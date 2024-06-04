@@ -68,18 +68,15 @@ GLuint faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb) {
 }
 
 /* TO CALL in main thread -> DONE Maybe remove return */
-RenderChunks *renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID) {
+void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 	/* Create VBO */
 	Chunks 			*chunks = NULL; 
 	RenderChunks 	*render = NULL; 
 
 
-	mtx_lock(chunkMtx);
-
 	chunks = hashmap_get(chunksMap, chunkID);
 	if (!chunks || !chunks->render) {
-		mtx_unlock(chunkMtx);
-		return (NULL);
+		return ;
 	}
 
 	render = chunks->render;
@@ -87,9 +84,6 @@ RenderChunks *renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, Bloc
 		render->faceVBO[i] = faceInstanceVBOCreate(render->faceArray[i], render->faceCount[i]);
 		render->faceTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, render->faceCount[i] * sizeof(GLuint), (void *)&render->faceTypeID[i][0]);
 	}
-
-	mtx_unlock(chunkMtx);
-	return (render);
 }
 
 /* NEW draw logic */

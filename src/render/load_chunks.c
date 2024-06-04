@@ -219,7 +219,8 @@ void chunksViewHandling(Context *c) {
 						mtx_lock(&c->renderMtx);
 						chunks->render = renderChunk;
 						mtx_unlock(&c->renderMtx);
-					} /* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
+					} 
+					/* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
 					if (!chunkInRenderMap && chunksRenderIsload) {
 						mtx_lock(&c->vboToCreateMtx);
 						renderVBOisLoaded = chunks->render->faceTypeVBO[5] != 0;
