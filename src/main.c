@@ -2,6 +2,7 @@
 #include "../include/skybox.h"		/* skybox rendering */
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
+#include "../include/thread_load.h"
 
 void chunksRender(Context *c, GLuint shader_id) {
     glLoadIdentity();
@@ -117,8 +118,15 @@ void updateGame(Context *c) {
 		glfwPollEvents();
 
 		/* Update data */
+		// clock_gettime(CLOCK_MONOTONIC, &c->mtxTime.startTime);
 		mtx_lock(&c->gameMtx);
-        handle_input(c);
+		// clock_gettime(CLOCK_MONOTONIC, &c->mtxTime.endTime);
+		// computeTimeSpend(&c->mtxTime.startTime, &c->mtxTime.endTime, &c->mtxTime.gameMtxTime);
+		// VOX_PROTECTED_LOG(c, "Game mtx time: %f\n", c->mtxTime.gameMtxTime);
+        
+		// mtxLockUpdateTime(c, &c->gameMtx, &c->mtxTime.start, &c->mtxTime.end, &c->mtxTime.gameMtxTime, "Game");
+
+		handle_input(c);
 		update_camera(c, c->cubeShaderID);
 		mtx_unlock(&c->gameMtx);
 

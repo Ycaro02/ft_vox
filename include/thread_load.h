@@ -52,13 +52,6 @@ FT_INLINE s64 ThreadsAvailableGet() {
 	return (num_threads);
 }
 
-#define VOX_PROTECTED_LOG(c, msg, ...) \
-    do { \
-        mtx_lock(&(c->threadContext->logMtx)); \
-        ft_printf_fd(1, msg, ##__VA_ARGS__); \
-        mtx_unlock(&(c->threadContext->logMtx)); \
-    } while (0)
-
 /* render/thread_supervisor.c */
 s8			threadSupervisorInit(Context *c);
 void		chunksToLoadPrioritySet(Context *c, BlockPos chunkID, u8 priority);
