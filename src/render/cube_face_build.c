@@ -73,12 +73,10 @@ void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 	Chunks 			*chunks = NULL; 
 	RenderChunks 	*render = NULL; 
 
-
 	chunks = hashmap_get(chunksMap, chunkID);
 	if (!chunks || !chunks->render) {
 		return ;
 	}
-
 	render = chunks->render;
 	for (u8 i = 0; i < 6; ++i) {
 		render->faceVBO[i] = faceInstanceVBOCreate(render->faceArray[i], render->faceCount[i]);
@@ -113,11 +111,8 @@ void drawAllChunksByFace(Context *c) {
     s8			next = TRUE;
 
     u32 		chunkRenderNb = 0, faceRendernb = 0;
-	// chunksLoaded =	hashmap_size(c->world->chunksMap);
-	// chunksLoading =	hashmap_size(c->threadContext->chunksMapToLoad);
     
     mtx_lock(&c->renderMtx);
-	// mtxLockUpdateTime(c, &c->renderMtx, &c->mtxTime.start, &c->mtxTime.end, &c->mtxTime.renderMtxTime, "Render");
     for (u8 i = 0; i < 6; ++i) {
 		glBindVertexArray(c->faceCube[i].VAO);
 
@@ -133,7 +128,6 @@ void drawAllChunksByFace(Context *c) {
     
 	}
     mtx_unlock(&c->renderMtx);
-	VOX_PROTECTED_LOG(c, RESET_LINE""PINK"Fps %d"RESET, fpsGet());
-    VOX_PROTECTED_LOG(c, RESET_LINE""GREEN"Chunk Rendered: %u -> "YELLOW"Visible Face: %u"RESET", "PINK" FPS: %d "RESET
-    , chunkRenderNb / 6, faceRendernb, fpsGet());
+    VOX_PROTECTED_LOG(c, RESET_LINE""GREEN"Chunk Rendered: %u, "ORANGE"Loaded %u "RESET""YELLOW"Visible Face: %u"RESET", "PINK" FPS: %d "RESET
+    , chunkRenderNb / 6, c->chunkLoadedNb ,faceRendernb, fpsGet());
 }

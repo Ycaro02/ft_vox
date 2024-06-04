@@ -28,25 +28,24 @@ typedef struct s_thread_context {
 
 typedef struct timespec TimeSpec;
 
-typedef struct s_mutex_time {
-	TimeSpec	start;
-	TimeSpec	end;
-	f64			gameMtxTime;
-	f64			renderMtxTime;
-	f64			isRunningMtxTime;
-	f64			vboToDestroyMtxTime;
-	f64			vboToCreateMtxTime;
-	f64			chunkMtxTime;
-	f64			threadMtxTime;
-	f64			logMtxTime;
-} MutexTime;
+// typedef struct s_mutex_time {
+// 	TimeSpec	start;
+// 	TimeSpec	end;
+// 	f64			gameMtxTime;
+// 	f64			renderMtxTime;
+// 	f64			isRunningMtxTime;
+// 	f64			vboToDestroyMtxTime;
+// 	f64			vboToCreateMtxTime;
+// 	f64			chunkMtxTime;
+// 	f64			threadMtxTime;
+// 	f64			logMtxTime;
+// } MutexTime;
 
 /* Context structure */
 typedef struct s_context {
 	World				*world;				/* World structure */
 	Camera				cam;				/* camera structure */
     GLFWwindow			*win_ptr;			/* Window pointer */
-	// ModelCube			cube;				/* Data Cube structure */
 	FaceCubeModel		*faceCube;			/* Data Face Cube structure */
 	u32					renderBlock;		/* Total block to render */
 	ThreadContext		*threadContext;		/* Thread context */
@@ -63,10 +62,10 @@ typedef struct s_context {
 	GLuint				cubeShaderID;		/* shader program id */
 	GLuint				skyboxShaderID;		/* shader program id */
 	GLuint				skyboxVAO;			/* skybox VAO */
-	// GLuint				cubeVAO;			/* cube VAO */
 	GLuint				skyTexture;			/* skybox VAO */
 	mat4				rotation;		/* rotation matrix */
-	MutexTime			mtxTime;		/* Mutex time */
+	u32					chunkLoadedNb;	/* Chunk loaded */
+	// MutexTime			mtxTime;		/* Mutex time */
 } Context;
 
 
@@ -77,17 +76,18 @@ typedef struct s_context {
         mtx_unlock(&(c->threadContext->logMtx)); \
     } while (0)
 
-FT_INLINE void computeTimeSpend(TimeSpec *start, TimeSpec *end, f64 *time) {
-	*time = (f64)(end->tv_sec - start->tv_sec) + (f64)(end->tv_nsec - start->tv_nsec) / 1e9;
+
+// FT_INLINE void computeTimeSpend(TimeSpec *start, TimeSpec *end, f64 *time) {
+// 	*time = (f64)(end->tv_sec - start->tv_sec) + (f64)(end->tv_nsec - start->tv_nsec) / 1e9;
 }
 
-FT_INLINE void mtxLockUpdateTime(Context *c, Mutex *mtx, TimeSpec *start, TimeSpec *end, f64 *time, char *mtxName) {
-	mtx_lock(mtx);
-	clock_gettime(CLOCK_MONOTONIC, start);
-	clock_gettime(CLOCK_MONOTONIC, end);
-	computeTimeSpend(start, end, time);
-	VOX_PROTECTED_LOG(c, "%s mtx time: %f\n", mtxName, *time);
-}
+// FT_INLINE void mtxLockUpdateTime(Context *c, Mutex *mtx, TimeSpec *start, TimeSpec *end, f64 *time, char *mtxName) {
+// 	mtx_lock(mtx);
+// 	clock_gettime(CLOCK_MONOTONIC, start);
+// 	clock_gettime(CLOCK_MONOTONIC, end);
+// 	computeTimeSpend(start, end, time);
+// 	VOX_PROTECTED_LOG(c, "%s mtx time: %f\n", mtxName, *time);
+// }
 
 
 /* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */
