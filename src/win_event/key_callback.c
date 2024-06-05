@@ -68,20 +68,19 @@ void act_reseCamera(Context *c) {
 }
 
 
-void displayPerlinNoise(Chunks *chunks, s32 blockX, s32 blockZ) {
-	PerlinData perlin = chunks->perlinVal[blockX][blockZ];
-	ft_printf_fd(1, CYAN"Block Z:|%d|, X:|%d| -> Given Z:[%d] X[%d]: \n"RESET, blockZ, blockX, perlin.givenZ, perlin.givenX);
-	ft_printf_fd(1, PINK"Perlin Idx0 : Z:[%d] X:[%d]\n"RESET, perlin.z0, perlin.x0);
-	ft_printf_fd(1, PINK"Perlin Idx1 : Z:[%d] X:[%d]\n"RESET, perlin.z1, perlin.x1);
-	ft_printf_fd(1, "Val:|%f| -> ", perlin.val);
-	ft_printf_fd(1, "Add:|%f| -> ", perlin.add);
-	ft_printf_fd(1, "Normalise:|%d|\n", perlin.normalise);
+void displayPerlinNoise(s32 blockX, s32 blockZ, PerlinData perlinData) {
+	ft_printf_fd(1, CYAN"----\nBlock Z:|%d|, X:|%d| -> Given Z:[%d] X[%d]: \n"RESET, blockZ, blockX, perlinData.givenZ, perlinData.givenX);
+	ft_printf_fd(1, PINK"Perlin Idx0 : Z:[%d] X:[%d]\n"RESET, perlinData.z0, perlinData.x0);
+	ft_printf_fd(1, PINK"Perlin Idx1 : Z:[%d] X:[%d]\n"RESET, perlinData.z1, perlinData.x1);
+	ft_printf_fd(1, "Val:|%f| -> ", perlinData.val);
+	ft_printf_fd(1, "Add:|%f| -> ", perlinData.add);
+	ft_printf_fd(1, "Normalise:|%d|\n----\n", perlinData.normalise);
 }
 
 
 void displayChunkData(Context *c, Chunks *chunk){
 	RenderChunks *renderChunk = chunk->render;
-	ft_printf_fd(1, CYAN"Chunk data:\n-----------------\n"RESET);
+	ft_printf_fd(1, "Chunk data:\n-----------------\n"RESET);
 	if (renderChunk) {
 		char *isRender = (chunksIsRenderer(c->world->renderChunksMap, renderChunk->chunkID)) ? GREEN"YES"RESET : RED"NO"RESET;
 		ft_printf_fd(1, YELLOW"Is in render map == "RESET"%s\n", isRender);
@@ -115,7 +114,10 @@ void testChunksExist(Context *c) {
 		mtx_lock(&c->vboToCreateMtx);
 		displayChunkData(c, chunk);
 		mtx_unlock(&c->vboToCreateMtx);
-		// displayPerlinNoise(chunks, blockX , blockZ);
+		ft_printf_fd(1, CYAN"Perlin Height\n");
+		displayPerlinNoise(blockX, blockZ,chunk->perlinVal[blockX][blockZ]);
+		ft_printf_fd(1, RED"Perlin cave\n");
+		displayPerlinNoise(blockX, blockZ,chunk->perlinCave[blockX][blockZ]);
 	} else {
 		ft_printf_fd(1, RED"Chunk not exist\n"RESET);
 	}
