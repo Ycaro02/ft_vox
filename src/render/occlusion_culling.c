@@ -196,74 +196,114 @@ void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][
 }
 
 
-/* Not mandatory now, we check face instead of block, but maybe good to check only no hidden block for perf */
+s8 blockVisibleFromCam(vec3 blockPos, vec3 faceNormal, Camera *camera) {
+    vec3 toCamera = {
+        camera->position[0] - blockPos[0],
+        camera->position[1] - blockPos[1],
+        camera->position[2] - blockPos[2]
+    };
 
-// s8 allNeighborsExist(Block *block) {
-// 	return (block->neighbors == BLOCK_HIDDEN);
-// }
+    /* Normalise toCamera vector */
+    float length = sqrt(toCamera[0] * toCamera[0] + toCamera[1] * toCamera[1] + toCamera[2] * toCamera[2]);
+    toCamera[0] /= length;
+    toCamera[1] /= length;
+    toCamera[2] /= length;
 
-// u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID) {
-//     s8 next = TRUE;
-//     HashMap *block_map = chunks->sub_chunks[subChunksID].block_map;
-//     HashMap_it it = hashmap_iterator(block_map);
-//     next = hashmap_next(&it);
-//     u32 nb_block = hashmap_size(block_map);
+   /* Dot product between the toCamera vector and the face normal */
+    float dotProduct = camera->viewVector[0] * faceNormal[0] + camera->viewVector[1] * faceNormal[1] + camera->viewVector[2] * faceNormal[2];
 
-//     while (next) {
-//         Block *block = (Block *)it.value;
-//         if (allNeighborsExist(block)) {
-//             --nb_block;
-//         }
-//         next = hashmap_next(&it);
+	/* if the dot product is negative, the face is visible */
+    return (dotProduct < 0);
+}
+
+void updateVisibleFaces(Chunks *chunk, Camera *camera) {
+	s8 next = FALSE;
+    for (u32 subChunkID = 0; chunk->sub_chunks[subChunkID].block_map ; ++subChunkID) {
+        SubChunks *subChunk = &chunk->sub_chunks[subChunkID];
+        HashMap_it it = hashmap_iterator(subChunk->block_map);
+        while ((next = hashmap_next(&it))) {
+            Block		*block = it.value;
+            vec3		blockPos = { block->x * (16 * chunk->x), block->y + subChunkID * 16, block->z * (16 * chunk->z) };
+
+            u8 visibleFaces = 0;
+			/* Visible mask */
+            vec3 faceNormals[6] = {
+                {0, 0, 1}, {0, 0, -1},
+                {1, 0, 0}, {-1, 0, 0},
+                {0, 1, 0}, {0, -1, 0}
+            };
+
+            for (int i = 0; i < 6; ++i) {
+                if (blockVisibleFromCam(blockPos, faceNormals[i], camera)) {
+                    visibleFaces |= (1 << i);
+                }
+            }
+            block->visibleFromCam = visibleFaces;
+        }
+    }
+	// chunks->lastUpdate = get_ms_time();
+}
+
+
+
+
+
+// void updateVisibleFaces(Chunks *chunk, Camera *camera) {
+//     s8 next = FALSE;
+
+//     // Directions de balayage basées sur le vecteur de vue de la caméra
+//     int xStart, xEnd, xStep;
+//     int yStart, yEnd, yStep;
+//     int zStart, zEnd, zStep;
+
+//     if (camera->viewVector.x > 0) {
+//         xStart = 0; xEnd = 16; xStep = 1;
+//     } else {
+//         xStart = 15; xEnd = -1; xStep = -1;
 //     }
-//     return (nb_block);
-// }
 
+//     if (camera->viewVector.y > 0) {
+//         yStart = 0; yEnd = 16; yStep = 1;
+//     } else {
+//         yStart = 15; yEnd = -1; yStep = -1;
+//     }
 
+//     if (camera->viewVector.z > 0) {
+//         zStart = 0; zEnd = 16; zStep = 1;
+//     } else {
+//         zStart = 15; zEnd = -1; zStep = -1;
+//     }
 
-/* OLD Occlusion Culling Strategy */
+//     for (u32 subChunkID = 0; subChunkID < SUB_CHUNKS_MAX; ++subChunkID) {
+//         SubChunks *subChunk = &chunk->sub_chunks[subChunkID];
+//         HashMap_it it = hashmap_iterator(subChunk->block_map);
 
+//         while ((next = hashmap_next(&it))) {
+//             Block *block = it.value;
+//             BlockPos blockPos = { block->x * (16 * chunk->x), block->y + subChunkID * 16, block->z * (16 * chunk->z) };
 
-/**
- * @brief Check if all neighbors of a block exist
- * @param block_map the hashmap containing all blocks
- * @param x,y,z the position of the block
- * @return TRUE if all neighbors exist, FALSE otherwise
-*/
-// s8 allNeighborsExist(HashMap *block_map, u32 x, u32 y, u32 z)
-// {
-// 	if (hashmap_get(block_map, (BlockPos){x + 1, y, z}) &&
-// 		hashmap_get(block_map, (BlockPos){x - 1, y, z}) &&
-// 		hashmap_get(block_map, (BlockPos){x, y + 1, z}) &&
-// 		hashmap_get(block_map, (BlockPos){x, y - 1, z}) &&
-// 		hashmap_get(block_map, (BlockPos){x, y, z + 1}) &&
-// 		hashmap_get(block_map, (BlockPos){x, y, z - 1}))
-// 	{
-// 		return (TRUE);
-// 	}
-// 	return (FALSE);
-// }
+//             // Masques de visibilité pour les 6 faces
+//             u8 visibleFaces = 0;
+//             vec3 faceNormals[6] = {
+//                 {0, 0, 1}, {0, 0, -1},
+//                 {1, 0, 0}, {-1, 0, 0},
+//                 {0, 1, 0}, {0, -1, 0}
+//             };
 
-/**
- * @brief Check if a block is hidden and note it as such
- * @param chunks the chunks containing all blocks
- * @return the number of visible block
-*/
-// u32 checkHiddenBlock(Chunks *chunks, u32 subChunksID)
-// {
-//     s8 next = TRUE;
-// 	HashMap *block_map = chunks->sub_chunks[subChunksID].block_map;
-// 	HashMap_it it = hashmap_iterator(block_map);
-// 	next = hashmap_next(&it);
-// 	u32 nb_block = hashmap_size(block_map);
+//             for (int i = 0; i < 6; ++i) {
+//                 if (isFaceVisible(blockPos, faceNormals[i], camera)) {
+//                     visibleFaces |= (1 << i);
 
-// 	while (next) {
-// 		Block *block = (Block *)it.value;
-// 		if (allNeighborsExist(block_map, block->x, block->y, block->z)) {
-// 			block->flag = BLOCK_HIDDEN;
-// 			--nb_block;
-// 		}
-// 		next = hashmap_next(&it);	
-// 	}
-// 	return (nb_block);
+//                     // Stop the iteration if this block is visible and we are moving in that direction
+//                     if ((i == 0 && zStep == -1) || (i == 1 && zStep == 1) ||
+//                         (i == 2 && xStep == -1) || (i == 3 && xStep == 1) ||
+//                         (i == 4 && yStep == -1) || (i == 5 && yStep == 1)) {
+//                         break;
+//                     }
+//                 }
+//             }
+
+//             block->visibleFromCam = visibleFaces;
+//         }
+//     }
 // }

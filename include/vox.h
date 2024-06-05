@@ -115,6 +115,7 @@ typedef struct PACKED_STRUCT s_block {
     s8 	z;          /* Block z position */
     s8	type;       /* Block type */
 	u8  neighbors;  /* Block flag */
+	u8	visibleFromCam;	/* Block visible from camera */
 }   Block;
 
 enum AtlasID {
