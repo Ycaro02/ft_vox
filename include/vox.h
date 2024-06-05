@@ -25,8 +25,8 @@
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
 
 /* Bonus value */
-#define CHUNKS_LOAD_RADIUS 22							/* Chunks load radius */
-#define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 8)	/* Chunks unload max radius */
+#define CHUNKS_LOAD_RADIUS 18							/* Chunks load radius */
+#define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 6)	/* Chunks unload max radius */
 #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 14.0f)	/* Max render distance */
 
 /* Basic Value */
@@ -196,6 +196,7 @@ enum BlockType {
 	GRASS=55,    /* Grass block (Exposed to light) */
 	GRASS_TOP=AT_GRASS_TOP,	/* Grass top */
 	WATER=AT_WATER,		/* Water */
+	WOOL_RED=AT_WOOL_RED,	/* Wool red */
 };
 
 /* texture load_texture */

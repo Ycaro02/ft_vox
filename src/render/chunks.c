@@ -28,18 +28,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, f32 **pe
     s32     seaLevel = (s32)SEA_LEVEL - 30;
 
 	(void)perlinCaveNoise, (void)chunk;
-	// s32 globalX = blockLocalToPerlinPos(chunk->x, z + realY);
-	// s32 globalZ = blockLocalToPerlinPos(chunk->z, x + realY);
 
-    // f32 caveNoiseValue = perlinCaveNoise[abs(globalX % PERLIN_NOISE_WIDTH)][abs(globalZ % PERLIN_NOISE_WIDTH)];
-    // f32 caveThreshold = 0.05f;
-    // if (!(realY <= seaLevel && realY > maxHeight) && caveNoiseValue > -caveThreshold && caveNoiseValue < caveThreshold && realY > 20) {
-    //     return (NULL);
-    // }
-
-	// if (caveNoiseValue < caveThreshold + 0.1f && realY < maxHeight - 2 && realY > 0) {
-	// 	blockType = DIRT;
-	// }
 	if (realY < maxHeight - 2) {
 		blockType = STONE;
 	} 
@@ -99,6 +88,8 @@ Chunks *getChunkAt(Context *c, s32 x, s32 z) {
 	return (hashmap_get(c->world->chunksMap, (BlockPos){0, x, z}));
 }
 
+
+
 /**
  * @brief BRUT fill subchunks with block
  * @param sub_chunk Subchunk pointer
@@ -127,6 +118,7 @@ size_t subchunksInit(Block *chunkBlockCache[16][16][16][16], Chunks *chunk, SubC
 	if (layer != 0) {
 		updateTopBotNeighbors(&chunk->sub_chunks[layer - 1], chunkBlockCache[layer]);
 	}
+
 
 	return (hashmap_size(sub_chunk->block_map));
 }
@@ -159,11 +151,10 @@ f32 perlinNoiseHeight(Mutex *mtx, f32 **perlin2D, s32 localX, s32 localZ, Perlin
         return (150.0f);
     }
 
-    perlinVal->add =  (perlinVal->val * scale);
+    perlinVal->add = (perlinVal->val * scale);
 
     return ((SEA_LEVEL) + perlinVal->add);
 }
-
 
 
 /**
@@ -194,6 +185,9 @@ void chunkBuild(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin
 		/* SET DEBUG VALUE HERE */
 		chunks->perlinVal = perlinVal;
 	}
+
+
+
 }
 
 Chunks *chunksLoad(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **perlin2D, s32 chunkX, s32 chunkZ, f32 **perlinCaveNoise) {
