@@ -231,9 +231,6 @@ void chunksViewHandling(Context *c) {
 							hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
 							mtx_unlock(&c->renderMtx);
 						} 
-						// else {
-						// 	addRenderToVBOCreate(c, chunkID);
-						// }
 					}
 				}
             } else { /* If chunk not event load and is in frustrum */

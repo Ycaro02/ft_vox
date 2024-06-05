@@ -20,27 +20,20 @@ void renderChunksVBODestroy(Context *c) {
 	mtx_unlock(&c->vboToDestroyMtx);
 }
 
-void timespecMSAdd(struct timespec *ts, int ms) {
-    clock_gettime(CLOCK_REALTIME, ts);
-    ts->tv_nsec += ms * 1000000; // convert ms to ns
-    if (ts->tv_nsec >= 1000000000) {
-        ts->tv_nsec -= 1000000000;
-        ts->tv_sec++;
-    }
-}
-
+// void timespecMSAdd(struct timespec *ts, int ms) {
+//     clock_gettime(CLOCK_REALTIME, ts);
+//     ts->tv_nsec += ms * 1000000; // convert ms to ns
+//     if (ts->tv_nsec >= 1000000000) {
+//         ts->tv_nsec -= 1000000000;
+//         ts->tv_sec++;
+//     }
+// }
 
 void renderChunksLoadNewVBO(Context *c) {
 
 	// /* LOCK chunk MTX */
 	if (mtx_trylock(&c->threadContext->chunkMtx) != thrd_success) {
 		renderNeedDataSet(c, TRUE);
-		// TimeSpec current;
-		// timespecMSAdd(&current, 10);
-		// if (mtx_timedlock(&c->threadContext->chunkMtx, &current) != thrd_success) {
-		// 	renderNeedDataSet(c, TRUE);
-		// 	return;
-		// }
 		return ;
 	}
 	renderNeedDataSet(c, FALSE);

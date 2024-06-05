@@ -9,14 +9,20 @@ typedef struct s_chunks Chunks;
 
 
 #define ONE_CHUNK_PER_SEC 0.133333f /* 1 chunk per sec, 0.1333 * 60 = 8.0f */
-#define ONE_BLOCK_PER_SEC 0.008333f /* 1 block per sec, 008333f * 60 = 0.5f */
 
-#define TWO_BLOCK_PER_SEC 0.016666f /* 2 block per sec, 016666f * 60 = 1.0f */
+#define ONE_BLOCK_PER_SEC 0.008333f 	/* 1 block per sec, 008333f * 60 = 0.5f */
+#define TWO_BLOCK_PER_SEC 0.016666f 	/* 2 block per sec, 016666f * 60 = 1.0f */
+#define THREE_BLOCK_PER_SEC 0.025000f 	/* 3 block per sec, 025000f * 60 = 1.5f */
+#define FOUR_BLOCK_PER_SEC 0.033333f 	/* 4 block per sec, 033333f * 60 = 2.0f */
+#define EIGHT_BLOCK_PER_SEC 0.066666f 	/* 8 block per sec, 066666f * 60 = 4.0f */
 
-#define CAM_BASE_SPEED TWO_BLOCK_PER_SEC	/* Camera move speed */
+/* base */
+// #define CAM_BASE_SPEED ONE_BLOCK_PER_SEC	/* Camera move speed */
+// #define CAM_BASE_SPEED TWO_BLOCK_PER_SEC	/* Camera move speed */
+#define CAM_BASE_SPEED THREE_BLOCK_PER_SEC	/* Camera move speed */
 
-/* Camera move speed (40 block per sec) */
-#define CAM_HIGHT_SPEED (TWO_BLOCK_PER_SEC * 20.0f) 
+/* Camera Hight move speed */
+#define CAM_HIGHT_SPEED (CAM_BASE_SPEED * 20.0f) 
 
 #define CAM_UP_DOWN 0.2f			/* Move camera up/down value */
 #define CAM_NEAR 	0.1f

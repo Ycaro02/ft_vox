@@ -21,6 +21,8 @@ all:		$(NAME)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(NAME):	deps_install $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS) $(DISPLAY_NAME)
+	@$(MAKE_LIBFT)
+	@$(MAKE_LIST)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) ${OPENGL_LIB}
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
