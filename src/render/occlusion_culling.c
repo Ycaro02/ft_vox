@@ -195,95 +195,51 @@ void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][
     chunk->lastUpdate = get_ms_time();
 }
 
+// s8 blockVisibleFromCam(vec3 blockPos, vec3 faceNormal, Camera *camera) {
+//     vec3 toCamera = {
+//         camera->position[0] - blockPos[0],
+//         camera->position[1] - blockPos[1],
+//         camera->position[2] - blockPos[2]
+//     };
 
-s8 blockVisibleFromCam(vec3 blockPos, vec3 faceNormal, Camera *camera) {
-    vec3 toCamera = {
-        camera->position[0] - blockPos[0],
-        camera->position[1] - blockPos[1],
-        camera->position[2] - blockPos[2]
-    };
+//     /* Normalise toCamera vector */
+//     float length = sqrt(toCamera[0] * toCamera[0] + toCamera[1] * toCamera[1] + toCamera[2] * toCamera[2]);
+//     toCamera[0] /= length;
+//     toCamera[1] /= length;
+//     toCamera[2] /= length;
 
-    /* Normalise toCamera vector */
-    float length = sqrt(toCamera[0] * toCamera[0] + toCamera[1] * toCamera[1] + toCamera[2] * toCamera[2]);
-    toCamera[0] /= length;
-    toCamera[1] /= length;
-    toCamera[2] /= length;
+//    /* Dot product between the toCamera vector and the face normal */
+//     float dotProduct = camera->viewVector[0] * faceNormal[0] + camera->viewVector[1] * faceNormal[1] + camera->viewVector[2] * faceNormal[2];
 
-   /* Dot product between the toCamera vector and the face normal */
-    float dotProduct = camera->viewVector[0] * faceNormal[0] + camera->viewVector[1] * faceNormal[1] + camera->viewVector[2] * faceNormal[2];
+// 	/* if the dot product is negative, the face is visible */
+//     return (dotProduct < 0);
+// }
 
-	/* if the dot product is negative, the face is visible */
-    return (dotProduct < 0);
-}
-
-void updateVisibleFaces(Chunks *chunk, Camera *camera) {
-	s8 next = FALSE;
-    for (u32 subChunkID = 0; chunk->sub_chunks[subChunkID].block_map ; ++subChunkID) {
-        SubChunks *subChunk = &chunk->sub_chunks[subChunkID];
-        HashMap_it it = hashmap_iterator(subChunk->block_map);
-        while ((next = hashmap_next(&it))) {
-            Block		*block = it.value;
-            vec3		blockPos = { block->x * (16 * chunk->x), block->y + subChunkID * 16, block->z * (16 * chunk->z) };
-
-            u8 visibleFaces = 0;
-			/* Visible mask */
-            vec3 faceNormals[6] = {
-                {0, 0, 1}, {0, 0, -1},
-                {1, 0, 0}, {-1, 0, 0},
-                {0, 1, 0}, {0, -1, 0}
-            };
-
-            for (int i = 0; i < 6; ++i) {
-                if (blockVisibleFromCam(blockPos, faceNormals[i], camera)) {
-                    visibleFaces |= (1 << i);
-                }
-            }
-            block->visibleFromCam = visibleFaces;
-        }
-    }
-	// chunks->lastUpdate = get_ms_time();
-}
-
-
-
+// void blockWorldSpaceGet(Chunks *chunk, Block *block, s32 subChunkId, vec3 blockPos) {
+// 	f32 x = ((f32)block->x * 0.5f) + (8.0f * (f32)chunk->x);
+// 	f32 y = ((f32)block->y * 0.5f) + (f32)subChunkId * 8.0f;
+// 	f32 z = ((f32)block->z * 0.5f) + (8.0f * (f32)chunk->z);
+// 	// if (block->x == 0 && block->y == 0) {
+// 	// 	ft_printf_fd(1, "Sub [%d] Block at [%d][%d][%d] (%f, %f, %f)\n", subChunkId, block->x, block->y, block->z ,x, y, z);
+// 	// }
+// 	blockPos[0] = x;
+// 	blockPos[1] = y;
+// 	blockPos[2] = z;
+// }
 
 
 // void updateVisibleFaces(Chunks *chunk, Camera *camera) {
-//     s8 next = FALSE;
-
-//     // Directions de balayage basées sur le vecteur de vue de la caméra
-//     int xStart, xEnd, xStep;
-//     int yStart, yEnd, yStep;
-//     int zStart, zEnd, zStep;
-
-//     if (camera->viewVector.x > 0) {
-//         xStart = 0; xEnd = 16; xStep = 1;
-//     } else {
-//         xStart = 15; xEnd = -1; xStep = -1;
-//     }
-
-//     if (camera->viewVector.y > 0) {
-//         yStart = 0; yEnd = 16; yStep = 1;
-//     } else {
-//         yStart = 15; yEnd = -1; yStep = -1;
-//     }
-
-//     if (camera->viewVector.z > 0) {
-//         zStart = 0; zEnd = 16; zStep = 1;
-//     } else {
-//         zStart = 15; zEnd = -1; zStep = -1;
-//     }
-
-//     for (u32 subChunkID = 0; subChunkID < SUB_CHUNKS_MAX; ++subChunkID) {
+// 	s8 next = FALSE;
+//     for (u32 subChunkID = 0; chunk->sub_chunks[subChunkID].block_map ; ++subChunkID) {
 //         SubChunks *subChunk = &chunk->sub_chunks[subChunkID];
 //         HashMap_it it = hashmap_iterator(subChunk->block_map);
-
 //         while ((next = hashmap_next(&it))) {
-//             Block *block = it.value;
-//             BlockPos blockPos = { block->x * (16 * chunk->x), block->y + subChunkID * 16, block->z * (16 * chunk->z) };
+//             Block		*block = it.value;
+//             vec3		blockPos = {0,0,0};
 
-//             // Masques de visibilité pour les 6 faces
+// 			blockWorldSpaceGet(chunk, block, subChunkID, blockPos);
 //             u8 visibleFaces = 0;
+// 			/* Visible mask */
 //             vec3 faceNormals[6] = {
 //                 {0, 0, 1}, {0, 0, -1},
 //                 {1, 0, 0}, {-1, 0, 0},
@@ -291,19 +247,12 @@ void updateVisibleFaces(Chunks *chunk, Camera *camera) {
 //             };
 
 //             for (int i = 0; i < 6; ++i) {
-//                 if (isFaceVisible(blockPos, faceNormals[i], camera)) {
+//                 if (blockVisibleFromCam(blockPos, faceNormals[i], camera)) {
 //                     visibleFaces |= (1 << i);
-
-//                     // Stop the iteration if this block is visible and we are moving in that direction
-//                     if ((i == 0 && zStep == -1) || (i == 1 && zStep == 1) ||
-//                         (i == 2 && xStep == -1) || (i == 3 && xStep == 1) ||
-//                         (i == 4 && yStep == -1) || (i == 5 && yStep == 1)) {
-//                         break;
-//                     }
 //                 }
 //             }
-
 //             block->visibleFromCam = visibleFaces;
 //         }
 //     }
+// 	// chunks->lastUpdate = get_ms_time();
 // }
