@@ -2,6 +2,7 @@
 #include "../include/skybox.h"		/* skybox rendering */
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
+#include "../include/thread_load.h"
 
 void chunksRender(Context *c, GLuint shader_id) {
     glLoadIdentity();
@@ -10,12 +11,59 @@ void chunksRender(Context *c, GLuint shader_id) {
     glFlush();
 }
 
+void renderChunksVBODestroy(Context *c) {
+	mtx_lock(&c->vboToDestroyMtx);
+	for (t_list *current = c->vboToDestroy; current; current = current->next) {
+		glDeleteBuffers(1, (GLuint *)current->content);
+	}
+	ft_lstclear(&c->vboToDestroy, free);
+	mtx_unlock(&c->vboToDestroyMtx);
+}
+
+// void timespecMSAdd(struct timespec *ts, int ms) {
+//     clock_gettime(CLOCK_REALTIME, ts);
+//     ts->tv_nsec += ms * 1000000; // convert ms to ns
+//     if (ts->tv_nsec >= 1000000000) {
+//         ts->tv_nsec -= 1000000000;
+//         ts->tv_sec++;
+//     }
+// }
+
+void renderChunksLoadNewVBO(Context *c) {
+
+	// /* LOCK chunk MTX */
+	if (mtx_trylock(&c->threadContext->chunkMtx) != thrd_success) {
+		renderNeedDataSet(c, TRUE);
+		return ;
+	}
+	renderNeedDataSet(c, FALSE);
+
+	c->chunkLoadedNb = hashmap_size(c->world->chunksMap);
+	mtx_lock(&c->vboToCreateMtx);
+	for (t_list *current = c->vboToCreate; current; current = current->next) {
+		BlockPos chunkID = *(BlockPos *)current->content;
+		renderChunkCreateFaceVBO(c->world->chunksMap, chunkID);
+	}
+	/* UNLOCK chunk MTX */
+	mtx_unlock(&c->threadContext->chunkMtx);
+	ft_lstclear(&c->vboToCreate, free);
+	mtx_unlock(&c->vboToCreateMtx);
+}
+
+
+void renderChunksVBOhandling(Context *c) {
+	renderChunksLoadNewVBO(c);
+	renderChunksVBODestroy(c);
+}
+
 void vox_destroy(Context *c) {
 	s32 status = 0;
-	mtx_lock(&c->gameMtx);
+	mtx_lock(&c->isRunningMtx);
 	c->isPlaying = FALSE;
-	mtx_unlock(&c->gameMtx);
+	mtx_unlock(&c->isRunningMtx);
 	
+	renderNeedDataSet(c, FALSE);
+
 	thrd_join(c->threadContext->supervisor, &status);
 	hashmap_destroy(c->threadContext->chunksMapToLoad);
 	free(c->threadContext->workers);
@@ -29,7 +77,10 @@ void vox_destroy(Context *c) {
 
 	mtx_destroy(&c->renderMtx);
 	mtx_destroy(&c->gameMtx);
-
+	mtx_destroy(&c->isRunningMtx);
+	mtx_destroy(&c->vboToDestroyMtx);
+	mtx_destroy(&c->vboToCreateMtx);
+	mtx_destroy(&c->renderDataNeededMtx);
 
 
 	hashmap_destroy(c->world->renderChunksMap);
@@ -52,45 +103,32 @@ void vox_destroy(Context *c) {
 	glfwTerminate();
 }
 
-void renderChunksLoadNewVBO(Context *c) {
-	RenderChunks *render = NULL;
-
-
-	mtx_lock(&c->renderMtx);
-	
-	for (t_list *current = c->vboToCreate; current; current = current->next) {
-		BlockPos chunkID = *(BlockPos *)current->content;
-		render = renderChunkCreateFaceVBO(&c->threadContext->chunkMtx, c->world->chunksMap, chunkID);
-		if (render) {
-			hashmap_set_entry(c->world->renderChunksMap, chunkID, render);
-		}
-		
-	}
-	renderChunksVBODestroy(c);
-	ft_lstclear(&c->vboToCreate, free);
-	mtx_unlock(&c->renderMtx);
-}
-
 
 void updateGame(Context *c) {
-		/* Input handling */
-		glfwPollEvents();
-        handle_input(c);
+	/* Input handling */
+	glfwPollEvents();
+
+	/* Update data */
+	mtx_lock(&c->gameMtx);
+	// mtxLockUpdateTime(c, &c->gameMtx, &c->mtxTime.start, &c->mtxTime.end, &c->mtxTime.gameMtxTime, "Game");
+
+	handle_input(c);
+	update_camera(c, c->cubeShaderID);
+	mtx_unlock(&c->gameMtx);
+	/* Update render */
+	// renderChunksVBOhandling(c);
 		
-		/* Update data */
-		update_camera(c, c->cubeShaderID);
-		renderChunksLoadNewVBO(c);
 }
 
 void renderGame(Context *c, GLuint skyTexture) {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		/* Render logic */
-		displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
-		chunksRender(c, c->cubeShaderID);
-
-		glfwSwapBuffers(c->win_ptr);
+	/* Update render */
+	renderChunksVBOhandling(c);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	/* Render logic */
+	displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
+	chunksRender(c, c->cubeShaderID);
+	glfwSwapBuffers(c->win_ptr);
 }
-
 
 
 void main_loop(Context *c, GLuint skyTexture) {
@@ -99,7 +137,6 @@ void main_loop(Context *c, GLuint skyTexture) {
 		renderGame(c, skyTexture);	
     }
 }
-
 
 int main() {
     Context *context;
@@ -145,13 +182,15 @@ int main() {
 //         // Reset after one second
 //         if (glfwGetTime() - timer > 1.0) {
 //             timer++;
-//             printf("FPS: %d, Updates: %d\n", frames, updates);
+//             VOX_PROTECTED_LOG(c, RESET_LINE""PINK"FPS: %d, Updates: %d\n"RESET, frames, updates);
 //             (void)frames, (void)updates;
 //             updates = 0;
 //             frames = 0;
 //         }
 //     }
 // }
+
+
 
 
 

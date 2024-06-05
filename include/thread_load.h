@@ -52,8 +52,16 @@ FT_INLINE s64 ThreadsAvailableGet() {
 	return (num_threads);
 }
 
-/* Supervisor now init workers */
-s8		threadSupervisorInit(Context *c);
-void	chunksToLoadPrioritySet(Context *c, BlockPos chunkID, u8 priority);
+/* render/thread_supervisor.c */
+s8			threadSupervisorInit(Context *c);
+void		chunksToLoadPrioritySet(Context *c, BlockPos chunkID, u8 priority);
+ThreadData	*chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad);
+int			threadChunksLoad(void *data);
+
+
+/* render/thread_workers.c */
+s8 		workerIsLoadingChunks(Context *c, s32 chunkX, s32 chunkZ);
+s8 		threadWorkersInit(Context *c);
+void	chunksMapPopData(Context *c, ThreadData *tdata);
 
 #endif /* HEADER_THREAD_LOAD_H */

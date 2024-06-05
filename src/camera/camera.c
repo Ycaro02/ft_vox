@@ -74,7 +74,7 @@ Camera create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far)
 
     /* Compute view martice */
 	glm_lookat(camera.position, camera.target, camera.up, camera.view);
-	camera.camSpeed = ONE_BLOCK_PER_SEC;
+	camera.camSpeed = CAM_BASE_SPEED;
     /* Compute projection matrice */
 	glm_perspective(glm_rad(fov), aspect_ratio, near, far, camera.projection);
 	updateViewVec(&camera);
@@ -91,7 +91,7 @@ void update_camera(void *context, GLuint shader_id)
 {
 	Context *c = context;
 
-	mtx_lock(&c->gameMtx);
+	// mtx_lock(&c->gameMtx);
     /* Look at view */
 	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
 
@@ -108,8 +108,8 @@ void update_camera(void *context, GLuint shader_id)
 	chunkPosGet(&c->cam);
 
 	/* Extract Frustrum plane from projection and view matrix */
-	mtx_unlock(&c->gameMtx);
-	extractFrustumPlanes(&c->gameMtx, &c->cam.frustum, c->cam.projection, c->cam.view);
+	extractFrustumPlanes(&c->cam.frustum, c->cam.projection, c->cam.view);
+	// mtx_unlock(&c->gameMtx);
 
 }
 

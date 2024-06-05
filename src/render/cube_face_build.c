@@ -67,29 +67,21 @@ GLuint faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb) {
     return (bufferGlCreate(GL_ARRAY_BUFFER, faceNb * sizeof(vec3), (void *)faceArray[0]));
 }
 
-/* TO CALL in main thread -> DONE */
-RenderChunks *renderChunkCreateFaceVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID) {
+/* TO CALL in main thread -> DONE Maybe remove return */
+void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 	/* Create VBO */
 	Chunks 			*chunks = NULL; 
 	RenderChunks 	*render = NULL; 
 
-
-	mtx_lock(chunkMtx);
-
 	chunks = hashmap_get(chunksMap, chunkID);
 	if (!chunks || !chunks->render) {
-		mtx_unlock(chunkMtx);
-		return (NULL);
+		return ;
 	}
-
 	render = chunks->render;
 	for (u8 i = 0; i < 6; ++i) {
 		render->faceVBO[i] = faceInstanceVBOCreate(render->faceArray[i], render->faceCount[i]);
 		render->faceTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, render->faceCount[i] * sizeof(GLuint), (void *)&render->faceTypeID[i][0]);
 	}
-
-	mtx_unlock(chunkMtx);
-	return (render);
 }
 
 /* NEW draw logic */
@@ -118,9 +110,7 @@ void drawAllChunksByFace(Context *c) {
     HashMap_it	it;
     s8			next = TRUE;
 
-    u32 		chunkRenderNb = 0, faceRendernb = 0,  chunksLoaded = 0, chunksLoading = 0;
-	chunksLoaded =	hashmap_size(c->world->chunksMap);
-	chunksLoading =	hashmap_size(c->threadContext->chunksMapToLoad);
+    u32 		chunkRenderNb = 0, faceRendernb = 0;
     
     mtx_lock(&c->renderMtx);
     for (u8 i = 0; i < 6; ++i) {
@@ -138,6 +128,6 @@ void drawAllChunksByFace(Context *c) {
     
 	}
     mtx_unlock(&c->renderMtx);
-    ft_printf_fd(1, RESET_LINE""GREEN"Chunk Rendered: %u -> "YELLOW"Visible Face: %u"RESET","RESET""ORANGE" Loaded: %d, "RESET""CYAN" In loading: %d, "RESET""PINK" FPS: %d "RESET
-    , chunkRenderNb / 6, faceRendernb, chunksLoaded, chunksLoading, fpsGet());
+    VOX_PROTECTED_LOG(c, RESET_LINE""GREEN"Chunk Rendered: %u, "ORANGE"Loaded %u "RESET""YELLOW"Visible Face: %u"RESET", "PINK" FPS: %d "RESET
+    , chunkRenderNb / 6, c->chunkLoadedNb ,faceRendernb, fpsGet());
 }

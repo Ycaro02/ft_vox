@@ -3,10 +3,10 @@
 #include "../../include/camera.h"
 #include "../../include/chunks.h"
 
-BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize) {
+BoundingBox chunkBoundingBoxGet(s32 chunkX, s32 chunkZ, f32 chunkSize) {
     BoundingBox box;
     /* Compute bot left corner */
-    glm_vec3_copy((vec3){chunk->x * chunkSize, 0, chunk->z * chunkSize}, box.min);
+    glm_vec3_copy((vec3){chunkX * chunkSize, 0, chunkZ * chunkSize}, box.min);
 
     /* Compute top right corner */
 	/* Hardcode 80.0f need to refact this */
@@ -14,12 +14,9 @@ BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize) {
     return (box);
 }
 
-
-void extractFrustumPlanes(Mutex *gameMtx, Frustum *frustum, mat4 projection, mat4 view) {
+/* Locked before in update camera and context init */
+void extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view) {
     mat4 viewProjection;
-    
-	mtx_lock(gameMtx);
-
 	glm_mat4_mul(projection, view, viewProjection);
 
 	/* Left plane */
@@ -48,7 +45,6 @@ void extractFrustumPlanes(Mutex *gameMtx, Frustum *frustum, mat4 projection, mat
 			ft_printf_fd(1, RED"\nError: frustum plane divider %d is null\n"RESET, i);
 		}
     }
-	mtx_unlock(gameMtx);
 }
 
 s8 isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box) {

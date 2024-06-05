@@ -66,8 +66,8 @@ GLFWwindow *init_openGL_context()
 	// glEnable(GL_CULL_FACE);
 
 	/* Enable blending, make water transparent but we need to do occlusion culling between chunks */
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Set the viewport */
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

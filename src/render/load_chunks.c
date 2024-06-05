@@ -55,13 +55,13 @@ void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
 	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
 	
 	for (u32 i = 0; i < 6; ++i) {
-	if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
-		*instanceVBO = chunk->render->faceVBO[i];
-		*typeBlockVBO = chunk->render->faceTypeVBO[i];
-		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
-		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
+		if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
+			*instanceVBO = chunk->render->faceVBO[i];
+			*typeBlockVBO = chunk->render->faceTypeVBO[i];
+			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
+			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
+		}
 	}
-}
 }
 
 void unloadChunkHandler(Context *c) {
@@ -73,14 +73,12 @@ void unloadChunkHandler(Context *c) {
 	s32			camChunkX = 0, camChunkZ = 0;
 	s32 		maxChunkLoad = CHUNKS_UNLOAD_RADIUS;
 
-	// GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
-
 	mtx_lock(&c->gameMtx);
 	camChunkX = c->cam.chunkPos[0];
 	camChunkZ = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
-	mtx_lock(&c->renderMtx);
+	mtx_lock(&c->vboToDestroyMtx);
 	mtx_lock(&c->threadContext->chunkMtx);
 
 	it = hashmap_iterator(c->world->chunksMap);
@@ -102,7 +100,7 @@ void unloadChunkHandler(Context *c) {
 		}
 	}
 
-	mtx_unlock(&c->renderMtx);
+	mtx_unlock(&c->vboToDestroyMtx);
 	mtx_unlock(&c->threadContext->chunkMtx);
 
 
@@ -135,7 +133,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		chunks = hashmap_get(c->world->chunksMap, chunkID);
 		if (chunks) {
-			BoundingBox box = chunkBoundingBoxGet(chunks, 8.0f);
+			BoundingBox box = chunkBoundingBoxGet(chunks->x, chunks->z, 8.0f);
 			if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
 				if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 					ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
@@ -151,19 +149,11 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 		mtx_lock(&c->renderMtx);
 		hashmap_remove_entry(renderChunksMap, tmpChunkID, HASHMAP_FREE_NODE);
 		mtx_unlock(&c->renderMtx);
-		chunksToLoadPrioritySet(c, tmpChunkID, LOAD_PRIORITY_HIGH);
+		// chunksToLoadPrioritySet(c, tmpChunkID, LOAD_PRIORITY_HIGH);
 	}
 
 	ft_lstclear(&toRemoveList, free);
 
-}
-
-
-void renderChunksVBODestroy(Context *c) {
-	for (t_list *current = c->vboToDestroy; current; current = current->next) {
-		glDeleteBuffers(1, (GLuint *)current->content);
-	}
-	ft_lstclear(&c->vboToDestroy, free);
 }
 
 /**
@@ -177,11 +167,13 @@ void chunksViewHandling(Context *c) {
     vec3            start, rayDir, chunkPos, currPos, travelVector, camViewVector;
 	BlockPos 		chunkID;
 	Chunks 			*chunks = NULL;
+	RenderChunks 	*renderChunk = NULL;
     f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV);
 	f32 			radiusEnd = (CAM_FOV);
 	s8 				inView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;
 	u8				neightborChunkLoaded = 0;
+	s8				renderVBOisLoaded = FALSE;
 
 	mtx_lock(&c->gameMtx);
     glm_vec3_copy(c->cam.position, start);
@@ -214,24 +206,34 @@ void chunksViewHandling(Context *c) {
 
 
 			if (chunks) {
-                box = chunkBoundingBoxGet(chunks, 8.0f);
+                box = chunkBoundingBoxGet(chunks->x, chunks->z, 8.0f);
 				chunksRenderIsload = chunksRenderIsLoaded(chunks);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
 				if (inView) { /* If chunk is in frustum */
 					chunkNeighborMaskUpdate(c, chunks);
 					neightborChunkLoaded = chunks->neighbors == CHUNKS_NEIGHBOR_LOADED;
-					mtx_lock(&c->renderMtx);
 					/* If chunk->render is not load and all nearby chunk are loaded (to wait full ocllusion culling)*/
 					if (!chunksRenderIsload && neightborChunkLoaded) {
-						chunks->render = renderChunkCreate(c, chunks);
-					} /* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
-					else if (!chunkInRenderMap && chunksRenderIsload && chunks->render->faceTypeVBO[0] != 0) {
-						hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
+						renderChunk = renderChunkCreate(c, chunks);
+						mtx_lock(&c->vboToCreateMtx);
+						chunks->render = renderChunk;
+						mtx_unlock(&c->vboToCreateMtx);
+						chunksRenderIsload = TRUE;
+					} 
+					/* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
+					if (!chunkInRenderMap && chunksRenderIsload) {
+						mtx_lock(&c->vboToCreateMtx);
+						renderVBOisLoaded = chunks->render->faceTypeVBO[5] != 0;
+						mtx_unlock(&c->vboToCreateMtx);
+						if (renderVBOisLoaded) {
+							mtx_lock(&c->renderMtx);
+							hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
+							mtx_unlock(&c->renderMtx);
+						} 
 					}
-					mtx_unlock(&c->renderMtx);
 				}
-            } else {
+            } else { /* If chunk not event load and is in frustrum */
 				chunksToLoadPrioritySet(c, chunkID, LOAD_PRIORITY_HIGH);
 			}
 

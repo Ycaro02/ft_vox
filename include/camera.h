@@ -8,13 +8,23 @@
 typedef struct s_chunks Chunks;
 
 
-#define ONE_BLOCK_PER_SEC 0.133333f /* 1 block per sec, 0.1333 * 60 = 8.0f */
+#define ONE_CHUNK_PER_SEC 0.133333f /* 1 chunk per sec, 0.1333 * 60 = 8.0f */
 
-#define CAM_ZOOM 0.3f				/* Zoom/Unzoom value */
-#define CAM_MOVE_HORIZONTAL 1.0f	/* Move camera horizontal value */
+#define ONE_BLOCK_PER_SEC 0.008333f 	/* 1 block per sec, 008333f * 60 = 0.5f */
+#define TWO_BLOCK_PER_SEC 0.016666f 	/* 2 block per sec, 016666f * 60 = 1.0f */
+#define THREE_BLOCK_PER_SEC 0.025000f 	/* 3 block per sec, 025000f * 60 = 1.5f */
+#define FOUR_BLOCK_PER_SEC 0.033333f 	/* 4 block per sec, 033333f * 60 = 2.0f */
+#define EIGHT_BLOCK_PER_SEC 0.066666f 	/* 8 block per sec, 066666f * 60 = 4.0f */
+
+/* base */
+// #define CAM_BASE_SPEED ONE_BLOCK_PER_SEC	/* Camera move speed */
+// #define CAM_BASE_SPEED TWO_BLOCK_PER_SEC	/* Camera move speed */
+#define CAM_BASE_SPEED THREE_BLOCK_PER_SEC	/* Camera move speed */
+
+/* Camera Hight move speed */
+#define CAM_HIGHT_SPEED (CAM_BASE_SPEED * 20.0f) 
+
 #define CAM_UP_DOWN 0.2f			/* Move camera up/down value */
-#define ROTATE_ANGLE 2.0f			/* Rotate obj angle when arrow pressed */
-
 #define CAM_NEAR 	0.1f
 #define CAM_FAR 	1000.0f
 
@@ -49,8 +59,8 @@ typedef struct s_camera {
 
 /* Frustrum */
 s8			isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box);
-void		extractFrustumPlanes(Mutex *gameMtx,Frustum *frustum, mat4 projection, mat4 view);
-BoundingBox chunkBoundingBoxGet(Chunks *chunk, f32 chunkSize);
+void		extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view);
+BoundingBox chunkBoundingBoxGet(s32 chunkX, s32 chunkZ, f32 chunkSize);
 
 /* Camera */
 Camera		create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far);
