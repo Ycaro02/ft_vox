@@ -113,13 +113,17 @@ void chunkNeighborMaskUpdate(Context *c, Chunks *chunk) {
 
 	Chunks *neightborsChunk = NULL;
 
+	if (!chunk->occlusionDone) {
+		return;
+	}
+
 	for (u32 i = 0; i < 4; ++i) {
 		if (!(chunk->neighbors & chunkMask[i])) {
 			// mtx_lock(&c->threadContext->chunkMtx);
 			neightborsChunk = getChunkAt(c, pos[i].x, pos[i].z);
 			// mtx_unlock(&c->threadContext->chunkMtx);
 		}
-		if (neightborsChunk) {
+		if (neightborsChunk && neightborsChunk->occlusionDone == TRUE) {
 			chunk->neighbors |= chunkMask[i];
 		}
 	}
@@ -193,6 +197,7 @@ void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][
 		neighborChunk->lastUpdate = get_ms_time();
     } /* for i (direction )*/
     chunk->lastUpdate = get_ms_time();
+	chunk->occlusionDone = TRUE;
 }
 
 // s8 blockVisibleFromCam(vec3 blockPos, vec3 faceNormal, Camera *camera) {

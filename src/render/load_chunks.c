@@ -215,24 +215,32 @@ void chunksViewHandling(Context *c) {
 					chunkNeighborMaskUpdate(c, chunk);
 					neightborChunkLoaded = chunk->neighbors == CHUNKS_NEIGHBOR_LOADED;
 					/* If chunk->render is not load and all nearby chunk are loaded (to wait full ocllusion culling)*/
+					
+					mtx_lock(&c->vboToCreateMtx);
+					mtx_lock(&c->renderMtx);
+					
 					if (!chunksRenderIsload && neightborChunkLoaded) {
 						renderChunk = renderChunkCreate(c, chunk);
-						mtx_lock(&c->vboToCreateMtx);
+						// mtx_lock(&c->vboToCreateMtx);
 						chunk->render = renderChunk;
-						mtx_unlock(&c->vboToCreateMtx);
+						// mtx_unlock(&c->vboToCreateMtx);
 						chunksRenderIsload = TRUE;
 					} 
 					/* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
 					if (!chunkInRenderMap && chunksRenderIsload) {
-						mtx_lock(&c->vboToCreateMtx);
+						// mtx_lock(&c->vboToCreateMtx);
 						renderVBOisLoaded = chunk->render->faceTypeVBO[5] != 0;
-						mtx_unlock(&c->vboToCreateMtx);
+						// mtx_unlock(&c->vboToCreateMtx);
 						if (renderVBOisLoaded) {
-							mtx_lock(&c->renderMtx);
+							// mtx_lock(&c->renderMtx);
 							hashmap_set_entry(c->world->renderChunksMap, chunkID, chunk->render);
-							mtx_unlock(&c->renderMtx);
+							// mtx_unlock(&c->renderMtx);
 						} 
 					}
+
+					mtx_unlock(&c->renderMtx);
+					mtx_unlock(&c->vboToCreateMtx);
+
 				}
             } else { /* If chunk not event load and is in frustrum */
 				chunksToLoadPrioritySet(c, chunkID, LOAD_PRIORITY_HIGH);

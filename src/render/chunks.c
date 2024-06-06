@@ -248,6 +248,6 @@ Chunks *chunksLoad(Block *chunkBlockCache[16][16][16][16], Mutex *mtx, f32 **per
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
 	chunkBuild(chunkBlockCache, mtx, perlin2D, chunks, perlinCaveNoise);
-	chunks->lastUpdate = get_ms_time();
+	// chunks->lastUpdate = get_ms_time();
 	return (chunks);
 }

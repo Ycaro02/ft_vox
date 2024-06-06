@@ -28,6 +28,7 @@ typedef struct s_chunks {
 	PerlinData		**perlinCave;				/* Perlin noise cave value */
 	RenderChunks 	*render;					/* RenderChunks pointer */
 	u8				neighbors;					/* Neighbors */
+	u8				occlusionDone;				/* Neighbors occlusion done */
 } Chunks;
 
 

@@ -24,12 +24,13 @@ void renderChunksMapFree(void *entry) {
 void addRenderToVBOCreate(Context *c, BlockPos chunkID) {
 	BlockPos	  *chunkIDVBOtoCreate = NULL;
 	
-	mtx_lock(&c->vboToCreateMtx);
+	(void)c;
+	// mtx_lock(&c->vboToCreateMtx);
 	if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {
 		ft_memcpy(chunkIDVBOtoCreate, &chunkID, sizeof(BlockPos));
 		ft_lstadd_back(&c->vboToCreate, ft_lstnew(chunkIDVBOtoCreate));
 	}
-	mtx_unlock(&c->vboToCreateMtx);
+	// mtx_unlock(&c->vboToCreateMtx);
 }
 
 RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {

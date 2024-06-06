@@ -4,9 +4,9 @@ include rsc/mk/source.mk
 NAME			=	ft_vox
 # CC				=	gcc
 CC				=	clang
-# CFLAGS			=	-Wall -Wextra -Werror -O3
-# CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=address
-CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=thread
+CFLAGS			=	-Wall -Wextra -Werror -O3
+# CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=address,undefined
+# CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=thread
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
 
@@ -76,6 +76,7 @@ clean_lib:
 	@$(MAKE_LIBFT) fclean
 
 test: $(NAME)
+	ulimit -c unlimited
 	@./$(NAME)
 
 vtest: $(NAME)
