@@ -115,9 +115,9 @@ void chunkNeighborMaskUpdate(Context *c, Chunks *chunk) {
 
 	for (u32 i = 0; i < 4; ++i) {
 		if (!(chunk->neighbors & chunkMask[i])) {
-			mtx_lock(&c->threadContext->chunkMtx);
+			// mtx_lock(&c->threadContext->chunkMtx);
 			neightborsChunk = getChunkAt(c, pos[i].x, pos[i].z);
-			mtx_unlock(&c->threadContext->chunkMtx);
+			// mtx_unlock(&c->threadContext->chunkMtx);
 		}
 		if (neightborsChunk) {
 			chunk->neighbors |= chunkMask[i];

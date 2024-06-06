@@ -34,7 +34,8 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 
 	ft_bzero(idx, sizeof(u32) * 6);
 
-	mtx_lock(chunkMtx);
+	// mtx_lock(chunkMtx);
+	(void)chunkMtx;
 
 	render->faceCount = faceVisibleCount(chunks);
 	for (u8 i = 0; i < 6; ++i) {
@@ -58,7 +59,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 			}
 		}
 	}
-	mtx_unlock(chunkMtx);
+	// mtx_unlock(chunkMtx);
 
 }
 
@@ -67,7 +68,6 @@ GLuint faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb) {
     return (bufferGlCreate(GL_ARRAY_BUFFER, faceNb * sizeof(vec3), (void *)faceArray[0]));
 }
 
-/* TO CALL in main thread -> DONE Maybe remove return */
 void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 	/* Create VBO */
 	Chunks 			*chunks = NULL; 

@@ -88,7 +88,7 @@ void displayChunkData(Context *c, Chunks *chunk){
 			ft_printf_fd(1, YELLOW"Face:|%u| Count %u-> "RESET, i, renderChunk->faceCount[i]);
 			ft_printf_fd(1, ORANGE"Face VBO %u, TypeVBO %u\n"RESET, renderChunk->faceVBO[i], renderChunk->faceTypeVBO[i]);
 		}
-		ft_printf_fd(1, GREEN"Last update %u\n"RESET, renderChunk->lastUpdate);
+		ft_printf_fd(1, GREEN"Last update %u\n"RESET, renderChunk->lastUpdate - get_ms_time());
 	} else {
 		ft_printf_fd(1, RED"Render chunk is NULL\n"RESET);
 	}

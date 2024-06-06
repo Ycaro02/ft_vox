@@ -20,6 +20,7 @@ typedef struct s_chunks Chunks;
 // #define CAM_BASE_SPEED ONE_BLOCK_PER_SEC	/* Camera move speed */
 // #define CAM_BASE_SPEED TWO_BLOCK_PER_SEC	/* Camera move speed */
 #define CAM_BASE_SPEED THREE_BLOCK_PER_SEC	/* Camera move speed */
+// #define CAM_BASE_SPEED ONE_CHUNK_PER_SEC	/* Camera move speed */
 
 /* Camera Hight move speed */
 #define CAM_HIGHT_SPEED (CAM_BASE_SPEED * 20.0f) 

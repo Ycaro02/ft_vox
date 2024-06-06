@@ -166,7 +166,7 @@ void chunksViewHandling(Context *c) {
 	BoundingBox 	box;
     vec3            start, rayDir, chunkPos, currPos, travelVector, camViewVector;
 	BlockPos 		chunkID;
-	Chunks 			*chunks = NULL;
+	Chunks 			*chunk = NULL;
 	RenderChunks 	*renderChunk = NULL;
     f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV);
@@ -202,33 +202,34 @@ void chunksViewHandling(Context *c) {
             /* Convert world coordonate to chunk offset */
             worldToChunksPos(currPos, chunkPos);
             chunkID = CHUNKS_MAP_ID_GET(chunkPos[0], chunkPos[2]);
-            chunks = hashmap_get(c->world->chunksMap, chunkID);
 
-
-			if (chunks) {
-                box = chunkBoundingBoxGet(chunks->x, chunks->z, 8.0f);
-				chunksRenderIsload = chunksRenderIsLoaded(chunks);
+			mtx_lock(&c->threadContext->chunkMtx);
+			/* Check if chunk is already loaded */
+            chunk = hashmap_get(c->world->chunksMap, chunkID);
+			if (chunk) {
+                box = chunkBoundingBoxGet(chunk->x, chunk->z, 8.0f);
+				chunksRenderIsload = chunksRenderIsLoaded(chunk);
                 inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
 				if (inView) { /* If chunk is in frustum */
-					chunkNeighborMaskUpdate(c, chunks);
-					neightborChunkLoaded = chunks->neighbors == CHUNKS_NEIGHBOR_LOADED;
+					chunkNeighborMaskUpdate(c, chunk);
+					neightborChunkLoaded = chunk->neighbors == CHUNKS_NEIGHBOR_LOADED;
 					/* If chunk->render is not load and all nearby chunk are loaded (to wait full ocllusion culling)*/
 					if (!chunksRenderIsload && neightborChunkLoaded) {
-						renderChunk = renderChunkCreate(c, chunks);
+						renderChunk = renderChunkCreate(c, chunk);
 						mtx_lock(&c->vboToCreateMtx);
-						chunks->render = renderChunk;
+						chunk->render = renderChunk;
 						mtx_unlock(&c->vboToCreateMtx);
 						chunksRenderIsload = TRUE;
 					} 
 					/* If renderChunks is not in render map and he's completly loaded (VBO created in main thread) */
 					if (!chunkInRenderMap && chunksRenderIsload) {
 						mtx_lock(&c->vboToCreateMtx);
-						renderVBOisLoaded = chunks->render->faceTypeVBO[5] != 0;
+						renderVBOisLoaded = chunk->render->faceTypeVBO[5] != 0;
 						mtx_unlock(&c->vboToCreateMtx);
 						if (renderVBOisLoaded) {
 							mtx_lock(&c->renderMtx);
-							hashmap_set_entry(c->world->renderChunksMap, chunkID, chunks->render);
+							hashmap_set_entry(c->world->renderChunksMap, chunkID, chunk->render);
 							mtx_unlock(&c->renderMtx);
 						} 
 					}
@@ -236,7 +237,7 @@ void chunksViewHandling(Context *c) {
             } else { /* If chunk not event load and is in frustrum */
 				chunksToLoadPrioritySet(c, chunkID, LOAD_PRIORITY_HIGH);
 			}
-
+			mtx_unlock(&c->threadContext->chunkMtx);
 		}
     }
 }
