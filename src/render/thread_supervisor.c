@@ -6,6 +6,40 @@ s8 chunkIsInQueue(HashMap *chunksMapToLoad, BlockPos chunkID) {
 	return (hashmap_get(chunksMapToLoad, chunkID) != NULL);
 }
 
+
+Block *****chunkBlockCacheAlloc()
+{
+	Block *****cache = NULL;
+	cache = malloc(sizeof(Block ****) * 16);
+	for (s32 subId = 0; subId < 16; ++subId) {
+		cache[subId] = malloc(sizeof(Block ***) * 16);
+		for (s32 x = 0; x < 16; ++x) {
+			cache[subId][x] = malloc(sizeof(Block **) * 16);
+			for (s32 y = 0; y < 16; ++y) {
+				cache[subId][x][y] = malloc(sizeof(Block *) * 16);
+				for (s32 z = 0; z < 16; ++z) {
+					cache[subId][x][y][z] = NULL;
+				}
+			}
+		}
+	}
+	return (cache);
+}
+
+void chunkBlockCacheFree(Block *****cache)
+{
+	for (s32 subId = 0; subId < 16; ++subId) {
+		for (s32 x = 0; x < 16; ++x) {
+			for (s32 y = 0; y < 16; ++y) {
+				free(cache[subId][x][y]);
+			}
+			free(cache[subId][x]);
+		}
+		free(cache[subId]);
+	}
+	free(cache);
+}
+
 /**
  * @brief Load chunks in a thread
  * @param data ThreadData
@@ -14,13 +48,21 @@ s8 chunkIsInQueue(HashMap *chunksMapToLoad, BlockPos chunkID) {
 int threadChunksLoad(void *data) {
 
 	/* Big block cache to avoid multiple call to hashmap_get for this chunk */
-	Block		*chunkBlockCache[16][16][16][16];
+	Block *****chunksBlockCache = NULL;
+	
 	Chunks		*neighborChunksCache[4] = {NULL, NULL, NULL, NULL};
 	ThreadData 	*t = (ThreadData *)data;
 
 	Chunks 		*chunk = NULL;
 	
-	chunk = chunksLoad(chunkBlockCache, t->chunkMtx, t->c->perlin2D, t->chunkX, t->chunkZ, t->c->perlinCaveNoise);
+	chunksBlockCache = chunkBlockCacheAlloc();
+	if (!chunksBlockCache) {
+		ft_printf_fd(2, "Error: threadChunksLoad: chunkBlockCacheAlloc failed\n");
+		return (0);
+	}
+
+	chunk = chunksLoad(chunksBlockCache, t->c->perlin2D, t->chunkX, t->chunkZ, t->c->perlinCaveNoise);
+	// chunk = chunksLoad(chunkBlockCache, t->c->perlin2D, t->chunkX, t->chunkZ, t->c->perlinCaveNoise);
 	
 	
 	mtx_lock(t->chunkMtx);
@@ -30,8 +72,13 @@ int threadChunksLoad(void *data) {
 	chunkNeighborsGet(t->c, chunk, neighborChunksCache);
 
 	mtx_lock(t->chunkMtx);
-	updateChunkNeighbors(t->c, chunk, chunkBlockCache, neighborChunksCache);
+	// updateChunkNeighbors(t->c, chunk, chunkBlockCache, neighborChunksCache);
+	updateChunkNeighbors(t->c, chunk, chunksBlockCache, neighborChunksCache);
 	mtx_unlock(t->chunkMtx);
+
+
+	chunkBlockCacheFree(chunksBlockCache);
+
 	return (1);
 }
 
@@ -159,7 +206,7 @@ s8 supervisorLoadChunksArround(Context *c, s32 radius) {
 			BlockPos pos = CHUNKS_MAP_ID_GET(currentX + i, currentZ + j);
 			if (!chunksQueueHandling(c, pos.y, pos.z)) {
 				ft_printf_fd(2, "Error: supervisorLoadChunksArround: chunksQueueHandling failed\n");
-				mtx_unlock(&c->threadContext->chunkMtx);
+				// mtx_unlock(&c->threadContext->chunkMtx);
 				return (FALSE);
 			}
 		}

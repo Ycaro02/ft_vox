@@ -66,6 +66,8 @@ typedef struct s_context {
 	mat4				rotation;			/* rotation matrix */
 	u32					chunkLoadedNb;		/* Chunk loaded */
 	u8					renderDataNeeded; 	/* Render need data, bool to specify render want to lock data (chunkMtx) */
+	s8					autoMove;			/* Auto move camera */
+	s8					autoRotate;			/* Auto rotate camera */
 	// MutexTime			mtxTime;		/* Mutex time */
 } Context;
 

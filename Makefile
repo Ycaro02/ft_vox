@@ -4,7 +4,7 @@ include rsc/mk/source.mk
 NAME			=	ft_vox
 # CC				=	gcc
 CC				=	clang
-CFLAGS			=	-Wall -Wextra -Werror -O3
+CFLAGS			=	-Wall -Wextra -Werror -O3 -g3
 # CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=address,undefined
 # CFLAGS			=	-Wall -Wextra -Werror -O3 -g -fsanitize=thread
 # ASCII_ART		=	./rsc/mk/ascii.sh

@@ -114,6 +114,7 @@ void updateGame(Context *c) {
 
 	handle_input(c);
 	update_camera(c, c->cubeShaderID);
+
 	mtx_unlock(&c->gameMtx);
 	/* Update render */
 	// renderChunksVBOhandling(c);

@@ -3,7 +3,7 @@
 
 /* Occlusion Culling Strategy */
 
-void updateNeighbors(Block *block, Block *blockCache[16][16][16]) {
+void updateNeighbors(Block *block, Block ****blockCache) {
     BlockPos pos[6] = {
         {block->x, block->y, block->z + 1}, {block->x, block->y, block->z - 1},
         {block->x + 1, block->y, block->z}, {block->x - 1, block->y, block->z},
@@ -46,7 +46,7 @@ void blockYLayerCacheLoad(Block *blockCache[16][16], SubChunks *subChunk, u32 la
 	@param botSubChunk the bottom subchunk to update (maybe we can give the last layer of the top subchunk loaded in cache)
 	@param topBlockCache the top block cache 
 */
-void updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]) {
+void updateTopBotNeighbors(SubChunks *botSubChunk, Block ****topBlockCache) {
 	Block *botBlockCache[16][16];
 
 	blockYLayerCacheLoad(botBlockCache, botSubChunk, 16 - 1);
@@ -130,7 +130,7 @@ void chunkNeighborMaskUpdate(Context *c, Chunks *chunk) {
 
 }
 
-void updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16], Chunks *neighborChunksCache[4]) {
+void updateChunkNeighbors(Context *c, Chunks *chunk, Block *****chunkBlockCache, Chunks *neighborChunksCache[4]) {
     u32 subChunksMax = subChunksMaxGet(chunk);
 	// s32 camChunkX = 0, camChunkZ = 0;
 	// mtx_lock(&c->gameMtx);

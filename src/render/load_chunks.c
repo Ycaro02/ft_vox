@@ -101,15 +101,14 @@ void unloadChunkHandler(Context *c) {
 	}
 
 	mtx_unlock(&c->vboToDestroyMtx);
-	mtx_unlock(&c->threadContext->chunkMtx);
-
+	// mtx_unlock(&c->threadContext->chunkMtx);
 
 	for (t_list *current = toRemoveList; current; current = current->next) {
-		mtx_lock(&c->threadContext->chunkMtx);
+		// mtx_lock(&c->threadContext->chunkMtx);
 		hashmap_remove_entry(c->world->chunksMap, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
-		mtx_unlock(&c->threadContext->chunkMtx);
 	}
 
+	mtx_unlock(&c->threadContext->chunkMtx);
 	ft_lstclear(&toRemoveList, free);
 
 }
@@ -128,6 +127,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	BlockPos 		tmpChunkID;
 	
 	mtx_lock(&c->renderMtx);
+	
 	it = hashmap_iterator(renderChunksMap);
 	while ((next = hashmap_next(&it))) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
@@ -142,15 +142,13 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 			}
 		}
 	}
-	mtx_unlock(&c->renderMtx);
 
 	for (t_list *current = toRemoveList; current; current = current->next) {
 		tmpChunkID = *(BlockPos *)current->content;
-		mtx_lock(&c->renderMtx);
 		hashmap_remove_entry(renderChunksMap, tmpChunkID, HASHMAP_FREE_NODE);
-		mtx_unlock(&c->renderMtx);
-		// chunksToLoadPrioritySet(c, tmpChunkID, LOAD_PRIORITY_HIGH);
 	}
+
+	mtx_unlock(&c->renderMtx);
 
 	ft_lstclear(&toRemoveList, free);
 

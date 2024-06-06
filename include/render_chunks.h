@@ -34,10 +34,10 @@ void 			renderChunksVBODestroyListBuild(Context *c, Chunks *chunk);
 
 /* render/occlusion_culling */
 // u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
-void			updateNeighbors(Block *block, Block *blockCache[16][16][16]);
-void			updateTopBotNeighbors(SubChunks *botSubChunk, Block *topBlockCache[16][16][16]);
+void			updateNeighbors(Block *block, Block ****blockCache);
+void			updateTopBotNeighbors(SubChunks *botSubChunk, Block ****topBlockCache);
 void			chunkNeighborsGet(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]);
-void			updateChunkNeighbors(Context *c, Chunks *chunk, Block *chunkBlockCache[16][16][16][16], Chunks *neighborChunksCache[4]);
+void			updateChunkNeighbors(Context *c, Chunks *chunk, Block *****chunkBlockCache, Chunks *neighborChunksCache[4]);
 void			chunkNeighborMaskUpdate(Context *c, Chunks *chunk);
 
 

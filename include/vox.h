@@ -109,12 +109,15 @@
 /* If all neighnor block is hidden */
 #define BLOCK_HIDDEN (NEIGHBOR_RIGHT | NEIGHBOR_LEFT | NEIGHBOR_TOP | NEIGHBOR_BOTTOM | NEIGHBOR_FRONT | NEIGHBOR_BACK)
 
-typedef struct PACKED_STRUCT s_block {
+// typedef struct PACKED_STRUCT s_block {
+typedef struct s_block {
     s8 	x;          /* Block x position */
     s8 	y;          /* Block y position (height) */
     s8 	z;          /* Block z position */
     s8	type;       /* Block type */
 	u8  neighbors;  /* Block flag */
+	/* padding */
+	s8 pad1, pad2;
 	// u8	visibleFromCam;	/* Block visible from camera */
 }   Block;
 

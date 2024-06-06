@@ -12,6 +12,14 @@ void act_change_cam_speed(Context *c) {
 	c->cam.camSpeed = (c->cam.camSpeed == CAM_BASE_SPEED) ? (CAM_HIGHT_SPEED) : CAM_BASE_SPEED;
 }
 
+void act_autoMoveTrigger(Context *c) {
+	c->autoMove = (c->autoMove == FALSE) ? TRUE : FALSE;
+}
+
+void act_autoRotateTrigger(Context *c) {
+	c->autoRotate = (c->autoRotate == FALSE) ? TRUE : FALSE;
+}
+
 /* Zoom : W */
 void act_zoom(Context *c) {
     move_camera_forward(&c->cam, c->cam.camSpeed);
@@ -191,6 +199,8 @@ void handle_input(void *context)
 		{GLFW_KEY_C, act_display_camera_value, SINGLE_PRESS},
 		{GLFW_KEY_E, testChunksExist, SINGLE_PRESS},
 		{GLFW_KEY_L, act_change_cam_speed, SINGLE_PRESS},
+		{GLFW_KEY_M, act_autoMoveTrigger, SINGLE_PRESS},
+		{GLFW_KEY_N, act_autoRotateTrigger, SINGLE_PRESS},
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(KeyAction));
 	s32				state = GLFW_RELEASE;
@@ -210,6 +220,13 @@ void handle_input(void *context)
 			key_actions[i].action(c);
 		}
         previous_state[key_actions[i].key] = state;
+	}
+
+	if (c->autoMove) {
+		move_camera_forward(&c->cam, c->cam.camSpeed);
+	}
+	if (c->autoRotate) {
+		act_rotate_camera_left(c);
 	}
 
 	// mtx_unlock(&c->gameMtx);
