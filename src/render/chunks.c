@@ -67,12 +67,12 @@ void chunksMapFree(void *entry) {
 		}
 		free(chunks->perlinVal);
 		/* cave */
-		if (chunks->perlinCave) {
-			for (u32 i = 0; i < 16; ++i) {
-				free(chunks->perlinCave[i]);
-			}
-			free(chunks->perlinCave);
-		}
+		// if (chunks->perlinCave) {
+		// 	for (u32 i = 0; i < 16; ++i) {
+		// 		free(chunks->perlinCave[i]);
+		// 	}
+		// 	free(chunks->perlinCave);
+		// }
 		/* cave end */
 		if (chunks->render) {
 			renderChunkFree(chunks->render);
@@ -222,7 +222,7 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, f32 *
 		Check value in PerlinCaveNoise array if value is lower than 0.3
 		Then dig the chunk with cave follow the perlinCaveNoise value
 	*/
-	perlinCaveDataGet(chunk, perlinCaveNoise);
+	// perlinCaveDataGet(chunk, perlinCaveNoise);
 	// if (chunkMaxY <= (s32)SEA_LEVEL && chunk->perlinCave[0][0].val < 0.3 && chunk->perlinCave[0][0].val > 0.2) {
 	// 	// ft_printf_fd(1, "Cave generation\n");
 	// 	chunkDigCave(chunk, chunkBlockCache);

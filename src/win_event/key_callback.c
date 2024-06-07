@@ -124,8 +124,8 @@ void testChunksExist(Context *c) {
 		mtx_unlock(&c->vboToCreateMtx);
 		ft_printf_fd(1, CYAN"Perlin Height\n");
 		displayPerlinNoise(blockX, blockZ,chunk->perlinVal[blockX][blockZ]);
-		ft_printf_fd(1, RED"Perlin cave\n");
-		displayPerlinNoise(blockX, blockZ,chunk->perlinCave[blockX][blockZ]);
+		// ft_printf_fd(1, RED"Perlin cave\n");
+		// displayPerlinNoise(blockX, blockZ,chunk->perlinCave[blockX][blockZ]);
 	} else {
 		ft_printf_fd(1, RED"Chunk not exist\n"RESET);
 	}

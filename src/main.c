@@ -12,22 +12,17 @@ void chunksRender(Context *c, GLuint shader_id) {
 }
 
 void renderChunksVBODestroy(Context *c) {
-	mtx_lock(&c->vboToDestroyMtx);
+	if (mtx_trylock(&c->vboToDestroyMtx) != thrd_success) {
+		renderNeedDataSet(c, TRUE);
+		return ;
+	}
+	// mtx_lock(&c->vboToDestroyMtx);
 	for (t_list *current = c->vboToDestroy; current; current = current->next) {
 		glDeleteBuffers(1, (GLuint *)current->content);
 	}
 	ft_lstclear(&c->vboToDestroy, free);
 	mtx_unlock(&c->vboToDestroyMtx);
 }
-
-// void timespecMSAdd(struct timespec *ts, int ms) {
-//     clock_gettime(CLOCK_REALTIME, ts);
-//     ts->tv_nsec += ms * 1000000; // convert ms to ns
-//     if (ts->tv_nsec >= 1000000000) {
-//         ts->tv_nsec -= 1000000000;
-//         ts->tv_sec++;
-//     }
-// }
 
 void renderChunksLoadNewVBO(Context *c) {
 
@@ -37,7 +32,6 @@ void renderChunksLoadNewVBO(Context *c) {
 		return ;
 	}
 	renderNeedDataSet(c, FALSE);
-
 	c->chunkLoadedNb = hashmap_size(c->world->chunksMap);
 	mtx_lock(&c->vboToCreateMtx);
 	for (t_list *current = c->vboToCreate; current; current = current->next) {
@@ -49,7 +43,6 @@ void renderChunksLoadNewVBO(Context *c) {
 	ft_lstclear(&c->vboToCreate, free);
 	mtx_unlock(&c->vboToCreateMtx);
 }
-
 
 void renderChunksVBOhandling(Context *c) {
 	renderChunksLoadNewVBO(c);
@@ -116,9 +109,6 @@ void updateGame(Context *c) {
 	update_camera(c, c->cubeShaderID);
 
 	mtx_unlock(&c->gameMtx);
-	/* Update render */
-	// renderChunksVBOhandling(c);
-		
 }
 
 void renderGame(Context *c, GLuint skyTexture) {

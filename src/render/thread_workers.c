@@ -6,9 +6,9 @@ s32 workersThreadRoutine(void *data) {
 	ThreadData *inputData = (ThreadData *)data;
 	ThreadData *tmp = NULL;
 
-	mtx_lock(&inputData->c->threadContext->threadMtx);
-	inputData->c->threadContext->workers[inputData->threadID].busy = WORKER_BUSY;
-	mtx_unlock(&inputData->c->threadContext->threadMtx);
+	// mtx_lock(&inputData->c->threadContext->threadMtx);
+	// inputData->c->threadContext->workers[inputData->threadID].busy = WORKER_BUSY;
+	// mtx_unlock(&inputData->c->threadContext->threadMtx);
 
 	while (1) {
 		while (renderNeedDataGet(inputData->c)) {
@@ -18,7 +18,7 @@ s32 workersThreadRoutine(void *data) {
 		mtx_lock(&inputData->c->threadContext->threadMtx);
 		tmp = chunksToLoadNearestGet(inputData->c, inputData->c->threadContext->chunksMapToLoad);
 		if (tmp) {
-			// inputData->c->threadContext->workers[inputData->threadID].busy = WORKER_BUSY;
+			inputData->c->threadContext->workers[inputData->threadID].busy = WORKER_BUSY;
 			inputData->chunkX = tmp->chunkX;
 			inputData->chunkZ = tmp->chunkZ;
 			inputData->priority = tmp->priority;
