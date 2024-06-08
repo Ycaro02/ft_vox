@@ -122,8 +122,8 @@ s8 chunksToLoadBuildMap(Context *c, s32 chunkX, s32 chunkZ) {
 	ThreadData	*tdata = NULL;
 	BlockPos 	chunkID = CHUNKS_MAP_ID_GET(chunkX, chunkZ);
 
-	mtx_lock(&c->threadContext->threadMtx);
 	mtx_lock(&c->threadContext->chunkMtx);
+	mtx_lock(&c->threadContext->threadMtx);
 	if (chunkIsLoaded(c->world->chunksMap, chunkID)) {
 		mtx_unlock(&c->threadContext->threadMtx);
 		mtx_unlock(&c->threadContext->chunkMtx);
