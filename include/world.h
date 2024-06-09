@@ -4,10 +4,10 @@
 #include "vox.h"
 #include "cube.h"
 
-typedef struct s_camera Camera;
-typedef struct s_thread_entity ThreadEntity;
-typedef mtx_t Mutex;
-typedef thrd_t Thread;
+typedef struct 	s_camera Camera;
+typedef struct 	s_thread_entity ThreadEntity;
+typedef 		mtx_t Mutex;
+typedef 		thrd_t Thread;
 
 typedef struct s_world {
 	u64				seed;					/* World seed */
@@ -25,21 +25,6 @@ typedef struct s_thread_context {
 	s64         	workerMax;			/* Maximum of worker thread (size of workers array) */
 } ThreadContext;
 
-typedef struct timespec TimeSpec;
-
-// typedef struct s_mutex_time {
-// 	TimeSpec	start;
-// 	TimeSpec	end;
-// 	f64			gameMtxTime;
-// 	f64			renderMtxTime;
-// 	f64			isRunningMtxTime;
-// 	f64			vboToDestroyMtxTime;
-// 	f64			vboToCreateMtxTime;
-// 	f64			chunkMtxTime;
-// 	f64			threadMtxTime;
-// 	f64			logMtxTime;
-// } MutexTime;
-
 /* Context structure */
 typedef struct s_context {
 	World				*world;				/* World structure */
@@ -48,17 +33,19 @@ typedef struct s_context {
 	FaceCubeModel		*faceCube;			/* Data Face Cube structure */
 	u32					renderBlock;		/* Total block to render */
 	ThreadContext		*threadContext;		/* Thread context */
-	s8					isPlaying;			/* Game is playing */
 	f32					**perlin2D;			/* Perlin noise 2D */
 	f32					**perlinCaveNoise;	/* Perlin noise 2D for cave */
+	/* Vbo handling list can be with mutex  */
 	t_list				*vboToDestroy;		/* VBO to destroy */
 	t_list				*vboToCreate;		/* VBO to create */
+	/* Mutex protect can be in is own struct */
 	Mutex				renderMtx;			/* Mutex to protect VBO, used for renderChunks map */
 	Mutex				gameMtx;			/* Mutex to protect game, used for game boolean and cam chunk Pos */
 	Mutex				isRunningMtx;		/* Mutex to protect isRunning */
 	Mutex				vboToDestroyMtx;	/* Mutex to protect vboToDestroy list */
 	Mutex				vboToCreateMtx;		/* Mutex to protect vboToCreate list */
 	Mutex				renderDataNeededMtx; /* Mutex to protect renderDataNeeded */
+	/* Opengl ID for shader vao or textyre */
 	GLuint				cubeShaderID;		/* shader program id */
 	GLuint				skyboxShaderID;		/* shader program id */
 	GLuint				skyboxVAO;			/* skybox VAO */
@@ -66,10 +53,11 @@ typedef struct s_context {
 	mat4				rotation;			/* rotation matrix */
 	u32					chunkLoadedNb;		/* Chunk loaded */
 	u32					chunkToLoadInQueue;	/* Chunk to load in queue */
+	/* Multiple bool can be in the same var and handle with power of 2 (flag )*/
+	s8					isPlaying;			/* Game is playing */
 	u8					renderDataNeeded; 	/* Render need data, bool to specify render want to lock data (chunkMtx) */
 	s8					autoMove;			/* Auto move camera */
 	s8					autoRotate;			/* Auto rotate camera */
-	// MutexTime			mtxTime;		/* Mutex time */
 } Context;
 
 

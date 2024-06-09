@@ -42,14 +42,14 @@ void act_move_left(Context *c) {
 
 /* Rotate camera left : LEFT */
 void act_rotate_camera_left(Context *c) {
-	// rotate_camera(&c->cam, 1.0f, VEC3_ROTATEY);
-	rotate_camera(&c->cam, 3.0f, VEC3_ROTATEY);
+	rotate_camera(&c->cam, 1.0f, VEC3_ROTATEY);
+	// rotate_camera(&c->cam, 3.0f, VEC3_ROTATEY);
 }
 
 /* Rotate camera right: RIGHT */
 void act_rotate_camera_right(Context *c) {
-    // rotate_camera(&c->cam, -1.0f, VEC3_ROTATEY);
-    rotate_camera(&c->cam, -3.0f, VEC3_ROTATEY);
+    rotate_camera(&c->cam, -1.0f, VEC3_ROTATEY);
+    // rotate_camera(&c->cam, -3.0f, VEC3_ROTATEY);
 }
 
 /* Rotate camera top UP */
