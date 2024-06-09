@@ -31,14 +31,16 @@ void renderChunksLoadNewVBO(Context *c) {
 		renderNeedDataSet(c, TRUE);
 		return ;
 	}
-	renderNeedDataSet(c, FALSE);
 	c->chunkLoadedNb = hashmap_size(c->world->chunksMap);
+	c->chunkToLoadInQueue = hashmap_size(c->threadContext->chunksMapToLoad);
 	mtx_lock(&c->vboToCreateMtx);
 	for (t_list *current = c->vboToCreate; current; current = current->next) {
 		BlockPos chunkID = *(BlockPos *)current->content;
 		renderChunkCreateFaceVBO(c->world->chunksMap, chunkID);
 	}
 	/* UNLOCK chunk MTX */
+	renderNeedDataSet(c, FALSE);
+	
 	mtx_unlock(&c->threadContext->chunkMtx);
 	ft_lstclear(&c->vboToCreate, free);
 	mtx_unlock(&c->vboToCreateMtx);

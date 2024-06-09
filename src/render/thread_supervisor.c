@@ -243,6 +243,39 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	return (current);
 }
 
+void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, HashMap *chunksMapToLoad) {
+	HashMap_it it;
+	s8 next = TRUE;
+	BlockPos pos = {0, 0, 0};
+	t_list *toRemoveList = NULL;
+	BlockPos *chunkIDToRemove = NULL;
+	s32 camChunkX, camChunkZ;
+
+	mtx_lock(gameMtx);
+	camChunkX = c->cam.chunkPos[0];
+	camChunkZ = c->cam.chunkPos[2];
+	mtx_unlock(gameMtx);
+
+	mtx_lock(threadMtx); /* LOCK */
+	it = hashmap_iterator(chunksMapToLoad);
+	while ((next = hashmap_next(&it))) {
+		pos = ((HashMap_entry *)it._current->content)->origin_data;
+		if (chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_UNLOAD_RADIUS) {
+			if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
+				ft_memcpy(chunkIDToRemove, &pos, sizeof(BlockPos));
+				ft_lstadd_back(&toRemoveList, ft_lstnew(chunkIDToRemove));
+			}
+		}
+	}
+
+	for (t_list *current = toRemoveList; current; current = current->next) {
+		hashmap_remove_entry(chunksMapToLoad, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
+	}
+	ft_lstclear(&toRemoveList, free);
+	mtx_unlock(threadMtx); /* UNLOCK */
+
+}
+
 /**
  * @brief Thread supervisor function, manage the worker threads
  * @param context Context
@@ -264,7 +297,7 @@ s32 supervisorThreadRoutine(void *context) {
 	    renderChunksFrustrumRemove(c, c->world->renderChunksMap);
 		unloadChunkHandler(c);
 		chunksViewHandling(c);
-		// chunksQueueRemoveHandling(c, &c->threadContext->threadMtx, &c->gameMtx, c->threadContext->chunksMapToLoad);
+		chunksQueueRemoveHandling(c, &c->threadContext->threadMtx, &c->gameMtx, c->threadContext->chunksMapToLoad);
 		// usleep(500);
 	}
 
@@ -297,35 +330,3 @@ s8 threadSupervisorInit(Context *c) {
 }
 
 
-// void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, HashMap *chunksMapToLoad) {
-// 	HashMap_it it;
-// 	s8 next = TRUE;
-// 	BlockPos pos = {0, 0, 0};
-// 	t_list *toRemoveList = NULL;
-// 	BlockPos *chunkIDToRemove = NULL;
-// 	s32 camChunkX, camChunkZ;
-
-// 	mtx_lock(gameMtx);
-// 	camChunkX = c->cam.chunkPos[0];
-// 	camChunkZ = c->cam.chunkPos[2];
-// 	mtx_unlock(gameMtx);
-
-// 	mtx_lock(threadMtx); /* LOCK */
-// 	it = hashmap_iterator(chunksMapToLoad);
-// 	while ((next = hashmap_next(&it))) {
-// 		pos = ((HashMap_entry *)it._current->content)->origin_data;
-// 		if (chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_UNLOAD_RADIUS) {
-// 			if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
-// 				*chunkIDToRemove = pos;
-// 				ft_lstadd_back(&toRemoveList, ft_lstnew(chunkIDToRemove));
-// 			}
-// 		}
-// 	}
-
-// 	for (t_list *current = toRemoveList; current; current = current->next) {
-// 		hashmap_remove_entry(chunksMapToLoad, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
-// 	}
-// 	ft_lstclear(&toRemoveList, free);
-// 	mtx_unlock(threadMtx); /* UNLOCK */
-
-// }

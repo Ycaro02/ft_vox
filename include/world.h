@@ -65,6 +65,7 @@ typedef struct s_context {
 	GLuint				skyTexture;			/* skybox VAO */
 	mat4				rotation;			/* rotation matrix */
 	u32					chunkLoadedNb;		/* Chunk loaded */
+	u32					chunkToLoadInQueue;	/* Chunk to load in queue */
 	u8					renderDataNeeded; 	/* Render need data, bool to specify render want to lock data (chunkMtx) */
 	s8					autoMove;			/* Auto move camera */
 	s8					autoRotate;			/* Auto rotate camera */

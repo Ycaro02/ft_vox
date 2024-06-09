@@ -119,9 +119,7 @@ void chunkNeighborMaskUpdate(Context *c, Chunks *chunk) {
 
 	for (u32 i = 0; i < 4; ++i) {
 		if (!(chunk->neighbors & chunkMask[i])) {
-			// mtx_lock(&c->threadContext->chunkMtx);
 			neightborsChunk = getChunkAt(c, pos[i].x, pos[i].z);
-			// mtx_unlock(&c->threadContext->chunkMtx);
 		}
 		if (neightborsChunk && neightborsChunk->occlusionDone == TRUE) {
 			chunk->neighbors |= chunkMask[i];
@@ -132,17 +130,6 @@ void chunkNeighborMaskUpdate(Context *c, Chunks *chunk) {
 
 void updateChunkNeighbors(Context *c, Chunks *chunk, Block *****chunkBlockCache, Chunks *neighborChunksCache[4]) {
     u32 subChunksMax = subChunksMaxGet(chunk);
-	// s32 camChunkX = 0, camChunkZ = 0;
-	// mtx_lock(&c->gameMtx);
-	// camChunkX = c->cam.chunkPos[0];
-	// camChunkZ = c->cam.chunkPos[2];
-	// mtx_unlock(&c->gameMtx);
-    // BlockPos pos[4] = {
-    //     {chunk->x, 0, chunk->z + 1}, // front
-    //     {chunk->x, 0, chunk->z - 1}, // back
-    //     {chunk->x + 1, 0, chunk->z}, // right
-    //     {chunk->x - 1, 0, chunk->z}, // left
-    // };
 	(void)c;
 
     u8 blockMasks[4] = {

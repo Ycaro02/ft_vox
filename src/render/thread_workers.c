@@ -22,7 +22,7 @@ s32 workersThreadRoutine(void *data) {
 			inputData->chunkX = tmp->chunkX;
 			inputData->chunkZ = tmp->chunkZ;
 			inputData->priority = tmp->priority;
-			// VOX_PROTECTED_LOG(inputData->c, ORANGE"Thread %d: Loading chunk %d %d\n"RESET, inputData->threadID, tmp->chunkX, tmp->chunkZ);
+			// VOX_PROTECTED_LOG(inputData->c, ORANGE"\nThread %d:"RESET" "PINK"Load Chunk |%d %d|\n"RESET, inputData->threadID, tmp->chunkX, tmp->chunkZ);
 			mtx_unlock(&inputData->c->threadContext->threadMtx);
 			free(tmp);
 			threadChunksLoad(inputData);
