@@ -16,7 +16,7 @@ typedef struct s_render_chunks {
 /* render/render_chunks.c */
 void			renderChunkFree(RenderChunks *render);
 /* Function to provide at hashmap init for renderChunks map */
-void			renderChunksMapFree(void *entry);
+// void			renderChunksMapFree(void *entry);
 
 void addRenderToVBOCreate(Context *c, BlockPos chunkID);
 

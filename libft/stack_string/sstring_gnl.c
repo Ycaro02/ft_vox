@@ -10,7 +10,7 @@ static u8 sstring_read(t_sstring *sstr, int fd)
 {
 	int     read_result = 1;
 
-	empty_sstring(sstr);
+	*sstr = empty_sstring();
 	if (fd < 0 || !sstr)
 		return (0);
 	read_result = read(fd, sstr->data, SSTRING_MAX - 1);

@@ -5,31 +5,31 @@
  * @param header pointer to the BMP header
  * @param info pointer to the BMP info header
 */
-FT_INLINE void display_bmp_hdr_data(bmp_hdr *header, bmp_info_hdr *info) {
-    /* display size of structure */    
-    ft_printf_fd(1, "Size of BMP Header: %d\n", BMP_HDR_SIZE);
-    ft_printf_fd(1, "Size of BMP Info Header: %d\n", BMP_INFO_HDR_SIZE);
+// FT_INLINE void display_bmp_hdr_data(bmp_hdr *header, bmp_info_hdr *info) {
+//     /* display size of structure */    
+//     ft_printf_fd(1, "Size of BMP Header: %d\n", BMP_HDR_SIZE);
+//     ft_printf_fd(1, "Size of BMP Info Header: %d\n", BMP_INFO_HDR_SIZE);
   
-    /* display header struct field  */
-    ft_printf_fd(1, "Type: %c%c\n", (char)header->type, (char)(header->type >> 8));
-    ft_printf_fd(1, "Size: %d\n", header->size);
-    ft_printf_fd(1, "Reserved1: %d\n", header->reserved1);
-    ft_printf_fd(1, "Reserved2: %d\n", header->reserved2);
-    ft_printf_fd(1, "Offset: %d\n", header->offset);
+//     /* display header struct field  */
+//     ft_printf_fd(1, "Type: %c%c\n", (char)header->type, (char)(header->type >> 8));
+//     ft_printf_fd(1, "Size: %d\n", header->size);
+//     ft_printf_fd(1, "Reserved1: %d\n", header->reserved1);
+//     ft_printf_fd(1, "Reserved2: %d\n", header->reserved2);
+//     ft_printf_fd(1, "Offset: %d\n", header->offset);
   
-    /* display header info field */
-    ft_printf_fd(1, "Size: %d\n", info->size);
-    ft_printf_fd(1, "Width: %d\n", info->width);
-    ft_printf_fd(1, "Height: %d\n", info->height);
-    ft_printf_fd(1, "Planes: %d\n", info->planes);
-    ft_printf_fd(1, "Bits: %d\n", info->bits);
-    ft_printf_fd(1, "Compression: %d\n", info->compression);
-    ft_printf_fd(1, "ImageSize: %d\n", info->imagesize);
-    ft_printf_fd(1, "XResolution: %d\n", info->xresolution);
-    ft_printf_fd(1, "YResolution: %d\n", info->yresolution);
-    ft_printf_fd(1, "NColours: %d\n", info->ncolours);
-    ft_printf_fd(1, "ImportantColours: %d\n", info->important_colours);
-}
+//     /* display header info field */
+//     ft_printf_fd(1, "Size: %d\n", info->size);
+//     ft_printf_fd(1, "Width: %d\n", info->width);
+//     ft_printf_fd(1, "Height: %d\n", info->height);
+//     ft_printf_fd(1, "Planes: %d\n", info->planes);
+//     ft_printf_fd(1, "Bits: %d\n", info->bits);
+//     ft_printf_fd(1, "Compression: %d\n", info->compression);
+//     ft_printf_fd(1, "ImageSize: %d\n", info->imagesize);
+//     ft_printf_fd(1, "XResolution: %d\n", info->xresolution);
+//     ft_printf_fd(1, "YResolution: %d\n", info->yresolution);
+//     ft_printf_fd(1, "NColours: %d\n", info->ncolours);
+//     ft_printf_fd(1, "ImportantColours: %d\n", info->important_colours);
+// }
 
 /**
  * @brief Load a file into memory using mmap

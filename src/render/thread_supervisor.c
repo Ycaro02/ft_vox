@@ -121,6 +121,7 @@ void supervisorWaitWorker(Context *c) {
 s8 chunksToLoadBuildMap(Context *c, s32 chunkX, s32 chunkZ) {
 	ThreadData	*tdata = NULL;
 	BlockPos 	chunkID = CHUNKS_MAP_ID_GET(chunkX, chunkZ);
+	BoundingBox	box = {0};
 
 	mtx_lock(&c->threadContext->chunkMtx);
 	mtx_lock(&c->threadContext->threadMtx);
@@ -145,7 +146,7 @@ s8 chunksToLoadBuildMap(Context *c, s32 chunkX, s32 chunkZ) {
 	tdata->chunkX = chunkX;
 	tdata->chunkZ = chunkZ;
 
-	BoundingBox box = {};
+
 	box = chunkBoundingBoxGet(chunkX, chunkZ, 8.0f);
 	if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
 		tdata->priority = LOAD_PRIORITY_LOW;

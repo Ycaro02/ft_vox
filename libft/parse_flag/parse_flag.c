@@ -71,8 +71,8 @@ static void *check_for_flag(char* programe_name, char *str, t_flag_context *flag
     t_opt_node	*opt = NULL;
     int			tmp_value = 0;
 	/* Function ptr to choice between char or long format function call */
-	int			(*get_flag_val_func)() = get_flag_value;
-	int8_t		(*is_same_func)() = is_same_char_opt;
+	int			(*get_flag_val_func)(t_flag_context *, char *) = get_flag_value;
+	int8_t		(*is_same_func)(void *, void *) = is_same_char_opt;
 	int			j_start = 1;
 
 	if (long_option) {

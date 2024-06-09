@@ -35,13 +35,14 @@
 // #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 16.0f)		/* Max render distance */
 
 /* DEBUG VAL */
-// #define CHUNKS_LOAD_RADIUS 1	
+// #define CHUNKS_LOAD_RADIUS 2	
 // #define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 5)
 // #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 2.0f)
 
 
 
-#define TRAVEL_INCREMENT CHUNK_FLOAT_SIZE							/* Travel increment */
+// #define TRAVEL_INCREMENT CHUNK_FLOAT_SIZE	/* Travel increment */
+#define TRAVEL_INCREMENT 5.0f				/* Travel increment */
 
 /* Texture atlas path */
 #define TEXTURE_ATLAS_PATH "rsc/texture/atlas.bmp"

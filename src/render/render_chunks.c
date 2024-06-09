@@ -12,13 +12,13 @@ void renderChunkFree(RenderChunks *render) {
 	free(render);
 }
 
-void renderChunksMapFree(void *entry) {
-	HashMap_entry *e = (HashMap_entry *)entry;
-	if (e->value) {
-		renderChunkFree((RenderChunks *)e->value);
-	}
-	free(e); /* free the entry t_list node */
-}
+// void renderChunksMapFree(void *entry) {
+// 	HashMap_entry *e = (HashMap_entry *)entry;
+// 	if (e->value) {
+// 		renderChunkFree((RenderChunks *)e->value);
+// 	}
+// 	free(e); /* free the entry t_list node */
+// }
 
 
 void addRenderToVBOCreate(Context *c, BlockPos chunkID) {

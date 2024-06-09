@@ -63,7 +63,7 @@ int8_t is_same_flag_val_opt(void *content, void *value) {
  * @param data data to compare
  * @return opt_node if found, NULL otherwise
 */
-void *search_exist_opt(t_list *opt_lst, int8_t (cmp()), void *data)
+void *search_exist_opt(t_list *opt_lst, int8_t (cmp(void *, void *)), void *data)
 {
     for (t_list *tmp = opt_lst; tmp; tmp = tmp->next) {
         if (cmp(tmp->content, data)) {

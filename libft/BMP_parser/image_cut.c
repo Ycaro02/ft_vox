@@ -26,7 +26,7 @@ s8 is_square_empty(u8* square, int width, int height, int type) {
 t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int width, int height, int type) {
     int num_squares_x = tex_width / width;
     int num_squares_y = tex_height / height;
-    int square_count = 0;
+    // int square_count = 0;
     t_list *square_lst = NULL;
 
     for (int i = 0; i < num_squares_y; i++) {
@@ -55,7 +55,7 @@ t_list *cut_texture_into_squares(u8* texture, int tex_width, int tex_height, int
 				} else {
 					ft_lstadd_back(&square_lst, ft_lstnew(square));
 				}
-                square_count++;
+                // square_count++;
             }
         }
     }

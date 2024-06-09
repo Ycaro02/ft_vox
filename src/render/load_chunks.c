@@ -104,11 +104,8 @@ void unloadChunkHandler(Context *c) {
 		}
 	}
 
-	// mtx_unlock(&c->vboToDestroyMtx);
-	// mtx_unlock(&c->threadContext->chunkMtx);
 
 	for (t_list *current = toRemoveList; current; current = current->next) {
-		// mtx_lock(&c->threadContext->chunkMtx);
 		hashmap_remove_entry(c->world->chunksMap, *(BlockPos *)current->content, HASHMAP_FREE_DATA);
 	}
 
