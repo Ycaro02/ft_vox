@@ -45,7 +45,7 @@ typedef struct s_context {
 	Mutex				vboToDestroyMtx;	/* Mutex to protect vboToDestroy list */
 	Mutex				vboToCreateMtx;		/* Mutex to protect vboToCreate list */
 	Mutex				renderDataNeededMtx; /* Mutex to protect renderDataNeeded */
-	/* Opengl ID for shader vao or textyre */
+	/* Opengl ID for shader vao or texture (openGl context) */
 	GLuint				cubeShaderID;		/* shader program id */
 	GLuint				skyboxShaderID;		/* shader program id */
 	GLuint				skyboxVAO;			/* skybox VAO */
@@ -59,6 +59,20 @@ typedef struct s_context {
 	s8					autoMove;			/* Auto move camera */
 	s8					autoRotate;			/* Auto rotate camera */
 } Context;
+
+
+/* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */
+#define RENDER_CHUNKS_ID(r) ((BlockPos)r->chunkID)
+
+/* Chunks ID in chunksHashmap, same id than RENDER_CHUNKS_ID(RenderChunks) */
+#define CHUNKS_MAP_ID_GET(offsetX, offsetZ) ((BlockPos){0, offsetX, offsetZ})
+
+#define VOX_PROTECTED_LOG(c, msg, ...) \
+	do { \
+		mtx_lock(&(c->threadContext->logMtx)); \
+		ft_printf_fd(1, msg, ##__VA_ARGS__); \
+		mtx_unlock(&(c->threadContext->logMtx)); \
+	} while (0)
 
 
 FT_INLINE void renderNeedDataSet(Context *c, u8 value) {
@@ -77,12 +91,15 @@ FT_INLINE s8 renderNeedDataGet(Context *c) {
 }
 
 
-#define VOX_PROTECTED_LOG(c, msg, ...) \
-    do { \
-        mtx_lock(&(c->threadContext->logMtx)); \
-        ft_printf_fd(1, msg, ##__VA_ARGS__); \
-        mtx_unlock(&(c->threadContext->logMtx)); \
-    } while (0)
+
+
+FT_INLINE s8 voxIsRunning(Context *context) {
+	s8 playing = TRUE;
+	mtx_lock(&context->isRunningMtx);
+	playing = context->isPlaying;
+	mtx_unlock(&context->isRunningMtx);
+	return (playing);
+}
 
 
 // FT_INLINE void computeTimeSpend(TimeSpec *start, TimeSpec *end, f64 *time) {
@@ -98,27 +115,12 @@ FT_INLINE s8 renderNeedDataGet(Context *c) {
 // }
 
 
-/* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */
-#define RENDER_CHUNKS_ID(r) ((BlockPos)r->chunkID)
-
-/* Chunks ID in chunksHashmap, same id than RENDER_CHUNKS_ID(RenderChunks) */
-#define CHUNKS_MAP_ID_GET(offsetX, offsetZ) ((BlockPos){0, offsetX, offsetZ})
-
-
 /* cube.c */
 GLuint bufferGlCreate(GLenum type, u32 size, void *data);
 
 
 void display_camera_value(Context *context);
 
-
-FT_INLINE s8 voxIsRunning(Context *context) {
-	s8 playing = TRUE;
-	mtx_lock(&context->isRunningMtx);
-	playing = context->isPlaying;
-	mtx_unlock(&context->isRunningMtx);
-	return (playing);
-}
 
 Context *contextInit();
 u8 *perlinNoiseGeneration(unsigned int seed);

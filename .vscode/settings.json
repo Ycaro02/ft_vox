@@ -54,6 +54,11 @@
 		"time.h": "c",
 		"struct_timeval.h": "c",
 		"cmath": "c",
-		"cstdlib": "c"
+		"cstdlib": "c",
+		"stdarg.h": "c",
+		"__stdarg___gnuc_va_list.h": "c",
+		"__stdarg_va_list.h": "c",
+		"__stdarg_va_arg.h": "c",
+		"__stdarg_va_copy.h": "c"
 	}
 }
