@@ -1,15 +1,15 @@
 #include "../../include/perlin_noise.h"
 
-void addPointToPath(Path *path, int x, int y) {
+void addPointToPath(Path *path, s32 x, s32 y) {
     path->points = realloc(path->points, (path->length + 1) * sizeof(PathPoint));
     path->points[path->length].x = x;
     path->points[path->length].y = y;
     path->length++;
 }
 
-void markEntryCircle(u8 **snakeData, int x, int y, int size) {
-	for (int dy = -size; dy <= size; ++dy) {
-		for (int dx = -size; dx <= size; ++dx) {
+void markEntryCircle(u8 **snakeData, s32 x, s32 y, s32 size) {
+	for (s32 dy = -size; dy <= size; ++dy) {
+		for (s32 dx = -size; dx <= size; ++dx) {
 			if (dx * dx + dy * dy <= size * size) {
 				snakeData[y + dy][x + dx] = ENTRY_EXIT_VAL;
 			}
@@ -17,10 +17,10 @@ void markEntryCircle(u8 **snakeData, int x, int y, int size) {
 	}
 }
 
-void markPathEntry(u8 **snakeData, Path *paths, int numPaths, int w, int h) {
-    int entryDistThreshold = 100;
+void markPathEntry(u8 **snakeData, Path *paths, s32 numPaths, s32 w, s32 h) {
+    s32 entryDistThreshold = 100;
 
-    for (int i = 0; i < numPaths; i++) {
+    for (s32 i = 0; i < numPaths; i++) {
         Path 		*path = paths + i;
 		PathPoint 	point = path->points[path->length / 2];
 
@@ -32,10 +32,10 @@ void markPathEntry(u8 **snakeData, Path *paths, int numPaths, int w, int h) {
 
 		// Check the distance with all previous entries
 		s8 tooClose = FALSE;
-		for (int k = 0; k < numPaths; k++) {
-			int dx = point.x - paths[k].entry.x;
-			int dy = point.y - paths[k].entry.y;
-			int distance = sqrt(dx * dx + dy * dy);
+		for (s32 k = 0; k < numPaths; k++) {
+			s32 dx = point.x - paths[k].entry.x;
+			s32 dy = point.y - paths[k].entry.y;
+			s32 distance = sqrt(dx * dx + dy * dy);
 			if (distance < entryDistThreshold) {
 				tooClose = TRUE;
 				break;
@@ -50,13 +50,14 @@ void markPathEntry(u8 **snakeData, Path *paths, int numPaths, int w, int h) {
     }
 }
 
-u8 **visitedPixelAlloc(int w, int h) {
+u8 **unsignedCharDoubleAlloc(s32 w, s32 h) {
 	u8 **visited = ft_calloc(h, sizeof(u8*));
+	
 	if (!visited) {
 		ft_printf_fd(2, "Error: ft_calloc failed\n");
 		return (NULL);
 	}
-	for (int i = 0; i < h; ++i) {
+	for (s32 i = 0; i < h; ++i) {
 		visited[i] = ft_calloc(w, sizeof(u8));
 		if (!visited[i]) {
 			ft_printf_fd(2, "Error: ft_calloc failed\n");
@@ -66,18 +67,18 @@ u8 **visitedPixelAlloc(int w, int h) {
 	return (visited);
 }
 
-Path buildSinglePath(u8 **visited, u8 **snakeData, int x, int y, int h, int w) {
-	Path path = {NULL, (PathPoint){0,0}, 0};
-	int currentX = x;
-	int currentY = y;
+Path buildSinglePath(u8 **visited, u8 **snakeData, s32 x, s32 y, s32 h, s32 w) {
+	Path 	path = {NULL, (PathPoint){0,0}, 0};
+	s32 	currentX = x;
+	s32 	currentY = y;
 
 	while (1) {
 		addPointToPath(&path, currentX, currentY);
 		visited[currentY][currentX] = 1;
 		// Check the 8 neighbors
-		int found = 0;
-		for (int dy = -1; dy <= 1; ++dy) {
-			for (int dx = -1; dx <= 1; ++dx) {
+		s32 found = 0;
+		for (s32 dy = -1; dy <= 1; ++dy) {
+			for (s32 dx = -1; dx <= 1; ++dx) {
 				if (dy == 0 && dx == 0) continue; // Skip the center pixel
 				if (currentY + dy < 0 || currentY + dy >= h || currentX + dx < 0 || currentX + dx >= w) continue; // Check bounds
 				if (snakeData[currentY + dy][currentX + dx] == PATH_VAL && !visited[currentY + dy][currentX + dx]) {
@@ -94,18 +95,18 @@ Path buildSinglePath(u8 **visited, u8 **snakeData, int x, int y, int h, int w) {
 	return (path);
 }
 
-Path *buildPaths(u8 **snakeData, int w, int h, int *nbPaths, int minLength) {
-    Path *totalPath = NULL;
-    int numPaths = 0;
-
-    u8 **visited = visitedPixelAlloc(w, h);
-    if (!visited) {
+Path *buildPaths(u8 **snakeData, s32 w, s32 h, s32 *nbPaths, s32 minLength) {
+    u8		**visited = NULL;
+    Path	*totalPath = NULL;
+    s32		numPaths = 0;
+	
+    if (!(visited = unsignedCharDoubleAlloc(w, h))) {
         ft_printf_fd(2, "Error: ft_calloc failed\n");
         return (NULL);
     }
     // Find the first black pixel
-    for (int y = 0; y < h; ++y) {
-        for (int x = 0; x < w; ++x) {
+    for (s32 y = 0; y < h; ++y) {
+        for (s32 x = 0; x < w; ++x) {
             if (snakeData[y][x] == PATH_VAL && !visited[y][x]) {
                 // Start a new path
 				Path path = buildSinglePath(visited, snakeData, x, y, h, w);
@@ -122,7 +123,7 @@ Path *buildPaths(u8 **snakeData, int w, int h, int *nbPaths, int minLength) {
         }
     }
     // Free the visited array
-    for (int i = 0; i < h; ++i) {
+    for (s32 i = 0; i < h; ++i) {
         free(visited[i]);
     }
     free(visited);
@@ -131,15 +132,15 @@ Path *buildPaths(u8 **snakeData, int w, int h, int *nbPaths, int minLength) {
 	return (totalPath);
 }
 
-void morphologicalErosion(u8 **snakeData, int w, int h, u8 valTocheck, u8 valToSet, int neighborhoodSize, int minSameNeighbors) {
+void morphologicalErosion(u8 **snakeData, s32 w, s32 h, u8 valTocheck, u8 valToSet, s32 neighborhoodSize, s32 minSameNeighbors) {
 	// Morphological erosion
-	for (int y = neighborhoodSize; y < h - neighborhoodSize; ++y) {
-		for (int x = neighborhoodSize; x < w - neighborhoodSize; ++x) {
+	for (s32 y = neighborhoodSize; y < h - neighborhoodSize; ++y) {
+		for (s32 x = neighborhoodSize; x < w - neighborhoodSize; ++x) {
 			// Only apply the erosion to black pixels
 			if (snakeData[y][x] == valTocheck) {
-				int sameNeighbors = 0;
-				for (int dy = -neighborhoodSize; dy <= neighborhoodSize; ++dy) {
-					for (int dx = -neighborhoodSize; dx <= neighborhoodSize; ++dx) {
+				s32 sameNeighbors = 0;
+				for (s32 dy = -neighborhoodSize; dy <= neighborhoodSize; ++dy) {
+					for (s32 dx = -neighborhoodSize; dx <= neighborhoodSize; ++dx) {
 						if (snakeData[y + dy][x + dx] == valTocheck) {
 							sameNeighbors++;
 						}
@@ -154,13 +155,13 @@ void morphologicalErosion(u8 **snakeData, int w, int h, u8 valTocheck, u8 valToS
 	}
 }
 
-void neighborDiffEdgeDetection(f32 **perlinData, u8 **snakeData, int w, int h, f32 threshold) {
-	for (int y = 1; y < h - 1; ++y) {
-		for (int x = 1; x < w - 1; ++x) {
+void neighborDiffEdgeDetection(f32 **perlinData, u8 **snakeData, s32 w, s32 h, f32 threshold) {
+	for (s32 y = 1; y < h - 1; ++y) {
+		for (s32 x = 1; x < w - 1; ++x) {
 			// Calculate the difference in value between this pixel and its neighbors
 			f32 diff = 0.0f;
-			for (int dy = -1; dy <= 1; ++dy) {
-				for (int dx = -1; dx <= 1; ++dx) {
+			for (s32 dy = -1; dy <= 1; ++dy) {
+				for (s32 dx = -1; dx <= 1; ++dx) {
 					diff += fabsf(perlinData[y][x] - perlinData[y + dy][x + dx]);
 				}
 			}
@@ -174,9 +175,9 @@ void neighborDiffEdgeDetection(f32 **perlinData, u8 **snakeData, int w, int h, f
 	}
 }
 
-void makeBorderUniform(u8 **snakeData, int w, int h, int radius, u8 val) {
-	for (int y = 0; y < h; ++y) {
-		for (int x = 0; x < w; ++x) {
+void makeBorderUniform(u8 **snakeData, s32 w, s32 h, s32 radius, u8 val) {
+	for (s32 y = 0; y < h; ++y) {
+		for (s32 x = 0; x < w; ++x) {
 			if (x < radius || x >= w - radius || y < radius || y >= h - radius) {
 				snakeData[y][x] = val;
 			}
@@ -184,33 +185,28 @@ void makeBorderUniform(u8 **snakeData, int w, int h, int radius, u8 val) {
 	}
 }
 
-u8 **perlinToSnakeData(f32 **perlinData, int w, int h) {
-    float threshold = 0.02f; // Adjust this value to control the sensitivity of the edge detection
-	u8 **snakeData = ft_calloc(h, sizeof(u8*));
-	if (!snakeData) {
+u8 **perlinToSnakeData(f32 **perlinData, s32 w, s32 h) {
+	u8 		**snakeData = NULL;
+	Path 	*paths = NULL;
+    f32 	threshold = 0.02f; // Adjust this value to control the sensitivity of the edge detection
+	s32 	nbPaths = 0;
+
+	if (!(snakeData = unsignedCharDoubleAlloc(w, h))) {
 		ft_printf_fd(2, "Error: ft_calloc failed\n");
 		return (NULL);
 	}
-	for (int i = 0; i < h; ++i) {
-		if (!(snakeData[i] = ft_calloc(w, sizeof(u8)))) {
-			ft_printf_fd(2, "Error: ft_calloc failed\n");
-			return (NULL);
-		}
-	}
-	
+
 	neighborDiffEdgeDetection(perlinData, snakeData, w, h, threshold);
 	morphologicalErosion(snakeData, w, h, PERLIN_BLACK_VAL, PERLIN_WHITE_VAL, 2, 12);
 	morphologicalErosion(snakeData, w, h, PERLIN_WHITE_VAL, PERLIN_BLACK_VAL, 2, 12);
 	morphologicalErosion(snakeData, w, h, PERLIN_BLACK_VAL, PERLIN_WHITE_VAL, 2, 12);
-
 	makeBorderUniform(snakeData, w, h, 2, PERLIN_WHITE_VAL);
 
 
-	s32 nbPaths = 0;
-	Path *paths = buildPaths(snakeData, w, h, &nbPaths, 100);
+	paths = buildPaths(snakeData, w, h, &nbPaths, 100);
 	markPathEntry(snakeData, paths, nbPaths, w, h);
 
-	for (int i = 0; i < nbPaths; i++) {
+	for (s32 i = 0; i < nbPaths; i++) {
 		free(paths[i].points);
 	}
 	free(paths);
