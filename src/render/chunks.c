@@ -16,15 +16,26 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
     s32     blockType = AIR;
     s32     realY = startYWorld + y;
 
+	// if (realY < maxHeight - 2) {
+	// 	blockType = STONE;
+	// } 
+	// else if (realY == SEA_LEVEL && realY > maxHeight + 1) {
+	// 	blockType = WATER;
+	// } 
+	// else if (realY <= maxHeight + 1) {
+	// 	blockType = DIRT;
+	// 	if ((realY <= maxHeight + 1 && realY >= maxHeight - 1) && realY >= SEA_LEVEL) { blockType = GRASS;}
+	// } 
+
 	if (realY < maxHeight - 2) {
 		blockType = STONE;
 	} 
-	else if (realY == SEA_LEVEL && realY > maxHeight + 1) {
+	else if (realY == SEA_LEVEL && realY > maxHeight) {
 		blockType = WATER;
 	} 
-	else if (realY <= maxHeight + 1) {
+	else if (realY <= maxHeight) {
 		blockType = DIRT;
-		if ((realY <= maxHeight + 1 && realY >= maxHeight - 1) && realY >= SEA_LEVEL) { blockType = GRASS;}
+		if (realY == maxHeight || realY == maxHeight - 1) { blockType = GRASS;}
 	} 
 	else {
 		return (NULL);
@@ -185,8 +196,6 @@ void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s
 			hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, tmpY, startZ}, HASHMAP_FREE_DATA);
 			chunkBlockCache[subChunkId][startX][tmpY][startZ] = NULL;
 		}
-		// hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, startY % CHUNKS_NB_BLOCK, startZ}, HASHMAP_FREE_DATA);
-		// chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ] = NULL;
 	}
 }
 

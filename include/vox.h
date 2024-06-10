@@ -209,6 +209,7 @@ enum BlockType {
 	GRASS_TOP=AT_GRASS_TOP,	/* Grass top */
 	WATER=AT_WATER,		/* Water */
 	WOOL_RED=AT_WOOL_RED,	/* Wool red */
+	GLASS=AT_GLASS,			/* Glass */
 };
 
 /* texture load_texture */
