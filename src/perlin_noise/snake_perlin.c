@@ -66,8 +66,36 @@ u8 **visitedPixelAlloc(int w, int h) {
 	return (visited);
 }
 
+Path buildSinglePath(u8 **visited, u8 **snakeData, int x, int y, int h, int w) {
+	Path path = {NULL, (PathPoint){0,0}, 0};
+	int currentX = x;
+	int currentY = y;
+
+	while (1) {
+		addPointToPath(&path, currentX, currentY);
+		visited[currentY][currentX] = 1;
+		// Check the 8 neighbors
+		int found = 0;
+		for (int dy = -1; dy <= 1; ++dy) {
+			for (int dx = -1; dx <= 1; ++dx) {
+				if (dy == 0 && dx == 0) continue; // Skip the center pixel
+				if (currentY + dy < 0 || currentY + dy >= h || currentX + dx < 0 || currentX + dx >= w) continue; // Check bounds
+				if (snakeData[currentY + dy][currentX + dx] == PATH_VAL && !visited[currentY + dy][currentX + dx]) {
+					currentX += dx;
+					currentY += dy;
+					found = 1;
+					break;
+				}
+			}
+			if (found) break;
+		}
+		if (!found) break;
+	}
+	return (path);
+}
+
 Path *buildPaths(u8 **snakeData, int w, int h, int *nbPaths, int minLength) {
-    Path *paths = NULL;
+    Path *totalPath = NULL;
     int numPaths = 0;
 
     u8 **visited = visitedPixelAlloc(w, h);
@@ -80,33 +108,11 @@ Path *buildPaths(u8 **snakeData, int w, int h, int *nbPaths, int minLength) {
         for (int x = 0; x < w; ++x) {
             if (snakeData[y][x] == PATH_VAL && !visited[y][x]) {
                 // Start a new path
-                Path path = {NULL, (PathPoint){0,0}, 0};
-                int currentX = x;
-                int currentY = y;
-                while (1) {
-                    addPointToPath(&path, currentX, currentY);
-                    visited[currentY][currentX] = 1;
-                    // Check the 8 neighbors
-                    int found = 0;
-                    for (int dy = -1; dy <= 1; ++dy) {
-                        for (int dx = -1; dx <= 1; ++dx) {
-                            if (dy == 0 && dx == 0) continue; // Skip the center pixel
-                            if (currentY + dy < 0 || currentY + dy >= h || currentX + dx < 0 || currentX + dx >= w) continue; // Check bounds
-                            if (snakeData[currentY + dy][currentX + dx] == PATH_VAL && !visited[currentY + dy][currentX + dx]) {
-                                currentX += dx;
-                                currentY += dy;
-                                found = 1;
-                                break;
-                            }
-                        }
-                        if (found) break;
-                    }
-                    if (!found) break;
-                }
-                // Add the path to the paths array if it meets the minimum length requirement
+				Path path = buildSinglePath(visited, snakeData, x, y, h, w);
+                // Add the path to the totalPath array if it meets the minimum length requirement
                 if (path.length >= minLength) {
-                    paths = realloc(paths, (numPaths + 1) * sizeof(Path));
-                    paths[numPaths] = path;
+                    totalPath = realloc(totalPath, (numPaths + 1) * sizeof(Path));
+                    totalPath[numPaths] = path;
                     numPaths++;
                 } else {
                     // Free the path points if the path is too short
@@ -121,8 +127,8 @@ Path *buildPaths(u8 **snakeData, int w, int h, int *nbPaths, int minLength) {
     }
     free(visited);
     *nbPaths = numPaths;
-    ft_printf_fd(1, RED"Number of paths: %d\n"RESET, numPaths);
-	return (paths);
+    ft_printf_fd(1, RED"Number of totalPath: %d\n"RESET, numPaths);
+	return (totalPath);
 }
 
 void morphologicalErosion(u8 **snakeData, int w, int h, u8 valTocheck, u8 valToSet, int neighborhoodSize, int minSameNeighbors) {
