@@ -7,15 +7,15 @@
 
 
 u8 *perlinNoiseGeneration(unsigned int seed) {
-	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH\
+	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH
 		, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
 	// return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_CONTINENTAL_OCTAVE, PERLIN_CONTINENTAL_PERSISTENCE, PERLIN_CONTINENTAL_LACUNARITY));
 	// return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_PICKS_VALLEY_OCTAVE, PERLIN_PICKS_VALLEY_PERSISTENCE, PERLIN_PICKS_VALLEY_LACUNARITY));
 }
 
-u8 *perlinNoiseGenerationWithoutSeed() {
-	return (perlinImageGetWithoutSeed(PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, 10\
-		, 0.6, PERLIN_LACUNARITY));
+u8 *perlinNoiseGenerationWithoutSeed(s32 width, s32 height) {
+	return (perlinImageGetWithoutSeed(height, width, PERLIN_SNAKE_OCTAVE
+		, PERLIN_SNAKE_PERSISTENCE, PERLIN_SNAKE_LACUNARITY));
 }
 
 
@@ -46,17 +46,23 @@ f32 **perlin2DInit(u32 seed) {
 	return (perlin2D);
 }
 
-f32 **perlinCave2DGet() {
+u8	**perlinSnakeCave2DGet() {
 	f32 **perlin2D = NULL;
-	u8 *perlin1D = perlinNoiseGenerationWithoutSeed(); /* seed 42 */
+	u8  **snakePerlin2D = NULL;
+	u8 *perlin1D = perlinNoiseGenerationWithoutSeed(PERLIN_SNAKE_WIDTH, PERLIN_SNAKE_HEIGHT); /* seed 42 */
 	if (!perlin1D) {
 		ft_printf_fd(1, "Error: perlinNoise error\n");
 		return (NULL);
 	}
 	/* Transform 1D array to 2D array */
-	perlin2D = array1DTo2D(perlin1D, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH);
+	perlin2D = array1DTo2D(perlin1D, PERLIN_SNAKE_HEIGHT, PERLIN_SNAKE_WIDTH);
 	free(perlin1D);
-	return (perlin2D);
+	snakePerlin2D = perlinToSnakeData(perlin2D, PERLIN_SNAKE_HEIGHT, PERLIN_SNAKE_WIDTH);
+	for (u32 i = 0; i < PERLIN_SNAKE_HEIGHT; i++) {
+		free(perlin2D[i]);
+	}
+	free(perlin2D);
+	return (snakePerlin2D);
 }
 
 Context *contextInit() {
@@ -88,8 +94,8 @@ Context *contextInit() {
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
 		|| (!(context->perlin2D = perlin2DInit(42U)))
-		|| (!(context->perlinCaveNoise = perlinCave2DGet()))
-		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_2000, hashmap_free_node_only)))
+		|| (!(context->perlinCaveNoise = perlinSnakeCave2DGet()))
+		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, hashmap_free_node_only)))
 		|| (!threadSupervisorInit(context))) 
 	{
 		return (NULL);

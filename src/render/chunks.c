@@ -6,18 +6,16 @@
 
 
 /* Set local X and Z coordinates based on the center of the Perlin noise array */
-s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos) {
-	return ((chunkOffset * 16 + localPos) + (PERLIN_NOISE_WIDTH / 2));
+s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
+	return ((chunkOffset * CHUNKS_NB_BLOCK + localPos) + (width / 2));
 }
 
 
-Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, f32 **perlinCaveNoise) {
+Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
     Block   *block = NULL;
     s32     blockType = AIR;
     s32     realY = startYWorld + y;
     s32     seaLevel = (s32)SEA_LEVEL - 30;
-
-	(void)perlinCaveNoise;
 
 	if (realY < maxHeight - 2) {
 		blockType = STONE;
@@ -62,13 +60,13 @@ void chunksMapFree(void *entry) {
 		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
-		for (u32 i = 0; i < 16; ++i) {
+		for (u32 i = 0; i < CHUNKS_NB_BLOCK; ++i) {
 			free(chunks->perlinVal[i]);
 		}
 		free(chunks->perlinVal);
 		/* cave */
 		if (chunks->perlinCave) {
-			for (u32 i = 0; i < 16; ++i) {
+			for (u32 i = 0; i < CHUNKS_NB_BLOCK; ++i) {
 				free(chunks->perlinCave[i]);
 			}
 			free(chunks->perlinCave);
@@ -90,9 +88,9 @@ void occlusionCullingStatic(Block *****chunkBlockCache, Chunks *chunk) {
 	
 	s32 i = 0;
 	while (chunk->sub_chunks[i].block_map) {
-		for (s32 x = 0; x < 16; ++x) {
-			for (s32 y = 0; y < 16; ++y) {
-				for (s32 z = 0; z < 16; ++z) {
+		for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
+			for (s32 y = 0; y < CHUNKS_NB_BLOCK; ++y) {
+				for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
 					if (chunkBlockCache[i][x][y][z]) {
 						updateNeighbors(chunkBlockCache[i][x][y][z], chunkBlockCache[i]);
 					}
@@ -111,15 +109,15 @@ void occlusionCullingStatic(Block *****chunkBlockCache, Chunks *chunk) {
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinData **perlinVal, s32 layer, f32 **perlinCaveNoise)
+size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinData **perlinVal, s32 layer)
 {
 	Block *block = NULL;
-	s32 startYWorld = layer * 16;
+	s32 startYWorld = layer * CHUNKS_NB_BLOCK;
 
-    for (s32 x = 0; x < 16; ++x) {
-        for (s32 y = 0; y < 16; ++y) {
-            for (s32 z = 0; z < 16; ++z) {
-				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld, perlinCaveNoise))) {
+    for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
+        for (s32 y = 0; y < CHUNKS_NB_BLOCK; ++y) {
+            for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld))) {
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){x, y, z}, block);
 					chunkBlockCache[layer][x][y][z] = block;
 				}
@@ -132,8 +130,8 @@ size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinDat
 s32 maxHeightGet(PerlinData **perlinVal) {
 	s32 max = 0;
 
-	for (s32 i = 0; i < 16; ++i) {
-		for (s32 j = 0; j < 16; ++j) {
+	for (s32 i = 0; i < CHUNKS_NB_BLOCK; ++i) {
+		for (s32 j = 0; j < CHUNKS_NB_BLOCK; ++j) {
 			if (perlinVal[i][j].normalise > (s32)max) {
 				max = perlinVal[i][j].normalise;
 			}
@@ -162,32 +160,61 @@ f32 perlinNoiseHeight(f32 **perlin2D, s32 localX, s32 localZ, PerlinData *perlin
 }
 
 
-void perlinCaveDataGet(Chunks *chunk, f32 **perlinCaveNoise) {
-	PerlinData **caveData = malloc(sizeof(PerlinData *) * 16);
-	for (u32 x = 0; x < 16; ++x) {
-		caveData[x] = malloc(sizeof(PerlinData) * 16);
-		for (u32 z = 0; z < 16; ++z) {
-			s32 localX = blockLocalToPerlinPos(chunk->x, x);
-			s32 localZ = blockLocalToPerlinPos(chunk->z, z);
-			caveData[x][z].normalise = (s32)perlinNoiseHeight(perlinCaveNoise, localX, localZ, &caveData[x][z]);
+void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
+	u8 **caveData = malloc(sizeof(u8 *) * CHUNKS_NB_BLOCK);
+	s32 width = PERLIN_SNAKE_WIDTH;
+	s32 height = PERLIN_SNAKE_HEIGHT;
+
+	for (u32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
+		caveData[x] = malloc(sizeof(u8) * CHUNKS_NB_BLOCK);
+		for (u32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+			s32 localX = blockLocalToPerlinPos(chunk->x, x, width);
+			s32 localZ = blockLocalToPerlinPos(chunk->z, z, height);
+			caveData[x][z] = perlinSnakeCaveNoise[abs(localX % width)][abs(localZ % height)];
 		}
 	}
 	chunk->perlinCave = caveData;
 }
+
+void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s32 startX, s32 startY, s32 startZ) {
+	s32 subChunkId = startY / CHUNKS_NB_BLOCK;
+
+	(void)perlinCave, (void)chunk;
+	if (chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ]) {
+		chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ]->type = WOOL_RED;
+	}
+}
+
+void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinVal) {
+    s32 startX = 0, startY = 0, startZ = 0;
+
+    for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
+        for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+            if (chunk->perlinCave[x][z] == ENTRY_EXIT_VAL) {
+				// ft_printf_fd(1, "Start cave at [%d][%d][%d]\n", x, perlinVal[x][z].normalise, z);
+                startX = x;
+                startY = perlinVal[x][z].normalise; // Assuming the height map can provide an initial Y value
+                startZ = z;
+        		caveEntryMark(chunk, chunkBlockCache, chunk->perlinCave, startX, startY, startZ);
+            }
+        }
+    }
+}
+
 
 
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, f32 **perlinCaveNoise) {
-	PerlinData **perlinVal = malloc(sizeof(PerlinData *) * 16);
+void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **perlinSnakeCaveNoise) {
+	PerlinData **perlinVal = malloc(sizeof(PerlinData *) * CHUNKS_NB_BLOCK);
 
-	for (u32 x = 0; x < 16; ++x) {
-		perlinVal[x] = malloc(sizeof(PerlinData) * 16);
-		for (u32 z = 0; z < 16; ++z) {
-			s32 localX = blockLocalToPerlinPos(chunk->x, x);
-			s32 localZ = blockLocalToPerlinPos(chunk->z, z);
+	for (u32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
+		perlinVal[x] = malloc(sizeof(PerlinData) * CHUNKS_NB_BLOCK);
+		for (u32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+			s32 localX = blockLocalToPerlinPos(chunk->x, x, PERLIN_NOISE_WIDTH);
+			s32 localZ = blockLocalToPerlinPos(chunk->z, z, PERLIN_NOISE_WIDTH);
 			perlinVal[x][z].normalise = (s32)perlinNoiseHeight(perlin2D, localX, localZ, &perlinVal[x][z]);
 		}
 	}
@@ -197,30 +224,28 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, f32 *
 		chunkMaxY = (s32)SEA_LEVEL;
 	}
 
-	for (s32 i = 0; (i * 16) < chunkMaxY; ++i) {
+	for (s32 i = 0; (i * CHUNKS_NB_BLOCK) < chunkMaxY; ++i) {
 		chunk->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
 		if (!chunk->sub_chunks[i].block_map) {
 			ft_printf_fd(2, "Failed to allocate hashmap\n");
 			return;
 		}
-		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], perlinVal, i, perlinCaveNoise);
+		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], perlinVal, i);
 		chunk->perlinVal = perlinVal;
 	}
 
-	/* 
-		for cave genetaion select if chunkMaxY is lower than 4 or 5
-		Check value in PerlinCaveNoise array if value is lower than 0.3
-		Then dig the chunk with cave follow the perlinCaveNoise value
-	*/
-	perlinCaveDataGet(chunk, perlinCaveNoise);
-	// if (chunkMaxY <= (s32)SEA_LEVEL && chunk->perlinCave[0][0].val < 0.3 && chunk->perlinCave[0][0].val > 0.2) {
-	// 	// ft_printf_fd(1, "Cave generation\n");
-	// 	chunkDigCave(chunk, chunkBlockCache);
-	// }
+	perlinCaveDataGet(chunk, perlinSnakeCaveNoise);
+
+
+	if (chunkMaxY <= 90) {
+		digCaveCall(chunk, chunkBlockCache, perlinVal);
+	}
+	// digCaveCall(chunk, chunkBlockCache, perlinVal);
+
 	occlusionCullingStatic(chunkBlockCache, chunk);
 }
 
-Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, f32 **perlinCaveNoise) {
+Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, u8 **perlinSnakeCaveNoise) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
@@ -229,7 +254,7 @@ Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 c
 
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
-	chunkBuild(chunkBlockCache, perlin2D, chunks, perlinCaveNoise);
-	// chunks->lastUpdate = get_ms_time();
+	chunkBuild(chunkBlockCache, perlin2D, chunks, perlinSnakeCaveNoise);
+	chunks->lastUpdate = get_ms_time();
 	return (chunks);
 }

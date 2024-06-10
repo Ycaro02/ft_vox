@@ -83,9 +83,11 @@ void vox_destroy(Context *c) {
 	free(c->world);
 	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; ++i) {
 		free(c->perlin2D[i]);
-		free(c->perlinCaveNoise[i]);
 	}
 	free(c->perlin2D);
+	for (u32 i = 0; i < PERLIN_SNAKE_HEIGHT; ++i) {
+		free(c->perlinCaveNoise[i]);
+	}
 	free(c->perlinCaveNoise);
 	for (u32 i = 0; i < FACE_VERTEX_ARRAY_SIZE; ++i) {
 		glDeleteVertexArrays(1, &c->faceCube[i].VAO);

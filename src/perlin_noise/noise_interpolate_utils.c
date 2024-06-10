@@ -11,7 +11,7 @@ f32 perlinInterpolate(f32 a, f32 b, f32 t) {
 f32 bilinearInterpolation(f32 q11, f32 q12, f32 q21, f32 q22, f32 x, f32 z) {
     f32 r1 = perlinInterpolate(q11, q21, x);
     f32 r2 = perlinInterpolate(q12, q22, x);
-    return perlinInterpolate(r1, r2, z);
+    return (perlinInterpolate(r1, r2, z));
 }
 
 f32 getInterpolatedPerlinNoise(f32 **perlinNoise, f32 x, f32 z, f32 scale, s32 width, s32 height, PerlinData *perlinVal) {
@@ -27,9 +27,6 @@ f32 getInterpolatedPerlinNoise(f32 **perlinNoise, f32 x, f32 z, f32 scale, s32 w
 	/* set Perlin Debug val here */
 	perlinVal->x0 = x0 % width;
 	perlinVal->z0 = z0 % height;
-
-    // if (x1 >= width) x1 = abs(perlinVal->x0 -1);
-    // if (z1 >= height) z1 = abs(perlinVal->x0 - 1);
 
 	perlinVal->x1 = x1 % width;
 	perlinVal->z1 = z1 % height;

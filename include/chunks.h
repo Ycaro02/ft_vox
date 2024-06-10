@@ -6,6 +6,8 @@
 #define CHUNKS_HEIGHT   	256U	/* that will be 256 */
 #define SUB_CHUNKS_HEIGHT   16U
 
+#define CHUNKS_NB_BLOCK   	16	/* Number of block in X */
+
 /* Number of subchunks in chunk  */
 #define SUB_CHUNKS_MAX (CHUNKS_HEIGHT / SUB_CHUNKS_HEIGHT)
 
@@ -25,7 +27,7 @@ typedef struct s_chunks {
 	s32				z;							/* Chunk offset Z can be negative (relative to origine chunks) */
 	suseconds_t		lastUpdate;					/* Last update time */
 	PerlinData		**perlinVal;				/* Perlin noise value */
-	PerlinData		**perlinCave;				/* Perlin noise cave value */
+	u8				**perlinCave;				/* Perlin noise cave value */
 	RenderChunks 	*render;					/* RenderChunks pointer */
 	u8				neighbors;					/* Neighbors */
 	u8				occlusionDone;				/* Neighbors occlusion done */
@@ -36,7 +38,7 @@ void 	chunksMapFree(void *entry);
 Chunks *getChunkAt(Context *c, s32 x, s32 z);
 u32 	subChunksMaxGet(Chunks *chunk);
 /* chunks */
-Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, f32 **perlinCavenoise);
+Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, u8 **perlinSnakeCaveNoise);
 s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
 void unloadChunkHandler(Context *c);
 

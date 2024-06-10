@@ -34,7 +34,7 @@ typedef struct s_context {
 	u32					renderBlock;		/* Total block to render */
 	ThreadContext		*threadContext;		/* Thread context */
 	f32					**perlin2D;			/* Perlin noise 2D */
-	f32					**perlinCaveNoise;	/* Perlin noise 2D for cave */
+	u8					**perlinCaveNoise;	/* Perlin noise 2D for cave */
 	/* Vbo handling list can be with mutex  */
 	t_list				*vboToDestroy;		/* VBO to destroy */
 	t_list				*vboToCreate;		/* VBO to create */
