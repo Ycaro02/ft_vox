@@ -25,10 +25,10 @@ void markPathEntry(u8 **snakeData, Path *paths, s32 numPaths, s32 w, s32 h) {
 		PathPoint 	point = path->points[path->length / 2];
 
 		// Adjust the point to avoid the edges
-		point.x = point.x < 5 ? 5 : point.x;
-		point.x = point.x > w - 10 ? w - 10 : point.x;
-		point.y = point.y < 5 ? 5 : point.y;
-		point.y = point.y > h - 10 ? h - 10 : point.y;
+		if (point.x < 5) { point.x = 5; }
+		if (point.x > w - 10) { point.x = w - 10; }
+		if (point.y < 5) { point.y = 5; }
+		if (point.y > h - 10) { point.y = h - 10; }
 
 		// Check the distance with all previous entries
 		s8 tooClose = FALSE;
