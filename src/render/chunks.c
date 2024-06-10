@@ -15,17 +15,16 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
     Block   *block = NULL;
     s32     blockType = AIR;
     s32     realY = startYWorld + y;
-    s32     seaLevel = (s32)SEA_LEVEL - 30;
 
 	if (realY < maxHeight - 2) {
 		blockType = STONE;
 	} 
-	else if (realY <= seaLevel && realY > maxHeight) {
+	else if (realY == SEA_LEVEL && realY > maxHeight + 1) {
 		blockType = WATER;
 	} 
-	else if (realY <= maxHeight) {
+	else if (realY <= maxHeight + 1) {
 		blockType = DIRT;
-		if (realY == maxHeight || realY == maxHeight - 1) { blockType = GRASS;}
+		if ((realY <= maxHeight + 1 && realY >= maxHeight - 1) && realY >= SEA_LEVEL) { blockType = GRASS;}
 	} 
 	else {
 		return (NULL);
@@ -156,7 +155,7 @@ f32 perlinNoiseHeight(f32 **perlin2D, s32 localX, s32 localZ, PerlinData *perlin
 
     perlinVal->add = (perlinVal->val * scale);
 
-    return ((SEA_LEVEL) + perlinVal->add);
+    return ((MIN_HEIGHT) + perlinVal->add);
 }
 
 
@@ -181,7 +180,13 @@ void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s
 
 	(void)perlinCave, (void)chunk;
 	if (chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ]) {
-		chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ]->type = WOOL_RED;
+		// chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ]->type = WOOL_RED;
+		for (s32 tmpY = startY % CHUNKS_NB_BLOCK; tmpY > 0; --tmpY) {
+			hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, tmpY, startZ}, HASHMAP_FREE_DATA);
+			chunkBlockCache[subChunkId][startX][tmpY][startZ] = NULL;
+		}
+		// hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, startY % CHUNKS_NB_BLOCK, startZ}, HASHMAP_FREE_DATA);
+		// chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ] = NULL;
 	}
 }
 
@@ -202,7 +207,6 @@ void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinV
 }
 
 
-
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
@@ -220,8 +224,8 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **
 	}
 
 	s32 chunkMaxY = maxHeightGet(perlinVal);
-	if (chunkMaxY < (s32)SEA_LEVEL) {
-		chunkMaxY = (s32)SEA_LEVEL;
+	if (chunkMaxY < (s32)MIN_HEIGHT) {
+		chunkMaxY = (s32)MIN_HEIGHT;
 	}
 
 	for (s32 i = 0; (i * CHUNKS_NB_BLOCK) < chunkMaxY; ++i) {

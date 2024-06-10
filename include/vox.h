@@ -97,7 +97,8 @@
 // #define PERLIN_PICKS_VALLEY_LACUNARITY 1.4f
 
 
-#define SEA_LEVEL 80.0f
+#define MIN_HEIGHT 80.0f
+#define SEA_LEVEL  50
 
 #define CHUNK_FRONT 0
 #define CHUNK_BACK 1
