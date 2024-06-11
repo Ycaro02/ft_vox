@@ -13,6 +13,8 @@ vec4 fogColor = vec4(1.0, 1.0, 1.0, 0.0);
 void main()
 {
     vec4 baseColor = texture(textureAtlas, TexCoord);
+
+	baseColor.w = 1.0; // set base alpha to 1.0
     
 	fogColor = vec4(baseColor.xyz, 0.0);
 

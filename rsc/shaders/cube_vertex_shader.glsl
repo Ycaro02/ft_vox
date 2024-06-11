@@ -17,6 +17,13 @@ void main()
     float blockFace = aTexCoord.z;
     float textureID = aTextureID;
 
+	/*	Magic number :
+		- 55 is grass side
+		- 51 grass top 
+		- 5.0 is the face top of the block
+		- 67 is the number of texture in the texture atlas
+	*/
+
     if (aTextureID == 55.0 && blockFace == 5.0) {
         textureID = 51.0;
     }

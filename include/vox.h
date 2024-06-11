@@ -50,7 +50,6 @@
 /* Sky path */
 #define TEXTURE_SKY_PATH "rsc/texture/skybox.bmp"
 
-
 /* World Max size */
 #define WORLD_MAX_HEIGHT 256U
 #define WORLD_MAX_WIDTH (16384U * 2U)

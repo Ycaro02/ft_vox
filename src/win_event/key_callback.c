@@ -129,7 +129,8 @@ void testChunksExist(Context *c) {
 		ft_printf_fd(1, CYAN"Perlin Height\n");
 		displayPerlinNoise(blockX, blockZ,chunk->perlinVal[blockX][blockZ], FALSE);
 		/* TO restore now u8 val */
-		// ft_printf_fd(1, RED"Perlin cave\n");
+		ft_printf_fd(1, RED"Perlin cave\n");
+		ft_printf_fd(1, "Val: %u\n"RESET, chunk->perlinCave[blockX][blockZ]);
 		// displayPerlinNoise(blockX, blockZ,chunk->perlinCave[blockX][blockZ], TRUE);
 	} else {
 		ft_printf_fd(1, RED"Chunk not exist\n"RESET);
