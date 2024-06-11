@@ -186,33 +186,80 @@ void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
 	chunk->perlinCave = caveData;
 }
 
-void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s32 startX, s32 startY, s32 startZ) {
-	s32 subChunkId = startY / CHUNKS_NB_BLOCK;
 
-	(void)perlinCave, (void)chunk;
-	if (chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ]) {
-		// chunkBlockCache[subChunkId][startX][startY % CHUNKS_NB_BLOCK][startZ]->type = WOOL_RED;
-		for (s32 tmpY = startY % CHUNKS_NB_BLOCK; tmpY > 0; --tmpY) {
-			hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, tmpY, startZ}, HASHMAP_FREE_DATA);
-			chunkBlockCache[subChunkId][startX][tmpY][startZ] = NULL;
+#define CAVE_ENTRY_DEPTH 15
+
+void caveDigXAxis(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s32 startX, s32 startY, s32 startZ) {
+	(void)perlinCave;
+	if (startY <= 0) {
+		return;
+	}
+	if (startX >= 0 && startX < CHUNKS_NB_BLOCK && perlinCave[startX][startZ] == PATH_VAL) {
+		hashmap_remove_entry(chunk->sub_chunks[startY / CHUNKS_NB_BLOCK].block_map, (BlockPos){startX, startY % CHUNKS_NB_BLOCK, startZ}, HASHMAP_FREE_DATA);
+		chunkBlockCache[startY / CHUNKS_NB_BLOCK][startX][startY % CHUNKS_NB_BLOCK][startZ] = NULL;
+	}
+}
+
+void caveDigZAxis(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s32 startX, s32 startY, s32 startZ) {
+	(void)perlinCave;
+	
+	if (startY <= 0) {
+		return;
+	}
+	if (startZ >= 0 && startZ < CHUNKS_NB_BLOCK && perlinCave[startX][startZ] == PATH_VAL) {
+		hashmap_remove_entry(chunk->sub_chunks[startY / CHUNKS_NB_BLOCK].block_map, (BlockPos){startX, startY % CHUNKS_NB_BLOCK, startZ}, HASHMAP_FREE_DATA);
+		chunkBlockCache[startY / CHUNKS_NB_BLOCK][startX][startY % CHUNKS_NB_BLOCK][startZ] = NULL;
+	}
+
+}
+
+void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s32 startX, s32 startY, s32 startZ) {
+	(void)perlinCave;
+	s32 maxDepth = startY - CAVE_ENTRY_DEPTH;
+
+	for (s32 tmpY = startY; tmpY > maxDepth; --tmpY) {
+		s32 subChunkId = tmpY / CHUNKS_NB_BLOCK;
+		if (chunkBlockCache[subChunkId][startX][tmpY % CHUNKS_NB_BLOCK][startZ]) {
+			hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, tmpY % CHUNKS_NB_BLOCK, startZ}, HASHMAP_FREE_DATA);
+			chunkBlockCache[subChunkId][startX][tmpY % CHUNKS_NB_BLOCK][startZ] = NULL;
 		}
 	}
 }
 
+
 void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinVal) {
     s32 startX = 0, startY = 0, startZ = 0;
 
-    for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
-        for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
-            if (chunk->perlinCave[x][z] == ENTRY_EXIT_VAL) {
+	for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
+		for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+			if (chunk->perlinCave[x][z] == ENTRY_EXIT_VAL) {
 				// ft_printf_fd(1, "Start cave at [%d][%d][%d]\n", x, perlinVal[x][z].normalise, z);
-                startX = x;
-                startY = perlinVal[x][z].normalise; // Assuming the height map can provide an initial Y value
-                startZ = z;
-        		caveEntryMark(chunk, chunkBlockCache, chunk->perlinCave, startX, startY, startZ);
-            }
-        }
-    }
+				startX = x;
+				startY = perlinVal[x][z].normalise; // Assuming the height map can provide an initial Y value
+				startZ = z;
+				caveEntryMark(chunk, chunkBlockCache, chunk->perlinCave, startX, startY, startZ);
+			}
+		}
+	}
+
+	for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
+		for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+			if (chunk->perlinCave[x][z] == ENTRY_EXIT_VAL || chunk->perlinCave[x][z] == PATH_VAL) {
+				startX = x;
+				startY = perlinVal[x][z].normalise - CAVE_ENTRY_DEPTH;
+				startZ = z;
+				for (s32 depth = 0 ;depth < (perlinVal[x][z].normalise - CAVE_ENTRY_DEPTH) / 4; depth++) {
+					for (s32 horizontalDepth = 0; horizontalDepth < CHUNKS_NB_BLOCK; horizontalDepth++) {
+						caveDigZAxis(chunk, chunkBlockCache, chunk->perlinCave, startX, startY - depth, startZ - horizontalDepth);
+						caveDigZAxis(chunk, chunkBlockCache, chunk->perlinCave, startX, startY - depth, startZ + horizontalDepth);
+						caveDigXAxis(chunk, chunkBlockCache, chunk->perlinCave, startX - horizontalDepth, startY-depth, startZ);
+						caveDigXAxis(chunk, chunkBlockCache, chunk->perlinCave, startX + horizontalDepth, startY-depth, startZ);
+					}
+				}
+			}
+		}
+	}
+
 }
 
 
@@ -249,11 +296,9 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **
 
 	perlinCaveDataGet(chunk, perlinSnakeCaveNoise);
 
-
 	if (chunkMaxY <= 90) {
 		digCaveCall(chunk, chunkBlockCache, perlinVal);
 	}
-	// digCaveCall(chunk, chunkBlockCache, perlinVal);
 
 	occlusionCullingStatic(chunkBlockCache, chunk);
 }
