@@ -198,7 +198,7 @@ int main() {
 // 	BlockPos	*tmpChunkID = NULL;
 // 	s8			next = TRUE;
 
-// 	while ((next = hashmap_next(&it))) {
+// 	while (hashmap_next(&it)) {
 // 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 // 		tmpChunkID = malloc(sizeof(BlockPos));
 // 		ft_memcpy(tmpChunkID, &chunkID, sizeof(BlockPos));

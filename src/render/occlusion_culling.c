@@ -245,7 +245,7 @@ void updateChunkNeighbors(Context *c, Chunks *chunk, Block *****chunkBlockCache,
 //     for (u32 subChunkID = 0; chunk->sub_chunks[subChunkID].block_map ; ++subChunkID) {
 //         SubChunks *subChunk = &chunk->sub_chunks[subChunkID];
 //         HashMap_it it = hashmap_iterator(subChunk->block_map);
-//         while ((next = hashmap_next(&it))) {
+//         while (hashmap_next(&it)) {
 //             Block		*block = it.value;
 //             vec3		blockPos = {0,0,0};
 

@@ -8,35 +8,24 @@ void renderChunkFree(RenderChunks *render) {
 		free(render->faceArray[i]);
 		free(render->faceTypeID[i]);
 	}
+	free(render->topWaterFaceArray);
+	free(render->topWaterTypeID);
 	/* Care here we can't destroy VBO in sub thread */
 	free(render);
 }
 
-// void renderChunksMapFree(void *entry) {
-// 	HashMap_entry *e = (HashMap_entry *)entry;
-// 	if (e->value) {
-// 		renderChunkFree((RenderChunks *)e->value);
-// 	}
-// 	free(e); /* free the entry t_list node */
-// }
-
-
 void addRenderToVBOCreate(Context *c, BlockPos chunkID) {
 	BlockPos	  *chunkIDVBOtoCreate = NULL;
 	
-	(void)c;
-	// mtx_lock(&c->vboToCreateMtx);
 	if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {
 		ft_memcpy(chunkIDVBOtoCreate, &chunkID, sizeof(BlockPos));
 		ft_lstadd_back(&c->vboToCreate, ft_lstnew(chunkIDVBOtoCreate));
 	}
-	// mtx_unlock(&c->vboToCreateMtx);
 }
 
 RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
     RenderChunks *render = NULL;
 	BlockPos	  chunkID;
-	// BlockPos	  *chunkIDVBOtoCreate = NULL;
 
 
 	if (!chunks) {
@@ -44,7 +33,6 @@ RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
 	}
 	
 	chunkID = CHUNKS_MAP_ID_GET(chunks->x, chunks->z);
-
 	if (!(render = ft_calloc(sizeof(RenderChunks), 1))) {
 		ft_printf_fd(2, "Failed to allocate render\n");
 		return (NULL);
@@ -53,17 +41,7 @@ RenderChunks *renderChunkCreate(Context *c, Chunks *chunks) {
 	chunksCubeFaceGet(&c->threadContext->chunkMtx, chunks, render);
 
 	/* We need to store vbo to create in list to give it to main thread */
-	// mtx_lock(&c->vboToCreateMtx);
-	// if ((chunkIDVBOtoCreate = malloc(sizeof(BlockPos)))) {
-	// 	ft_memcpy(chunkIDVBOtoCreate, &chunkID, sizeof(BlockPos));
-	// 	ft_lstadd_back(&c->vboToCreate, ft_lstnew(chunkIDVBOtoCreate));
-	// }
-	// mtx_unlock(&c->vboToCreateMtx);
 	addRenderToVBOCreate(c, chunkID);
-
-	// (void)c;
-
 	render->lastUpdate = get_ms_time();
-
 	return (render);
 }

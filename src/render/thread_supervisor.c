@@ -212,7 +212,7 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	ThreadData		*tdata = NULL;
 	ThreadData		*current = NULL;
 	s32				distance = -1, tmpDistance = 0, camChunkX, camChunkZ;
-	s8 				next = 0;
+	// s8 				next = 0;
 	u8				priotiry = LOAD_PRIORITY_LOW;
 
 	mtx_lock(&c->gameMtx);
@@ -221,7 +221,7 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	mtx_unlock(&c->gameMtx);
 
 	it = hashmap_iterator(chunksMapToLoad);
-	while ((next = hashmap_next(&it))) {
+	while (hashmap_next(&it)) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
 		current = it.value;
 		tmpDistance = chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos.y, pos.z);
@@ -246,7 +246,7 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 
 void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, HashMap *chunksMapToLoad) {
 	HashMap_it it;
-	s8 next = TRUE;
+	// s8 next = TRUE;
 	BlockPos pos = {0, 0, 0};
 	t_list *toRemoveList = NULL;
 	BlockPos *chunkIDToRemove = NULL;
@@ -259,7 +259,7 @@ void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, Has
 
 	mtx_lock(threadMtx); /* LOCK */
 	it = hashmap_iterator(chunksMapToLoad);
-	while ((next = hashmap_next(&it))) {
+	while (hashmap_next(&it)) {
 		pos = ((HashMap_entry *)it._current->content)->origin_data;
 		if (chunksEuclideanDistanceGet(camChunkX, camChunkZ, pos.y, pos.z) > CHUNKS_UNLOAD_RADIUS) {
 			if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {

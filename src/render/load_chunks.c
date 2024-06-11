@@ -53,7 +53,9 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
 
 void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
 	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
-	
+	GLuint		*waterVBO = NULL, *waterTypeVBO = NULL;
+
+
 	for (u32 i = 0; i < 6; ++i) {
 		if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
 			*instanceVBO = chunk->render->faceVBO[i];
@@ -66,12 +68,23 @@ void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
 			}
 		}
 	}
+
+	if ((waterVBO = malloc(sizeof(GLuint))) && (waterTypeVBO = malloc(sizeof(GLuint)))) {
+		*waterVBO = chunk->render->topWaterFaceVBO;
+		*waterTypeVBO = chunk->render->topWaterTypeVBO;
+		if (*waterVBO != 0) {
+			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterVBO));
+		}
+		if (*waterTypeVBO != 0) {
+			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterTypeVBO));
+		}
+	}
 }
 
 void unloadChunkHandler(Context *c) {
 	Chunks 		*chunk = NULL;
 	HashMap_it 	it = {};
-	s8 			next = TRUE;
+	// s8 			next = TRUE;
 	t_list 		*toRemoveList = NULL;
 	BlockPos 	*chunkIDToRemove = NULL;
 	s32			camChunkX = 0, camChunkZ = 0;
@@ -86,7 +99,7 @@ void unloadChunkHandler(Context *c) {
 	mtx_lock(&c->threadContext->chunkMtx);
 
 	it = hashmap_iterator(c->world->chunksMap);
-	while ((next = hashmap_next(&it))) {
+	while (hashmap_next(&it)) {
 		chunk = (Chunks *)it.value;
 		if (chunk) {
 			s32 distance = chunksEuclideanDistanceGet(camChunkX, camChunkZ, chunk->x, chunk->z);
@@ -125,13 +138,13 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	BlockPos 		tmpChunkID;
 	t_list			*toRemoveList = NULL;
 	BlockPos		*chunkIDToRemove = NULL;
-	s8 				next = FALSE;
+	// s8 				next = FALSE;
 	// Chunks 			*chunks;
 	
 	mtx_lock(&c->renderMtx);
 	
 	it = hashmap_iterator(renderChunksMap);
-	while ((next = hashmap_next(&it))) {
+	while (hashmap_next(&it)) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		BoundingBox box = chunkBoundingBoxGet(chunkID.y, chunkID.z, 8.0f);
 		if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {

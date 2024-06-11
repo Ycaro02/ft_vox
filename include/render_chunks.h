@@ -11,17 +11,20 @@ typedef struct s_render_chunks {
 	u32			*faceCount;
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
 	suseconds_t lastUpdate;			/* Last update time */
+	
+	vec3		*topWaterFaceArray;
+	f32			*topWaterTypeID;
+	u32 		topWaterFaceCount;
+	GLuint		topWaterFaceVBO;
+	GLuint		topWaterTypeVBO;
 } RenderChunks;
 
 /* render/render_chunks.c */
 void			renderChunkFree(RenderChunks *render);
-/* Function to provide at hashmap init for renderChunks map */
-// void			renderChunksMapFree(void *entry);
 
-void addRenderToVBOCreate(Context *c, BlockPos chunkID);
+void			addRenderToVBOCreate(Context *c, BlockPos chunkID);
 
 /* Render chunks.c */
-void			chunksCubeGet(Chunks *chunks, RenderChunks *render);
 RenderChunks 	*renderChunkCreate(Context *c, Chunks *chunks);
 RenderChunks	*renderChunkCreateVBO(Mutex *chunkMtx, HashMap *chunksMap, BlockPos chunkID);
 
@@ -48,7 +51,6 @@ s8 				chunksIsRenderer(HashMap *renderChunksMap, BlockPos chunkID);
 
 
 /* render/cube_face_build.c */
-s8				faceVisible(u8 neighbors, u8 face);
 void			chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render);
 GLuint			faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb);
 void			renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID);
