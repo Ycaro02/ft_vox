@@ -30,12 +30,12 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	if (realY < maxHeight - 2) {
 		blockType = STONE;
 	} 
-	else if (realY == SEA_LEVEL && realY > maxHeight) {
-		blockType = WATER;
-	} 
 	else if (realY <= maxHeight) {
 		blockType = DIRT;
-		if (realY == maxHeight || realY == maxHeight - 1) { blockType = GRASS;}
+		if ((realY == maxHeight || realY == maxHeight - 1) && realY >= SEA_LEVEL) { blockType = GRASS;}
+	} 
+	else if (realY == SEA_LEVEL) {
+		blockType = WATER;
 	} 
 	else {
 		return (NULL);
@@ -219,8 +219,7 @@ void caveDigZAxis(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s3
 
 }
 
-void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s32 startX, s32 startY, s32 startZ) {
-	(void)perlinCave;
+void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, s32 startX, s32 startY, s32 startZ) {
 	s32 maxDepth = startY - CAVE_ENTRY_DEPTH;
 
 	for (s32 tmpY = startY; tmpY > maxDepth; --tmpY) {
@@ -244,7 +243,7 @@ void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinV
 				startY = perlinVal[x][z].normalise; // Assuming the height map can provide an initial Y value
 				startZ = z;
 				if (startY < 80) {
-					caveEntryMark(chunk, chunkBlockCache, chunk->perlinCave, startX, startY, startZ);
+					caveEntryMark(chunk, chunkBlockCache, startX, startY, startZ);
 				}
 			}
 		}

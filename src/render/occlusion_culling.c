@@ -2,15 +2,21 @@
 #include "../../include/chunks.h"
 
 
-// void ocllusionHandleTransparent(Block *block, Block *neighbor, u8 blockMask, u8 neighborMask) {
-// 	s8 blockIsTransparent = block->type == WATER || block->type == GLASS;
-// 	s8 neighborIsTransparent = neighbor->type == WATER || neighbor->type == GLASS;
-// 	s8 notApply = (blockIsTransparent && !neighborIsTransparent) || (!blockIsTransparent && neighborIsTransparent);
-// 	if (notApply == FALSE) {
-// 		block->neighbors |= blockMask;
-// 		neighbor->neighbors |= neighborMask;
-// 	}
-// }
+void ocllusionHandleTransparent(Block *block, Block *neighbor, u8 blockMask, u8 neighborMask) {
+	s8 blockIsTransparent = block->type == WATER || block->type == GLASS;
+	s8 neighborIsTransparent = neighbor->type == WATER || neighbor->type == GLASS;
+	s8 notApply = (blockIsTransparent && !neighborIsTransparent) || (!blockIsTransparent && neighborIsTransparent);
+	if (notApply == FALSE) {
+		block->neighbors |= blockMask;
+		neighbor->neighbors |= neighborMask;
+	} else {
+		if (blockIsTransparent) {
+			block->neighbors |= blockMask;
+		} else {
+			neighbor->neighbors |= neighborMask;
+		}
+	}
+}
 
 /* Occlusion Culling Strategy */
 
@@ -37,9 +43,9 @@ void updateNeighbors(Block *block, Block ****blockCache) {
         if (pos[i].x >= 0 && pos[i].x < 16 && pos[i].y >= 0 && pos[i].y < 16 && pos[i].z >= 0 && pos[i].z < 16) {
             Block *neighbor = blockCache[pos[i].x][pos[i].y][pos[i].z];
             if (neighbor != NULL) {
-                neighbor->neighbors |= neighborMasks[i];
-                block->neighbors |= blockMasks[i];
-				// ocllusionHandleTransparent(block, neighbor, blockMasks[i], neighborMasks[i]);
+                // neighbor->neighbors |= neighborMasks[i];
+                // block->neighbors |= blockMasks[i];
+				ocllusionHandleTransparent(block, neighbor, blockMasks[i], neighborMasks[i]);
             }
         }
     }
@@ -68,9 +74,9 @@ void updateTopBotNeighbors(SubChunks *botSubChunk, Block ****topBlockCache) {
 			Block *botBlock = botBlockCache[x][z];
 			Block *topBlock = topBlockCache[x][0][z];
 			if (botBlock && topBlock) {
-				botBlock->neighbors |= NEIGHBOR_TOP;
-				topBlock->neighbors |= NEIGHBOR_BOTTOM;
-				// ocllusionHandleTransparent(botBlock, topBlock, NEIGHBOR_TOP, NEIGHBOR_BOTTOM);
+				// botBlock->neighbors |= NEIGHBOR_TOP;
+				// topBlock->neighbors |= NEIGHBOR_BOTTOM;
+				ocllusionHandleTransparent(botBlock, topBlock, NEIGHBOR_TOP, NEIGHBOR_BOTTOM);
 			}
 		}
 	}
@@ -187,9 +193,9 @@ void updateChunkNeighbors(Context *c, Chunks *chunk, Block *****chunkBlockCache,
 						}
 
 						if (block != NULL && neighborBlock != NULL) {
-							block->neighbors |= blockMasks[i];
-							neighborBlock->neighbors |= neighborMasks[i];
-							// ocllusionHandleTransparent(block, neighborBlock, blockMasks[i], neighborMasks[i]);
+							// block->neighbors |= blockMasks[i];
+							// neighborBlock->neighbors |= neighborMasks[i];
+							ocllusionHandleTransparent(block, neighborBlock, blockMasks[i], neighborMasks[i]);
 						}
 					} /* for z */
 				} 	/* for x */
