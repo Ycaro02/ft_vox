@@ -44,6 +44,8 @@ void			updateChunkNeighbors(Context *c, Chunks *chunk, Block *****chunkBlockCach
 void			chunkNeighborMaskUpdate(Context *c, Chunks *chunk);
 
 
+void updateHiddenFaces(Chunks *chunk, Camera *camera);
+
 /* render/loadchunks.c */
 s8 				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);
 s8 				chunksRenderIsLoaded(Chunks *chunk);

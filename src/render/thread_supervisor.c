@@ -69,14 +69,17 @@ int threadChunksLoad(void *data) {
 	
 	mtx_lock(t->chunkMtx);
 	hashmap_set_entry(t->c->world->chunksMap, CHUNKS_MAP_ID_GET(t->chunkX, t->chunkZ), chunk);
+	// updateHiddenFaces(chunk, &t->c->cam); /* need to lock game->mtx for cam */
 	mtx_unlock(t->chunkMtx);
 	
 	chunkNeighborsGet(t->c, chunk, neighborChunksCache);
-
 	// chunk->occlusionDone = TRUE;
+
 	mtx_lock(t->chunkMtx);
 	updateChunkNeighbors(t->c, chunk, chunksBlockCache, neighborChunksCache);
 	mtx_unlock(t->chunkMtx);
+
+	// mtx_lock(t->chunkMtx);
 
 	chunkBlockCacheFree(chunksBlockCache);
 	free(chunksBlockCache);
