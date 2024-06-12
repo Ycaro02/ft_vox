@@ -78,14 +78,13 @@ void act_reseCamera(Context *c) {
 }
 
 
-void displayPerlinNoise(s32 blockX, s32 blockZ, PerlinData perlinData, u8 caveData) {
-	if (!caveData) {
-		ft_printf_fd(1, CYAN"----\nBlock Z:|%d|, X:|%d| -> Given Z:[%d] X[%d]: \n"RESET, blockZ, blockX, perlinData.givenZ, perlinData.givenX);
-		ft_printf_fd(1, PINK"Perlin Idx0 : Z:[%d] X:[%d]\n"RESET, perlinData.z0, perlinData.x0);
-		ft_printf_fd(1, PINK"Perlin Idx1 : Z:[%d] X:[%d]\n"RESET, perlinData.z1, perlinData.x1);
-		ft_printf_fd(1, "Val:|%f| -> ", perlinData.val);
-		ft_printf_fd(1, "Add:|%f| -> ", perlinData.add);
-	}
+void displayPerlinNoise(s32 blockX, s32 blockZ, PerlinData perlinData) {
+	(void)blockX, (void)blockZ;
+// 	ft_printf_fd(1, CYAN"----\nBlock Z:|%d|, Z:|%d| -> Given X:[%d] Z[%d]: \n"RESET, blockX, blockZ, perlinData.givenX, perlinData.givenZ);
+// 	ft_printf_fd(1, PINK"Perlin Idx0 : X:[%d] Z:[%d]\n"RESET, perlinData.x0, perlinData.z0);
+// 	ft_printf_fd(1, PINK"Perlin Idx1 : X:[%d] Z:[%d]\n"RESET, perlinData.x1, perlinData.z1);
+// 	ft_printf_fd(1, "Val:|%f| -> ", perlinData.val);
+// 	ft_printf_fd(1, "Add:|%f| -> ", perlinData.add);
 	ft_printf_fd(1, "Normalise:|%d|\n----\n", perlinData.normalise);
 }
 
@@ -109,31 +108,64 @@ void displayChunkData(Context *c, Chunks *chunk){
 }
 
 
+void cameraToBlockPosition(vec3 camPos, BlockPos *blockPos) {
+	blockPos->y = 0;
+	blockPos->x = (s32)floor(camPos[0] * 2.0f) % 16;
+	blockPos->z = (s32)floor(camPos[2] * 2.0f) % 16;
+	if (blockPos->x < 0) { blockPos->x *= -1; }
+	if (blockPos->z < 0) { blockPos->z *= -1; }
+}
+
+// s8 cameraViewIsUndergroundNoCave(Context *c){
+// 	// mtx_lock(&c->gameMtx);
+// 	BlockPos 	chunkPos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
+// 	vec3 		camPos = {c->cam.position[0], c->cam.position[1], c->cam.position[2]};
+// 	// mtx_unlock(&c->gameMtx);
+// 	mtx_lock(&c->threadContext->chunkMtx);
+// 	Chunks *chunk = hashmap_get(c->world->chunksMap, chunkPos);
+// 	s32 blockX = (((s32)floor(camPos[0] * 2.0)) % 16);
+// 	s32 blockZ = (((s32)floor(camPos[2] * 2.0)) % 16);
+// 	s32 CurrentMaxHeight = chunk->perlinVal[blockX][blockZ].normalise;
+// 	if (CurrentMaxHeight > camPos[1]) {
+// 		mtx_unlock(&c->threadContext->chunkMtx);
+// 		return (FALSE);
+// 	}
+// 	mtx_unlock(&c->threadContext->chunkMtx);
+// 	return (TRUE);
+// }
+
+void displayBlockPosition(Chunks *chunk, BlockPos blockPos) {
+	ft_printf_fd(1, "Block Pos:\n-----------------\n"RESET);
+	ft_printf_fd(1, ORANGE"World : X|%d|, Z|%d|\n"RESET, blockPos.x + 16 * chunk->x, blockPos.z + 16 * chunk->z);
+	ft_printf_fd(1,   CYAN"Local : X|%d|, Z|%d|\n"RESET, blockPos.x, blockPos.z);
+	ft_printf_fd(1, "Block end:\n-----------------\n"RESET);
+
+}
 
 void testChunksExist(Context *c) {
-	BlockPos pos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
+	BlockPos chunkPos = CHUNKS_MAP_ID_GET(c->cam.chunkPos[0], c->cam.chunkPos[2]);
 	ft_printf_fd(1, GREEN"\nCam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2]);
 	// display_camera_value(c);
-	ft_printf_fd(1, YELLOW"\nTest for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, pos.y, pos.z);
-	Chunks *chunks = hashmap_get(c->world->chunksMap, pos);
+	ft_printf_fd(1, YELLOW"Test for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, chunkPos.y, chunkPos.z);
+	Chunks *chunks = hashmap_get(c->world->chunksMap, chunkPos);
 	if (chunks) {
-		ft_printf_fd(1, GREEN"Chunk exist\n"RESET);
-		s32 blockX = (((s32)floor(c->cam.position[0] * 2.0)) % 16);
-		s32 blockZ = (((s32)floor(c->cam.position[2] * 2.0)) % 16);
-		if (blockX < 0) { blockX *= -1; }
-		if (blockZ < 0) { blockZ *= -1; }
-		Chunks *chunk = hashmap_get(c->world->chunksMap, pos);
-		mtx_lock(&c->vboToCreateMtx);
-		displayChunkData(c, chunk);
-		mtx_unlock(&c->vboToCreateMtx);
+		ft_printf_fd(1, GREEN" -> Chunk exist\n"RESET);
+		BlockPos blockPos = {0};
+		cameraToBlockPosition(c->cam.position, &blockPos);
+		Chunks *chunk = hashmap_get(c->world->chunksMap, chunkPos);
+		Block *block = getBlockAt(chunk, blockPos.x, blockPos.y, blockPos.z);
+		displayBlockPosition(chunk, blockPos);
 		ft_printf_fd(1, CYAN"Perlin Height\n");
-		displayPerlinNoise(blockX, blockZ,chunk->perlinVal[blockX][blockZ], FALSE);
+		displayPerlinNoise(blockPos.x,blockPos.z,chunk->perlinVal[blockPos.x][blockPos.z]);
+
+		// mtx_lock(&c->vboToCreateMtx);
+		// displayChunkData(c, chunk);
+		// mtx_unlock(&c->vboToCreateMtx);
 		/* TO restore now u8 val */
-		ft_printf_fd(1, RED"Perlin cave\n");
-		ft_printf_fd(1, "Val: %u\n"RESET, chunk->perlinCave[blockX][blockZ]);
-		// displayPerlinNoise(blockX, blockZ,chunk->perlinCave[blockX][blockZ], TRUE);
+		// ft_printf_fd(1, RED"Perlin cave\n");
+		// ft_printf_fd(1, "Val: %u\n"RESET, chunk->perlinCave[blockPos.x][blockPos.z]);
 	} else {
-		ft_printf_fd(1, RED"Chunk not exist\n"RESET);
+		ft_printf_fd(1, RED" -> Chunk not exist\n"RESET);
 	}
 
 	// Camera *cam = &c->cam;

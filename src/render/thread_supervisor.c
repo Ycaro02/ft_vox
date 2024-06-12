@@ -1,6 +1,7 @@
 #include "../../include/thread_load.h"
 #include "../../include/chunks.h"
 #include "../../include/render_chunks.h"
+#include "../../include/perlin_noise.h"
 
 s8 chunkIsInQueue(HashMap *chunksMapToLoad, BlockPos chunkID) {
 	return (hashmap_get(chunksMapToLoad, chunkID) != NULL);
@@ -279,6 +280,7 @@ void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, Has
 	mtx_unlock(threadMtx); /* UNLOCK */
 
 }
+
 
 /**
  * @brief Thread supervisor function, manage the worker threads
