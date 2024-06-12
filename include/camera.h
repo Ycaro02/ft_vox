@@ -17,9 +17,9 @@ typedef struct s_chunks Chunks;
 #define EIGHT_BLOCK_PER_SEC 0.066666f 	/* 8 block per sec, 066666f * 60 = 4.0f */
 
 /* base */
-// #define CAM_BASE_SPEED ONE_BLOCK_PER_SEC	/* Camera move speed */
+#define CAM_BASE_SPEED ONE_BLOCK_PER_SEC	/* Camera move speed */
 // #define CAM_BASE_SPEED TWO_BLOCK_PER_SEC	/* Camera move speed */
-#define CAM_BASE_SPEED THREE_BLOCK_PER_SEC	/* Camera move speed */
+// #define CAM_BASE_SPEED THREE_BLOCK_PER_SEC	/* Camera move speed */
 // #define CAM_BASE_SPEED ONE_CHUNK_PER_SEC	/* Camera move speed */
 
 /* Camera Hight move speed */
@@ -31,9 +31,12 @@ typedef struct s_chunks Chunks;
 
 #define CAM_ASPECT_RATIO(width, height) (f32)((f32)width / (f32)height)
 
-#define VEC3_ROTATEX (vec3){1.0f, 0.0f, 0.0f}
-#define VEC3_ROTATEY (vec3){0.0f, 1.0f, 0.0f}
-#define VEC3_ROTATEZ (vec3){0.0f, 0.0f, 1.0f}
+#define CAMERA_SPAWN_POSITION	(vec3){0.0f, 50.0f, 0.0f}
+#define CAMERA_SPAWN_TARGET		(vec3){0.0f, 50.0f, 100.0f}
+
+#define VEC3_ROTATEX 			(vec3){1.0f, 0.0f, 0.0f}
+#define VEC3_ROTATEY 			(vec3){0.0f, 1.0f, 0.0f}
+#define VEC3_ROTATEZ 			(vec3){0.0f, 0.0f, 1.0f}
 
 typedef struct s_frustrum {
     vec4 planes[6]; // Les plans du frustum : 0=droite, 1=gauche, 2=bas, 3=haut, 4=proche, 5=loin

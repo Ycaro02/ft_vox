@@ -91,8 +91,6 @@ FT_INLINE s8 renderNeedDataGet(Context *c) {
 }
 
 
-
-
 FT_INLINE s8 voxIsRunning(Context *context) {
 	s8 playing = TRUE;
 	mtx_lock(&context->isRunningMtx);

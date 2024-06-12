@@ -109,30 +109,29 @@ void displayChunkData(Context *c, Chunks *chunk){
 
 
 void cameraToBlockPosition(vec3 camPos, BlockPos *blockPos) {
-	blockPos->y = 0;
-	blockPos->x = (s32)floor(camPos[0] * 2.0f) % 16;
-	blockPos->z = (s32)floor(camPos[2] * 2.0f) % 16;
-	if (blockPos->x < 0) { blockPos->x *= -1; }
-	if (blockPos->z < 0) { blockPos->z *= -1; }
+	blockPos->x = (s32)fabs(camPos[0] * 2.0f) % 16;
+	blockPos->y = (s32)fabs(camPos[1] * 2.0f) % 16;
+	blockPos->z = (s32)fabs(camPos[2] * 2.0f) % 16;
 }
 
-// s8 cameraViewIsUndergroundNoCave(Context *c){
-// 	// mtx_lock(&c->gameMtx);
-// 	BlockPos 	chunkPos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
-// 	vec3 		camPos = {c->cam.position[0], c->cam.position[1], c->cam.position[2]};
-// 	// mtx_unlock(&c->gameMtx);
-// 	mtx_lock(&c->threadContext->chunkMtx);
-// 	Chunks *chunk = hashmap_get(c->world->chunksMap, chunkPos);
-// 	s32 blockX = (((s32)floor(camPos[0] * 2.0)) % 16);
-// 	s32 blockZ = (((s32)floor(camPos[2] * 2.0)) % 16);
-// 	s32 CurrentMaxHeight = chunk->perlinVal[blockX][blockZ].normalise;
-// 	if (CurrentMaxHeight > camPos[1]) {
-// 		mtx_unlock(&c->threadContext->chunkMtx);
-// 		return (FALSE);
-// 	}
-// 	mtx_unlock(&c->threadContext->chunkMtx);
-// 	return (TRUE);
-// }
+s8 cameraViewIsUndergroundNoCave(Context *c, Chunks *chunk){
+	// mtx_lock(&c->gameMtx);
+	// BlockPos 	chunkPos = {0, c->cam.chunkPos[0], c->cam.chunkPos[2]};
+	vec3 		camPos = {c->cam.position[0], c->cam.position[1], c->cam.position[2]};
+	// mtx_unlock(&c->gameMtx);
+	// mtx_lock(&c->threadContext->chunkMtx);
+	BlockPos blockPos = {0};
+	cameraToBlockPosition(camPos, &blockPos);
+	s32 CurrentMaxHeight = chunk->perlinVal[blockPos.x][blockPos.z].normalise;
+	s32 currentCamY = (s32)floor((camPos[1] - 1.5f) *  2.0f);
+	ft_printf_fd(1, "CurrentMaxHeight:|%d|, camPos[1]:|%f|\n", CurrentMaxHeight, currentCamY);
+	if (CurrentMaxHeight <= currentCamY) {
+		// mtx_unlock(&c->threadContext->chunkMtx);
+		return (TRUE);
+	}
+	// mtx_unlock(&c->threadContext->chunkMtx);
+	return (FALSE);
+}
 
 void displayBlockPosition(Chunks *chunk, BlockPos blockPos) {
 	ft_printf_fd(1, "Block Pos:\n-----------------\n"RESET);
@@ -152,12 +151,19 @@ void testChunksExist(Context *c) {
 		ft_printf_fd(1, GREEN" -> Chunk exist\n"RESET);
 		BlockPos blockPos = {0};
 		cameraToBlockPosition(c->cam.position, &blockPos);
-		Chunks *chunk = hashmap_get(c->world->chunksMap, chunkPos);
-		Block *block = getBlockAt(chunk, blockPos.x, blockPos.y, blockPos.z);
+		Chunks	*chunk = hashmap_get(c->world->chunksMap, chunkPos);
+		// s32 	subId = subChunksMaxGet(chunk);
+		// Block	*block = getBlockAt(chunk, blockPos.x, blockPos.y, blockPos.z);
+		// block->type = WOOL_RED;
 		displayBlockPosition(chunk, blockPos);
 		ft_printf_fd(1, CYAN"Perlin Height\n");
 		displayPerlinNoise(blockPos.x,blockPos.z,chunk->perlinVal[blockPos.x][blockPos.z]);
 
+		if (cameraViewIsUndergroundNoCave(c, chunk)) {
+			ft_printf_fd(1, GREEN" -> Camera is not underground\n"RESET);
+		} else {
+			ft_printf_fd(1, RED" -> Camera is underground\n"RESET);
+		}
 		// mtx_lock(&c->vboToCreateMtx);
 		// displayChunkData(c, chunk);
 		// mtx_unlock(&c->vboToCreateMtx);

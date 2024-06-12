@@ -10,6 +10,11 @@ s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
 	return ((chunkOffset * CHUNKS_NB_BLOCK + localPos) + (width / 2));
 }
 
+Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
+	(void)y;
+	// return (hashmap_get(chunk->sub_chunks[y / 16].block_map, (BlockPos){x, y % 16, z}));
+	return (hashmap_get(chunk->sub_chunks[subChunkID].block_map, (BlockPos){x, y, z}));
+}
 
 Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
     Block   *block = NULL;
@@ -148,7 +153,6 @@ f32 perlinNoiseHeight(f32 **perlin2D, s32 localX, s32 localZ, PerlinData *perlin
     if (perlinVal->val > 0.3 && perlinVal->val <= 0.4) {
 		f32 ret = normalisef32Tof32(perlinVal->val, 0.3, 0.4, 100.0f, 150.0f);
 		return (ret);
-
     } else if (perlinVal->val >= 0.3999f) {
         return (150.0f);
     }

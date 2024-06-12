@@ -126,8 +126,7 @@ typedef struct s_block {
     s8	type;       /* Block type */
 	u8  neighbors;  /* Block flag */
 	/* padding */
-	s8 pad1, pad2;
-	// u8	visibleFromCam;	/* Block visible from camera */
+	s8 pad1, pad2, pad3;
 }   Block;
 
 enum AtlasID {
@@ -209,6 +208,13 @@ enum BlockType {
 	GRASS_TOP=AT_GRASS_TOP,	/* Grass top */
 	WATER=AT_WATER,		/* Water */
 	WOOL_RED=AT_WOOL_RED,	/* Wool red */
+	WOOL_ORANGE=AT_WOOL_ORANGE,	/* Wool orange */
+	WOOL_YELLOW=AT_WOOL_YELLOW,	/* Wool yellow */
+	WOOL_LIGHTGREEN=AT_WOOL_LIGHTGREEN,	/* Wool lime */
+	WOOL_GREEN=AT_WOOL_GREEN,	/* Wool green */
+	WOOL_CYAN=AT_WOOL_CYAN,	/* Wool cyan */
+	WOOL_LIGHT_BLUE=AT_WOOL_LIGHT_BLUE,	/* Wool light blue */
+	WOOL_BLUE=AT_WOOL_BLUE,	/* Wool blue */
 	GLASS=AT_GLASS,			/* Glass */
 };
 

@@ -4,6 +4,9 @@ out vec4 FragColor;
 
 in vec3 TexCoord;
 
+// in vec3 instancePosition;
+// in vec4 realWorldPos;
+
 uniform sampler3D textureAtlas;
 
 const float fogStart = 140.0;
@@ -15,7 +18,16 @@ void main()
     vec4 baseColor = texture(textureAtlas, TexCoord);
 
 	// baseColor.w = 1.0; // set base alpha to 1.0
-    
+	// if (instancePosition.x == 0.0 && instancePosition.z == 0.0)
+	// {
+	//  	if (realWorldPos.x > 0.0) {
+	// 		FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+	// 	} else if (realWorldPos.x < 0.0) {
+	// 		FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+	// 	}
+	// 	return;
+	// }
+
 	fogColor = vec4(baseColor.xyz, 0.0);
 
     float depth = gl_FragCoord.z / gl_FragCoord.w;

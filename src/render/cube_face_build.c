@@ -31,6 +31,26 @@ u32 *faceVisibleCount(Chunks *chunks, u32 *waterFaceCount) {
 	return (count);
 }
 
+void woolHelpDebug(f32 x, f32 z, f32 *type) {
+	if ((x == 0 || x == 8) && z == 0) {
+		*type = (f32)WOOL_RED;
+	} else if ((x == 1 || x == 9) && z == 0) {
+		*type = (f32)WOOL_BLUE;
+	} else if ((x == 2 || x == 10) && z == 0) {
+		*type = (f32)WOOL_GREEN;
+	} else if ((x == 3 || x == 11) && z == 0) {
+		*type = (f32)WOOL_CYAN;
+	} else if ((x == 4 || x == 12) && z == 0) {
+		*type = (f32)WOOL_LIGHT_BLUE;
+	} else if ((x == 5 || x == 13) && z == 0) {
+		*type = (f32)WOOL_LIGHTGREEN;
+	} else if ((x == 6 || x == 14) && z == 0) {
+		*type = (f32)WOOL_YELLOW;
+	} else if ((x == 7 || x == 15) && z == 0) {
+		*type = (f32)WOOL_ORANGE;
+	}
+}
+
 /* To call in create render chunk -> DONE */
 void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 {
@@ -65,6 +85,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->faceArray[i][idx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][idx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
 					render->faceTypeID[i][idx[i]] = (f32)block->type;
+					woolHelpDebug(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
 					idx[i] += 1;
 				} else if (i == 5U && block->type == WATER) {
 					render->topWaterFaceArray[waterFaceCount][0] = (f32)block->x + (f32)(chunks->x * 16);

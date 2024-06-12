@@ -35,7 +35,8 @@ typedef struct s_chunks {
 
 
 void 	chunksMapFree(void *entry);
-Chunks *getChunkAt(Context *c, s32 x, s32 z);
+Chunks	*getChunkAt(Context *c, s32 x, s32 z);
+Block	*getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID);
 u32 	subChunksMaxGet(Chunks *chunk);
 /* chunks */
 Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, u8 **perlinSnakeCaveNoise);

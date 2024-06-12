@@ -82,12 +82,6 @@ void updateTopBotNeighbors(SubChunks *botSubChunk, Block ****topBlockCache) {
 	}
 }
 
-Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
-	(void)y;
-	// return (hashmap_get(chunk->sub_chunks[y / 16].block_map, (BlockPos){x, y % 16, z}));
-	return (hashmap_get(chunk->sub_chunks[subChunkID].block_map, (BlockPos){x, y, z}));
-}
-
 u32 subChunksMaxGet(Chunks *chunk) {
 	u32 subChunksMax = 0;
 
@@ -96,10 +90,6 @@ u32 subChunksMaxGet(Chunks *chunk) {
 	}
 	--subChunksMax;
 	return (subChunksMax);
-}
-
-void logBlockNeighbors(Block *block, const char *position, char *color) {
-    ft_printf_fd(1, "%s Block at %s: neighbors mask = %d\n"RESET,color,  position, block->neighbors);
 }
 
 void chunkNeighborsGet(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]) {

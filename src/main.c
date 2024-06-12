@@ -38,9 +38,8 @@ void renderChunksLoadNewVBO(Context *c) {
 		BlockPos chunkID = *(BlockPos *)current->content;
 		renderChunkCreateFaceVBO(c->world->chunksMap, chunkID);
 	}
-	/* UNLOCK chunk MTX */
 	renderNeedDataSet(c, FALSE);
-	
+	/* UNLOCK chunk MTX */
 	mtx_unlock(&c->threadContext->chunkMtx);
 	ft_lstclear(&c->vboToCreate, free);
 	mtx_unlock(&c->vboToCreateMtx);
