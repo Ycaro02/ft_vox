@@ -5,10 +5,10 @@
 
 void chunkPosGet(Camera *camera)
 {
-	f32 chunkSize = 8.0; // cubeSize is 0.5
-	camera->chunkPos[0]= floor(camera->position[0] / chunkSize);
-	camera->chunkPos[1] = floor(camera->position[1] / chunkSize);
-	camera->chunkPos[2] = floor(camera->position[2] / chunkSize);
+	s32 chunkSize = 8; // cubeSize is 0.5
+	camera->chunkPos[0] = (s32)floor((camera->position[0]) / chunkSize);
+	camera->chunkPos[1] = (s32)floor((camera->position[1]) / chunkSize);
+	camera->chunkPos[2] = (s32)floor((camera->position[2]) / chunkSize);
 }
 
 /**

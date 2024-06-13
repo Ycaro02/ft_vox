@@ -64,12 +64,14 @@ void act_rotate_camera_down(Context *c) {
 
 /* Up camera : SPACE */
 void act_up_camera(Context *c) {
-    move_camera_up(&c->cam, CAM_UP_DOWN);
+    move_camera_up(&c->cam, c->cam.camSpeed);
+    // move_camera_up(&c->cam, CAM_UP_DOWN);
 }
 
 /* Down camera : Q */
 void act_down_camera(Context *c) {
-    move_camera_up(&c->cam, -CAM_UP_DOWN);
+    move_camera_up(&c->cam, -c->cam.camSpeed);
+    // move_camera_up(&c->cam, -CAM_UP_DOWN);
 }
 
 /* Reset cam : ENTER */
@@ -108,10 +110,32 @@ void displayChunkData(Context *c, Chunks *chunk){
 }
 
 
+
+void blockNegPosHandle(BlockPos *blockPos) {
+    /* Handle neg for x and z */
+    if (blockPos->x < 0) {
+        blockPos->x = 16 + (blockPos->x % 16);
+        if (blockPos->x == 16) blockPos->x = 0;
+    } else {
+        blockPos->x = blockPos->x % 16;
+    }
+
+    if (blockPos->z < 0) {
+        blockPos->z = 16 + (blockPos->z % 16);
+        if (blockPos->z == 16) blockPos->z = 0;
+    } else {
+        blockPos->z = blockPos->z % 16;
+    }
+
+    blockPos->y = blockPos->y % 16;
+	if (blockPos->y < 0) { blockPos->y = 0; } 
+}
+
 void cameraToBlockPosition(vec3 camPos, BlockPos *blockPos) {
-	blockPos->x = (s32)fabs(camPos[0] * 2.0f) % 16;
-	blockPos->y = (s32)fabs(camPos[1] * 2.0f) % 16;
-	blockPos->z = (s32)fabs(camPos[2] * 2.0f) % 16;
+ 	blockPos->x = (s32)(floor(camPos[0] * 2.0f));
+    blockPos->y = (s32)(floor(camPos[1] * 2.0f));
+    blockPos->z = (s32)(floor(camPos[2] * 2.0f));
+	blockNegPosHandle(blockPos);
 }
 
 s8 cameraViewIsUndergroundNoCave(Context *c, Chunks *chunk){
@@ -123,8 +147,8 @@ s8 cameraViewIsUndergroundNoCave(Context *c, Chunks *chunk){
 	BlockPos blockPos = {0};
 	cameraToBlockPosition(camPos, &blockPos);
 	s32 CurrentMaxHeight = chunk->perlinVal[blockPos.x][blockPos.z].normalise;
-	s32 currentCamY = (s32)floor((camPos[1] - 1.5f) *  2.0f);
-	ft_printf_fd(1, "CurrentMaxHeight:|%d|, camPos[1]:|%f|\n", CurrentMaxHeight, currentCamY);
+	s32 currentCamY = (s32)floor((camPos[1] - 1.5f) *  2);
+	ft_printf_fd(1, YELLOW"MaxHeight:|%d|, CurrentY:|%d|\n"RESET, CurrentMaxHeight, currentCamY);
 	if (CurrentMaxHeight <= currentCamY) {
 		// mtx_unlock(&c->threadContext->chunkMtx);
 		return (TRUE);
@@ -134,16 +158,16 @@ s8 cameraViewIsUndergroundNoCave(Context *c, Chunks *chunk){
 }
 
 void displayBlockPosition(Chunks *chunk, BlockPos blockPos) {
-	ft_printf_fd(1, "Block Pos:\n-----------------\n"RESET);
+	ft_printf_fd(1, PURPLE"\n-----------------\n"RESET);
+	ft_printf_fd(1, YELLOW"Chunk : X|%d|, Z|%d|\n"RESET, chunk->x, chunk->z);
 	ft_printf_fd(1, ORANGE"World : X|%d|, Z|%d|\n"RESET, blockPos.x + 16 * chunk->x, blockPos.z + 16 * chunk->z);
 	ft_printf_fd(1,   CYAN"Local : X|%d|, Z|%d|\n"RESET, blockPos.x, blockPos.z);
-	ft_printf_fd(1, "Block end:\n-----------------\n"RESET);
+	ft_printf_fd(1, PURPLE"\n-----------------\n"RESET);
 
 }
 
 void testChunksExist(Context *c) {
 	BlockPos chunkPos = CHUNKS_MAP_ID_GET(c->cam.chunkPos[0], c->cam.chunkPos[2]);
-	ft_printf_fd(1, GREEN"\nCam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2]);
 	// display_camera_value(c);
 	ft_printf_fd(1, YELLOW"Test for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, chunkPos.y, chunkPos.z);
 	Chunks *chunks = hashmap_get(c->world->chunksMap, chunkPos);
@@ -152,13 +176,10 @@ void testChunksExist(Context *c) {
 		BlockPos blockPos = {0};
 		cameraToBlockPosition(c->cam.position, &blockPos);
 		Chunks	*chunk = hashmap_get(c->world->chunksMap, chunkPos);
-		// s32 	subId = subChunksMaxGet(chunk);
-		// Block	*block = getBlockAt(chunk, blockPos.x, blockPos.y, blockPos.z);
-		// block->type = WOOL_RED;
+		ft_printf_fd(1, CYAN"\nCam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2]);
 		displayBlockPosition(chunk, blockPos);
-		ft_printf_fd(1, CYAN"Perlin Height\n");
-		displayPerlinNoise(blockPos.x,blockPos.z,chunk->perlinVal[blockPos.x][blockPos.z]);
-
+		// ft_printf_fd(1, CYAN"Perlin Height\n");
+		// displayPerlinNoise(blockPos.x,blockPos.z,chunk->perlinVal[blockPos.x][blockPos.z]);
 		if (cameraViewIsUndergroundNoCave(c, chunk)) {
 			ft_printf_fd(1, GREEN" -> Camera is not underground\n"RESET);
 		} else {

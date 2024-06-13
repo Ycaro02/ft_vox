@@ -32,21 +32,21 @@ u32 *faceVisibleCount(Chunks *chunks, u32 *waterFaceCount) {
 }
 
 void woolHelpDebug(f32 x, f32 z, f32 *type) {
-	if ((x == 0 || x == 8) && z == 0) {
+	if ((x == 0 || x == 8) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_RED;
-	} else if ((x == 1 || x == 9) && z == 0) {
+	} else if ((x == 1 || x == 9) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_BLUE;
-	} else if ((x == 2 || x == 10) && z == 0) {
+	} else if ((x == 2 || x == 10) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_GREEN;
-	} else if ((x == 3 || x == 11) && z == 0) {
+	} else if ((x == 3 || x == 11) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_CYAN;
-	} else if ((x == 4 || x == 12) && z == 0) {
+	} else if ((x == 4 || x == 12) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_LIGHT_BLUE;
-	} else if ((x == 5 || x == 13) && z == 0) {
+	} else if ((x == 5 || x == 13) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_LIGHTGREEN;
-	} else if ((x == 6 || x == 14) && z == 0) {
+	} else if ((x == 6 || x == 14) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_YELLOW;
-	} else if ((x == 7 || x == 15) && z == 0) {
+	} else if ((x == 7 || x == 15) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_ORANGE;
 	}
 }

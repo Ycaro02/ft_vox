@@ -7,8 +7,8 @@ layout (location = 3) in float aTextureID;
 
 out vec3 TexCoord;
 
-// out vec3 instancePosition;
-// out vec4 realWorldPos;
+out vec3 instancePosition;
+out vec4 realWorldPos;
 
 uniform mat4 view;
 uniform mat4 projection;
@@ -39,6 +39,6 @@ void main()
     vec4 worldPosition = m * vec4(aPos, 1.0);
     gl_Position = projection * view * worldPosition;
 	
-	// instancePosition = aInstancePos;
-	// realWorldPos = worldPosition;
+	instancePosition = aInstancePos;
+	realWorldPos = worldPosition;
 }
