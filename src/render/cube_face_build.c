@@ -136,18 +136,24 @@ void undergroundBlockFree(UndergroundBlock *udg) {
 	}
 }
 
-#define UNDERGROUND_FACE_NB 2
+#define UNDERGROUND_FACE_NB 9
 #define UNDERGROUND_INCREMENT 1.0f
 
 
-void underGroundBlockArrayFillAxis(vec3 *faceArray, f32 *faceTypeID, vec3 camPos, f32 incrementX) {
+void underGroundBlockArrayFillAxis(vec3 *faceArray, f32 *faceTypeID, vec3 camPos) {
 
+	s32 incrementX = -1.0f;
+	s32 incrementZ = -1.0f;
 	for (u32 i = 0; i < UNDERGROUND_FACE_NB; ++i) {
+		if (i != 0 && i % 3 == 0) {
+			incrementX += UNDERGROUND_INCREMENT;
+			incrementZ = -1.0f;
+		}
 		faceArray[i][0] = (camPos[0] * 2.0f) + incrementX;
 		faceArray[i][1] = (camPos[1] * 2.0f);
-		faceArray[i][2] = (camPos[2] * 2.0f);
+		faceArray[i][2] = (camPos[2] * 2.0f) + incrementZ;
 		faceTypeID[i] = (f32)STONE;
-		incrementX += UNDERGROUND_INCREMENT;
+		incrementZ += UNDERGROUND_INCREMENT;
 	}
 }
 
@@ -195,7 +201,8 @@ void undergroundBlockcreate(Context *c) {
 	for (u8 i = 0; i < 6; ++i) {
 		udg->udgFaceArray[i] = ft_calloc(sizeof(vec3), UNDERGROUND_FACE_NB);
 		udg->udgTypeID[i] = ft_calloc(sizeof(vec3), UNDERGROUND_FACE_NB);
-		underGroundBlockArrayFillAxis(udg->udgFaceArray[i], udg->udgTypeID[i], camPos, -0.5f);
+		// underGroundBlockArrayFillAxis(udg->udgFaceArray[i], udg->udgTypeID[i], camPos, -0.5f);
+		underGroundBlockArrayFillAxis(udg->udgFaceArray[i], udg->udgTypeID[i], camPos);
 		udg->udgFaceVBO[i] = faceInstanceVBOCreate(udg->udgFaceArray[i], UNDERGROUND_FACE_NB);
 		udg->udgTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, UNDERGROUND_FACE_NB * sizeof(GLuint), (void *)udg->udgTypeID[i]);
 		udg->udgFaceCount += UNDERGROUND_FACE_NB;
