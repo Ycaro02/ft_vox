@@ -6,9 +6,6 @@ s32 workersThreadRoutine(void *data) {
 	ThreadData *inputData = (ThreadData *)data;
 	ThreadData *tmp = NULL;
 
-	// mtx_lock(&inputData->c->threadContext->threadMtx);
-	// inputData->c->threadContext->workers[inputData->threadID].busy = WORKER_BUSY;
-	// mtx_unlock(&inputData->c->threadContext->threadMtx);
 
 	while (1) {
 		while (renderNeedDataGet(inputData->c)) {
@@ -26,7 +23,6 @@ s32 workersThreadRoutine(void *data) {
 			mtx_unlock(&inputData->c->threadContext->threadMtx);
 			free(tmp);
 			threadChunksLoad(inputData);
-			
 		} else {
 			mtx_unlock(&inputData->c->threadContext->threadMtx);
 			usleep(10000);
@@ -50,14 +46,6 @@ s32 workersThreadRoutine(void *data) {
  * @return 1 if success, 0 if failed to init the workers threads
 */
 s8 threadWorkersInit(Context *c) {
-
-	c->threadContext->workerMax = ThreadsAvailableGet();
-	c->threadContext->workers = ft_calloc(sizeof(ThreadEntity), c->threadContext->workerMax);
-	if (!c->threadContext->workers) {
-		ft_printf_fd(2, "Error: threadWorkersInit: malloc failed\n");
-		return (FALSE);
-	}
-	VOX_PROTECTED_LOG(c, YELLOW"Supervisor Thread Init: %d workers\n"RESET, (s32)c->threadContext->workerMax);
 
 	/* TO move in is own func thread worker load */
 	mtx_lock(&c->threadContext->threadMtx);

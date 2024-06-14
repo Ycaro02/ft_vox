@@ -60,11 +60,18 @@ void vox_destroy(Context *c) {
 
 	thrd_join(c->threadContext->supervisor, &status);
 	hashmap_destroy(c->threadContext->chunksMapToLoad);
-	free(c->threadContext->workers);
 	mtx_destroy(&c->threadContext->chunkMtx);
+	// free(c->threadContext->workers);
 	free(c->threadContext);
 
 	ft_printf_fd(1, PINK"\nSupervisor thread joined with status %d\n"RESET, status);
+
+
+	if (c->world->undergroundBlock->udgFaceCount != 0) {
+		undergroundBlockFree(c->world->undergroundBlock);
+		c->world->undergroundBlock->udgFaceCount = 0;
+	}
+	free(c->world->undergroundBlock);
 
 	renderChunksVBODestroy(c);
 	ft_lstclear(&c->vboToCreate, free);

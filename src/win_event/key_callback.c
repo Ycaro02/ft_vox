@@ -180,8 +180,10 @@ void testChunksExist(Context *c) {
 		// displayPerlinNoise(blockPos.x,blockPos.z,chunk->perlinVal[blockPos.x][blockPos.z]);
 		if (cameraViewIsUndergroundNoCave(c, chunk)) {
 			ft_printf_fd(1, GREEN" -> Camera is not underground\n"RESET);
+			c->world->undergroundBlock->isUnderground = FALSE;
 		} else {
 			ft_printf_fd(1, RED" -> Camera is underground\n"RESET);
+			c->world->undergroundBlock->isUnderground = TRUE;
 		}
 		// mtx_lock(&c->vboToCreateMtx);
 		// displayChunkData(c, chunk);

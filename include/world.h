@@ -4,15 +4,17 @@
 #include "vox.h"
 #include "cube.h"
 
+typedef struct	s_underground_block UndergroundBlock; 
 typedef struct 	s_camera Camera;
 typedef struct 	s_thread_entity ThreadEntity;
 typedef 		mtx_t Mutex;
 typedef 		thrd_t Thread;
 
 typedef struct s_world {
-	u64				seed;					/* World seed */
-	HashMap			*chunksMap;				/* Chunks hashmap */
-	HashMap			*renderChunksMap;		/* Render chunks map */
+	u64					seed;					/* World seed */
+	HashMap				*chunksMap;				/* Chunks hashmap */
+	HashMap				*renderChunksMap;		/* Render chunks map */
+	UndergroundBlock 	*undergroundBlock;		/* Underground block */
 } World;
 
 typedef struct s_thread_context {

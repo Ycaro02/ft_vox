@@ -21,13 +21,19 @@ typedef struct s_render_chunks {
 } RenderChunks;
 
 typedef struct s_underground_block {
-	u8		underground;
-	vec3	*undergroundFaceArray;
-	f32		*undergroundTypeID;
-	u32 	undergroundFaceCount;
-	GLuint	undergroundFaceVBO;
-	GLuint	undergroundTypeVBO;
+	u8		isUnderground;
+	vec3	*udgFaceArray[6];
+	f32		*udgTypeID[6];
+	u32 	udgFaceCount;
+	GLuint	udgFaceVBO[6];
+	GLuint	udgTypeVBO[6];
 } UndergroundBlock;
+
+/* keycallback */
+void cameraToBlockPosition(vec3 camPos, BlockPos *blockPos);
+
+/* Face build file */
+void undergroundBlockFree(UndergroundBlock *udg);
 
 /* render/render_chunks.c */
 void			renderChunkFree(RenderChunks *render);

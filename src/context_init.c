@@ -65,20 +65,30 @@ u8	**perlinSnakeCave2DGet() {
 	return (snakePerlin2D);
 }
 
+s8 mutexMultipleInit(Context *c) {
+
+	if (	mtx_init(&c->renderMtx, mtx_plain) == thrd_error
+		|| mtx_init(&c->gameMtx, mtx_plain) == thrd_error
+		|| mtx_init(&c->isRunningMtx, mtx_plain) == thrd_error
+		|| mtx_init(&c->vboToDestroyMtx, mtx_plain) == thrd_error
+		|| mtx_init(&c->vboToCreateMtx, mtx_plain) == thrd_error
+		|| mtx_init(&c->renderDataNeededMtx, mtx_plain) == thrd_error)
+	{
+		ft_printf_fd(1, "Error: mutex init failed\n");
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
 Context *contextInit() {
 	Context *context;
 
 
 	if (!(context = ft_calloc(sizeof(Context), 1))) {
 		return (NULL);
+	} else if (!mutexMultipleInit(context)) {
+		return (NULL);
 	}
-
-	mtx_init(&context->renderMtx, mtx_plain);
-	mtx_init(&context->gameMtx, mtx_plain);
-	mtx_init(&context->isRunningMtx, mtx_plain);
-	mtx_init(&context->vboToDestroyMtx, mtx_plain);
-	mtx_init(&context->vboToCreateMtx, mtx_plain);
-	mtx_init(&context->renderDataNeededMtx, mtx_plain);
 
 	mtx_lock(&context->isRunningMtx);
 	context->isPlaying = TRUE;
@@ -90,6 +100,7 @@ Context *contextInit() {
 	mtx_unlock(&context->gameMtx);
 
 	if (!(context->world = ft_calloc(sizeof(World), 1))
+		|| (!((context->world->undergroundBlock = ft_calloc(sizeof(UndergroundBlock), 1))))
 		|| (!(context->win_ptr = init_openGL_context()))
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
@@ -100,6 +111,8 @@ Context *contextInit() {
 	{
 		return (NULL);
 	} 
+
+	
 
 	/* init context camera */
     glm_mat4_identity(context->rotation);

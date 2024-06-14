@@ -122,6 +122,61 @@ void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 	render->topWaterTypeVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->topWaterFaceCount * sizeof(GLuint), (void *)&render->topWaterTypeID[0]);
 }
 
+
+void undergroundBlockFree(UndergroundBlock *udg) {
+	for (u8 i = 0; i < 6; ++i) {
+		if (udg->udgFaceArray[i]) {
+			free(udg->udgFaceArray[i]);
+		}
+		if (udg->udgTypeID[i]) {
+			free(udg->udgTypeID[i]);
+		}
+		glDeleteBuffers(1, &udg->udgFaceVBO[i]);
+		glDeleteBuffers(1, &udg->udgTypeVBO[i]);
+	}
+}
+
+#define UNDERGROUND_FACE_NB 2
+#define UNDERGROUND_INCREMENT 1.0f
+
+
+void underGroundBlockArrayFillAxis(vec3 *faceArray, f32 *faceTypeID, vec3 camPos, f32 incrementX) {
+
+	for (u32 i = 0; i < UNDERGROUND_FACE_NB; ++i) {
+		faceArray[i][0] = (camPos[0] * 2.0f) + incrementX;
+		faceArray[i][1] = (camPos[1] * 2.0f);
+		faceArray[i][2] = (camPos[2] * 2.0f);
+		faceTypeID[i] = (f32)STONE;
+		incrementX += UNDERGROUND_INCREMENT;
+	}
+}
+
+void undergroundBlockcreate(Context *c) {
+	if (c->world->undergroundBlock->isUnderground == FALSE) {
+		return ;
+	} 
+	mtx_lock(&c->gameMtx);
+	vec3 camPos = {0};
+	glm_vec3_copy(c->cam.position, camPos);
+	mtx_unlock(&c->gameMtx);
+
+	if (c->world->undergroundBlock->udgFaceCount != 0) {
+		undergroundBlockFree(c->world->undergroundBlock);
+		c->world->undergroundBlock->udgFaceCount = 0;
+	}
+
+	UndergroundBlock *udg = c->world->undergroundBlock;
+
+	for (u8 i = 0; i < 6; ++i) {
+		udg->udgFaceArray[i] = ft_calloc(sizeof(vec3), UNDERGROUND_FACE_NB);
+		udg->udgTypeID[i] = ft_calloc(sizeof(vec3), UNDERGROUND_FACE_NB);
+		underGroundBlockArrayFillAxis(udg->udgFaceArray[i], udg->udgTypeID[i], camPos, -0.5f);
+		udg->udgFaceVBO[i] = faceInstanceVBOCreate(udg->udgFaceArray[i], UNDERGROUND_FACE_NB);
+		udg->udgTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, UNDERGROUND_FACE_NB * sizeof(GLuint), (void *)udg->udgTypeID[i]);
+		udg->udgFaceCount += UNDERGROUND_FACE_NB;
+	}
+}
+
 /* NEW draw logic */
 
 void drawFace(RenderChunks *render, u32 vertex_nb, u32 faceNb, u8 faceIdx) {
@@ -143,17 +198,17 @@ void drawFace(RenderChunks *render, u32 vertex_nb, u32 faceNb, u8 faceIdx) {
 	// glBindVertexArray(0);
 }
 
-void drawWaterFace(RenderChunks *render, u32 vertex_nb, u32 faceNb) {
+void drawSpecialFace(GLuint faceVBO, GLuint typeVBO, u32 vertex_nb, u32 faceNb) {
 	/* Bind Block instance VBO */
 	
-	glBindBuffer(GL_ARRAY_BUFFER, render->topWaterFaceVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glVertexAttribDivisor(1, 1);
 
 	/* Bind Block type VBO */
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, render->topWaterTypeVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, typeVBO);
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)0);
 	glVertexAttribDivisor(3, 1);
@@ -172,6 +227,8 @@ void drawAllChunksByFace(Context *c) {
 
     u32 		chunkRenderNb = 0, faceRendernb = 0;
     
+	undergroundBlockcreate(c);
+
     mtx_lock(&c->renderMtx);
     for (u8 i = 0; i < 6; ++i) {
 		glBindVertexArray(c->faceCube[i].VAO);
@@ -185,13 +242,17 @@ void drawAllChunksByFace(Context *c) {
             chunkRenderNb++;
         }
 	
-		if (i == 5U) {
+		if (c->world->undergroundBlock->isUnderground) { /* Front face*/
+			drawSpecialFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, UNDERGROUND_FACE_NB);			
+		}
+
+		if (i == 5U) { /* TOP face */
 			it = hashmap_iterator(c->world->renderChunksMap);
 			while (hashmap_next(&it)) {
 				render = (RenderChunks *)it.value;
 				faceNb = render->topWaterFaceCount;
 				faceRendernb += faceNb;
-				drawWaterFace(render, 6U, faceNb);
+				drawSpecialFace(render->topWaterFaceVBO, render->topWaterTypeVBO, 6U, faceNb);
 				// chunkRenderNb++;
 			}
 		}

@@ -109,6 +109,7 @@ void supervisorWaitWorker(Context *c) {
 			mtx_lock(&c->threadContext->threadMtx);
 			status = c->threadContext->workers[i].busy;
 		}
+		free(c->threadContext->workers[i].data);
 		mtx_unlock(&c->threadContext->threadMtx);
 		ft_printf_fd(1, ORANGE"\nWorkers Thread: "RESET""YELLOW"[%d]"RESET""GREEN" finished: status %d"RESET, i, status);
 		++i;
@@ -308,6 +309,7 @@ s32 supervisorThreadRoutine(void *context) {
 	}
 
 	supervisorWaitWorker(c);
+	free(c->threadContext->workers);
 	return (TRUE);
 }
 
@@ -330,6 +332,15 @@ s8 threadSupervisorInit(Context *c) {
 	mtx_init(&c->threadContext->threadMtx, mtx_plain);
 	mtx_init(&c->threadContext->chunkMtx, mtx_plain);
 	mtx_init(&c->threadContext->logMtx, mtx_plain);
+
+	c->threadContext->workerMax = ThreadsAvailableGet();
+	c->threadContext->workers = ft_calloc(sizeof(ThreadEntity), c->threadContext->workerMax);
+	if (!c->threadContext->workers) {
+		ft_printf_fd(2, "Error: threadWorkersInit: malloc failed\n");
+		return (FALSE);
+	}
+	VOX_PROTECTED_LOG(c, YELLOW"Supervisor Thread Init: %d workers\n"RESET, (s32)c->threadContext->workerMax);
+
 	thrd_create(&c->threadContext->supervisor, supervisorThreadRoutine, c);
 
 	return (TRUE);
