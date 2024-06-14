@@ -3,49 +3,7 @@
 #include "../../include/perlin_noise.h"
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
-
-
-/* Set local X and Z coordinates based on the center of the Perlin noise array */
-s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
-	return ((chunkOffset * CHUNKS_NB_BLOCK + localPos) + (width / 2));
-}
-
-Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
-	(void)y;
-	// return (hashmap_get(chunk->sub_chunks[y / 16].block_map, (BlockPos){x, y % 16, z}));
-	return (hashmap_get(chunk->sub_chunks[subChunkID].block_map, (BlockPos){x, y, z}));
-}
-
-Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
-    Block   *block = NULL;
-    s32     blockType = AIR;
-    s32     realY = startYWorld + y;
-
-	if (realY < maxHeight - 2) {
-		blockType = STONE;
-	} 
-	else if (realY <= maxHeight) {
-		blockType = DIRT;
-		if ((realY == maxHeight || realY == maxHeight - 1) && realY >= SEA_LEVEL) { blockType = GRASS;}
-	} 
-	else if (realY == SEA_LEVEL) {
-		blockType = WATER;
-	} 
-	else {
-		return (NULL);
-	}
-
-    if (!(block = malloc(sizeof(Block)))) {
-        ft_printf_fd(2, "Failed to allocate block\n");
-        return (NULL);
-    }
-    block->type = blockType;
-    block->x = x;
-    block->y = y;
-    block->z = z;
-    block->neighbors = 0;
-    return (block);
-}
+#include "../../include/block.h"
 
 
 // s32 chunksManhattanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
@@ -180,7 +138,7 @@ void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
 }
 
 
-#define CAVE_ENTRY_DEPTH 15
+
 
 s8 isCaveValue(u8 val) {
 	return (val == PATH_VAL || val == ENTRY_EXIT_VAL);
@@ -299,10 +257,7 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **
 
 	perlinCaveDataGet(chunk, perlinSnakeCaveNoise);
 
-	// if (chunkMaxY <= 90) {
 	digCaveCall(chunk, chunkBlockCache, perlinVal);
-	// }
-
 	occlusionCullingStatic(chunkBlockCache, chunk);
 }
 

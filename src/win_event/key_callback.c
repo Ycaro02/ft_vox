@@ -2,6 +2,7 @@
 #include "../../include/chunks.h"
 #include "../../include/perlin_noise.h"
 #include "../../include/render_chunks.h"
+#include "../../include/block.h"
 
 /* Escapte Key : ESC */
 void act_escape(Context *c) {
@@ -109,62 +110,7 @@ void displayChunkData(Context *c, Chunks *chunk){
 
 }
 
-void blockNegPosHandle(BlockPos *blockPos) {
-    /* Handle neg for x and z */
-    if (blockPos->x < 0) {
-        blockPos->x = 16 + (blockPos->x % 16);
-        if (blockPos->x == 16) blockPos->x = 0;
-    } else {
-        blockPos->x = blockPos->x % 16;
-    }
 
-    if (blockPos->z < 0) {
-        blockPos->z = 16 + (blockPos->z % 16);
-        if (blockPos->z == 16) blockPos->z = 0;
-    } else {
-        blockPos->z = blockPos->z % 16;
-    }
-
-    blockPos->y = blockPos->y % 16;
-	if (blockPos->y < 0) { blockPos->y = 0; } 
-}
-
-void cameraToBlockPosition(vec3 camPos, BlockPos *blockPos) {
- 	blockPos->x = (s32)(floor(camPos[0] * 2.0f));
-    blockPos->y = (s32)(floor(camPos[1] * 2.0f));
-    blockPos->z = (s32)(floor(camPos[2] * 2.0f));
-	blockNegPosHandle(blockPos);
-}
-
-void undergroundBoolUpdate(Context *c, BlockPos *blockPos) {
-	vec3		camPos = {0.0f};
-	Chunks		*chunk = NULL;
-	s32			currentMaxHeight = 0, currentCamY = 0, chunkPosx = 0, chunkPosz = 0;
-	
-	mtx_lock(&c->gameMtx);
-	glm_vec3_copy(c->cam.position, camPos);
-	chunkPosx = c->cam.chunkPos[0];
-	chunkPosz = c->cam.chunkPos[2];
-	mtx_unlock(&c->gameMtx);
-
-	cameraToBlockPosition(camPos, blockPos);
-
-	// mtx_lock(&c->threadContext->chunkMtx);
-	chunk = hashmap_get(c->world->chunksMap, CHUNKS_MAP_ID_GET(chunkPosx, chunkPosz));
-	if (!chunk) {
-		return ;
-	}
-	currentMaxHeight = chunk->perlinVal[blockPos->x][blockPos->z].normalise;
-	// mtx_unlock(&c->threadContext->chunkMtx);
-
-	currentCamY = (s32)floor((camPos[1] - 1.5f) *  2);
-	ft_printf_fd(1, YELLOW"MaxHeight:|%d|, CurrentY:|%d|\n"RESET, currentMaxHeight, currentCamY);
-	if (currentMaxHeight <= currentCamY) {
-		c->world->undergroundBlock->isUnderground = FALSE;
-	} else {
-		c->world->undergroundBlock->isUnderground = TRUE;
-	}
-}
 
 void displayBlockPosition(Chunks *chunk, BlockPos blockPos) {
 	ft_printf_fd(1, PURPLE"\n-----------------\n"RESET);
@@ -183,7 +129,7 @@ void testChunksExist(Context *c) {
 	if (chunks) {
 		ft_printf_fd(1, GREEN" -> Chunk exist\n"RESET);
 		BlockPos blockPos = {0};
-		cameraToBlockPosition(c->cam.position, &blockPos);
+		blockPosFromCam(c->cam.position, &blockPos);
 		Chunks	*chunk = hashmap_get(c->world->chunksMap, chunkPos);
 		ft_printf_fd(1, CYAN"\nCam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2]);
 		displayBlockPosition(chunk, blockPos);

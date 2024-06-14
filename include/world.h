@@ -7,6 +7,8 @@
 typedef struct	s_underground_block UndergroundBlock; 
 typedef struct 	s_camera Camera;
 typedef struct 	s_thread_entity ThreadEntity;
+typedef struct	s_underground_block UndergroundBlock;
+
 typedef 		mtx_t Mutex;
 typedef 		thrd_t Thread;
 

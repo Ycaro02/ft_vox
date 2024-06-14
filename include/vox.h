@@ -105,29 +105,6 @@
 #define CHUNK_RIGHT 2
 #define CHUNK_LEFT 3
 
-/* Neighbor flag value */
-#define NEIGHBOR_BACK  	1U
-#define NEIGHBOR_FRONT  2U
-#define NEIGHBOR_LEFT   4U
-#define NEIGHBOR_RIGHT 	8U
-#define NEIGHBOR_BOTTOM 16U
-#define NEIGHBOR_TOP 	32U
-
-#define CHUNKS_NEIGHBOR_LOADED (NEIGHBOR_BACK | NEIGHBOR_FRONT | NEIGHBOR_LEFT | NEIGHBOR_RIGHT)
-
-/* If all neighnor block is hidden */
-#define BLOCK_HIDDEN (NEIGHBOR_RIGHT | NEIGHBOR_LEFT | NEIGHBOR_TOP | NEIGHBOR_BOTTOM | NEIGHBOR_FRONT | NEIGHBOR_BACK)
-
-// typedef struct PACKED_STRUCT s_block {
-typedef struct s_block {
-    s8 	x;          /* Block x position */
-    s8 	y;          /* Block y position (height) */
-    s8 	z;          /* Block z position */
-    s8	type;       /* Block type */
-	u8  neighbors;  /* Block flag */
-	/* padding */
-	s8 pad1, pad2, pad3;
-}   Block;
 
 enum AtlasID {
     AT_BREAK_STONE=0,     /* Break stone */

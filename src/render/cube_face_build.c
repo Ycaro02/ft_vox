@@ -3,6 +3,7 @@
 #include "../../include/perlin_noise.h"
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
+#include "../../include/block.h"
 
 s8 faceHidden(u8 neighbors, u8 face) {
 	return (neighbors & (1U << face));
@@ -121,109 +122,6 @@ void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 	render->topWaterFaceVBO = faceInstanceVBOCreate(render->topWaterFaceArray, render->topWaterFaceCount);
 	render->topWaterTypeVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->topWaterFaceCount * sizeof(GLuint), (void *)&render->topWaterTypeID[0]);
 }
-
-
-void undergroundBlockFree(UndergroundBlock *udg) {
-	for (u8 i = 0; i < 6; ++i) {
-		if (udg->udgFaceArray[i]) {
-			free(udg->udgFaceArray[i]);
-		}
-		if (udg->udgTypeID[i]) {
-			free(udg->udgTypeID[i]);
-		}
-		glDeleteBuffers(1, &udg->udgFaceVBO[i]);
-		glDeleteBuffers(1, &udg->udgTypeVBO[i]);
-	}
-}
-
-#define UNDERGROUND_FACE_NB 9
-#define TOTAL_UNDERGROUND_FACE (UNDERGROUND_FACE_NB * 3)
-
-void underGroundBlockArrayFillAxis(vec3 *faceArray, f32 *faceTypeID, vec3 camPos) {
-
-	s32 incrementX = -1.0f;
-	s32 incrementY = -1.0f;
-	s32 incrementZ = -1.0f;
-	s32 idx = 0;
-	s8 	firstIter = TRUE;
-
-
-	for (s32 layer = 0; layer < 3; layer++) {
-		for (s32 i = 0; i < UNDERGROUND_FACE_NB; ++i) {
-			if (!firstIter && i % 3 == 0) {
-				incrementX += 1.0f;
-				incrementZ = -1.0f;
-			}
-			idx = i + (UNDERGROUND_FACE_NB * layer);
-			faceArray[idx][0] = (camPos[0] * 2.0f) + incrementX;
-			faceArray[idx][1] = (camPos[1] * 2.0f) + incrementY;
-			faceArray[idx][2] = (camPos[2] * 2.0f) + incrementZ;
-			faceTypeID[idx] = (f32)STONE;
-			incrementZ += 1.0f;
-			firstIter = FALSE;
-		}
-		incrementY += 1.0f;
-		incrementX = -1.0f;
-		incrementZ = -1.0f;
-		firstIter = TRUE;
-	}
-
-}
-
-void undergroundBlockcreate(Context *c) {
-	vec3				camPos = {0};
-	UndergroundBlock	*udg = NULL;
-	BlockPos			currentBloc = {0};
-	static BlockPos 	lastBlockPos = {-1, -1, -1};
-
-
-
-
-	undergroundBoolUpdate(c, &currentBloc);
-	if (!c->world->undergroundBlock->isUnderground) {
-		return ;
-	}
-	if (lastBlockPos.x == currentBloc.x && lastBlockPos.y == currentBloc.y && lastBlockPos.z == currentBloc.z) {
-		// ft_printf_fd(2, "SAME BLOCK\n");
-		return ;
-	} 
-	// else {
-	// 	ft_printf_fd(2, "NEW BLOCK\n");
-	// 	ft_printf_fd(2, "Last block: %d %d %d\n", lastBlockPos.x, lastBlockPos.y, lastBlockPos.z);
-	// 	ft_printf_fd(2, "Current block: %d %d %d\n", currentBloc.x, currentBloc.y, currentBloc.z);
-	// }
-
-	if (lastBlockPos.x == -1) {
-		ft_memcpy(&lastBlockPos, &currentBloc, sizeof(BlockPos));
-	}
-
-
-
-	mtx_lock(&c->gameMtx);
-	glm_vec3_copy(c->cam.position, camPos);
-	mtx_unlock(&c->gameMtx);
-
-	if (c->world->undergroundBlock->udgFaceCount != 0) {
-		undergroundBlockFree(c->world->undergroundBlock);
-		c->world->undergroundBlock->udgFaceCount = 0;
-	}
-
-	
-	udg = c->world->undergroundBlock;
-
-	for (u8 i = 0; i < 6; ++i) {
-		udg->udgFaceArray[i] = ft_calloc(sizeof(vec3), TOTAL_UNDERGROUND_FACE);
-		udg->udgTypeID[i] = ft_calloc(sizeof(vec3), TOTAL_UNDERGROUND_FACE);
-		// underGroundBlockArrayFillAxis(udg->udgFaceArray[i], udg->udgTypeID[i], camPos, -0.5f);
-		underGroundBlockArrayFillAxis(udg->udgFaceArray[i], udg->udgTypeID[i], camPos);
-		udg->udgFaceVBO[i] = faceInstanceVBOCreate(udg->udgFaceArray[i], TOTAL_UNDERGROUND_FACE);
-		udg->udgTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, TOTAL_UNDERGROUND_FACE * sizeof(GLuint), (void *)udg->udgTypeID[i]);
-		udg->udgFaceCount += TOTAL_UNDERGROUND_FACE;
-	}
-	ft_memcpy(&lastBlockPos, &currentBloc, sizeof(BlockPos));
-}
-
-/* NEW draw logic */
 
 void drawFace(RenderChunks *render, u32 vertex_nb, u32 faceNb, u8 faceIdx) {
 	/* Bind Block instance VBO */

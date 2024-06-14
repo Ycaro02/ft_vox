@@ -3,6 +3,7 @@
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
 #include "../include/thread_load.h"
+#include "../include/block.h"
 
 void chunksRender(Context *c, GLuint shader_id) {
     glLoadIdentity();

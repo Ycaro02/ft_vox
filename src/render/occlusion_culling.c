@@ -1,5 +1,6 @@
 #include "../../include/world.h"
 #include "../../include/chunks.h"
+#include "../../include/block.h"
 
 
 void ocllusionHandleTransparent(Block *block, Block *neighbor, u8 blockMask, u8 neighborMask) {
