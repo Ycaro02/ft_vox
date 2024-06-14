@@ -31,9 +31,11 @@ typedef struct s_underground_block {
 
 /* keycallback */
 void cameraToBlockPosition(vec3 camPos, BlockPos *blockPos);
+void undergroundBlockcreate(Context *c);
 
 /* Face build file */
 void undergroundBlockFree(UndergroundBlock *udg);
+void undergroundBoolUpdate(Context *c, BlockPos *blockPos);
 
 /* render/render_chunks.c */
 void			renderChunkFree(RenderChunks *render);

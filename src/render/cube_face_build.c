@@ -152,11 +152,35 @@ void underGroundBlockArrayFillAxis(vec3 *faceArray, f32 *faceTypeID, vec3 camPos
 }
 
 void undergroundBlockcreate(Context *c) {
-	if (c->world->undergroundBlock->isUnderground == FALSE) {
+	vec3				camPos = {0};
+	UndergroundBlock	*udg = NULL;
+	BlockPos			currentBloc = {0};
+	static BlockPos 	lastBlockPos = {-1, -1, -1};
+
+
+
+
+	undergroundBoolUpdate(c, &currentBloc);
+	if (!c->world->undergroundBlock->isUnderground) {
+		return ;
+	}
+	if (lastBlockPos.x == currentBloc.x && lastBlockPos.y == currentBloc.y && lastBlockPos.z == currentBloc.z) {
+		// ft_printf_fd(2, "SAME BLOCK\n");
 		return ;
 	} 
+	// else {
+	// 	ft_printf_fd(2, "NEW BLOCK\n");
+	// 	ft_printf_fd(2, "Last block: %d %d %d\n", lastBlockPos.x, lastBlockPos.y, lastBlockPos.z);
+	// 	ft_printf_fd(2, "Current block: %d %d %d\n", currentBloc.x, currentBloc.y, currentBloc.z);
+	// }
+
+	if (lastBlockPos.x == -1) {
+		ft_memcpy(&lastBlockPos, &currentBloc, sizeof(BlockPos));
+	}
+
+
+
 	mtx_lock(&c->gameMtx);
-	vec3 camPos = {0};
 	glm_vec3_copy(c->cam.position, camPos);
 	mtx_unlock(&c->gameMtx);
 
@@ -165,7 +189,8 @@ void undergroundBlockcreate(Context *c) {
 		c->world->undergroundBlock->udgFaceCount = 0;
 	}
 
-	UndergroundBlock *udg = c->world->undergroundBlock;
+	
+	udg = c->world->undergroundBlock;
 
 	for (u8 i = 0; i < 6; ++i) {
 		udg->udgFaceArray[i] = ft_calloc(sizeof(vec3), UNDERGROUND_FACE_NB);
@@ -175,6 +200,7 @@ void undergroundBlockcreate(Context *c) {
 		udg->udgTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, UNDERGROUND_FACE_NB * sizeof(GLuint), (void *)udg->udgTypeID[i]);
 		udg->udgFaceCount += UNDERGROUND_FACE_NB;
 	}
+	ft_memcpy(&lastBlockPos, &currentBloc, sizeof(BlockPos));
 }
 
 /* NEW draw logic */
@@ -227,7 +253,8 @@ void drawAllChunksByFace(Context *c) {
 
     u32 		chunkRenderNb = 0, faceRendernb = 0;
     
-	undergroundBlockcreate(c);
+	// undergroundBlockcreate(c);
+
 
     mtx_lock(&c->renderMtx);
     for (u8 i = 0; i < 6; ++i) {
@@ -242,7 +269,7 @@ void drawAllChunksByFace(Context *c) {
             chunkRenderNb++;
         }
 	
-		if (c->world->undergroundBlock->isUnderground) { /* Front face*/
+		if (c->world->undergroundBlock->isUnderground) {
 			drawSpecialFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, UNDERGROUND_FACE_NB);			
 		}
 

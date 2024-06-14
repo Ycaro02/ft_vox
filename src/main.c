@@ -31,6 +31,10 @@ void renderChunksLoadNewVBO(Context *c) {
 		renderNeedDataSet(c, TRUE);
 		return ;
 	}
+
+	undergroundBlockcreate(c);
+
+
 	c->chunkLoadedNb = hashmap_size(c->world->chunksMap);
 	c->chunkToLoadInQueue = hashmap_size(c->threadContext->chunksMapToLoad);
 	mtx_lock(&c->vboToCreateMtx);
