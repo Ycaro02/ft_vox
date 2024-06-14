@@ -109,8 +109,6 @@ void displayChunkData(Context *c, Chunks *chunk){
 
 }
 
-
-
 void blockNegPosHandle(BlockPos *blockPos) {
     /* Handle neg for x and z */
     if (blockPos->x < 0) {
@@ -194,25 +192,6 @@ void testChunksExist(Context *c) {
 	} else {
 		ft_printf_fd(1, RED" -> Chunk not exist\n"RESET);
 	}
-
-	// Camera *cam = &c->cam;
-	// f32 xDir = cam->viewVector[0];
-	// // f32 yDir = cam->viewVector[1];
-	// f32 zDir = cam->viewVector[2];
-
-	// char *NordSouth = "Unknown";
-	// if (xDir >= 0.0f) {
-	// 	NordSouth = CYAN"Nord"RESET;
-	// } else if (xDir < 0.0f) {
-	// 	NordSouth = RED"South"RESET;
-	// } 
-
-	// char *EstWest = "Unknown";
-	// if (zDir > 0.0f) {
-	// 	EstWest = ORANGE"East"RESET;
-	// } else if (zDir < 0.0f) {
-	// 	EstWest = PINK"West"RESET;
-	// }
 
 	// ft_printf_fd(1, PINK"View vec: X|%f|, Z|%f| "RESET":\n[%s] [%s]\n", xDir, zDir, NordSouth, EstWest);
 

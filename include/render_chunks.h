@@ -9,15 +9,25 @@ typedef struct s_render_chunks {
 	GLuint		faceVBO[6];
 	GLuint		faceTypeVBO[6];
 	u32			*faceCount;
-	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
-	suseconds_t lastUpdate;			/* Last update time */
-	
+
 	vec3		*topWaterFaceArray;
 	f32			*topWaterTypeID;
 	u32 		topWaterFaceCount;
 	GLuint		topWaterFaceVBO;
 	GLuint		topWaterTypeVBO;
+
+	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
+	suseconds_t lastUpdate;			/* Last update time */
 } RenderChunks;
+
+typedef struct s_underground_block {
+	u8		underground;
+	vec3	*undergroundFaceArray;
+	f32		*undergroundTypeID;
+	u32 	undergroundFaceCount;
+	GLuint	undergroundFaceVBO;
+	GLuint	undergroundTypeVBO;
+} UndergroundBlock;
 
 /* render/render_chunks.c */
 void			renderChunkFree(RenderChunks *render);

@@ -56,12 +56,9 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 {
 	u32 idx[6] = {0};
 	u32 waterFaceCount = 0;
-    // s8	next = TRUE;
-
 
 	ft_bzero(idx, sizeof(u32) * 6);
 
-	// mtx_lock(chunkMtx);
 	(void)chunkMtx;
 
 	render->faceCount = faceVisibleCount(chunks, &waterFaceCount);
@@ -70,6 +67,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 		render->faceTypeID[i] = ft_calloc(sizeof(f32), render->faceCount[i]);
 	}
 
+	/* Water face init */
 	render->topWaterFaceArray = ft_calloc(sizeof(vec3), waterFaceCount);
 	render->topWaterTypeID = ft_calloc(sizeof(f32), waterFaceCount);
 	render->topWaterFaceCount = waterFaceCount;
@@ -87,7 +85,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->faceTypeID[i][idx[i]] = (f32)block->type;
 					woolHelpDebug(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
 					idx[i] += 1;
-				} else if (i == 5U && block->type == WATER) {
+				} else if (i == 5U && block->type == WATER) { /* Water face fill */
 					render->topWaterFaceArray[waterFaceCount][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->topWaterFaceArray[waterFaceCount][1] = (f32)block->y + (f32)(subID * 16);
 					render->topWaterFaceArray[waterFaceCount][2] = (f32)block->z + (f32)(chunks->z * 16);
@@ -97,10 +95,6 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 			}
 		}
 	}
-
-
-
-	// mtx_unlock(chunkMtx);
 
 }
 
