@@ -16,6 +16,17 @@
 #define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size, cause one block is 0.5, 0.5 * 16 = 8.0f */
 #define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
 
+
+/* 
+	Compile freeType2 library
+	- gcl https://github.com/freetype/freetype.git 
+	(apt install libtool [libtool dependency for autogen.sh])
+	- sh autogen.sh
+	- ./configure
+	- make
+	(make install only with root permission)
+*/
+
 /* Basic value */
 #define CHUNKS_LOAD_RADIUS 16							/* Chunks load radius */
 // #define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 8)	/* Chunks unload max radius */
