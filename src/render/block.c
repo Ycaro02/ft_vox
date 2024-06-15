@@ -9,6 +9,18 @@ Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
 	return (hashmap_get(chunk->sub_chunks[subChunkID].block_map, (BlockPos){x, y, z}));
 }
 
+
+Block *worldPosProtectBlockGet(Chunks *chunk, BlockPos localPos, s32 camY) {
+	Block 	*block = NULL;
+	s32 	subChunkID = camY / 16;
+	s32 	maxSubChunk = chunk->perlinVal[localPos.x][localPos.z].normalise / 16;
+	if (subChunkID > maxSubChunk) {
+		return (NULL);
+	}
+	block = getBlockAt(chunk, localPos.x, localPos.y, localPos.z, subChunkID);
+	return (block);
+}
+
 /* Set local X and Z coordinates based on the center of the Perlin noise array */
 s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
 	return ((chunkOffset * CHUNKS_NB_BLOCK + localPos) + (width / 2));
@@ -175,9 +187,10 @@ void undergroundBlockcreate(Context *c) {
  * @param c The game context
  * @param blockPos The block position to set [out]
 */
-void undergroundBoolUpdate(Context *c, BlockPos *blockPos) {
+void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos) {
 	vec3		camPos = {0.0f};
 	Chunks		*chunk = NULL;
+	Block 		*block = NULL;
 	s32			currentMaxHeight = 0, currentCamY = 0, chunkPosx = 0, chunkPosz = 0;
 	
 	mtx_lock(&c->gameMtx);
@@ -186,16 +199,20 @@ void undergroundBoolUpdate(Context *c, BlockPos *blockPos) {
 	chunkPosz = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
-	blockPosFromCam(camPos, blockPos);
-
+	blockPosFromCam(camPos, localBlockPos);
 	chunk = hashmap_get(c->world->chunksMap, CHUNKS_MAP_ID_GET(chunkPosx, chunkPosz));
 	if (!chunk) {
 		return ;
 	}
-	currentMaxHeight = chunk->perlinVal[blockPos->x][blockPos->z].normalise;
-	currentCamY = (s32)floor((camPos[1] - 1.5f) *  2);
-	// ft_printf_fd(1, YELLOW"MaxHeight:|%d|, CurrentY:|%d|\n"RESET, currentMaxHeight, currentCamY);
-	if (currentMaxHeight <= currentCamY) {
+	currentMaxHeight = chunk->perlinVal[localBlockPos->x][localBlockPos->z].normalise;
+	
+	camPos[1] -= 0.2;
+	currentCamY = (s32)floor(camPos[1] *  2);
+	
+	block = worldPosProtectBlockGet(chunk, *localBlockPos, currentCamY);
+	if (!block) {
+		c->world->undergroundBlock->isUnderground = FALSE;
+	} else if (currentMaxHeight <= currentCamY) {
 		c->world->undergroundBlock->isUnderground = FALSE;
 	} else {
 		c->world->undergroundBlock->isUnderground = TRUE;
