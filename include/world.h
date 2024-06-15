@@ -1,25 +1,18 @@
 #ifndef HEADER_WORLD_H
 #define HEADER_WORLD_H
 
-#include "vox.h"
-#include "cube.h"
+// #include "vox.h"
+#include "typedef_struct.h"
 
-typedef struct	s_underground_block UndergroundBlock; 
-typedef struct 	s_camera Camera;
-typedef struct 	s_thread_entity ThreadEntity;
-typedef struct	s_underground_block UndergroundBlock;
 
-typedef 		mtx_t Mutex;
-typedef 		thrd_t Thread;
-
-typedef struct s_world {
+struct s_world {
 	u64					seed;					/* World seed */
 	HashMap				*chunksMap;				/* Chunks hashmap */
 	HashMap				*renderChunksMap;		/* Render chunks map */
 	UndergroundBlock 	*undergroundBlock;		/* Underground block */
-} World;
+};
 
-typedef struct s_thread_context {
+struct s_thread_context {
 	Thread			supervisor;			/* Thread supervisor */
 	Mutex 			chunkMtx;			/* Mutex to protect data, used for chunks hashmap  */
 	Mutex 			threadMtx;			/* Mutex to protect thread, used for thread status and chunk queue loading */
@@ -27,10 +20,10 @@ typedef struct s_thread_context {
 	HashMap 		*chunksMapToLoad;	/* Chunks queue to load, (for now contain ThreadData struct) */
     ThreadEntity	*workers;			/* Worker thread array */
 	s64         	workerMax;			/* Maximum of worker thread (size of workers array) */
-} ThreadContext;
+};
 
 /* Context structure */
-typedef struct s_context {
+struct s_context {
 	World				*world;				/* World structure */
 	Camera				cam;				/* camera structure */
     GLFWwindow			*win_ptr;			/* Window pointer */
@@ -63,7 +56,7 @@ typedef struct s_context {
 	s8					autoMove;			/* Auto move camera */
 	s8					autoRotate;			/* Auto rotate camera */
 	s8					displayUndergroundBlock; /* Display underground block */
-} Context;
+};
 
 
 /* RenderChunks ID in renderChunksHashmap, same id than CHUNKS_MAP_ID_GET(Chunks) */

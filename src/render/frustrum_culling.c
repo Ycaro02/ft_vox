@@ -1,3 +1,5 @@
+#include "../../include/camera.h"
+#include "../../include/vox.h"
 #include "../../include/world.h"
 #include "../../include/cube.h"
 #include "../../include/camera.h"

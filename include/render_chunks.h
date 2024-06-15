@@ -1,9 +1,9 @@
 #ifndef HEADER_RENDER_CHUNKS_H
 #define HEADER_RENDER_CHUNKS_H
 
-#include "chunks.h"
+#include "typedef_struct.h"
 
-typedef struct s_render_chunks {
+struct s_render_chunks {
 	vec3		*faceArray[6];
 	f32			*faceTypeID[6];
 	GLuint		faceVBO[6];
@@ -18,16 +18,16 @@ typedef struct s_render_chunks {
 
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
 	suseconds_t lastUpdate;			/* Last update time */
-} RenderChunks;
+};
 
-typedef struct s_underground_block {
+struct s_underground_block {
 	u8		isUnderground;
 	vec3	*udgFaceArray[6];
 	f32		*udgTypeID[6];
 	u32 	udgFaceCount;
 	GLuint	udgFaceVBO[6];
 	GLuint	udgTypeVBO[6];
-} UndergroundBlock;
+};
 
 /* render/render_chunks.c */
 void			renderChunkFree(RenderChunks *render);

@@ -2,11 +2,10 @@
 #define HEADER_CAMERA_H
 
 // #include "world.h"
-#include "../rsc/deps/cglm/include/cglm/cglm.h"
-#include "../libft/libft.h"
+#include "typedef_struct.h"
 
-typedef struct s_chunks Chunks;
-
+#define DIR_RIGHT 0
+#define DIR_LEFT 1
 
 #define ONE_CHUNK_PER_SEC 0.133333f /* 1 chunk per sec, 0.1333 * 60 = 8.0f */
 
@@ -38,17 +37,17 @@ typedef struct s_chunks Chunks;
 #define VEC3_ROTATEY 			(vec3){0.0f, 1.0f, 0.0f}
 #define VEC3_ROTATEZ 			(vec3){0.0f, 0.0f, 1.0f}
 
-typedef struct s_frustrum {
+struct s_frustrum {
     vec4 planes[6]; // Les plans du frustum : 0=droite, 1=gauche, 2=bas, 3=haut, 4=proche, 5=loin
-} Frustum;
+};
 
-typedef struct s_bounding_box {
+struct s_bounding_box {
     vec3 min; // Le coin inférieur gauche de la boîte
     vec3 max; // Le coin supérieur droit de la boîte
-} BoundingBox;
+};
 
 /* Camera structure */
-typedef struct s_camera {
+struct s_camera {
     vec3		position;			/* position vector */
     vec3		target;				/* target vector */
     vec3		up;					/* up vector */
@@ -59,7 +58,7 @@ typedef struct s_camera {
 	Frustum		frustum;			/* Frustum */
 	f32			camSpeed;			/* Camera speed */
 	// mat4		view_no_translation;
-} Camera; 
+}; 
 
 /* Frustrum */
 s8			isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box);

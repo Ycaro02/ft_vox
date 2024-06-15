@@ -4,6 +4,7 @@
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
 #include "../../include/block.h"
+#include "../../include/world.h"
 
 
 // s32 chunksManhattanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {

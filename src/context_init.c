@@ -4,6 +4,8 @@
 #include "../include/render_chunks.h"
 #include "../include/perlin_noise.h"
 #include "../include/thread_load.h"
+#include "../include/cube.h"
+#include "../include/world.h"
 
 
 u8 *perlinNoiseGeneration(unsigned int seed) {
@@ -67,7 +69,7 @@ u8	**perlinSnakeCave2DGet() {
 
 s8 mutexMultipleInit(Context *c) {
 
-	if (	mtx_init(&c->renderMtx, mtx_plain) == thrd_error
+	if ( mtx_init(&c->renderMtx, mtx_plain) == thrd_error
 		|| mtx_init(&c->gameMtx, mtx_plain) == thrd_error
 		|| mtx_init(&c->isRunningMtx, mtx_plain) == thrd_error
 		|| mtx_init(&c->vboToDestroyMtx, mtx_plain) == thrd_error

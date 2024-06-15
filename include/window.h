@@ -1,7 +1,8 @@
 #ifndef HEADER_WINDOW_GLFW
 #define HEADER_WINDOW_GLFW 1
 
-#include "vox.h"
+// #include "vox.h"
+#include "typedef_struct.h"
 
 /* openGL_glw_init.c */
 

@@ -2,15 +2,7 @@
 #define VOX_HEADER_H
 
 #include <math.h>					            /* LIBC Math functions */
-#include "glad/gl.h"				            /* Glad functions (Include glad header BEFORE glfw3) */
-#include "glfw3/glfw3.h"			            /* GLFW functions */
-#include "../rsc/deps/cglm/include/cglm/cglm.h" /* CGLM C maths openGL */
-#include "../src/tinycthread/tinycthread.h"        /* TinyCThread functions */
-
-#include "../libft/libft.h"		                /* Libft functions */
-#include "../libft/parse_flag/parse_flag.h"		/* Parse flag functions */
-#include "../libft/HashMap/HashMap.h"			/* Hashmap functions */
-#include "../libft/BMP_parser/parse_bmp.h"		/* BMP parser functions */
+#include "typedef_struct.h"		                /* Struct typedef */
 #include "window.h"					            /* Window related functions */
 #include "win_event.h"				            /* Window event handling functions */
 #include "camera.h"                             /* Camera handling function */
@@ -64,8 +56,7 @@
 #define SKY_FRAGMENT_SHADER		"rsc/shaders/sky_fragment_shader.glsl"
 
 
-#define DIR_RIGHT 0
-#define DIR_LEFT 1
+
 
 /* Perlin noise value generation for relief */
 #define PERLIN_OCTAVE 8

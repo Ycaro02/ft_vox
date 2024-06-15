@@ -1,3 +1,6 @@
+#include "../../include/camera.h"
+#include "../../include/vox.h"
+#include "../../include/world.h"
 #include "../../include/render_chunks.h"
 #include "../../include/perlin_noise.h"
 #include "../../include/chunks.h"

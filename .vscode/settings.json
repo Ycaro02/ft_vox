@@ -61,6 +61,7 @@
 		"__stdarg_va_arg.h": "c",
 		"__stdarg_va_copy.h": "c",
 		"types.h": "c",
-		"vec3.h": "c"
+		"vec3.h": "c",
+		"typedef_struct.h": "c"
 	}
 }

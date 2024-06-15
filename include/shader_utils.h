@@ -1,7 +1,7 @@
 #ifndef HEADER_SHADER_UTILS_H
 #define HEADER_SHADER_UTILS_H
 
-#include "vox.h"
+#include "typedef_struct.h"
 
 /* shader_utils.c */
 void 	set_shader_var_vec4(GLuint shader_id, char *var_name, vec4 vec);

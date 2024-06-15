@@ -1,6 +1,8 @@
 #include "../../include/vox.h"			/* Main project header */
+#include "../../include/world.h"		/* Main project header */
 #include "../../include/chunks.h"		/* Main project header */
 #include "../../include/render_chunks.h"	/* Main project header */
+
 
 void renderChunkFree(RenderChunks *render) {
 	free(render->faceCount);

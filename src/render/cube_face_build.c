@@ -1,9 +1,11 @@
 #include "../../include/vox.h"			/* Main project header */
+#include "../../include/world.h"
 #include "../../include/chunks.h"
 #include "../../include/perlin_noise.h"
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
 #include "../../include/block.h"
+#include "../../include/cube.h"
 
 s8 faceHidden(u8 neighbors, u8 face) {
 	return (neighbors & (1U << face));
@@ -164,16 +166,10 @@ void drawSpecialFace(GLuint faceVBO, GLuint typeVBO, u32 vertex_nb, u32 faceNb) 
 
 /* TO CALL in chunksRender in main  -> DONE */
 void drawAllChunksByFace(Context *c) {
-    HashMap_it	it;
-    // s8			next = TRUE;
-	RenderChunks *render = NULL;
-	u32 faceNb = 0;
-
-    u32 		chunkRenderNb = 0, faceRendernb = 0;
+    HashMap_it		it;
+	RenderChunks	*render = NULL;
+    u32 			chunkRenderNb = 0, faceRendernb = 0, faceNb = 0;
     
-	// undergroundBlockcreate(c);
-
-
     mtx_lock(&c->renderMtx);
     for (u8 i = 0; i < 6; ++i) {
 		glBindVertexArray(c->faceCube[i].VAO);

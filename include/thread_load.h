@@ -1,38 +1,31 @@
 #ifndef HEADER_THREAD_LOAD_H
 #define HEADER_THREAD_LOAD_H
 
-#include <stdio.h>									/* perror */
-#include <unistd.h>									/* sysconf */	
-#include "../src/tinycthread/tinycthread.h"			/* TinyCThread functions */
-#include "world.h"									/* Context */
-
-typedef thrd_t Thread;
-typedef mtx_t Mutex;
-
+#include "typedef_struct.h"							/* Struct typedef */
 
 #define LOAD_PRIORITY_LOW 		0U
 #define LOAD_PRIORITY_HIGH 		1U
 
 /* Thread data */
-typedef struct s_thread_data {
+struct s_thread_data {
 	Context *c;
 	Mutex	*chunkMtx;
 	s32 	chunkX;
 	s32 	chunkZ;
 	s8		threadID;
 	u8 		priority;
-} ThreadData;
+};
 
 /* Workers status */
 #define WORKER_FREE 0
 #define WORKER_BUSY 1
 
 /* Thread entity */
-typedef struct s_thread_entity {
+struct s_thread_entity {
 	Thread		thread;
 	s8			busy;
 	ThreadData	*data;
-} ThreadEntity;
+};
 
 /**
  * @brief Get the number of threads available on the system

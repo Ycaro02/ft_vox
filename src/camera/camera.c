@@ -1,7 +1,8 @@
+#include "../../include/camera.h"
 #include "../../include/world.h"
 #include "../../include/cube.h"
-#include "../../include/camera.h"
 #include "../../include/chunks.h"
+#include "../../include/shader_utils.h"
 
 void chunkPosGet(Camera *camera)
 {

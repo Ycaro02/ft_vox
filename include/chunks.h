@@ -1,7 +1,7 @@
 #ifndef HEADER_CHUNKS_H
 #define HEADER_CHUNKS_H
 
-#include "world.h"
+#include "typedef_struct.h"
 
 #define CHUNKS_HEIGHT   	256U	/* Height max for one chunk */
 #define SUB_CHUNKS_HEIGHT   16U		/* Height max for one subchunk */
@@ -12,15 +12,13 @@
 #define CHUNKS_NB_BLOCK   	16	/* Number of block in X */
 #define CAVE_ENTRY_DEPTH	15	/* Cave entry depth */
 
-typedef struct s_render_chunks	RenderChunks;
-typedef struct s_perlin_data 	PerlinData;
-typedef struct s_block 			Block;
 
-typedef struct s_sub_chunks {
+
+struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
-} SubChunks;
+};
 
-typedef struct s_chunks {
+struct s_chunks {
 	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
 	u32				nb_block;					/* nb block (outdated value total of blockmap subchunk) */
 	s32				x;							/* Chunk offset X can be negative  (relative to origine chunks) */	
@@ -31,7 +29,7 @@ typedef struct s_chunks {
 	RenderChunks 	*render;					/* RenderChunks pointer */
 	u8				neighbors;					/* Neighbors */
 	u8				occlusionDone;				/* Neighbors occlusion done */
-} Chunks;
+};
 
 #define CHUNK_NEIGHBOR_BACK 	1U
 #define CHUNK_NEIGHBOR_FRONT 	2U
