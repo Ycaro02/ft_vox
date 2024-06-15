@@ -1,3 +1,9 @@
+// #include "../../freetype/freetype/include/ft2build.h"
+// #include "../../freetype/freetype/include/freetype/freetype.h"
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include "../include/vox.h"			/* Main project header */
 #include "../include/world.h"
 #include "../include/skybox.h"		/* skybox rendering */
@@ -7,6 +13,31 @@
 #include "../include/block.h"
 #include "../include/cube.h"
 #include "../include/chunks.h"
+
+void initFreeTypeFont(Context *c) {
+	(void)c;
+	FT_Library ft;
+	FT_Face face;
+
+	if (FT_Init_FreeType(&ft)) {
+		ft_printf_fd(2, "ERROR::FREETYPE: Could not init FreeType Library\n");
+		return ;
+	}
+	if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face)) {
+		ft_printf_fd(2, "ERROR::FREETYPE: Failed to load font\n");
+		return ;
+	}
+	// FT_Set_Pixel_Sizes(face, 0, 48);
+	// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	// if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
+	// 	ft_printf_fd(2, "ERROR::FREETYPE: Failed to load Glyph\n");
+	// 	return ;
+	// }
+
+	// FT_Done_Face(face);
+	// FT_Done_FreeType(ft);
+}
 
 void chunksRender(Context *c, GLuint shader_id) {
     glLoadIdentity();

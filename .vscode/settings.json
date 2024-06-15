@@ -62,6 +62,12 @@
 		"__stdarg_va_copy.h": "c",
 		"types.h": "c",
 		"vec3.h": "c",
-		"typedef_struct.h": "c"
+		"typedef_struct.h": "c",
+		"ft2build.h": "c",
+		"ftheader.h": "c",
+		"freetype.h": "c",
+		"fttypes.h": "c",
+		"fterrors.h": "c",
+		"ftconfig.h": "c"
 	}
 }

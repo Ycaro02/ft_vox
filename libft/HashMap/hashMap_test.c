@@ -14,7 +14,7 @@ int compare_BlockPos(BlockPos pos1, BlockPos pos2) {
 // Function to compare values
 int compare_values(void *value1, void *value2) {
     // For this example, assuming values are strings
-    return ft_strcmp((char *)value1, (char *)value2) == 0;
+    return ftlib_strcmp((char *)value1, (char *)value2) == 0;
 }
 
 int compare_keys(u64 key1, u64 key2) {

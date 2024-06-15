@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 15:43:41 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/05 21:51:19 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/15 21:22:24 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,11 @@ char	*ft_strnstr(const char *big, const char *little, size_t len);
 char	*ft_strdup(const char *s);
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 void	ft_striteri(char *s, void (*f)(unsigned int, char*));
-int 	ft_strcpy(char* dst, char *src, int len);	
+int 	ftlib_strcpy(char* dst, char *src, int len);	
 void 	ft_free_tab(char **tab);
 char    *ft_strjoin_free(char *s1, char *s2, char option);
 int 	ft_lower_strcmp(char *s1, char *s2);
-int 	ft_strcmp(char *s1, char *s2);
+int 	ftlib_strcmp(char *s1, char *s2);
 void 	free_incomplete_array(void **array, int max);
 int8_t	str_is_digit(char *str);
 int8_t	str_is_hexa(char *str);

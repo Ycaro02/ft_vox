@@ -10,21 +10,23 @@ CFLAGS			=	-Wall -Wextra -Werror -O3 -g3
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
 
-OPENGL_LIB		= -lglfw3 -lGL -lm -Lrsc/lib_deps/
+FREETYPE_INC	=	-Irsc/deps/freetype/include -Irsc/deps/freetype/include/freetype2
+
+OPENGL_LIB		= -lglfw3 -lGL -lm -Lrsc/lib_deps/ -lfreetype -Lrsc/depsfreetype
 VALGRIND_TEST	= valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
 
 INSTALL_DEPS	=	./install/install_deps.sh
 
 all:		$(NAME)
 
-%.o : %.c
-	@$(CC) $(CFLAGS) -c $< -o $@
+# %.o : %.c
+# 	@$(CC) $(CFLAGS) $(FREETYPE_INC) -c $< -o $@
 
 $(NAME):	deps_install $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS) $(DISPLAY_NAME)
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) ${OPENGL_LIB}
+	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) ${OPENGL_LIB}
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
 
 deps_install:
@@ -50,7 +52,7 @@ $(OBJ_DIR):
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@printf "$(YELLOW)Compile $<$(RESET)\n"
-	@$(CC) -o $@ -c $< $(CFLAGS)
+	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $@ -c $< $(CFLAGS)
 
 bonus: clear_mandatory ${NAME}
 

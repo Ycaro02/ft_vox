@@ -14,7 +14,7 @@ t_sstring fill_sstring(char *str)
     size_t len = ft_strlen(str);
 
     ft_bzero(&sstr, sizeof(t_sstring));
-    ft_strcpy(sstr.data, str, len);
+    ftlib_strcpy(sstr.data, str, len);
     sstr.size = len;
     return (sstr);
 }
@@ -48,7 +48,7 @@ void concat_sstring(t_sstring *sstr, char *str)
     size_t len = ft_strlen(str);
 
     if (sstr->size + len < SSTRING_MAX) {
-        ft_strcpy(sstr->data + sstr->size, str, len);
+        ftlib_strcpy(sstr->data + sstr->size, str, len);
         sstr->size += len;
         sstr->data[sstr->size] = 0;
     }

@@ -22,3 +22,9 @@ fi
 if [ ! -d "rsc/deps/tinycthread" ]; then
 	./install/install_tinycthread.sh
 fi
+
+# deps needed for freetype 
+# libtool [libtool dependency for autogen.sh])
+if [ ! -d "rsc/deps/freetype" ]; then
+	./install/install_freetype.sh
+fi
