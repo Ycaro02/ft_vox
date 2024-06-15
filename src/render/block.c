@@ -78,13 +78,12 @@ static void blockNegPosHandle(BlockPos *blockPos) {
 	if (blockPos->y < 0) { blockPos->y = 0; } 
 }
 
-void blockPosFromCam(vec3 camPos, BlockPos *blockPos) {
+void blockLocalPosFromCam(vec3 camPos, BlockPos *blockPos) {
  	blockPos->x = (s32)(floor(camPos[0] * 2.0f));
     blockPos->y = (s32)(floor(camPos[1] * 2.0f));
     blockPos->z = (s32)(floor(camPos[2] * 2.0f));
 	blockNegPosHandle(blockPos);
 }
-
 
 /* Underground display logic */
 /**
@@ -110,32 +109,33 @@ void undergroundBlockFree(UndergroundBlock *udg) {
  * @param faceTypeID The face type array
  * @param camPos The camera position
 */
-void underGroundBlockDataFill(vec3 *faceArray, f32 *faceTypeID, vec3 camPos) {
+void underGroundBlockDataFill(s32 columnMaxHeight, vec3 *faceArray, f32 *faceTypeID, vec3 camPos) {
+	BlockPos	increment = {-1.0f, -1.0f, -1.0f};
+	f32			blockType = STONE;
+	s32 		idx = 0;
+	s8 			firstIter = TRUE;
 
-	s32 incrementX = -1.0f;
-	s32 incrementY = -1.0f;
-	s32 incrementZ = -1.0f;
-	s32 idx = 0;
-	s8 	firstIter = TRUE;
-
+	if ((s32)(camPos[1] * 2.0f) >= columnMaxHeight - 1) {
+		blockType = DIRT;
+	}
 
 	for (s32 layer = 0; layer < 3; layer++) {
 		for (s32 i = 0; i < UNDERGROUND_FACE_NB; ++i) {
 			if (!firstIter && i % 3 == 0) {
-				incrementX += 1.0f;
-				incrementZ = -1.0f;
+				increment.x += 1.0f;
+				increment.z = -1.0f;
 			}
 			idx = i + (UNDERGROUND_FACE_NB * layer);
-			faceArray[idx][0] = (camPos[0] * 2.0f) + incrementX;
-			faceArray[idx][1] = (camPos[1] * 2.0f) + incrementY;
-			faceArray[idx][2] = (camPos[2] * 2.0f) + incrementZ;
-			faceTypeID[idx] = (f32)STONE;
-			incrementZ += 1.0f;
+			faceArray[idx][0] = (camPos[0] * 2.0f) + increment.x;
+			faceArray[idx][1] = (camPos[1] * 2.0f) + increment.y;
+			faceArray[idx][2] = (camPos[2] * 2.0f) + increment.z;
+			faceTypeID[idx] = blockType;
+			increment.z += 1.0f;
 			firstIter = FALSE;
 		}
-		incrementY += 1.0f;
-		incrementX = -1.0f;
-		incrementZ = -1.0f;
+		increment.y += 1.0f;
+		increment.x = -1.0f;
+		increment.z = -1.0f;
 		firstIter = TRUE;
 	}
 
@@ -147,13 +147,14 @@ void underGroundBlockDataFill(vec3 *faceArray, f32 *faceTypeID, vec3 camPos) {
  * @param c The game context
 */
 void undergroundBlockcreate(Context *c) {
+	static BlockPos 	lastBlockPos = {-1, -1, -1};
 	vec3				camPos = {0};
 	UndergroundBlock	*udg = NULL;
 	BlockPos			currentBloc = {0};
-	static BlockPos 	lastBlockPos = {-1, -1, -1};
+	s32					columnMaxHeight = 0;
 
 
-	undergroundBoolUpdate(c, &currentBloc);
+	undergroundBoolUpdate(c, &currentBloc, &columnMaxHeight);
 	if (!c->world->undergroundBlock->isUnderground
 		|| BLOCKPOS_CMP(lastBlockPos, currentBloc)) {
 		return ;
@@ -174,7 +175,7 @@ void undergroundBlockcreate(Context *c) {
 	for (u8 i = 0; i < 6; ++i) {
 		udg->udgFaceArray[i] = ft_calloc(sizeof(vec3), TOTAL_UNDERGROUND_FACE);
 		udg->udgTypeID[i] = ft_calloc(sizeof(vec3), TOTAL_UNDERGROUND_FACE);
-		underGroundBlockDataFill(udg->udgFaceArray[i], udg->udgTypeID[i], camPos);
+		underGroundBlockDataFill(columnMaxHeight, udg->udgFaceArray[i], udg->udgTypeID[i], camPos);
 		udg->udgFaceVBO[i] = faceInstanceVBOCreate(udg->udgFaceArray[i], TOTAL_UNDERGROUND_FACE);
 		udg->udgTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, TOTAL_UNDERGROUND_FACE * sizeof(GLuint), (void *)udg->udgTypeID[i]);
 		udg->udgFaceCount += TOTAL_UNDERGROUND_FACE;
@@ -187,11 +188,11 @@ void undergroundBlockcreate(Context *c) {
  * @param c The game context
  * @param blockPos The block position to set [out]
 */
-void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos) {
+void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHeight) {
 	vec3		camPos = {0.0f};
 	Chunks		*chunk = NULL;
 	Block 		*block = NULL;
-	s32			currentMaxHeight = 0, currentCamY = 0, chunkPosx = 0, chunkPosz = 0;
+	s32			currentCamY = 0, chunkPosx = 0, chunkPosz = 0;
 	
 	mtx_lock(&c->gameMtx);
 	glm_vec3_copy(c->cam.position, camPos);
@@ -199,20 +200,25 @@ void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos) {
 	chunkPosz = c->cam.chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
-	blockPosFromCam(camPos, localBlockPos);
+	blockLocalPosFromCam(camPos, localBlockPos);
 	chunk = hashmap_get(c->world->chunksMap, CHUNKS_MAP_ID_GET(chunkPosx, chunkPosz));
 	if (!chunk) {
 		return ;
 	}
-	currentMaxHeight = chunk->perlinVal[localBlockPos->x][localBlockPos->z].normalise;
+	*columnMaxHeight = chunk->perlinVal[localBlockPos->x][localBlockPos->z].normalise;
 	
-	camPos[1] -= 0.2;
+
+	camPos[1] -= 0.333333f;
+	if (camPos[1] < 0) {
+		c->world->undergroundBlock->isUnderground = FALSE;
+		return ;
+	}
 	currentCamY = (s32)floor(camPos[1] *  2);
 	
 	block = worldPosProtectBlockGet(chunk, *localBlockPos, currentCamY);
 	if (!block) {
 		c->world->undergroundBlock->isUnderground = FALSE;
-	} else if (currentMaxHeight <= currentCamY) {
+	} else if (*columnMaxHeight <= currentCamY) {
 		c->world->undergroundBlock->isUnderground = FALSE;
 	} else {
 		c->world->undergroundBlock->isUnderground = TRUE;

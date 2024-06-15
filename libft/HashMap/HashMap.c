@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:27 by nfour             #+#    #+#             */
-/*   Updated: 2024/06/02 15:23:33 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/15 13:51:06 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,11 +74,15 @@ void hashmap_destroy(HashMap *map) {
 
 void *hashmap_get(HashMap *map, BlockPos p) {
 	u64		key = hash_block_position(p.x, p.y, p.z);
-	size_t	index = HASHMAP_INDEX(key, map->capacity);
 	t_list	*entry =  NULL;
 	void	*ret = NULL;
+	size_t	index;
 
+	if (!map) {
+		return (NULL);
+	}
 	mtx_lock(&map->mtx);
+	index = HASHMAP_INDEX(key, map->capacity);
 	entry = map->entries[index];
 	while (entry) {
 		HashMap_entry *e = (HashMap_entry *)entry->content;

@@ -21,6 +21,10 @@ void act_autoRotateTrigger(Context *c) {
 	c->autoRotate = (c->autoRotate == FALSE) ? TRUE : FALSE;
 }
 
+void act_displayUnderGroundTrigger(Context *c) {
+	c->displayUndergroundBlock = (c->displayUndergroundBlock == FALSE) ? TRUE : FALSE;
+}
+
 /* Zoom : W */
 void act_zoom(Context *c) {
     move_camera_forward(&c->cam, c->cam.camSpeed);
@@ -113,25 +117,25 @@ void displayChunkData(Context *c, Chunks *chunk){
 
 
 void displayBlockPosition(Chunks *chunk, BlockPos blockPos) {
-	ft_printf_fd(1, PURPLE"\n-----------------\n"RESET);
+	ft_printf_fd(1, PURPLE"-----------------\n"RESET);
 	ft_printf_fd(1, YELLOW"Chunk : X|%d|, Z|%d|\n"RESET, chunk->x, chunk->z);
 	ft_printf_fd(1, ORANGE"World : X|%d|, Z|%d|\n"RESET, blockPos.x + 16 * chunk->x, blockPos.z + 16 * chunk->z);
 	ft_printf_fd(1,   CYAN"Local : X|%d|, Z|%d|\n"RESET, blockPos.x, blockPos.z);
-	ft_printf_fd(1, PURPLE"\n-----------------\n"RESET);
+	ft_printf_fd(1, PURPLE"-----------------\n"RESET);
 
 }
 
 void testChunksExist(Context *c) {
 	BlockPos chunkPos = CHUNKS_MAP_ID_GET(c->cam.chunkPos[0], c->cam.chunkPos[2]);
 	// display_camera_value(c);
-	ft_printf_fd(1, YELLOW"Test for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, chunkPos.y, chunkPos.z);
+	ft_printf_fd(1, YELLOW"\nTest for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, chunkPos.y, chunkPos.z);
 	Chunks *chunks = hashmap_get(c->world->chunksMap, chunkPos);
 	if (chunks) {
 		ft_printf_fd(1, GREEN" -> Chunk exist\n"RESET);
 		BlockPos blockPos = {0};
-		blockPosFromCam(c->cam.position, &blockPos);
+		blockLocalPosFromCam(c->cam.position, &blockPos);
 		Chunks	*chunk = hashmap_get(c->world->chunksMap, chunkPos);
-		ft_printf_fd(1, CYAN"\nCam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2]);
+		ft_printf_fd(1, CYAN"Cam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2]);
 		displayBlockPosition(chunk, blockPos);
 		// ft_printf_fd(1, CYAN"Perlin Height\n");
 		// displayPerlinNoise(blockPos.x,blockPos.z,chunk->perlinVal[blockPos.x][blockPos.z]);
@@ -204,6 +208,7 @@ void handle_input(void *context)
 		{GLFW_KEY_L, act_change_cam_speed, SINGLE_PRESS},
 		{GLFW_KEY_M, act_autoMoveTrigger, SINGLE_PRESS},
 		{GLFW_KEY_N, act_autoRotateTrigger, SINGLE_PRESS},
+		{GLFW_KEY_U, act_displayUnderGroundTrigger, SINGLE_PRESS}
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(KeyAction));
 	s32				state = GLFW_RELEASE;

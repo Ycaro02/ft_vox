@@ -187,7 +187,7 @@ void drawAllChunksByFace(Context *c) {
             chunkRenderNb++;
         }
 	
-		if (c->world->undergroundBlock->isUnderground) {
+		if (c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
 			drawSpecialFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, TOTAL_UNDERGROUND_FACE);			
 		}
 

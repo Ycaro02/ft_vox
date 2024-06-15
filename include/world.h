@@ -62,6 +62,7 @@ typedef struct s_context {
 	u8					renderDataNeeded; 	/* Render need data, bool to specify render want to lock data (chunkMtx) */
 	s8					autoMove;			/* Auto move camera */
 	s8					autoRotate;			/* Auto rotate camera */
+	s8					displayUndergroundBlock; /* Display underground block */
 } Context;
 
 

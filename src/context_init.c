@@ -94,6 +94,9 @@ Context *contextInit() {
 	context->isPlaying = TRUE;
 	mtx_unlock(&context->isRunningMtx);
 
+	context->displayUndergroundBlock = TRUE;
+
+
 	mtx_lock(&context->gameMtx);
 	context->cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(SCREEN_WIDTH, SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
 	extractFrustumPlanes(&context->cam.frustum, context->cam.projection, context->cam.view);
