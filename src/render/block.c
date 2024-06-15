@@ -7,11 +7,8 @@
 #include "../../include/block.h"
 
 Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
-	(void)y;
-	// return (hashmap_get(chunk->sub_chunks[y / 16].block_map, (BlockPos){x, y % 16, z}));
 	return (hashmap_get(chunk->sub_chunks[subChunkID].block_map, (BlockPos){x, y, z}));
 }
-
 
 Block *worldPosProtectBlockGet(Chunks *chunk, BlockPos localPos, s32 camY) {
 	Block 	*block = NULL;
