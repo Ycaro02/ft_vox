@@ -18,6 +18,7 @@ struct s_font_context {
 	GLuint 			VAO, VBO;
 	GLuint 			fontShaderID;
 	CharacterFont	*font;
+	mat4			projection;
 };
 
 struct s_character_font {
@@ -26,6 +27,44 @@ struct s_character_font {
 	vec2 	Bearing;	/* Offset from baseline to left/top of glyph */
 	GLuint	Advance;	/* Offset to advance to next glyph */
 };
+
+
+void renderFontText(Context *c, const char *text, f32 x, f32 y, f32 scale, vec3 color) {
+	glUseProgram(c->fontContext->fontShaderID);
+	set_shader_var_vec3(c->fontContext->fontShaderID, "textColor", color);
+	glActiveTexture(GL_TEXTURE0);
+	glBindVertexArray(c->fontContext->VAO);
+
+	/* Iterate through all characters */
+	for (u32 i = 0; i < ft_strlen(text); i++) {
+		CharacterFont ch = c->fontContext->font[(s8)text[i]];
+		f32 xpos = x + ch.Bearing[0] * scale;
+		f32 ypos = y - (ch.Size[1] - ch.Bearing[1]) * scale;
+		f32 w = ch.Size[0] * scale;
+		f32 h = ch.Size[1] * scale;
+		/* Update VBO for each character */
+		f32 vertices[6][4] = {
+			{xpos, ypos + h, 0.0f, 0.0f},
+			{xpos, ypos, 0.0f, 1.0f},
+			{xpos + w, ypos, 1.0f, 1.0f},
+			{xpos, ypos + h, 0.0f, 0.0f},
+			{xpos + w, ypos, 1.0f, 1.0f},
+			{xpos + w, ypos + h, 1.0f, 0.0f}
+		};
+		/* Render glyph texture over quad */
+		glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+		/* Update content of VBO memory */
+		glBindBuffer(GL_ARRAY_BUFFER, c->fontContext->VBO);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		/* Render quad */
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		/* Now advance cursors for next glyph */
+		x += (ch.Advance >> 6) * scale; /* Bitshift by 6 to get value in pixels (1/64th times 2^6 = 64) */
+	}
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+}
 
 s8 freeTypeFontLoadChar(Context *context, FT_Face face) {
 
@@ -94,12 +133,7 @@ void freeTypeFontInit(Context *c) {
 		ft_printf_fd(2, "ERROR::FREETYPE: Failed to allocate memory for font context\n");
 		return ;
 	}
-	if (!freeTypeFontLoadChar(c, face)) {
-		return ;
-	}
-	/* Free the free type rsc */
-	FT_Done_Face(face);
-	FT_Done_FreeType(ft);
+
 
 	/* Configure VAO/VBO for texture quads */
 	glGenVertexArrays(1, &c->fontContext->VAO);
@@ -114,6 +148,18 @@ void freeTypeFontInit(Context *c) {
 
 	/* Load font shaders */
 	c->fontContext->fontShaderID = load_shader(CHAR_VERTEX_SHADER, CHAR_FRAGMENT_SHADER);
+	glUseProgram(c->fontContext->fontShaderID);
+	VOX_PROTECTED_LOG(c, CYAN"Font shader id: %d\n"RESET, c->fontContext->fontShaderID);
+	if (!freeTypeFontLoadChar(c, face)) {
+		return ;
+	}
+	/* Free the freetype rsc */
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+
+	glm_ortho(0.0f, (f32)SCREEN_WIDTH, 0.0f, (f32)SCREEN_HEIGHT, -1.0f, 1.0f, c->fontContext->projection);
+	set_shader_var_mat4(c->fontContext->fontShaderID, "projection", c->fontContext->projection);
+	set_shader_texture(c->fontContext->fontShaderID, c->fontContext->font[0].TextureID, GL_TEXTURE_2D, "text");
 }
 
 void chunksRender(Context *c, GLuint shader_id) {
@@ -229,21 +275,29 @@ void updateGame(Context *c) {
 
 	/* Update data */
 	mtx_lock(&c->gameMtx);
-	// mtxLockUpdateTime(c, &c->gameMtx, &c->mtxTime.start, &c->mtxTime.end, &c->mtxTime.gameMtxTime, "Game");
-
+	glUseProgram(c->cubeShaderID);
 	handle_input(c);
 	update_camera(c, c->cubeShaderID);
-
+	glUseProgram(0);
 	mtx_unlock(&c->gameMtx);
+}
+
+void fpsDisplayOnScreen(Context *c) {
+	renderFontText(c, "FPS: ", 15.0f, (f32)SCREEN_HEIGHT - 25.0f, 0.4f, (vec3){1.0, 1.0, 0.0});
+	char *fps = ft_itoa(fpsGet());
+	renderFontText(c, (const char *)fps, 80.0f, (f32)SCREEN_HEIGHT - 25.0f, 0.4f, (vec3){1.0, 0.7, 0.0});
+	free(fps);
 }
 
 void renderGame(Context *c, GLuint skyTexture) {
 	/* Update render */
 	renderChunksVBOhandling(c);
+	/* Clear the color and depth buffer */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	/* Render logic */
 	displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
 	chunksRender(c, c->cubeShaderID);
+	fpsDisplayOnScreen(c);
 	glfwSwapBuffers(c->win_ptr);
 }
 

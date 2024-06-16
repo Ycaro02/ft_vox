@@ -77,13 +77,10 @@ GLuint load_shader(char *vertexShader, char *fragmentShader)
 		glGetProgramInfoLog(shaderID , 512, NULL, data);
 		ft_printf_fd(2, "Shader program log: %s\n", data);
 	} 
-	// else {
-	// 	ft_printf_fd(1, "Shader program linked\n");
-	// }
 
-	glUseProgram(shaderID);
+	// glUseProgram(shaderID);
 
-	/* delete shader tocheck */
+	/* delete shader fragment */
 	glDeleteShader(frag_vertex_shader);
 	glDeleteShader(frag_pixel_shader);
 

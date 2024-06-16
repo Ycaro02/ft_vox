@@ -4,6 +4,7 @@
 #include "typedef_struct.h"
 
 /* shader_utils.c */
+char	*load_shader_file(char *path);
 void 	set_shader_var_vec4(GLuint shader_id, char *var_name, vec4 vec);
 void 	set_shader_var_mat4(GLuint shader_id, char *var_name, mat4 data);
 void 	set_shader_var_float(GLuint shader_id, char *var_name, float data);

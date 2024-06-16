@@ -21,15 +21,74 @@ u8 *perlinNoiseGenerationWithoutSeed(s32 width, s32 height) {
 }
 
 
+void resetOpenGLContext() {
+	glUseProgram(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0); // Pour les textures 2D
+}
+
 void initSkyBox(Context *c) {
 	c->skyboxVAO = skyboxInit();
 	c->skyboxShaderID = load_shader(SKY_VERTEX_SHADER, SKY_FRAGMENT_SHADER);
+	glUseProgram(c->skyboxShaderID);
+	VOX_PROTECTED_LOG(c, CYAN"Skybox shader id: %d\n"RESET, c->skyboxShaderID);
 	c->skyTexture = load_cubemap(TEXTURE_SKY_PATH, 1024, 1024);
 	set_shader_texture(c->skyboxShaderID, c->skyTexture, GL_TEXTURE_CUBE_MAP, "texture1");
+
+}
+
+
+GLuint test_shader(char *vertexShader, char *fragmentShader)
+{
+	char *vertex_shader = load_shader_file(vertexShader);
+	char *fragment_shader = load_shader_file(fragmentShader);
+	
+	/* create shader */
+	GLuint frag_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint frag_pixel_shader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	/* compile shader */
+	glShaderSource(frag_vertex_shader, 1, (const char **)&vertex_shader, NULL);
+	glCompileShader(frag_vertex_shader);
+
+	glShaderSource(frag_pixel_shader, 1, (const char **)&fragment_shader, NULL);
+	glCompileShader(frag_pixel_shader);
+
+	GLuint shaderID = glCreateProgram();
+	
+	/* Attach and link shader program  */
+	glAttachShader(shaderID , frag_vertex_shader);
+	glAttachShader(shaderID , frag_pixel_shader);
+	
+	glLinkProgram(shaderID);
+
+	GLint succes = 0;
+	glGetProgramiv(shaderID , GL_LINK_STATUS, &succes);
+	if (!succes) {
+		GLchar data[1024];
+		ft_bzero(data, 1024);
+		glGetProgramInfoLog(shaderID , 512, NULL, data);
+		ft_printf_fd(2, "Shader program log: %s\n", data);
+	} 
+
+	// glUseProgram(shaderID);
+
+	/* delete shader fragment */
+	glDeleteShader(frag_vertex_shader);
+	glDeleteShader(frag_pixel_shader);
+
+	/* delete ressource */
+	free(vertex_shader);
+	free(fragment_shader);
+	// return (0);
+	return (shaderID);
 }
 
 void initAtlasTexture(Context *c) {
-	c->cubeShaderID = load_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
+	(void)c;
+	c->cubeShaderID = test_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
+	VOX_PROTECTED_LOG(c, CYAN"Cube shader id: %d\n"RESET, c->cubeShaderID);
 	GLuint textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16);
 	set_shader_texture(c->cubeShaderID, textureAtlas, GL_TEXTURE_3D, "textureAtlas");
 }
@@ -117,11 +176,8 @@ Context *contextInit() {
 		return (NULL);
 	} 
 
-	
-
 	/* init context camera */
     glm_mat4_identity(context->rotation);
-
 	initSkyBox(context);
 	initAtlasTexture(context);
 	return (context);
