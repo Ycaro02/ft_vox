@@ -55,7 +55,8 @@
 #define SKY_VERTEX_SHADER		"rsc/shaders/sky_vertex_shader.glsl"
 #define SKY_FRAGMENT_SHADER		"rsc/shaders/sky_fragment_shader.glsl"
 
-
+#define CHAR_VERTEX_SHADER		"rsc/shaders/char_vertex_shader.glsl"
+#define CHAR_FRAGMENT_SHADER	"rsc/shaders/char_fragment_shader.glsl"
 
 
 /* Perlin noise value generation for relief */

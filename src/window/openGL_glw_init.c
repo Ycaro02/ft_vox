@@ -65,7 +65,7 @@ GLFWwindow *init_openGL_context()
 	/* Enable face culling */
 	// glEnable(GL_CULL_FACE);
 
-	/* Enable blending, make water transparent but we need to do occlusion culling between chunks */
+	/* Enable blending, make water transparent and fog too, needed for freetype font */
     glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

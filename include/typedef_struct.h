@@ -51,4 +51,9 @@ typedef struct s_vertex_texture VertexTexture;
 typedef struct s_modelCube ModelCube;
 typedef struct s_faceCubeModel FaceCubeModel;
 
+/* Character font */
+typedef struct s_font_context	FontContext;
+typedef struct s_character_font CharacterFont;
+
+
 #endif /* HEADER_TYPEDEF_STRUCT_H */

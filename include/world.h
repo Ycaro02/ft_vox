@@ -32,6 +32,8 @@ struct s_context {
 	ThreadContext		*threadContext;		/* Thread context */
 	f32					**perlin2D;			/* Perlin noise 2D */
 	u8					**perlinCaveNoise;	/* Perlin noise 2D for cave */
+	/* Font handling can be in is own struct */
+	FontContext			*fontContext;		/* Font context */
 	/* Vbo handling list can be with mutex  */
 	t_list				*vboToDestroy;		/* VBO to destroy */
 	t_list				*vboToCreate;		/* VBO to create */

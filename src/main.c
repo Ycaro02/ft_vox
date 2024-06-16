@@ -14,29 +14,106 @@
 #include "../include/cube.h"
 #include "../include/chunks.h"
 
-void initFreeTypeFont(Context *c) {
-	(void)c;
-	FT_Library ft;
-	FT_Face face;
+struct s_font_context {
+	GLuint 			VAO, VBO;
+	GLuint 			fontShaderID;
+	CharacterFont	*font;
+};
+
+struct s_character_font {
+	GLuint	TextureID;	/* Glyph ID */
+	vec2 	Size;		/* Glyphe Size */
+	vec2 	Bearing;	/* Offset from baseline to left/top of glyph */
+	GLuint	Advance;	/* Offset to advance to next glyph */
+};
+
+s8 freeTypeFontLoadChar(Context *context, FT_Face face) {
+
+	if (!(context->fontContext->font = ft_calloc(sizeof(CharacterFont), 128))) {
+		ft_printf_fd(2, "ERROR::FREETYPE: Failed to allocate memory for characters\n");
+		return (FALSE);
+	}
+
+	/* Disable byte-alignment restriction */
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	/* Load first 128 characters of ASCII set */
+	for (u8 c = 0; c < 128; c++) {
+		/* Load character glyph */
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+			ft_printf_fd(2, "ERROR::FREETYPE: Failed to load Glyph\n");
+			continue ;
+		}
+		/* Generate texture */
+		GLuint textureId;
+		glGenTextures(1, &textureId);
+		glBindTexture(GL_TEXTURE_2D, textureId);
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_RED,
+			face->glyph->bitmap.width,
+			face->glyph->bitmap.rows,
+			0,
+			GL_RED,
+			GL_UNSIGNED_BYTE,
+			face->glyph->bitmap.buffer
+		);
+		/* Set texture options */
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		/* Now store character for later use */
+		CharacterFont character = {
+			textureId,
+			{face->glyph->bitmap.width, face->glyph->bitmap.rows},
+			{face->glyph->bitmap_left, face->glyph->bitmap_top},
+			face->glyph->advance.x
+		};
+		context->fontContext->font[c] = character;
+	}
+	return (TRUE);
+}
+
+void freeTypeFontInit(Context *c) {
+	FT_Library	ft;
+	FT_Face		face;
 
 	if (FT_Init_FreeType(&ft)) {
 		ft_printf_fd(2, "ERROR::FREETYPE: Could not init FreeType Library\n");
 		return ;
 	}
-	if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face)) {
+	if (FT_New_Face(ft, "rsc/font/arial.ttf", 0, &face)) {
 		ft_printf_fd(2, "ERROR::FREETYPE: Failed to load font\n");
 		return ;
 	}
-	// FT_Set_Pixel_Sizes(face, 0, 48);
-	// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	FT_Set_Pixel_Sizes(face, 0, 48);
 
-	// if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
-	// 	ft_printf_fd(2, "ERROR::FREETYPE: Failed to load Glyph\n");
-	// 	return ;
-	// }
+	if (!(c->fontContext = ft_calloc(sizeof(FontContext), 1))) {
+		ft_printf_fd(2, "ERROR::FREETYPE: Failed to allocate memory for font context\n");
+		return ;
+	}
+	if (!freeTypeFontLoadChar(c, face)) {
+		return ;
+	}
+	/* Free the free type rsc */
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
 
-	// FT_Done_Face(face);
-	// FT_Done_FreeType(ft);
+	/* Configure VAO/VBO for texture quads */
+	glGenVertexArrays(1, &c->fontContext->VAO);
+	glGenBuffers(1, &c->fontContext->VBO);
+	glBindVertexArray(c->fontContext->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, c->fontContext->VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(f32), 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	/* Load font shaders */
+	c->fontContext->fontShaderID = load_shader(CHAR_VERTEX_SHADER, CHAR_FRAGMENT_SHADER);
 }
 
 void chunksRender(Context *c, GLuint shader_id) {
@@ -185,10 +262,10 @@ int main() {
 		return (1);
 	}
 
+	freeTypeFontInit(context);
+	
 	/* Disable VSync to avoid fps locking */
 	// glfwSwapInterval(0);
-	// testUpdateLogic(context, context->skyTexture);
-
 	main_loop(context, context->skyTexture);
     vox_destroy(context);
     return (0);
