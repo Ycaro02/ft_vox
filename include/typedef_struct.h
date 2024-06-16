@@ -4,6 +4,7 @@
 #include "../rsc/deps/cglm/include/cglm/cglm.h" /* CGLM C maths openGL */
 #include "glad/gl.h"				            /* Glad functions (Include glad header BEFORE glfw3) */
 #include "glfw3/glfw3.h"			            /* GLFW functions */
+#include <math.h>					            /* LIBC Math functions */
 #include "../src/tinycthread/tinycthread.h"        /* TinyCThread functions */
 #include "../libft/libft.h"							/* Libft functions */
 #include "../libft/HashMap/HashMap.h"				/* Hashmap functions */

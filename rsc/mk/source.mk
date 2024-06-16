@@ -32,6 +32,7 @@ SRCS			=	context_init.c\
 					render/frustrum_culling.c\
 					render/cube_face_build.c\
 					render/block.c\
+					render/text_render.c\
 					texture/load_texture.c\
 					perlin_noise/perlin_noise.c\
 					perlin_noise/noise_utils.c\

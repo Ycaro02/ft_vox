@@ -161,7 +161,7 @@ void undergroundBlockcreate(Context *c) {
 	}
 
 	mtx_lock(&c->gameMtx);
-	glm_vec3_copy(c->cam.position, camPos);
+	glm_vec3_copy(c->cam->position, camPos);
 	mtx_unlock(&c->gameMtx);
 
 	if (c->world->undergroundBlock->udgFaceCount != 0) {
@@ -195,9 +195,9 @@ void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHe
 	s32			currentCamY = 0, chunkPosx = 0, chunkPosz = 0;
 	
 	mtx_lock(&c->gameMtx);
-	glm_vec3_copy(c->cam.position, camPos);
-	chunkPosx = c->cam.chunkPos[0];
-	chunkPosz = c->cam.chunkPos[2];
+	glm_vec3_copy(c->cam->position, camPos);
+	chunkPosx = c->cam->chunkPos[0];
+	chunkPosz = c->cam->chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
 	blockLocalPosFromCam(camPos, localBlockPos);

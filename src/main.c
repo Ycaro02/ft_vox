@@ -1,9 +1,6 @@
-// #include "../../freetype/freetype/include/ft2build.h"
-// #include "../../freetype/freetype/include/freetype/freetype.h"
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
+// #include <ft2build.h>
+// #include FT_FREETYPE_H
+#include "../include/text_render.h" /* text rendering, need to include this first  */
 #include "../include/vox.h"			/* Main project header */
 #include "../include/world.h"
 #include "../include/skybox.h"		/* skybox rendering */
@@ -13,155 +10,9 @@
 #include "../include/block.h"
 #include "../include/cube.h"
 #include "../include/chunks.h"
-
-struct s_font_context {
-	GLuint 			VAO, VBO;
-	GLuint 			fontShaderID;
-	CharacterFont	*font;
-	mat4			projection;
-};
-
-struct s_character_font {
-	GLuint	TextureID;	/* Glyph ID */
-	vec2 	Size;		/* Glyphe Size */
-	vec2 	Bearing;	/* Offset from baseline to left/top of glyph */
-	GLuint	Advance;	/* Offset to advance to next glyph */
-};
-
-
-void renderFontText(Context *c, const char *text, f32 x, f32 y, f32 scale, vec3 color) {
-	glUseProgram(c->fontContext->fontShaderID);
-	set_shader_var_vec3(c->fontContext->fontShaderID, "textColor", color);
-	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(c->fontContext->VAO);
-
-	/* Iterate through all characters */
-	for (u32 i = 0; i < ft_strlen(text); i++) {
-		CharacterFont ch = c->fontContext->font[(s8)text[i]];
-		f32 xpos = x + ch.Bearing[0] * scale;
-		f32 ypos = y - (ch.Size[1] - ch.Bearing[1]) * scale;
-		f32 w = ch.Size[0] * scale;
-		f32 h = ch.Size[1] * scale;
-		/* Update VBO for each character */
-		f32 vertices[6][4] = {
-			{xpos, ypos + h, 0.0f, 0.0f},
-			{xpos, ypos, 0.0f, 1.0f},
-			{xpos + w, ypos, 1.0f, 1.0f},
-			{xpos, ypos + h, 0.0f, 0.0f},
-			{xpos + w, ypos, 1.0f, 1.0f},
-			{xpos + w, ypos + h, 1.0f, 0.0f}
-		};
-		/* Render glyph texture over quad */
-		glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-		/* Update content of VBO memory */
-		glBindBuffer(GL_ARRAY_BUFFER, c->fontContext->VBO);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		/* Render quad */
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		/* Now advance cursors for next glyph */
-		x += (ch.Advance >> 6) * scale; /* Bitshift by 6 to get value in pixels (1/64th times 2^6 = 64) */
-	}
-	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D,0);
-}
-
-s8 freeTypeFontLoadChar(Context *context, FT_Face face) {
-
-	if (!(context->fontContext->font = ft_calloc(sizeof(CharacterFont), 128))) {
-		ft_printf_fd(2, "ERROR::FREETYPE: Failed to allocate memory for characters\n");
-		return (FALSE);
-	}
-
-	/* Disable byte-alignment restriction */
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	/* Load first 128 characters of ASCII set */
-	for (u8 c = 0; c < 128; c++) {
-		/* Load character glyph */
-		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-			ft_printf_fd(2, "ERROR::FREETYPE: Failed to load Glyph\n");
-			continue ;
-		}
-		/* Generate texture */
-		GLuint textureId;
-		glGenTextures(1, &textureId);
-		glBindTexture(GL_TEXTURE_2D, textureId);
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			GL_RED,
-			face->glyph->bitmap.width,
-			face->glyph->bitmap.rows,
-			0,
-			GL_RED,
-			GL_UNSIGNED_BYTE,
-			face->glyph->bitmap.buffer
-		);
-		/* Set texture options */
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		/* Now store character for later use */
-		CharacterFont character = {
-			textureId,
-			{face->glyph->bitmap.width, face->glyph->bitmap.rows},
-			{face->glyph->bitmap_left, face->glyph->bitmap_top},
-			face->glyph->advance.x
-		};
-		context->fontContext->font[c] = character;
-	}
-	return (TRUE);
-}
-
-s8 freeTypeFontInit(Context *c) {
-	FT_Library	ft;
-	FT_Face		face;
-
-	if (FT_Init_FreeType(&ft)) {
-		ft_printf_fd(2, "ERROR::FREETYPE: Could not init FreeType Library\n");
-		return (FALSE);
-	}
-	if (FT_New_Face(ft, "rsc/font/arial.ttf", 0, &face)) {
-		ft_printf_fd(2, "ERROR::FREETYPE: Failed to load font\n");
-		return (FALSE);
-	}
-	FT_Set_Pixel_Sizes(face, 0, 48);
-
-	if (!(c->fontContext = ft_calloc(sizeof(FontContext), 1))) {
-		ft_printf_fd(2, "ERROR::FREETYPE: Failed to allocate memory for font context\n");
-		return (FALSE);
-	}
-
-
-	/* Configure VAO/VBO for texture quads */
-	glGenVertexArrays(1, &c->fontContext->VAO);
-	glGenBuffers(1, &c->fontContext->VBO);
-	glBindVertexArray(c->fontContext->VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, c->fontContext->VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(f32), 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	/* Load font shaders */
-	c->fontContext->fontShaderID = load_shader(CHAR_VERTEX_SHADER, CHAR_FRAGMENT_SHADER);
-	glUseProgram(c->fontContext->fontShaderID);
-	if (!freeTypeFontLoadChar(c, face)) {
-		return (FALSE);
-	}
-	/* Free the freetype rsc */
-	FT_Done_Face(face);
-	FT_Done_FreeType(ft);
-
-	glm_ortho(0.0f, (f32)SCREEN_WIDTH, 0.0f, (f32)SCREEN_HEIGHT, -1.0f, 1.0f, c->fontContext->projection);
-	set_shader_var_mat4(c->fontContext->fontShaderID, "projection", c->fontContext->projection);
-	set_shader_texture(c->fontContext->fontShaderID, c->fontContext->font[0].TextureID, GL_TEXTURE_2D, "text");
-
-	return (TRUE);
-}
+#include "../include/camera.h"
+#include "../include/win_event.h"
+#include "../include/window.h"
 
 void chunksRender(Context *c, GLuint shader_id) {
     // glLoadIdentity();
@@ -223,18 +74,14 @@ void vox_destroy(Context *c) {
 	thrd_join(c->threadContext->supervisor, &status);
 	hashmap_destroy(c->threadContext->chunksMapToLoad);
 	mtx_destroy(&c->threadContext->chunkMtx);
-	// free(c->threadContext->workers);
 	free(c->threadContext);
 
 	ft_printf_fd(1, PINK"\nSupervisor thread joined with status %d\n"RESET, status);
-
-
 	if (c->world->undergroundBlock->udgFaceCount != 0) {
 		undergroundBlockFree(c->world->undergroundBlock);
 		c->world->undergroundBlock->udgFaceCount = 0;
 	}
 	free(c->world->undergroundBlock);
-
 	renderChunksVBODestroy(c);
 	ft_lstclear(&c->vboToCreate, free);
 
@@ -244,7 +91,6 @@ void vox_destroy(Context *c) {
 	mtx_destroy(&c->vboToDestroyMtx);
 	mtx_destroy(&c->vboToCreateMtx);
 	mtx_destroy(&c->renderDataNeededMtx);
-
 
 	hashmap_destroy(c->world->renderChunksMap);
 	hashmap_destroy(c->world->chunksMap);
@@ -262,12 +108,31 @@ void vox_destroy(Context *c) {
 		glDeleteBuffers(1, &c->faceCube[i].VBO);
 		glDeleteBuffers(1, &c->faceCube[i].EBO);
 	}
+
+	glDeleteVertexArrays(1, &c->skyboxVAO);
+
+	glDeleteProgram(c->cubeShaderID);
+	glDeleteProgram(c->skyboxShaderID);
+
+	glDeleteTextures(1, &c->skyTexture);
+	glDeleteTextures(1, &c->blockAtlasId);
+
+	for (u32 i = 0; i < 128; i++) {
+		glDeleteTextures(1, &c->fontContext->font[i].TextureID);
+	}
+
+	glDeleteProgram(c->fontContext->fontShaderID);
+	glDeleteVertexArrays(1, &c->fontContext->VAO);
+	glDeleteBuffers(1, &c->fontContext->VBO);
+
+	free(c->fontContext->font);
+	free(c->fontContext);
+
+	free(c->cam);
 	free(c->faceCube);
 	free(c);
-    // free(c->perlinNoise);
 	glfwTerminate();
 }
-
 
 void updateGame(Context *c) {
 	/* Input handling */
@@ -282,26 +147,10 @@ void updateGame(Context *c) {
 	mtx_unlock(&c->gameMtx);
 }
 
-
-
-#define TEXT_HEIGHT_OFFSET_GET(x) ((f32)SCREEN_HEIGHT - (f32)x)
-
-#define FPS_SCALE 0.3f
-
-#define TEXT_DESCRIBED_WIDTH_OFFSET 15.0f
-#define TEXT_DATA_WIDTH_OFFSET 150.0f
-
-#define VEC3_GREEN (vec3){0.0, 1.0, 0.0}
-#define VEC3_RED (vec3){1.0, 0.0, 0.0}
-#define VEC3_CYAN (vec3){0.0, 1.0, 1.0}
-#define VEC3_YELLOW (vec3){1.0, 1.0, 0.0}
-#define VEC3_ORANGE (vec3){1.0, 0.7, 0.0}
-
-
 void displayTextCall(Context *c, const char *description, f32 offsetHeight, u32 dataNumber, vec3 colorDescription, vec3 colorData) {
 	char *dataString = ft_ultoa(dataNumber);
-	renderFontText(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
-	renderFontText(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
+	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
+	textRender(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
 	free(dataString);
 }
 
@@ -319,7 +168,7 @@ void renderGame(Context *c, GLuint skyTexture) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* Render logic */
-	displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
+	displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam->projection, c->cam->view);
 	chunksRender(c, c->cubeShaderID);
 	dataDisplay(c);
 	/* glFlush forces the execution of all previous GL commands */
@@ -343,9 +192,10 @@ int main(void)
 
 	if (!(context = contextInit())) {
 		return (1);
-	} else if (!freeTypeFontInit(context)) {
-		return (1);
 	}
+	// else if (!freeTypeFontInit(context)) {
+	// 	return (1);
+	// }
 	
 
 	mainLoopFpsUnlock(context, context->skyTexture);

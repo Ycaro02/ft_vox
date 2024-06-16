@@ -4,8 +4,8 @@ include rsc/mk/source.mk
 NAME			=	ft_vox
 # CC				=	gcc
 CC				=	clang
-CFLAGS			=	-Wall -Wextra -Werror -O3 -g3
-# CFLAGS			=	-Wall -Wextra -Werror -O3 -g3 -fsanitize=address
+# CFLAGS			=	-Wall -Wextra -Werror -O3 -g3
+CFLAGS			=	-Wall -Wextra -Werror -O3 -g3 -fsanitize=address
 # CFLAGS			=	-Wall -Wextra -Werror -O3 -g3 -fsanitize=thread
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
@@ -47,7 +47,7 @@ ifeq ($(shell [ -f ${LIBFT} ] && echo 0 || echo 1), 1)
 endif
 
 $(OBJ_DIR):
-	mkdir $(ALL_SRC_DIR)
+	@mkdir $(ALL_SRC_DIR)
 # @$(ASCII_ART) $(ASCII_NAME)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c

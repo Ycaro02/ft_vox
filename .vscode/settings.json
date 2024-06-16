@@ -68,6 +68,8 @@
 		"freetype.h": "c",
 		"fttypes.h": "c",
 		"fterrors.h": "c",
-		"ftconfig.h": "c"
+		"ftconfig.h": "c",
+		"text_render.h": "c",
+		"skybox.h": "c"
 	}
 }

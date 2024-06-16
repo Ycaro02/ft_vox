@@ -4,7 +4,6 @@
 // #include "vox.h"
 #include "typedef_struct.h"
 
-
 struct s_world {
 	u64					seed;					/* World seed */
 	HashMap				*chunksMap;				/* Chunks hashmap */
@@ -24,7 +23,7 @@ struct s_thread_context {
 
 /* Context structure */
 struct s_context {
-	Camera				cam;				/* camera structure */
+	Camera				*cam;				/* camera structure */
 	World				*world;				/* World structure */
     GLFWwindow			*win_ptr;			/* Window pointer */
 	FaceCubeModel		*faceCube;			/* Data Face Cube structure */
@@ -44,10 +43,11 @@ struct s_context {
 	Mutex				vboToCreateMtx;		/* Mutex to protect vboToCreate list */
 	Mutex				renderDataNeededMtx; /* Mutex to protect renderDataNeeded */
 	/* Opengl ID for shader vao or texture (openGl context) */
-	GLuint				cubeShaderID;		/* shader program id */
-	GLuint				skyboxShaderID;		/* shader program id */
+	GLuint				cubeShaderID;		/* shader program ID */
+	GLuint				skyboxShaderID;		/* shader program ID */
 	GLuint				skyboxVAO;			/* skybox VAO */
-	GLuint				skyTexture;			/* skybox VAO */
+	GLuint				blockAtlasId;		/* block texture ID */
+	GLuint				skyTexture;			/* skybox texture ID */
 	mat4				rotation;			/* rotation matrix */
 	/* Data displayed */
 	u32					chunkRenderedNb;	/* Chunk rendered */

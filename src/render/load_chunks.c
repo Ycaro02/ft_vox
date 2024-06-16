@@ -4,7 +4,7 @@
 #include "../../include/chunks.h"
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
-
+#include "../../include/camera.h"
 
 /**
  * @brief Check if a chunk is already in render map
@@ -93,8 +93,8 @@ void unloadChunkHandler(Context *c) {
 	s32 		maxChunkLoad = CHUNKS_UNLOAD_RADIUS;
 
 	mtx_lock(&c->gameMtx);
-	camChunkX = c->cam.chunkPos[0];
-	camChunkZ = c->cam.chunkPos[2];
+	camChunkX = c->cam->chunkPos[0];
+	camChunkZ = c->cam->chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
 	mtx_lock(&c->vboToDestroyMtx);
@@ -149,7 +149,7 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	while (hashmap_next(&it)) {
 		BlockPos chunkID = ((RenderChunks *)it.value)->chunkID;
 		BoundingBox box = chunkBoundingBoxGet(chunkID.y, chunkID.z, 8.0f);
-		if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
+		if (!isChunkInFrustum(&c->gameMtx, &c->cam->frustum, &box)) {
 			if ((chunkIDToRemove = malloc(sizeof(BlockPos)))) {
 				ft_memcpy(chunkIDToRemove, &chunkID, sizeof(BlockPos));
 				ft_lstadd_front(&toRemoveList, ft_lstnew(chunkIDToRemove));
@@ -187,7 +187,7 @@ void chunksViewHandling(Context *c) {
 	s8				renderVBOisLoaded = FALSE;
 
 	mtx_lock(&c->gameMtx);
-    glm_vec3_copy(c->cam.position, start);
+    glm_vec3_copy(c->cam->position, start);
 	mtx_unlock(&c->gameMtx);
     
 	glm_vec3_zero(chunkPos);
@@ -198,7 +198,7 @@ void chunksViewHandling(Context *c) {
     for (f32 angle = radiusStart; angle <= radiusEnd; angle += ANGLE_INCREMENT) {
 		
 		mtx_lock(&c->gameMtx);
-		glm_vec3_copy(c->cam.viewVector, camViewVector);
+		glm_vec3_copy(c->cam->viewVector, camViewVector);
 		mtx_unlock(&c->gameMtx);
 
         glm_vec3_copy(camViewVector, rayDir);
@@ -220,7 +220,7 @@ void chunksViewHandling(Context *c) {
 			if (chunk) {
                 box = chunkBoundingBoxGet(chunk->x, chunk->z, 8.0f);
 				chunksRenderIsload = chunksRenderIsLoaded(chunk);
-                inView = isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box);
+                inView = isChunkInFrustum(&c->gameMtx, &c->cam->frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
 				if (inView) { /* If chunk is in frustum */
 					chunkNeighborMaskUpdate(c, chunk);

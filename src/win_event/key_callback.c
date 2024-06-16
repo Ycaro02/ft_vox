@@ -6,6 +6,7 @@
 #include "../../include/render_chunks.h"
 #include "../../include/block.h"
 #include "../../include/shader_utils.h"
+#include "../../include/win_event.h"
 
 /* Escapte Key : ESC */
 void act_escape(Context *c) {
@@ -13,7 +14,7 @@ void act_escape(Context *c) {
 }
 
 void act_change_cam_speed(Context *c) {
-	c->cam.camSpeed = (c->cam.camSpeed == CAM_BASE_SPEED) ? (CAM_HIGHT_SPEED) : CAM_BASE_SPEED;
+	c->cam->camSpeed = (c->cam->camSpeed == CAM_BASE_SPEED) ? (CAM_HIGHT_SPEED) : CAM_BASE_SPEED;
 }
 
 void act_autoMoveTrigger(Context *c) {
@@ -30,56 +31,56 @@ void act_displayUnderGroundTrigger(Context *c) {
 
 /* Zoom : W */
 void act_zoom(Context *c) {
-    move_camera_forward(&c->cam, c->cam.camSpeed);
+    move_camera_forward(c->cam, c->cam->camSpeed);
 }
 
 /* Unzoom : S */
 void act_unzoom(Context *c) {
-    move_camera_backward(&c->cam, c->cam.camSpeed);
+    move_camera_backward(c->cam, c->cam->camSpeed);
 }
 
 /* Unzoom: D */
 void act_move_right(Context *c) {
-	straf_camera(&c->cam, c->cam.camSpeed, DIR_RIGHT);
+	straf_camera(c->cam, c->cam->camSpeed, DIR_RIGHT);
 }
 
 /* Unzoom: A */
 void act_move_left(Context *c) {
-	straf_camera(&c->cam, c->cam.camSpeed, DIR_LEFT);
+	straf_camera(c->cam, c->cam->camSpeed, DIR_LEFT);
 }
 
 /* Rotate camera left : LEFT */
 void act_rotate_camera_left(Context *c) {
-	rotate_camera(&c->cam, 1.0f, VEC3_ROTATEY);
-	// rotate_camera(&c->cam, 3.0f, VEC3_ROTATEY);
+	rotate_camera(c->cam, 1.0f, VEC3_ROTATEY);
+	// rotate_camera(c->cam, 3.0f, VEC3_ROTATEY);
 }
 
 /* Rotate camera right: RIGHT */
 void act_rotate_camera_right(Context *c) {
-    rotate_camera(&c->cam, -1.0f, VEC3_ROTATEY);
-    // rotate_camera(&c->cam, -3.0f, VEC3_ROTATEY);
+    rotate_camera(c->cam, -1.0f, VEC3_ROTATEY);
+    // rotate_camera(c->cam, -3.0f, VEC3_ROTATEY);
 }
 
 /* Rotate camera top UP */
 void act_rotate_camera_top(Context *c) {
-	rotateTopBot(&c->cam, -1.0f);
+	rotateTopBot(c->cam, -1.0f);
 }
 
 /* Rotate camera down : DOWN */
 void act_rotate_camera_down(Context *c) {
-	rotateTopBot(&c->cam, 1.0f);
+	rotateTopBot(c->cam, 1.0f);
 }
 
 /* Up camera : SPACE */
 void act_up_camera(Context *c) {
-    move_camera_up(&c->cam, c->cam.camSpeed);
-    // move_camera_up(&c->cam, CAM_UP_DOWN);
+    move_camera_up(c->cam, c->cam->camSpeed);
+    // move_camera_up(c->cam, CAM_UP_DOWN);
 }
 
 /* Down camera : Q */
 void act_down_camera(Context *c) {
-    move_camera_up(&c->cam, -c->cam.camSpeed);
-    // move_camera_up(&c->cam, -CAM_UP_DOWN);
+    move_camera_up(c->cam, -c->cam->camSpeed);
+    // move_camera_up(c->cam, -CAM_UP_DOWN);
 }
 
 /* Reset cam : ENTER */
@@ -129,16 +130,16 @@ void displayBlockPosition(Chunks *chunk, BlockPos blockPos) {
 }
 
 void testChunksExist(Context *c) {
-	BlockPos chunkPos = CHUNKS_MAP_ID_GET(c->cam.chunkPos[0], c->cam.chunkPos[2]);
+	BlockPos chunkPos = CHUNKS_MAP_ID_GET(c->cam->chunkPos[0], c->cam->chunkPos[2]);
 	// display_camera_value(c);
 	ft_printf_fd(1, YELLOW"\nTest for chunk:"RESET" "ORANGE"X|%d| Z|%d|"RESET, chunkPos.y, chunkPos.z);
 	Chunks *chunks = hashmap_get(c->world->chunksMap, chunkPos);
 	if (chunks) {
 		ft_printf_fd(1, GREEN" -> Chunk exist\n"RESET);
 		BlockPos blockPos = {0};
-		blockLocalPosFromCam(c->cam.position, &blockPos);
+		blockLocalPosFromCam(c->cam->position, &blockPos);
 		Chunks	*chunk = hashmap_get(c->world->chunksMap, chunkPos);
-		ft_printf_fd(1, CYAN"Cam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam.position[0], c->cam.position[1], c->cam.position[2]);
+		ft_printf_fd(1, CYAN"Cam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam->position[0], c->cam->position[1], c->cam->position[2]);
 		displayBlockPosition(chunk, blockPos);
 		// ft_printf_fd(1, CYAN"Perlin Height\n");
 		// displayPerlinNoise(blockPos.x,blockPos.z,chunk->perlinVal[blockPos.x][blockPos.z]);
@@ -165,9 +166,9 @@ void testChunksExist(Context *c) {
 
 /* Display cam data : C */
 void act_display_camera_value(Context *c) {
-    ft_printf_fd(1, CYAN"\nPos: %f, %f, %f\n"RESET, c->cam.position[0], c->cam.position[1],c->cam.position[2]);
-	ft_printf_fd(1, PINK"Chunk X[%d], Z[%d], Y:|%d|\n", c->cam.chunkPos[0], c->cam.chunkPos[2], c->cam.chunkPos[1]);
-	// display_camera_value(&c->cam);
+    ft_printf_fd(1, CYAN"\nPos: %f, %f, %f\n"RESET, c->cam->position[0], c->cam->position[1],c->cam->position[2]);
+	ft_printf_fd(1, PINK"Chunk X[%d], Z[%d], Y:|%d|\n", c->cam->chunkPos[0], c->cam->chunkPos[2], c->cam->chunkPos[1]);
+	// display_camera_value(c->cam);
 }
 
 /* Change polygon mode : P */
@@ -234,7 +235,7 @@ void handle_input(void *context)
 	}
 
 	if (c->autoMove) {
-		move_camera_forward(&c->cam, c->cam.camSpeed);
+		move_camera_forward(c->cam, c->cam->camSpeed);
 	}
 	if (c->autoRotate) {
 		act_rotate_camera_left(c);

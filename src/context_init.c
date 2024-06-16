@@ -6,6 +6,10 @@
 #include "../include/thread_load.h"
 #include "../include/cube.h"
 #include "../include/world.h"
+#include "../include/text_render.h"
+#include "../include/camera.h"
+#include "../include/shader_utils.h"
+#include "../include/window.h"
 
 
 u8 *perlinNoiseGeneration(unsigned int seed) {
@@ -85,11 +89,9 @@ GLuint test_shader(char *vertexShader, char *fragmentShader)
 }
 
 void initAtlasTexture(Context *c) {
-	(void)c;
 	c->cubeShaderID = test_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
-	VOX_PROTECTED_LOG(c, CYAN"Cube shader id: %d\n"RESET, c->cubeShaderID);
-	GLuint textureAtlas = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16);
-	set_shader_texture(c->cubeShaderID, textureAtlas, GL_TEXTURE_3D, "textureAtlas");
+	c->blockAtlasId = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16);
+	set_shader_texture(c->cubeShaderID, c->blockAtlasId, GL_TEXTURE_3D, "textureAtlas");
 }
 
 
@@ -159,7 +161,7 @@ Context *contextInit() {
 
 	mtx_lock(&context->gameMtx);
 	context->cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(SCREEN_WIDTH, SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
-	extractFrustumPlanes(&context->cam.frustum, context->cam.projection, context->cam.view);
+	extractFrustumPlanes(&context->cam->frustum, context->cam->projection, context->cam->view);
 	mtx_unlock(&context->gameMtx);
 
 	if (!(context->world = ft_calloc(sizeof(World), 1))
@@ -179,5 +181,8 @@ Context *contextInit() {
     glm_mat4_identity(context->rotation);
 	initSkyBox(context);
 	initAtlasTexture(context);
+	if (!freeTypeFontInit(context)) {
+		return (NULL);
+	}
 	return (context);
 }

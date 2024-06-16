@@ -19,26 +19,26 @@ void chunkPosGet(Camera *camera)
 void display_camera_value(Context *c)
 {
 	// Context *c = context;
-	ft_printf_fd(1, CYAN"position: %f %f %f\n", c->cam.position[0], c->cam.position[1], c->cam.position[2]);
-	ft_printf_fd(1, "target: %f %f %f\n", c->cam.target[0], c->cam.target[1], c->cam.target[2]);
-	ft_printf_fd(1, "up: %f %f %f\n", c->cam.up[0], c->cam.up[1], c->cam.up[2]);
+	ft_printf_fd(1, CYAN"position: %f %f %f\n", c->cam->position[0], c->cam->position[1], c->cam->position[2]);
+	ft_printf_fd(1, "target: %f %f %f\n", c->cam->target[0], c->cam->target[1], c->cam->target[2]);
+	ft_printf_fd(1, "up: %f %f %f\n", c->cam->up[0], c->cam->up[1], c->cam->up[2]);
 	ft_printf_fd(1, "view: \n");
 	for (u32 i = 0; i < 4; i++) {
-		ft_printf_fd(1, "|%f||%f||%f||%f|\n", c->cam.view[i][0], c->cam.view[i][1], c->cam.view[i][2], c->cam.view[i][3]);
+		ft_printf_fd(1, "|%f||%f||%f||%f|\n", c->cam->view[i][0], c->cam->view[i][1], c->cam->view[i][2], c->cam->view[i][3]);
 	}
 	ft_printf_fd(1, "projection: \n");
 	for (u32 i = 0; i < 4; i++) {
-		ft_printf_fd(1, "|%f||%f||%f||%f|\n", c->cam.projection[i][0], c->cam.projection[i][1], c->cam.projection[i][2], c->cam.projection[i][3]);
+		ft_printf_fd(1, "|%f||%f||%f||%f|\n", c->cam->projection[i][0], c->cam->projection[i][1], c->cam->projection[i][2], c->cam->projection[i][3]);
 	}
 
 	ft_printf_fd(1, RESET"Model matrix: \n");
 	for (u32 i = 0; i < 4; i++) {
 		ft_printf_fd(1, "%f %f %f %f\n", c->rotation[i][0], c->rotation[i][1], c->rotation[i][2], c->rotation[i][3]);
 	}
-	ft_printf_fd(1, RESET"View vector: %f %f %f\n", c->cam.viewVector[0], c->cam.viewVector[1], c->cam.viewVector[2]);
+	ft_printf_fd(1, RESET"View vector: %f %f %f\n", c->cam->viewVector[0], c->cam->viewVector[1], c->cam->viewVector[2]);
 	ft_printf_fd(1, ORANGE"Frustum: \n"RESET);
 	for (u32 i = 0; i < 6; i++) {
-		ft_printf_fd(1, "Plane %d: %f %f %f %f\n", i, c->cam.frustum.planes[i][0], c->cam.frustum.planes[i][1], c->cam.frustum.planes[i][2], c->cam.frustum.planes[i][3]);
+		ft_printf_fd(1, "Plane %d: %f %f %f %f\n", i, c->cam->frustum.planes[i][0], c->cam->frustum.planes[i][1], c->cam->frustum.planes[i][2], c->cam->frustum.planes[i][3]);
 	}
 
 }
@@ -58,26 +58,27 @@ void updateViewVec(Camera *camera)
  * @param far far plane
  * @return new camera
 */
-Camera create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far)
+Camera *create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far)
 {
-    Camera camera;
+    Camera *camera;
 
 	// ft_printf_fd(1, CYAN"fov: %f\naspect_ratio: %f\nnear: %f\nfar: %f\n"RESET, fov, aspect_ratio, near, far);
-	ft_bzero(&camera, sizeof(Camera));
-    /* init camera position */
-	glm_vec3_copy(CAMERA_SPAWN_POSITION, camera.position);
+	// ft_bzero(camera, sizeof(Camera));
+    camera = ft_calloc(1, sizeof(Camera));
+	/* init camera position */
+	glm_vec3_copy(CAMERA_SPAWN_POSITION, camera->position);
     /* init camera target */
-	glm_vec3_copy(CAMERA_SPAWN_TARGET, camera.target);
+	glm_vec3_copy(CAMERA_SPAWN_TARGET, camera->target);
     /* init up vector */
-	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, camera.up);
+	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, camera->up);
 
     /* Compute view martice */
-	glm_lookat(camera.position, camera.target, camera.up, camera.view);
-	camera.camSpeed = CAM_BASE_SPEED;
+	glm_lookat(camera->position, camera->target, camera->up, camera->view);
+	camera->camSpeed = CAM_BASE_SPEED;
     /* Compute projection matrice */
-	glm_perspective(glm_rad(fov), aspect_ratio, near, far, camera.projection);
-	updateViewVec(&camera);
-	chunkPosGet(&camera);
+	glm_perspective(glm_rad(fov), aspect_ratio, near, far, camera->projection);
+	updateViewVec(camera);
+	chunkPosGet(camera);
     return (camera);
 }
 
@@ -92,22 +93,22 @@ void update_camera(void *context, GLuint shader_id)
 
 	// mtx_lock(&c->gameMtx);
     /* Look at view */
-	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
+	glm_lookat(c->cam->position, c->cam->target, c->cam->up, c->cam->view);
 
 	/* Update shaders variable */
-    set_shader_var_mat4(shader_id, "view", c->cam.view);
-    set_shader_var_mat4(shader_id, "projection", c->cam.projection);
+    set_shader_var_mat4(shader_id, "view", c->cam->view);
+    set_shader_var_mat4(shader_id, "projection", c->cam->projection);
 	set_shader_var_mat4(shader_id, "model", c->rotation);
 	
 
 	/* Update view vector */
-	updateViewVec(&c->cam);
+	updateViewVec(c->cam);
 
 	/* Update camera chunk position */
-	chunkPosGet(&c->cam);
+	chunkPosGet(c->cam);
 
 	/* Extract Frustrum plane from projection and view matrix */
-	extractFrustumPlanes(&c->cam.frustum, c->cam.projection, c->cam.view);
+	extractFrustumPlanes(&c->cam->frustum, c->cam->projection, c->cam->view);
 	// mtx_unlock(&c->gameMtx);
 
 }
@@ -245,13 +246,13 @@ void reseCamera(void *context)
 	Context *c = context;
 
     /* init camera position */
-	glm_vec3_copy(CAMERA_SPAWN_POSITION, c->cam.position);
+	glm_vec3_copy(CAMERA_SPAWN_POSITION, c->cam->position);
     /* init camera target */
-	glm_vec3_copy(CAMERA_SPAWN_TARGET, c->cam.target);
+	glm_vec3_copy(CAMERA_SPAWN_TARGET, c->cam->target);
     /* init up vector */
-	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, c->cam.up);
+	glm_vec3_copy((vec3){0.00000f, 1.00000f, 0.00000f}, c->cam->up);
 
 	/* Look at view */
-	glm_lookat(c->cam.position, c->cam.target, c->cam.up, c->cam.view);
+	glm_lookat(c->cam->position, c->cam->target, c->cam->up, c->cam->view);
 	glm_mat4_identity(c->rotation);
 }

@@ -66,7 +66,7 @@ void		extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view);
 BoundingBox chunkBoundingBoxGet(s32 chunkX, s32 chunkZ, f32 chunkSize);
 
 /* Camera */
-Camera		create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far);
+Camera		*create_camera(f32 fov, f32 aspect_ratio, f32 near, f32 far);
 void		move_camera_forward(Camera* camera, float distance);
 void		move_camera_backward(Camera* camera, float distance);
 void		move_camera_up(Camera* camera, float distance);

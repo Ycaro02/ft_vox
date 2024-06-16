@@ -1,12 +1,7 @@
 #ifndef VOX_HEADER_H
 #define VOX_HEADER_H
 
-#include <math.h>					            /* LIBC Math functions */
 #include "typedef_struct.h"		                /* Struct typedef */
-#include "window.h"					            /* Window related functions */
-#include "win_event.h"				            /* Window event handling functions */
-#include "camera.h"                             /* Camera handling function */
-#include "shader_utils.h"						/* Shader utils functions */
 
 /* Screen size */
 #define SCREEN_WIDTH	1920			/* Screen width */
@@ -170,21 +165,21 @@ enum AtlasID {
 };
 
 enum BlockType {
-    AIR=0,      /* Air block (Empty) */
-    STONE=53,    /* Stone block (Underground) */
-    DIRT=54,     /* Dirt block (Exposed to light) */
-	GRASS=55,    /* Grass block (Exposed to light) */
-	GRASS_TOP=AT_GRASS_TOP,	/* Grass top */
-	WATER=AT_WATER,		/* Water */
-	WOOL_RED=AT_WOOL_RED,	/* Wool red */
-	WOOL_ORANGE=AT_WOOL_ORANGE,	/* Wool orange */
-	WOOL_YELLOW=AT_WOOL_YELLOW,	/* Wool yellow */
+    AIR=0,								/* Air block (Empty) */
+    STONE=53,							/* Stone block (Underground) */
+    DIRT=54,							/* Dirt block (Exposed to light) */
+	GRASS=55,							/* Grass block (Exposed to light) */
+	GRASS_TOP=AT_GRASS_TOP,				/* Grass top */
+	WATER=AT_WATER,						/* Water */
+	WOOL_RED=AT_WOOL_RED,				/* Wool red */
+	WOOL_ORANGE=AT_WOOL_ORANGE,			/* Wool orange */
+	WOOL_YELLOW=AT_WOOL_YELLOW,			/* Wool yellow */
 	WOOL_LIGHTGREEN=AT_WOOL_LIGHTGREEN,	/* Wool lime */
-	WOOL_GREEN=AT_WOOL_GREEN,	/* Wool green */
-	WOOL_CYAN=AT_WOOL_CYAN,	/* Wool cyan */
+	WOOL_GREEN=AT_WOOL_GREEN,			/* Wool green */
+	WOOL_CYAN=AT_WOOL_CYAN,				/* Wool cyan */
 	WOOL_LIGHT_BLUE=AT_WOOL_LIGHT_BLUE,	/* Wool light blue */
-	WOOL_BLUE=AT_WOOL_BLUE,	/* Wool blue */
-	GLASS=AT_GLASS,			/* Glass */
+	WOOL_BLUE=AT_WOOL_BLUE,				/* Wool blue */
+	GLASS=AT_GLASS,						/* Glass */
 };
 
 /* texture load_texture */

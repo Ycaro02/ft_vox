@@ -114,7 +114,7 @@ void supervisorWaitWorker(Context *c) {
 		}
 		free(c->threadContext->workers[i].data);
 		mtx_unlock(&c->threadContext->threadMtx);
-		ft_printf_fd(1, ORANGE"\nWorkers Thread: "RESET""YELLOW"[%d]"RESET""GREEN" finished: status %d"RESET, i, status);
+		ft_printf_fd(1, ORANGE"Workers Thread: "RESET""YELLOW"[%d]"RESET""GREEN" finished: status %d\n"RESET, i, status);
 		++i;
 	}
 }
@@ -157,7 +157,7 @@ s8 chunksToLoadBuildMap(Context *c, s32 chunkX, s32 chunkZ) {
 
 
 	box = chunkBoundingBoxGet(chunkX, chunkZ, 8.0f);
-	if (!isChunkInFrustum(&c->gameMtx, &c->cam.frustum, &box)) {
+	if (!isChunkInFrustum(&c->gameMtx, &c->cam->frustum, &box)) {
 		tdata->priority = LOAD_PRIORITY_LOW;
 	} else {
 		tdata->priority = LOAD_PRIORITY_HIGH;
@@ -181,8 +181,8 @@ s8 supervisorLoadChunksArround(Context *c, s32 radius) {
 	s32 		currentX, currentZ;
 	
 	mtx_lock(&c->gameMtx);
-	currentX = c->cam.chunkPos[0];
-	currentZ = c->cam.chunkPos[2];
+	currentX = c->cam->chunkPos[0];
+	currentZ = c->cam->chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 	for (s32 i = -radius; i <= radius; ++i) {
 		for (s32 j = -radius; j <= radius; ++j) {
@@ -224,8 +224,8 @@ ThreadData *chunksToLoadNearestGet(Context *c, HashMap *chunksMapToLoad) {
 	u8				priotiry = LOAD_PRIORITY_LOW;
 
 	mtx_lock(&c->gameMtx);
-	camChunkX = c->cam.chunkPos[0];
-	camChunkZ = c->cam.chunkPos[2];
+	camChunkX = c->cam->chunkPos[0];
+	camChunkZ = c->cam->chunkPos[2];
 	mtx_unlock(&c->gameMtx);
 
 	it = hashmap_iterator(chunksMapToLoad);
@@ -261,8 +261,8 @@ void chunksQueueRemoveHandling(Context *c, Mutex *threadMtx, Mutex *gameMtx, Has
 	s32 camChunkX, camChunkZ;
 
 	mtx_lock(gameMtx);
-	camChunkX = c->cam.chunkPos[0];
-	camChunkZ = c->cam.chunkPos[2];
+	camChunkX = c->cam->chunkPos[0];
+	camChunkZ = c->cam->chunkPos[2];
 	mtx_unlock(gameMtx);
 
 	mtx_lock(threadMtx); /* LOCK */
