@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 17:03:53 by nfour             #+#    #+#             */
-/*   Updated: 2024/05/05 21:51:26 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/16 12:55:43 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@
 #define		FT_INLINE   static inline __attribute((always_inline))
 
 /* Packed struct */
-#define PACKED_STRUCT __attribute__((packed))
+#define		PACKED_STRUCT __attribute__((packed))
 
 /* Typedef for integet type */
 typedef		uint8_t	 	u8;			/* Unsigned int 8 bits */

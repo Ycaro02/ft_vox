@@ -11,49 +11,49 @@
 #include "../libft/BMP_parser/parse_bmp.h"		/* BMP parser functions */
 
 /* Tinycthread */
-typedef 		mtx_t Mutex;
-typedef 		thrd_t Thread;
+typedef 		mtx_t					Mutex;
+typedef 		thrd_t					Thread;
 
 /* World.h */
-typedef struct	s_context			Context;
-typedef struct	s_thread_context	ThreadContext;
-typedef struct 	s_world 			World;
+typedef struct	s_context				Context;
+typedef struct	s_thread_context		ThreadContext;
+typedef struct 	s_world 				World;
 
 /* thread_load.h */
-typedef struct 	s_thread_entity ThreadEntity;
-typedef struct s_thread_data 	ThreadData;
+typedef struct 	s_thread_entity 		ThreadEntity;
+typedef struct	s_thread_data 			ThreadData;
 
 /* chunks.h */
-typedef struct	s_chunks		Chunks;
-typedef struct	s_sub_chunks 	SubChunks;
+typedef struct	s_chunks				Chunks;
+typedef struct	s_sub_chunks 			SubChunks;
 
 /* render_chunks.h*/
-typedef struct	s_render_chunks	RenderChunks;
+typedef struct	s_render_chunks			RenderChunks;
 
 /* perlin_nosie.h */
-typedef struct	s_perlin_data 	PerlinData;
+typedef struct	s_perlin_data 			PerlinData;
 
 /* block.h */
-typedef struct	s_block 		Block;
-typedef struct s_underground_block UndergroundBlock;
+typedef struct	s_block 				Block;
+typedef struct	s_underground_block		UndergroundBlock;
 
 /* camera.h */
-typedef struct	s_camera 		Camera;
-typedef struct	s_bounding_box 	BoundingBox;
-typedef struct	s_frustrum 		Frustum;
+typedef struct	s_camera 				Camera;
+typedef struct	s_bounding_box 			BoundingBox;
+typedef struct	s_frustrum 				Frustum;
 
 
 /* win_event.h */
-typedef struct s_key_action 	KeyAction;
+typedef struct	s_key_action 			KeyAction;
 
 /* cube.h */
-typedef struct s_vertex_texture VertexTexture;
-typedef struct s_modelCube ModelCube;
-typedef struct s_faceCubeModel FaceCubeModel;
+typedef struct	s_vertex_texture		VertexTexture;
+typedef struct	s_modelCube				ModelCube;
+typedef struct	s_faceCubeModel			FaceCubeModel;
 
 /* Character font */
-typedef struct s_font_context	FontContext;
-typedef struct s_character_font CharacterFont;
+typedef struct	s_font_context			FontContext;
+typedef struct	s_character_font 		CharacterFont;
 
 
 #endif /* HEADER_TYPEDEF_STRUCT_H */
