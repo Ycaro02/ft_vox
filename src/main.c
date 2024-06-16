@@ -76,7 +76,7 @@ void vox_destroy(Context *c) {
 	mtx_destroy(&c->threadContext->chunkMtx);
 	free(c->threadContext);
 
-	ft_printf_fd(1, PINK"\nSupervisor thread joined with status %d\n"RESET, status);
+	ft_printf_fd(1, PINK"Supervisor thread joined with status %d\n"RESET, status);
 	if (c->world->undergroundBlock->udgFaceCount != 0) {
 		undergroundBlockFree(c->world->undergroundBlock);
 		c->world->undergroundBlock->udgFaceCount = 0;
