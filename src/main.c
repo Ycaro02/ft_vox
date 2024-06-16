@@ -186,17 +186,12 @@ void mainLoopFpsLock(Context *c, GLuint skyTexture) {
 
 void mainLoopFpsUnlock(Context *c, GLuint skyTexture);
 
-int main(void)
-{
+int main(void) {
     Context *context;
 
 	if (!(context = contextInit())) {
 		return (1);
 	}
-	// else if (!freeTypeFontInit(context)) {
-	// 	return (1);
-	// }
-	
 
 	mainLoopFpsUnlock(context, context->skyTexture);
 	// mainLoopFpsLock(context, context->skyTexture);
@@ -217,16 +212,16 @@ void mainLoopFpsUnlock(Context *c, GLuint skyTexture) {
 
     while (!glfwWindowShouldClose(c->win_ptr)) {
         nowTime = glfwGetTime();
-        deltaTime += (nowTime - lastTime) * updatePerSec; // Multiply instead of divide
+        deltaTime += (nowTime - lastTime) * updatePerSec;
         lastTime = nowTime;
         
 		/* Input update */
         while (deltaTime >= 1.0) {
-            updateGame(c); // Update game logic here
+            updateGame(c);
             deltaTime--;
         }
         /* Render */
-        renderGame(c, skyTexture); // Render game here
+        renderGame(c, skyTexture);
         /* Reset after one second */
         if (glfwGetTime() - timer > 1.0) {
             timer++;
