@@ -32,7 +32,6 @@ void initSkyBox(Context *c) {
 	c->skyboxVAO = skyboxInit();
 	c->skyboxShaderID = load_shader(SKY_VERTEX_SHADER, SKY_FRAGMENT_SHADER);
 	glUseProgram(c->skyboxShaderID);
-	VOX_PROTECTED_LOG(c, CYAN"Skybox shader id: %d\n"RESET, c->skyboxShaderID);
 	c->skyTexture = load_cubemap(TEXTURE_SKY_PATH, 1024, 1024);
 	set_shader_texture(c->skyboxShaderID, c->skyTexture, GL_TEXTURE_CUBE_MAP, "texture1");
 

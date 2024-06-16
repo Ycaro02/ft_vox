@@ -115,23 +115,23 @@ s8 freeTypeFontLoadChar(Context *context, FT_Face face) {
 	return (TRUE);
 }
 
-void freeTypeFontInit(Context *c) {
+s8 freeTypeFontInit(Context *c) {
 	FT_Library	ft;
 	FT_Face		face;
 
 	if (FT_Init_FreeType(&ft)) {
 		ft_printf_fd(2, "ERROR::FREETYPE: Could not init FreeType Library\n");
-		return ;
+		return (FALSE);
 	}
 	if (FT_New_Face(ft, "rsc/font/arial.ttf", 0, &face)) {
 		ft_printf_fd(2, "ERROR::FREETYPE: Failed to load font\n");
-		return ;
+		return (FALSE);
 	}
 	FT_Set_Pixel_Sizes(face, 0, 48);
 
 	if (!(c->fontContext = ft_calloc(sizeof(FontContext), 1))) {
 		ft_printf_fd(2, "ERROR::FREETYPE: Failed to allocate memory for font context\n");
-		return ;
+		return (FALSE);
 	}
 
 
@@ -149,9 +149,8 @@ void freeTypeFontInit(Context *c) {
 	/* Load font shaders */
 	c->fontContext->fontShaderID = load_shader(CHAR_VERTEX_SHADER, CHAR_FRAGMENT_SHADER);
 	glUseProgram(c->fontContext->fontShaderID);
-	VOX_PROTECTED_LOG(c, CYAN"Font shader id: %d\n"RESET, c->fontContext->fontShaderID);
 	if (!freeTypeFontLoadChar(c, face)) {
-		return ;
+		return (FALSE);
 	}
 	/* Free the freetype rsc */
 	FT_Done_Face(face);
@@ -160,13 +159,14 @@ void freeTypeFontInit(Context *c) {
 	glm_ortho(0.0f, (f32)SCREEN_WIDTH, 0.0f, (f32)SCREEN_HEIGHT, -1.0f, 1.0f, c->fontContext->projection);
 	set_shader_var_mat4(c->fontContext->fontShaderID, "projection", c->fontContext->projection);
 	set_shader_texture(c->fontContext->fontShaderID, c->fontContext->font[0].TextureID, GL_TEXTURE_2D, "text");
+
+	return (TRUE);
 }
 
 void chunksRender(Context *c, GLuint shader_id) {
-    glLoadIdentity();
+    // glLoadIdentity();
 	glUseProgram(shader_id);
 	drawAllChunksByFace(c);
-    glFlush();
 }
 
 void renderChunksVBODestroy(Context *c) {
@@ -282,11 +282,34 @@ void updateGame(Context *c) {
 	mtx_unlock(&c->gameMtx);
 }
 
-void fpsDisplayOnScreen(Context *c) {
-	renderFontText(c, "FPS: ", 15.0f, (f32)SCREEN_HEIGHT - 25.0f, 0.4f, (vec3){1.0, 1.0, 0.0});
-	char *fps = ft_itoa(fpsGet());
-	renderFontText(c, (const char *)fps, 80.0f, (f32)SCREEN_HEIGHT - 25.0f, 0.4f, (vec3){1.0, 0.7, 0.0});
-	free(fps);
+
+
+#define TEXT_HEIGHT_OFFSET_GET(x) ((f32)SCREEN_HEIGHT - (f32)x)
+
+#define FPS_SCALE 0.3f
+
+#define TEXT_DESCRIBED_WIDTH_OFFSET 15.0f
+#define TEXT_DATA_WIDTH_OFFSET 150.0f
+
+#define VEC3_GREEN (vec3){0.0, 1.0, 0.0}
+#define VEC3_RED (vec3){1.0, 0.0, 0.0}
+#define VEC3_CYAN (vec3){0.0, 1.0, 1.0}
+#define VEC3_YELLOW (vec3){1.0, 1.0, 0.0}
+#define VEC3_ORANGE (vec3){1.0, 0.7, 0.0}
+
+
+void displayTextCall(Context *c, const char *description, f32 offsetHeight, u32 dataNumber, vec3 colorDescription, vec3 colorData) {
+	char *dataString = ft_ultoa(dataNumber);
+	renderFontText(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
+	renderFontText(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
+	free(dataString);
+}
+
+void dataDisplay(Context *c) {
+	displayTextCall(c, "FPS: ", 25.0f, fpsGet(), VEC3_YELLOW, VEC3_ORANGE);
+	displayTextCall(c, "Chunk Rendered: ", 50.0f, c->chunkRenderedNb, VEC3_YELLOW, VEC3_GREEN);
+	displayTextCall(c, "Chunk Loaded: ", 75.0f, c->chunkLoadedNb, VEC3_YELLOW, VEC3_RED);
+	displayTextCall(c, "Face Rendered: ", 100.0f, c->faceRendered, VEC3_YELLOW, VEC3_GREEN);
 }
 
 void renderGame(Context *c, GLuint skyTexture) {
@@ -294,72 +317,72 @@ void renderGame(Context *c, GLuint skyTexture) {
 	renderChunksVBOhandling(c);
 	/* Clear the color and depth buffer */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	/* Render logic */
 	displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam.projection, c->cam.view);
 	chunksRender(c, c->cubeShaderID);
-	fpsDisplayOnScreen(c);
+	dataDisplay(c);
+	/* glFlush forces the execution of all previous GL commands */
+    glFlush();
 	glfwSwapBuffers(c->win_ptr);
 }
 
 
-void main_loop(Context *c, GLuint skyTexture) {
+void mainLoopFpsLock(Context *c, GLuint skyTexture) {
     while (!glfwWindowShouldClose(c->win_ptr)) {
 		updateGame(c);
 		renderGame(c, skyTexture);	
     }
 }
 
-int main() {
+void mainLoopFpsUnlock(Context *c, GLuint skyTexture);
+
+int main(void)
+{
     Context *context;
 
 	if (!(context = contextInit())) {
 		return (1);
+	} else if (!freeTypeFontInit(context)) {
+		return (1);
 	}
-
-	freeTypeFontInit(context);
 	
-	/* Disable VSync to avoid fps locking */
-	// glfwSwapInterval(0);
-	main_loop(context, context->skyTexture);
+
+	mainLoopFpsUnlock(context, context->skyTexture);
+	// mainLoopFpsLock(context, context->skyTexture);
     vox_destroy(context);
     return (0);
 }
 
 
-// void testUpdateLogic(Context *c, GLuint skyTexture) {
-//     double lastTime = glfwGetTime();
-//     double timer = lastTime;
-//     double deltaTime = 0;
-//     double nowTime = 0;
-//     int frames = 0;
-//     int updates = 0;
+void mainLoopFpsUnlock(Context *c, GLuint skyTexture) {
+    f64 lastTime = glfwGetTime();
+    f64 timer = lastTime;
+    f64 deltaTime = 0;
+    f64 nowTime = 0;
+    f64 updatePerSec = 60.0;
 
-//     double limitFPS = 60.0;
+	/* Disable VSync to avoid fps locking */
+	glfwSwapInterval(0);
 
-//     while (!glfwWindowShouldClose(c->win_ptr)) {
-//         nowTime = glfwGetTime();
-//         deltaTime += (nowTime - lastTime) * limitFPS; // Multiply instead of divide
-//         lastTime = nowTime;
-//         // Input, AI, Physics, etc.
-//         while (deltaTime >= 1.0) {
-//             updateGame(c); // Update game logic here
-//             updates++;
-//             deltaTime--;
-//         }
-//         // Rendering
-//         renderGame(c, skyTexture); // Render game here
-//         frames++;
-
-//         // Reset after one second
-//         if (glfwGetTime() - timer > 1.0) {
-//             timer++;
-//             VOX_PROTECTED_LOG(c, RESET_LINE""PINK"FPS: %d, Updates: %d\n"RESET, frames, updates);
-//             (void)frames, (void)updates;
-//             updates = 0;
-//             frames = 0;
-//         }
-//     }
-// }
+    while (!glfwWindowShouldClose(c->win_ptr)) {
+        nowTime = glfwGetTime();
+        deltaTime += (nowTime - lastTime) * updatePerSec; // Multiply instead of divide
+        lastTime = nowTime;
+        
+		/* Input update */
+        while (deltaTime >= 1.0) {
+            updateGame(c); // Update game logic here
+            deltaTime--;
+        }
+        /* Render */
+        renderGame(c, skyTexture); // Render game here
+        /* Reset after one second */
+        if (glfwGetTime() - timer > 1.0) {
+            timer++;
+        }
+    }
+}
 
 
 

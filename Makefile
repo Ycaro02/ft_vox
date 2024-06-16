@@ -78,7 +78,7 @@ clean_lib:
 	@$(MAKE_LIBFT) fclean
 
 test: $(NAME)
-	ulimit -c unlimited
+	@ulimit -c unlimited
 	@./$(NAME)
 
 vtest: $(NAME)

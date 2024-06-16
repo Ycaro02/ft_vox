@@ -128,7 +128,7 @@ Path *buildPaths(u8 **snakeData, s32 w, s32 h, s32 *nbPaths, s32 minLength) {
     }
     free(visited);
     *nbPaths = numPaths;
-    ft_printf_fd(1, RED"Number of totalPath: %d\n"RESET, numPaths);
+    // ft_printf_fd(1, RED"Number of totalPath: %d\n"RESET, numPaths);
 	return (totalPath);
 }
 

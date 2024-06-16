@@ -24,11 +24,10 @@ struct s_thread_context {
 
 /* Context structure */
 struct s_context {
-	World				*world;				/* World structure */
 	Camera				cam;				/* camera structure */
+	World				*world;				/* World structure */
     GLFWwindow			*win_ptr;			/* Window pointer */
 	FaceCubeModel		*faceCube;			/* Data Face Cube structure */
-	u32					renderBlock;		/* Total block to render */
 	ThreadContext		*threadContext;		/* Thread context */
 	f32					**perlin2D;			/* Perlin noise 2D */
 	u8					**perlinCaveNoise;	/* Perlin noise 2D for cave */
@@ -50,8 +49,11 @@ struct s_context {
 	GLuint				skyboxVAO;			/* skybox VAO */
 	GLuint				skyTexture;			/* skybox VAO */
 	mat4				rotation;			/* rotation matrix */
+	/* Data displayed */
+	u32					chunkRenderedNb;	/* Chunk rendered */
 	u32					chunkLoadedNb;		/* Chunk loaded */
 	u32					chunkToLoadInQueue;	/* Chunk to load in queue */
+	u32					faceRendered;		/* Face rendered */
 	/* Multiple bool can be in the same var and handle with power of 2 (flag )*/
 	s8					isPlaying;			/* Game is playing */
 	u8					renderDataNeeded; 	/* Render need data, bool to specify render want to lock data (chunkMtx) */

@@ -10,10 +10,10 @@ GLFWwindow  *window_create(int width, int height, const char *title);
 GLFWwindow  *init_openGL_context();
 void        glfw_destroy(GLFWwindow *win);
 
-FT_INLINE  s32 fpsGet() {
+FT_INLINE  u32 fpsGet() {
 	static f64 lastTime = 0.0f; 
-	static s32 nbFrames = 0;
-	static s32 saveFrames = 0;
+	static u32 nbFrames = 0;
+	static u32 saveFrames = 0;
 
 	if (lastTime == 0.0f) {
 		lastTime = glfwGetTime();

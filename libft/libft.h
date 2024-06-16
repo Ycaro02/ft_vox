@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 15:43:41 by nfour             #+#    #+#             */
-/*   Updated: 2024/06/15 21:22:24 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/16 18:44:58 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,7 @@ char	*ft_itoa(int n);
 char	*ft_ltoa(long n);
 
 /**
- *	@brief Convert unsi9gned long to string
+ *	@brief Convert unsigned long to string
  *	@param n unsigned long value
  *	@return allocated char *
 */

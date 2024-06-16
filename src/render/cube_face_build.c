@@ -168,9 +168,11 @@ void drawSpecialFace(GLuint faceVBO, GLuint typeVBO, u32 vertex_nb, u32 faceNb) 
 void drawAllChunksByFace(Context *c) {
     HashMap_it		it;
 	RenderChunks	*render = NULL;
-    u32 			chunkRenderNb = 0, faceRendernb = 0, faceNb = 0;
+    u32 			faceNb = 0;
     
     mtx_lock(&c->renderMtx);
+	c->chunkRenderedNb = hashmap_size(c->world->renderChunksMap);
+	c->faceRendered = 0;
     for (u8 i = 0; i < 6; ++i) {
 		glBindVertexArray(c->faceCube[i].VAO);
 
@@ -178,23 +180,21 @@ void drawAllChunksByFace(Context *c) {
         while (hashmap_next(&it)) {
             render = (RenderChunks *)it.value;
             faceNb = render->faceCount[i];
-            faceRendernb += faceNb;
+            c->faceRendered += faceNb;
             drawFace(render, 6U, faceNb, i);
-            chunkRenderNb++;
         }
 	
 		if (c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
 			drawSpecialFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, TOTAL_UNDERGROUND_FACE);			
 		}
 
-		if (i == 5U) { /* TOP face */
+		if (i == 5U) { /* 5 == TOP face */
 			it = hashmap_iterator(c->world->renderChunksMap);
 			while (hashmap_next(&it)) {
 				render = (RenderChunks *)it.value;
 				faceNb = render->topWaterFaceCount;
-				faceRendernb += faceNb;
+				c->faceRendered += faceNb;
 				drawSpecialFace(render->topWaterFaceVBO, render->topWaterTypeVBO, 6U, faceNb);
-				// chunkRenderNb++;
 			}
 		}
 	
@@ -202,6 +202,4 @@ void drawAllChunksByFace(Context *c) {
     
 	}
     mtx_unlock(&c->renderMtx);
-    VOX_PROTECTED_LOG(c, RESET_LINE""GREEN"Chunk Rendered: %u, "ORANGE"Loaded %u "RESET""CYAN"In load %u "RESET""YELLOW"Visible Face: %u"RESET", "PINK" FPS: %d "RESET
-    , chunkRenderNb / 6, c->chunkLoadedNb , c->chunkToLoadInQueue,faceRendernb, fpsGet());
 }
