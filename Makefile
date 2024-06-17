@@ -10,9 +10,11 @@ CFLAGS			=	-Wall -Wextra -Werror -O3 -g3
 # ASCII_ART		=	./rsc/mk/ascii.sh
 ASCII_NAME		=	${NAME}
 
-FREETYPE_INC	=	-Irsc/deps/freetype/include -Irsc/deps/freetype/include/freetype2
+FREETYPE_INC	=	-Irsc/deps/freetype/include
 
-OPENGL_LIB		= -lglfw3 -lGL -lm -Lrsc/lib_deps/ -lfreetype -Lrsc/depsfreetype
+FREETYPE_FLAGS	= $(shell pkg-config --cflags --libs freetype2)
+
+OPENGL_LIB		= -lglfw3 -lGL -lm -Lrsc/lib_deps/
 VALGRIND_TEST	= valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
 
 INSTALL_DEPS	=	./install/install_deps.sh
@@ -26,7 +28,7 @@ $(NAME):	deps_install $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS) $(DISPLAY_NAME)
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
-	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) ${OPENGL_LIB}
+	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) $(OPENGL_LIB) $(FREETYPE_FLAGS)
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
 
 deps_install:
