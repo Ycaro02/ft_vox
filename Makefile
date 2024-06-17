@@ -51,7 +51,7 @@ $(OBJ_DIR):
 # @$(ASCII_ART) $(ASCII_NAME)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@printf "$(YELLOW)Compile $<$(RESET)\n"
+	@printf "$(YELLOW)Compile $<$(RESET) $(BRIGHT_BLACK)-->$(RESET) $(BRIGHT_MAGENTA)$@$(RESET)\n"
 	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $@ -c $< $(CFLAGS)
 
 bonus: clear_mandatory ${NAME}
