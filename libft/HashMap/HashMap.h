@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/06/17 12:37:38 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/17 17:28:02 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #define HEADER_HASHMAP_H
 
 #include "../libft.h"
-#include "../../src/tinycthread/tinycthread.h"
+#include "../tinycthread.h"
 
 typedef mtx_t Mutex;
 

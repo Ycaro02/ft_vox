@@ -14,7 +14,7 @@ FREETYPE_INC	=	-Irsc/deps/freetype/include
 
 LIB_DEPS_DIR	=	-Lrsc/lib_deps/
 
-OPENGL_LIB		= -lglfw3 -lGL -lm
+OPENGL_LIB		= -lglfw3 -lGL -lm -lstatic_tinycthread
 
 FREETYPE_LIB	= -lstaticfreetype -lz -lbz2 -lpng16 -lbrotlidec
 
