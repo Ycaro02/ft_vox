@@ -2,20 +2,16 @@ include libft/rsc/mk/color.mk
 include rsc/mk/source.mk
 
 NAME			=	ft_vox
-# CC				=	gcc
 CC				=	clang
-CFLAGS			=	-Wall -Wextra -Werror -O3 -g3
-# CFLAGS			=	-Wall -Wextra -Werror -O3 -g3 -fsanitize=address
-# CFLAGS			=	-Wall -Wextra -Werror -O3 -g3 -fsanitize=thread
+
 # ASCII_ART		=	./rsc/mk/ascii.sh
-ASCII_NAME		=	${NAME}
+# ASCII_NAME		=	${NAME}
 
 FREETYPE_INC	=	-Irsc/deps/freetype/include
 
 LIB_DEPS_DIR	=	-Lrsc/lib_deps/
 
 OPENGL_LIB		= -lglfw3 -lGL -lm -lstatic_tinycthread
-
 
 # zlib1g-dev libbz2-dev libpng-dev libbrotli-dev
 FREETYPE_LIB	= -lstaticfreetype -lz -lbz2 -lpng16 -lbrotlidec
@@ -24,15 +20,15 @@ INSTALL_DEPS	=	./install/install_deps.sh
 
 all:		$(NAME)
 
-$(NAME):	deps_install $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS) $(DISPLAY_NAME)
+$(NAME): $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS)
+	@$(DEPS_INSTALL_RULE)
+	@${INSTALL_DEPS}
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
 	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) $(LIB_DEPS_DIR) $(OPENGL_LIB) $(FREETYPE_LIB)
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
 
-deps_install:
-	@${INSTALL_DEPS}
 
 $(LIST):
 ifeq ($(shell [ -f ${LIST} ] && echo 0 || echo 1), 1)
@@ -68,23 +64,24 @@ clean:
 ifeq ($(shell [ -d ${OBJ_DIR} ] && echo 0 || echo 1), 0)
 	@$(RM) $(OBJ_DIR)
 	@printf "$(RED)Clean $(OBJ_DIR)/test output$(RESET)\n"
-	@$(RM) ${TESTER_OUT_FILES}
+	@$(RM)
 endif
 
 fclean:		clean_lib clean
 	@printf "$(RED)Clean $(NAME)/lib$(RESET)\n"
-	@$(RM) $(NAME) ${TESTER_OUT_FILES} ${DISPLAY_NAME}
+	@$(RM) $(NAME)
 
 clean_lib:
 	@$(MAKE_LIST) fclean
 	@$(MAKE_LIBFT) fclean
 
 test: $(NAME)
-	@ulimit -c unlimited
 	@./$(NAME)
 
-vtest: $(NAME)
-	@valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
+# @ulimit -c unlimited
+leak thread: clean $(NAME)
+	@printf	"$(CYAN)CFLAGS: $(CFLAGS)$(RESET)\n"
+	@./$(NAME)
 
 re: clean $(NAME)
 

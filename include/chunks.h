@@ -37,15 +37,17 @@ struct s_chunks {
 
 #define CHUNKS_NEIGHBOR_LOADED (CHUNK_NEIGHBOR_BACK | CHUNK_NEIGHBOR_FRONT | CHUNK_NEIGHBOR_LEFT | CHUNK_NEIGHBOR_RIGHT)
 
+/* chunks.c */
 void 	chunksMapFree(void *entry);
-Chunks	*getChunkAt(Context *c, s32 x, s32 z);
 u32 	subChunksMaxGet(Chunks *chunk);
-/* chunks */
-Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, u8 **perlinSnakeCaveNoise);
-s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
-void unloadChunkHandler(Context *c);
+Chunks	*getChunkAt(Context *c, s32 x, s32 z);
+Chunks	*chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, u8 **perlinSnakeCaveNoise);
+s32		chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
 
-/* digcave */
-// void chunkDigCave(Chunks *chunk, Block *chunkBlockCache[16][16][16][16]);
+/* load_chunk.c*/
+void	unloadChunkHandler(Context *c);
+
+/* digcave.c */
+void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinVal);
 
 #endif /* HEADER_CHUNKS_H */

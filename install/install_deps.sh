@@ -2,10 +2,9 @@
 
 source ./rsc/sh/color.sh
 
-display_color_msg ${LIGHT_CYAN} "Installing dependencies"
-
 if [ ! -d "rsc/deps" ]; then
 	mkdir rsc/deps
+	display_color_msg ${LIGHT_CYAN} "Installing dependencies"
 fi
 
 if [ ! -d "rsc/lib_deps" ]; then

@@ -5,9 +5,9 @@
 #include "glad/gl.h"				            /* Glad functions (Include glad header BEFORE glfw3) */
 #include "glfw3/glfw3.h"			            /* GLFW functions */
 #include <math.h>					            /* LIBC Math functions */
-#include "../libft/tinycthread.h"        /* TinyCThread functions */
-#include "../libft/libft.h"							/* Libft functions */
-#include "../libft/HashMap/HashMap.h"				/* Hashmap functions */
+#include "../libft/libft.h"						/* Libft functions */
+#include "../libft/tinycthread.h"        		/* TinyCThread functions */
+#include "../libft/HashMap/HashMap.h"			/* Hashmap functions */
 #include "../libft/parse_flag/parse_flag.h"		/* Parse flag functions */
 #include "../libft/BMP_parser/parse_bmp.h"		/* BMP parser functions */
 
