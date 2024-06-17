@@ -6,7 +6,7 @@
 /*   By: nfour <nfour@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 19:35:19 by nfour             #+#    #+#             */
-/*   Updated: 2024/06/14 17:15:45 by nfour            ###   ########.fr       */
+/*   Updated: 2024/06/17 12:37:38 by nfour            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,16 +55,16 @@ typedef mtx_t Mutex;
 
 /* Block position structure */
 typedef struct PACKED_STRUCT s_block_pos {
-	s32 x;
-	s32 y;
-	s32 z;
+	s32			x;
+	s32			y;
+	s32			z;
 } BlockPos;
 
 /* HashMap entry key + value + original data */
 typedef struct s_hashmap_entry {
-	BlockPos 	origin_data;	/* Original data (block pos) */
-	u64				key;			/* Key of the entry */
-	void 			*value;			/* Value linked */
+	BlockPos	origin_data;	/* Original data (block pos) */
+	u64			key;			/* Key of the entry */
+	void		*value;			/* Value linked */
 } HashMap_entry;
 
 /* HashMap structure */
