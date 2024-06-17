@@ -12,23 +12,21 @@ ASCII_NAME		=	${NAME}
 
 FREETYPE_INC	=	-Irsc/deps/freetype/include
 
-FREETYPE_FLAGS	= $(shell pkg-config --cflags --libs freetype2)
+LIB_DEPS_DIR	=	-Lrsc/lib_deps/
 
-OPENGL_LIB		= -lglfw3 -lGL -lm -Lrsc/lib_deps/
-VALGRIND_TEST	= valgrind --suppressions=rsc/vsupp/vsupp.supp --leak-check=full ./${NAME}
+OPENGL_LIB		= -lglfw3 -lGL -lm
+
+FREETYPE_LIB	= -lstaticfreetype -lz -lbz2 -lpng16 -lbrotlidec
 
 INSTALL_DEPS	=	./install/install_deps.sh
 
 all:		$(NAME)
 
-# %.o : %.c
-# 	@$(CC) $(CFLAGS) $(FREETYPE_INC) -c $< -o $@
-
 $(NAME):	deps_install $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS) $(DISPLAY_NAME)
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
-	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) $(OPENGL_LIB) $(FREETYPE_FLAGS)
+	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) $(LIB_DEPS_DIR) $(OPENGL_LIB) $(FREETYPE_LIB)
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
 
 deps_install:
