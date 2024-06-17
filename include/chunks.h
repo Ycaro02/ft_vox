@@ -9,9 +9,8 @@
 /* Number of subchunks in chunk  */
 #define SUB_CHUNKS_MAX (CHUNKS_HEIGHT / SUB_CHUNKS_HEIGHT)
 
-#define CHUNKS_NB_BLOCK   	16	/* Number of block in X */
+#define BLOCKS_PER_CHUNK   	16	/* Number of block in X */
 #define CAVE_ENTRY_DEPTH	15	/* Cave entry depth */
-
 
 
 struct s_sub_chunks {

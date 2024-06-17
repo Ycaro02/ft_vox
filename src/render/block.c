@@ -23,7 +23,7 @@ Block *worldPosProtectBlockGet(Chunks *chunk, BlockPos localPos, s32 camY) {
 
 /* Set local X and Z coordinates based on the center of the Perlin noise array */
 s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
-	return ((chunkOffset * CHUNKS_NB_BLOCK + localPos) + (width / 2));
+	return ((chunkOffset * BLOCKS_PER_CHUNK + localPos) + (width / 2));
 }
 
 Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {

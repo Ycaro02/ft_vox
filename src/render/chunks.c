@@ -23,13 +23,13 @@ void chunksMapFree(void *entry) {
 		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
-		for (u32 i = 0; i < CHUNKS_NB_BLOCK; ++i) {
+		for (u32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
 			free(chunks->perlinVal[i]);
 		}
 		free(chunks->perlinVal);
 		/* cave */
 		if (chunks->perlinCave) {
-			for (u32 i = 0; i < CHUNKS_NB_BLOCK; ++i) {
+			for (u32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
 				free(chunks->perlinCave[i]);
 			}
 			free(chunks->perlinCave);
@@ -51,9 +51,9 @@ void occlusionCullingStatic(Block *****chunkBlockCache, Chunks *chunk) {
 	
 	s32 i = 0;
 	while (chunk->sub_chunks[i].block_map) {
-		for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
-			for (s32 y = 0; y < CHUNKS_NB_BLOCK; ++y) {
-				for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+		for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
+			for (s32 y = 0; y < BLOCKS_PER_CHUNK; ++y) {
+				for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 					if (chunkBlockCache[i][x][y][z]) {
 						updateNeighbors(chunkBlockCache[i][x][y][z], chunkBlockCache[i]);
 					}
@@ -75,11 +75,11 @@ void occlusionCullingStatic(Block *****chunkBlockCache, Chunks *chunk) {
 size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinData **perlinVal, s32 layer)
 {
 	Block *block = NULL;
-	s32 startYWorld = layer * CHUNKS_NB_BLOCK;
+	s32 startYWorld = layer * BLOCKS_PER_CHUNK;
 
-    for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
-        for (s32 y = 0; y < CHUNKS_NB_BLOCK; ++y) {
-            for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+    for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
+        for (s32 y = 0; y < BLOCKS_PER_CHUNK; ++y) {
+            for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld))) {
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){x, y, z}, block);
 					chunkBlockCache[layer][x][y][z] = block;
@@ -93,8 +93,8 @@ size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinDat
 s32 maxHeightGet(PerlinData **perlinVal) {
 	s32 max = 0;
 
-	for (s32 i = 0; i < CHUNKS_NB_BLOCK; ++i) {
-		for (s32 j = 0; j < CHUNKS_NB_BLOCK; ++j) {
+	for (s32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
+		for (s32 j = 0; j < BLOCKS_PER_CHUNK; ++j) {
 			if (perlinVal[i][j].normalise > (s32)max) {
 				max = perlinVal[i][j].normalise;
 			}
@@ -123,13 +123,13 @@ f32 perlinNoiseHeight(f32 **perlin2D, s32 localX, s32 localZ, PerlinData *perlin
 
 
 void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
-	u8 **caveData = malloc(sizeof(u8 *) * CHUNKS_NB_BLOCK);
+	u8 **caveData = malloc(sizeof(u8 *) * BLOCKS_PER_CHUNK);
 	s32 width = PERLIN_SNAKE_WIDTH;
 	s32 height = PERLIN_SNAKE_HEIGHT;
 
-	for (u32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
-		caveData[x] = malloc(sizeof(u8) * CHUNKS_NB_BLOCK);
-		for (u32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+	for (u32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
+		caveData[x] = malloc(sizeof(u8) * BLOCKS_PER_CHUNK);
+		for (u32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			s32 localX = blockLocalToPerlinPos(chunk->x, x, width);
 			s32 localZ = blockLocalToPerlinPos(chunk->z, z, height);
 			caveData[x][z] = perlinSnakeCaveNoise[abs(localX % width)][abs(localZ % height)];
@@ -154,9 +154,9 @@ void caveDigXAxis(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s3
 
 	if (digHeightGuard(startY)) { return; }
 
-	if (startX >= 0 && startX < CHUNKS_NB_BLOCK && isCaveValue(perlinCave[startX][startZ])) {
-		hashmap_remove_entry(chunk->sub_chunks[startY / CHUNKS_NB_BLOCK].block_map, (BlockPos){startX, startY % CHUNKS_NB_BLOCK, startZ}, HASHMAP_FREE_DATA);
-		chunkBlockCache[startY / CHUNKS_NB_BLOCK][startX][startY % CHUNKS_NB_BLOCK][startZ] = NULL;
+	if (startX >= 0 && startX < BLOCKS_PER_CHUNK && isCaveValue(perlinCave[startX][startZ])) {
+		hashmap_remove_entry(chunk->sub_chunks[startY / BLOCKS_PER_CHUNK].block_map, (BlockPos){startX, startY % BLOCKS_PER_CHUNK, startZ}, HASHMAP_FREE_DATA);
+		chunkBlockCache[startY / BLOCKS_PER_CHUNK][startX][startY % BLOCKS_PER_CHUNK][startZ] = NULL;
 	}
 }
 
@@ -164,9 +164,9 @@ void caveDigZAxis(Chunks *chunk, Block *****chunkBlockCache, u8 **perlinCave, s3
 	
 	if (digHeightGuard(startY)) { return; }
 
-	if (startZ >= 0 && startZ < CHUNKS_NB_BLOCK && isCaveValue(perlinCave[startX][startZ])) {
-		hashmap_remove_entry(chunk->sub_chunks[startY / CHUNKS_NB_BLOCK].block_map, (BlockPos){startX, startY % CHUNKS_NB_BLOCK, startZ}, HASHMAP_FREE_DATA);
-		chunkBlockCache[startY / CHUNKS_NB_BLOCK][startX][startY % CHUNKS_NB_BLOCK][startZ] = NULL;
+	if (startZ >= 0 && startZ < BLOCKS_PER_CHUNK && isCaveValue(perlinCave[startX][startZ])) {
+		hashmap_remove_entry(chunk->sub_chunks[startY / BLOCKS_PER_CHUNK].block_map, (BlockPos){startX, startY % BLOCKS_PER_CHUNK, startZ}, HASHMAP_FREE_DATA);
+		chunkBlockCache[startY / BLOCKS_PER_CHUNK][startX][startY % BLOCKS_PER_CHUNK][startZ] = NULL;
 	}
 
 }
@@ -175,10 +175,10 @@ void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, s32 startX, s32 st
 	s32 maxDepth = startY - CAVE_ENTRY_DEPTH;
 
 	for (s32 tmpY = startY; tmpY > maxDepth; --tmpY) {
-		s32 subChunkId = tmpY / CHUNKS_NB_BLOCK;
-		if (chunkBlockCache[subChunkId][startX][tmpY % CHUNKS_NB_BLOCK][startZ]) {
-			hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, tmpY % CHUNKS_NB_BLOCK, startZ}, HASHMAP_FREE_DATA);
-			chunkBlockCache[subChunkId][startX][tmpY % CHUNKS_NB_BLOCK][startZ] = NULL;
+		s32 subChunkId = tmpY / BLOCKS_PER_CHUNK;
+		if (chunkBlockCache[subChunkId][startX][tmpY % BLOCKS_PER_CHUNK][startZ]) {
+			hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, tmpY % BLOCKS_PER_CHUNK, startZ}, HASHMAP_FREE_DATA);
+			chunkBlockCache[subChunkId][startX][tmpY % BLOCKS_PER_CHUNK][startZ] = NULL;
 		}
 	}
 }
@@ -187,8 +187,8 @@ void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, s32 startX, s32 st
 void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinVal) {
     s32 startX = 0, startY = 0, startZ = 0, maxDepth = 0;
 
-	for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
-		for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+	for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
+		for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			if (chunk->perlinCave[x][z] == ENTRY_EXIT_VAL) {
 				// ft_printf_fd(1, "Start cave at [%d][%d][%d]\n", x, perlinVal[x][z].normalise, z);
 				startX = x;
@@ -201,8 +201,8 @@ void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinV
 		}
 	}
 
-	for (s32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
-		for (s32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+	for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
+		for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			if (isCaveValue(chunk->perlinCave[x][z])) {
 				startX = x;
 				startY = perlinVal[x][z].normalise - CAVE_ENTRY_DEPTH; /* 80 - 15 = 65*/
@@ -211,7 +211,7 @@ void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinV
 				// maxDepth = (perlinVal[x][z].normalise - CAVE_ENTRY_DEPTH) / 4;
 				maxDepth = 4;
 				for (s32 depth = 0 ; depth < maxDepth; depth++) {
-					for (s32 horizontalDepth = 0; horizontalDepth < CHUNKS_NB_BLOCK; horizontalDepth++) {
+					for (s32 horizontalDepth = 0; horizontalDepth < BLOCKS_PER_CHUNK; horizontalDepth++) {
 						caveDigZAxis(chunk, chunkBlockCache, chunk->perlinCave, startX, startY-depth, startZ - horizontalDepth);
 						caveDigZAxis(chunk, chunkBlockCache, chunk->perlinCave, startX, startY-depth, startZ + horizontalDepth);
 						caveDigXAxis(chunk, chunkBlockCache, chunk->perlinCave, startX - horizontalDepth, startY-depth, startZ);
@@ -230,11 +230,11 @@ void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinV
  * @param chunks Chunks array pointer
 */
 void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **perlinSnakeCaveNoise) {
-	PerlinData **perlinVal = malloc(sizeof(PerlinData *) * CHUNKS_NB_BLOCK);
+	PerlinData **perlinVal = malloc(sizeof(PerlinData *) * BLOCKS_PER_CHUNK);
 
-	for (u32 x = 0; x < CHUNKS_NB_BLOCK; ++x) {
-		perlinVal[x] = malloc(sizeof(PerlinData) * CHUNKS_NB_BLOCK);
-		for (u32 z = 0; z < CHUNKS_NB_BLOCK; ++z) {
+	for (u32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
+		perlinVal[x] = malloc(sizeof(PerlinData) * BLOCKS_PER_CHUNK);
+		for (u32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			s32 localX = blockLocalToPerlinPos(chunk->x, x, PERLIN_NOISE_WIDTH);
 			s32 localZ = blockLocalToPerlinPos(chunk->z, z, PERLIN_NOISE_WIDTH);
 			perlinVal[x][z].normalise = (s32)perlinNoiseHeight(perlin2D, localX, localZ, &perlinVal[x][z]);
@@ -246,7 +246,7 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **
 		chunkMaxY = (s32)MIN_HEIGHT;
 	}
 
-	for (s32 i = 0; (i * CHUNKS_NB_BLOCK) < chunkMaxY; ++i) {
+	for (s32 i = 0; (i * BLOCKS_PER_CHUNK) < chunkMaxY; ++i) {
 		chunk->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
 		if (!chunk->sub_chunks[i].block_map) {
 			ft_printf_fd(2, "Failed to allocate hashmap\n");

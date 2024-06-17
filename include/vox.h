@@ -7,15 +7,14 @@
 #define SCREEN_WIDTH	1920			/* Screen width */
 #define SCREEN_HEIGHT	1080			/* Screen height */
 
-#define CAM_FOV			80.0f			/* Camera field of view */
-#define CHUNK_FLOAT_SIZE 8.0f			/* Chunk float size, cause one block is 0.5, 0.5 * 16 = 8.0f */
-#define ANGLE_INCREMENT 5.0f			/* Angle increment in chunk veiw handling */
+#define CAM_FOV				80.0f			/* Camera field of view */
+#define CHUNK_FLOAT_SIZE	8.0f			/* Chunk float size, cause one block is 0.5, 0.5 * 16 = 8.0f */
+#define ANGLE_INCREMENT		5.0f			/* Angle increment in chunk veiw handling */
 
 /* Basic value */
 #define CHUNKS_LOAD_RADIUS 16							/* Chunks load radius */
-// #define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 8)	/* Chunks unload max radius */
 #define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS * 2)	/* Chunks unload max radius */
-#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 14.0f)	/* Max render distance */
+#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 16.0f)	/* Max render distance */
 
 /* Bonus Value */
 // #define CHUNKS_LOAD_RADIUS 25								/* Chunks load radius */
@@ -82,7 +81,7 @@
 // #define PERLIN_PICKS_VALLEY_PERSISTENCE 2.0f
 // #define PERLIN_PICKS_VALLEY_LACUNARITY 1.4f
 
-
+/* Chunk generation */
 #define MIN_HEIGHT 80.0f
 #define SEA_LEVEL  50
 
@@ -183,9 +182,9 @@ enum BlockType {
 };
 
 /* texture load_texture */
-GLuint load_texture_atlas(char *path, int squareHeight, int squareWidth);
-void set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *varName);
-GLuint load_cubemap(char* path, int squareHeight, int squareWidth);
+GLuint	load_texture_atlas(char *path, int squareHeight, int squareWidth);
+void	set_shader_texture(GLuint shaderId, GLuint atlasID, u32 textureType, char *varName);
+GLuint	load_cubemap(char* path, int squareHeight, int squareWidth);
 
 
 #include <sys/time.h>

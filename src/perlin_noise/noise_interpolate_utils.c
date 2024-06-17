@@ -46,15 +46,10 @@ f32 getInterpolatedPerlinNoise(f32 **perlinNoise, f32 x, f32 z, f32 scale, s32 w
 }
 /* Interpolate noise value */
 f32 normaliseNoiseGet(f32 **perlinNoise, s32 x, s32 z, PerlinData *perlinVal) {
-    // s32 normX = abs(x % PERLIN_NOISE_WIDTH);
-    // s32 normZ = abs(z % PERLIN_NOISE_HEIGHT);
-
 	/* set Perlin Debug val here */
 	perlinVal->givenX = x;
 	perlinVal->givenZ = z;
 
-	// return (perlinNoise[normX][normZ]);
-	// return (getInterpolatedPerlinNoise(perlinNoise, x, z, 2.0f, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal));
 	return (getInterpolatedPerlinNoise(perlinNoise, x, z, 4.0f, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, perlinVal));
 }
 

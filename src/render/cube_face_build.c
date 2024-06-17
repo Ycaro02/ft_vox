@@ -197,7 +197,6 @@ void drawAllChunksByFace(Context *c) {
 				drawSpecialFace(render->topWaterFaceVBO, render->topWaterTypeVBO, 6U, faceNb);
 			}
 		}
-	
 		glBindVertexArray(0);
     
 	}
