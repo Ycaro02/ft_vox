@@ -4,8 +4,7 @@ include rsc/mk/source.mk
 NAME			=	ft_vox
 CC				=	clang
 
-# ASCII_ART		=	./rsc/mk/ascii.sh
-# ASCII_NAME		=	${NAME}
+ASCII_ART		=	./rsc/sh/vox_ascii.sh
 
 FREETYPE_INC	=	-Irsc/deps/freetype/include
 
@@ -46,7 +45,7 @@ endif
 
 $(OBJ_DIR):
 	@mkdir $(ALL_SRC_DIR)
-# @$(ASCII_ART) $(ASCII_NAME)
+	@$(ASCII_ART)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@printf "$(YELLOW)Compile $<$(RESET) $(BRIGHT_BLACK)-->$(RESET) $(BRIGHT_MAGENTA)$@$(RESET)\n"
