@@ -20,7 +20,6 @@ INSTALL_DEPS	=	./install/install_deps.sh
 all:		$(NAME)
 
 $(NAME): $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS)
-	@$(DEPS_INSTALL_RULE)
 	@${INSTALL_DEPS}
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
