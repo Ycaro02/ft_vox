@@ -17,9 +17,11 @@ FREETYPE_LIB	= -lstaticfreetype -lz -lbz2 -lpng16 -lbrotlidec
 
 INSTALL_DEPS	=	./install/install_deps.sh
 
+DEPS_RULE		=	rsc/deps
+
 all:		$(NAME)
 
-$(NAME): $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS)
+$(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS)
 	@${INSTALL_DEPS}
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
@@ -27,6 +29,9 @@ $(NAME): $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS)
 	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) $(LIB_DEPS_DIR) $(OPENGL_LIB) $(FREETYPE_LIB)
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
 
+$(DEPS_RULE):
+	@$(INSTALL_DEPS)
+	@printf "$(GREEN)Installing dependencies done$(RESET)\n"
 
 $(LIST):
 ifeq ($(shell [ -f ${LIST} ] && echo 0 || echo 1), 1)

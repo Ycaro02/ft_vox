@@ -17,7 +17,7 @@ jobs:
       run: sudo apt update && sudo apt install libwayland-dev libxkbcommon-dev xorg-dev make -y
     
     - name: Run make
-      run: ./install/install_deps.sh && make
+      run: make
 
     - name: clean
       run: make fclean
