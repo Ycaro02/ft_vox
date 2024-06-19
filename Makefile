@@ -1,6 +1,8 @@
 include libft/rsc/mk/color.mk
 include rsc/mk/source.mk
 
+##ss
+
 NAME			=	ft_vox
 CC				=	clang
 
