@@ -15,7 +15,6 @@ jobs:
     with:
       submodules: 'recursive'
 
-    # Configure SSH
     - name: Setup SSH
     uses: webfactory/ssh-agent@v0.5.3
     with:
