@@ -18,7 +18,7 @@ FREETYPE_LIB	= -lfreetype
 
 PERLIN_LIB		=	-lperlin_noise
 
-COMPILE_PERLIN_LIB = make -s -C rsc/perlin_noise lib
+COMPILE_PERLIN_LIB = ./install/compile_perlin_lib.sh
 
 INSTALL_DEPS	=	./install/install_deps.sh
 
