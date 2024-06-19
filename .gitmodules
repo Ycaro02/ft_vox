@@ -1,6 +1,6 @@
 [submodule "libft"]
 	path = libft
-	url = https://github.com/Ycaro02/sub_libft.git
+	url = git@github.com:Ycaro02/sub_libft.git
 	branch = main
 [submodule "rsc/perlin_noise"]
 	path = rsc/perlin_noise
