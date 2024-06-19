@@ -13,7 +13,8 @@ LIB_DEPS_DIR	=	-Lrsc/lib_deps/
 OPENGL_LIB		= -lglfw3 -lGL -lm -lstatic_tinycthread
 
 # zlib1g-dev libbz2-dev libpng-dev libbrotli-dev
-FREETYPE_LIB	= -lstaticfreetype -lz -lbz2 -lpng16 -lbrotlidec
+# FREETYPE_LIB	= -lstaticfreetype -lz -lbz2 -lpng16 -lbrotlidec
+FREETYPE_LIB	= -lfreetype
 
 INSTALL_DEPS	=	./install/install_deps.sh
 
