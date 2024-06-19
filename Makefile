@@ -41,7 +41,7 @@ $(DEPS_RULE):
 $(PERLIN_LIB):
 ifeq ($(shell [ -f rsc/perlin_noise/lib/libperlin_noise.a ] && echo 0 || echo 1), 1)
 	@printf "$(CYAN)Compiling perlin noise lib...$(RESET)\n"
-	@$(COMPILE_PERLIN_LIB) > /dev/null 2> /dev/null
+	@$(COMPILE_PERLIN_LIB)
 	@printf "$(GREEN)Compiling perlin noise lib done$(RESET)\n"
 endif
 
