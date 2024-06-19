@@ -1,6 +1,6 @@
 #include "../../include/vox.h"			/* Main project header */
 #include "../../include/chunks.h"
-#include "../../include/perlin_noise.h"
+#include "../../rsc/perlin_noise/include/perlin_noise.h"
 #include "../../include/render_chunks.h"
 #include "../../include/thread_load.h"
 

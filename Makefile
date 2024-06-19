@@ -16,23 +16,34 @@ OPENGL_LIB		= -lglfw3 -lGL -lm -lstatic_tinycthread
 # FREETYPE_LIB	= -lstaticfreetype -lz -lbz2 -lpng16 -lbrotlidec
 FREETYPE_LIB	= -lfreetype
 
+PERLIN_LIB		=	-lperlin_noise
+
+COMPILE_PERLIN_LIB = make -s -C rsc/perlin_noise lib
+
 INSTALL_DEPS	=	./install/install_deps.sh
 
 DEPS_RULE		=	rsc/deps
 
 all:		$(NAME)
 
-$(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(OBJ_DIR) $(OBJS)
+$(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_LIB) $(OBJ_DIR) $(OBJS)
 	@${INSTALL_DEPS}
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
-	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(LIBFT) $(LIST) $(LIB_DEPS_DIR) $(OPENGL_LIB) $(FREETYPE_LIB)
+	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(PERLIN_LIB) $(LIBFT) $(LIST) $(LIB_DEPS_DIR) $(OPENGL_LIB) $(FREETYPE_LIB) 
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
 
 $(DEPS_RULE):
 	@$(INSTALL_DEPS)
 	@printf "$(GREEN)Installing dependencies done$(RESET)\n"
+
+$(PERLIN_LIB):
+ifeq ($(shell [ -f rsc/perlin_noise/lib/libperlin_noise.a ] && echo 0 || echo 1), 1)
+	@printf "$(CYAN)Compiling perlin noise lib...$(RESET)\n"
+	@$(COMPILE_PERLIN_LIB) > /dev/null 2> /dev/null
+	@printf "$(GREEN)Compiling perlin noise lib done$(RESET)\n"
+endif
 
 $(LIST):
 ifeq ($(shell [ -f ${LIST} ] && echo 0 || echo 1), 1)
@@ -78,6 +89,7 @@ fclean:		clean_lib clean
 clean_lib:
 	@$(MAKE_LIST) fclean
 	@$(MAKE_LIBFT) fclean
+	@make -s -C rsc/perlin_noise fclean
 
 test: $(NAME)
 	@./$(NAME)

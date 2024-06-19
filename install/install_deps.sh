@@ -42,9 +42,3 @@ if [ ! -d "rsc/deps/freetype" ]; then
 	./install/install_freetype.sh >/dev/null 2>&1
 	display_color_msg ${GREEN} "freetype installed"
 fi
-
-if [ -d "rsc/perlin_noise" ]; then
-	display_color_msg ${MAGENTA} "Updating perlin noise ..."
-	./install/update_perlin_src.sh
-	display_color_msg ${GREEN} "perlin noise updated"
-fi

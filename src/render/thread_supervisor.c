@@ -4,7 +4,7 @@
 #include "../../include/thread_load.h"
 #include "../../include/chunks.h"
 #include "../../include/render_chunks.h"
-#include "../../include/perlin_noise.h"
+#include "../../rsc/perlin_noise/include/perlin_noise.h"
 
 s8 chunkIsInQueue(HashMap *chunksMapToLoad, BlockPos chunkID) {
 	return (hashmap_get(chunksMapToLoad, chunkID) != NULL);

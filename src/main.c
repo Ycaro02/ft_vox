@@ -5,7 +5,7 @@
 #include "../include/world.h"
 #include "../include/skybox.h"		/* skybox rendering */
 #include "../include/render_chunks.h"
-#include "../include/perlin_noise.h"
+#include "../rsc/perlin_noise/include/perlin_noise.h"
 #include "../include/thread_load.h"
 #include "../include/block.h"
 #include "../include/cube.h"

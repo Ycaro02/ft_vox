@@ -2,7 +2,7 @@
 #include "../../include/vox.h"
 #include "../../include/world.h"
 #include "../../include/chunks.h"
-#include "../../include/perlin_noise.h"
+#include "../../rsc/perlin_noise/include/perlin_noise.h"
 #include "../../include/render_chunks.h"
 #include "../../include/block.h"
 #include "../../include/shader_utils.h"

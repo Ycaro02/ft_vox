@@ -10,7 +10,6 @@ SUB_SRC_DIR		=	glad\
 					camera\
 					render\
 					texture\
-					perlin_noise\
 					tinycthread\
 
 ALL_SRC_DIR		=	$(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_SRC_DIR))
@@ -21,11 +20,6 @@ SRCS			=	context_init.c\
 					glad/gl.c\
 					window/openGL_glw_init.c\
 					win_event/key_callback.c\
-					perlin_noise/perlin_noise.c\
-					perlin_noise/noise_utils.c\
-					perlin_noise/noise_image.c\
-					perlin_noise/noise_interpolate_utils.c\
-					perlin_noise/snake_perlin.c\
 					camera/camera.c\
 					texture/load_texture.c\
 					render/shader_utils.c\
