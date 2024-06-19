@@ -39,9 +39,9 @@ $(DEPS_RULE):
 	@printf "$(GREEN)Installing dependencies done$(RESET)\n"
 
 $(PERLIN_LIB):
-ifeq ($(shell [ -f rsc/perlin_noise/lib/libperlin_noise.a ] && echo 0 || echo 1), 1)
+ifeq ($(shell [ -f rsc/lib_deps/libperlin_noise.a ] && echo 0 || echo 1), 1)
 	@printf "$(CYAN)Compiling perlin noise lib...$(RESET)\n"
-	@$(COMPILE_PERLIN_LIB)
+	@$(COMPILE_PERLIN_LIB) > /dev/null 2> /dev/null
 	@printf "$(GREEN)Compiling perlin noise lib done$(RESET)\n"
 endif
 
