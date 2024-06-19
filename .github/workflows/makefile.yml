@@ -12,6 +12,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    with:
+      submodules: 'recursive'
+
+    # Configure SSH
+    - name: Setup SSH
+    uses: webfactory/ssh-agent@v0.5.3
+    with:
+      ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Get dependencies
       run: sudo apt update && sudo apt install libwayland-dev libxkbcommon-dev xorg-dev make -y
