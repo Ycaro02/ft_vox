@@ -169,8 +169,8 @@ Context *contextInit() {
 		|| (!(context->win_ptr = init_openGL_context()))
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
-		|| (!(context->perlin2D = perlin2DInit(42U)))
-		|| (!(context->perlinCaveNoise = perlinSnakeCave2DGet()))
+		|| (!(context->world->noise.continental = perlin2DInit(42U)))
+		|| (!(context->world->noise.cave = perlinSnakeCave2DGet()))
 		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, hashmap_free_node_only)))
 		|| (!threadSupervisorInit(context))) 
 	{

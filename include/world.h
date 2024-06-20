@@ -4,11 +4,21 @@
 // #include "vox.h"
 #include "typedef_struct.h"
 
+struct s_noise_generation {
+	f32					**continental;		/* Continental noise 2D */
+	f32					**erosion;			/* Erosion noise */
+	f32					**peaksValley;		/* Peaks and valley noise */
+	f32					**humidity;			/* Humidity noise */
+	f32					**temperature;		/* Temperature noise */
+	u8					**cave;				/* 2D noise for cave */
+} ;
+
 struct s_world {
 	u64					seed;					/* World seed */
 	HashMap				*chunksMap;				/* Chunks hashmap */
 	HashMap				*renderChunksMap;		/* Render chunks map */
 	UndergroundBlock 	*undergroundBlock;		/* Underground block */
+	NoiseGeneration		noise;
 };
 
 struct s_thread_context {
@@ -28,8 +38,6 @@ struct s_context {
     GLFWwindow			*win_ptr;			/* Window pointer */
 	FaceCubeModel		*faceCube;			/* Data Face Cube structure */
 	ThreadContext		*threadContext;		/* Thread context */
-	f32					**perlin2D;			/* Perlin noise 2D */
-	u8					**perlinCaveNoise;	/* Perlin noise 2D for cave */
 	/* Font handling can be in is own struct */
 	FontContext			*fontContext;		/* Font context */
 	/* Vbo handling list can be with mutex  */

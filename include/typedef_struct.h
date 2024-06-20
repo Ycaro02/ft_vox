@@ -19,6 +19,7 @@ typedef 		thrd_t					Thread;
 typedef struct	s_context				Context;
 typedef struct	s_thread_context		ThreadContext;
 typedef struct 	s_world 				World;
+typedef struct	s_noise_generation		NoiseGeneration;
 
 /* thread_load.h */
 typedef struct 	s_thread_entity 		ThreadEntity;

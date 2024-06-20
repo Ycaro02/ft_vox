@@ -96,13 +96,13 @@ void vox_destroy(Context *c) {
 	hashmap_destroy(c->world->chunksMap);
 	free(c->world);
 	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; ++i) {
-		free(c->perlin2D[i]);
+		free(c->world->noise.continental[i]);
 	}
-	free(c->perlin2D);
+	free(c->world->noise.continental);
 	for (u32 i = 0; i < PERLIN_SNAKE_HEIGHT; ++i) {
-		free(c->perlinCaveNoise[i]);
+		free(c->world->noise.cave[i]);
 	}
-	free(c->perlinCaveNoise);
+	free(c->world->noise.cave);
 	for (u32 i = 0; i < FACE_VERTEX_ARRAY_SIZE; ++i) {
 		glDeleteVertexArrays(1, &c->faceCube[i].VAO);
 		glDeleteBuffers(1, &c->faceCube[i].VBO);
