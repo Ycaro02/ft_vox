@@ -94,15 +94,23 @@ void vox_destroy(Context *c) {
 
 	hashmap_destroy(c->world->renderChunksMap);
 	hashmap_destroy(c->world->chunksMap);
-	free(c->world);
+
+	/* noise free */
 	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; ++i) {
 		free(c->world->noise.continental[i]);
+		free(c->world->noise.erosion[i]);
+		free(c->world->noise.peaksValley[i]);
 	}
 	free(c->world->noise.continental);
+	free(c->world->noise.erosion);
+	free(c->world->noise.peaksValley);
 	for (u32 i = 0; i < PERLIN_SNAKE_HEIGHT; ++i) {
 		free(c->world->noise.cave[i]);
 	}
 	free(c->world->noise.cave);
+
+
+
 	for (u32 i = 0; i < FACE_VERTEX_ARRAY_SIZE; ++i) {
 		glDeleteVertexArrays(1, &c->faceCube[i].VAO);
 		glDeleteBuffers(1, &c->faceCube[i].VBO);
@@ -128,6 +136,7 @@ void vox_destroy(Context *c) {
 	free(c->fontContext->font);
 	free(c->fontContext);
 
+	free(c->world);
 	free(c->cam);
 	free(c->faceCube);
 	free(c);

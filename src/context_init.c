@@ -15,6 +15,8 @@
 u8 *perlinNoiseGeneration(unsigned int seed) {
 	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH
 		, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
+	// return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH
+	// 	, PERLIN_CONTINENTAL_OCTAVE, PERLIN_CONTINENTAL_PERSISTENCE, PERLIN_CONTINENTAL_LACUNARITY));
 }
 
 u8 *perlinNoiseGenerationWithoutSeed(s32 width, s32 height, s32 octaves, f32 persistence, f32 lacurarity) {
@@ -22,13 +24,6 @@ u8 *perlinNoiseGenerationWithoutSeed(s32 width, s32 height, s32 octaves, f32 per
 		, persistence, lacurarity));
 }
 
-
-void resetOpenGLContext() {
-	glUseProgram(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D, 0); // Pour les textures 2D
-}
 
 void initSkyBox(Context *c) {
 	c->skyboxVAO = skyboxInit();
@@ -39,55 +34,8 @@ void initSkyBox(Context *c) {
 
 }
 
-
-GLuint test_shader(char *vertexShader, char *fragmentShader)
-{
-	char *vertex_shader = load_shader_file(vertexShader);
-	char *fragment_shader = load_shader_file(fragmentShader);
-	
-	/* create shader */
-	GLuint frag_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	GLuint frag_pixel_shader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	/* compile shader */
-	glShaderSource(frag_vertex_shader, 1, (const char **)&vertex_shader, NULL);
-	glCompileShader(frag_vertex_shader);
-
-	glShaderSource(frag_pixel_shader, 1, (const char **)&fragment_shader, NULL);
-	glCompileShader(frag_pixel_shader);
-
-	GLuint shaderID = glCreateProgram();
-	
-	/* Attach and link shader program  */
-	glAttachShader(shaderID , frag_vertex_shader);
-	glAttachShader(shaderID , frag_pixel_shader);
-	
-	glLinkProgram(shaderID);
-
-	GLint succes = 0;
-	glGetProgramiv(shaderID , GL_LINK_STATUS, &succes);
-	if (!succes) {
-		GLchar data[1024];
-		ft_bzero(data, 1024);
-		glGetProgramInfoLog(shaderID , 512, NULL, data);
-		ft_printf_fd(2, "Shader program log: %s\n", data);
-	} 
-
-	// glUseProgram(shaderID);
-
-	/* delete shader fragment */
-	glDeleteShader(frag_vertex_shader);
-	glDeleteShader(frag_pixel_shader);
-
-	/* delete ressource */
-	free(vertex_shader);
-	free(fragment_shader);
-	// return (0);
-	return (shaderID);
-}
-
 void initAtlasTexture(Context *c) {
-	c->cubeShaderID = test_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
+	c->cubeShaderID = load_shader(CUBE_VERTEX_SHADER, CUBE_FRAGMENT_SHADER);
 	c->blockAtlasId = load_texture_atlas(TEXTURE_ATLAS_PATH, 16, 16);
 	set_shader_texture(c->cubeShaderID, c->blockAtlasId, GL_TEXTURE_3D, "textureAtlas");
 }
@@ -96,6 +44,21 @@ void initAtlasTexture(Context *c) {
 f32 **perlin2DInit(u32 seed) {
 	f32 **perlin2D = NULL;
 	u8 *perlin1D = perlinNoiseGeneration(seed); /* seed 42 */
+	if (!perlin1D) {
+		ft_printf_fd(1, "Error: perlinNoise error\n");
+		return (NULL);
+	}
+	/* Transform 1D array to 2D array */
+	perlin2D = array1DTo2D(perlin1D, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH);
+	free(perlin1D);
+	return (perlin2D);
+}
+
+
+f32 **perlin2DGeneration(s32 octaves, f32 persistence, f32 lacunarity) {
+	f32 **perlin2D = NULL;
+	u8	*perlin1D = perlinNoiseGenerationWithoutSeed(PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT
+		, octaves, persistence, lacunarity); /* seed already generated */
 	if (!perlin1D) {
 		ft_printf_fd(1, "Error: perlinNoise error\n");
 		return (NULL);
@@ -170,6 +133,8 @@ Context *contextInit() {
 		|| (!(context->faceCube = cubeFaceVAOinit()))
 		|| (!(context->world->noise.continental = perlin2DInit(42U)))
 		|| (!(context->world->noise.cave = perlinSnakeCave2DGet()))
+		|| (!(context->world->noise.erosion = perlin2DGeneration(PERLIN_EROSION_OCTAVE, PERLIN_EROSION_PERSISTENCE, PERLIN_EROSION_LACUNARITY)))
+		|| (!(context->world->noise.peaksValley = perlin2DGeneration(PERLIN_PICKS_VALLEY_OCTAVE, PERLIN_PICKS_VALLEY_PERSISTENCE, PERLIN_PICKS_VALLEY_LACUNARITY)))
 		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, hashmap_free_node_only)))
 		|| (!threadSupervisorInit(context))) 
 	{
