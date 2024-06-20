@@ -1,11 +1,7 @@
 #ifndef HEADER_WORLD_H
 #define HEADER_WORLD_H
 
-// #include "vox.h"
 #include "typedef_struct.h"
-
-
-// #define CAVE_IDX 5
 
 struct s_noise_generation {
 	f32					**continental;		/* Continental noise 2D */
@@ -47,12 +43,12 @@ struct s_context {
 	t_list				*vboToDestroy;		/* VBO to destroy */
 	t_list				*vboToCreate;		/* VBO to create */
 	/* Mutex protect can be in is own struct */
-	Mutex				renderMtx;			/* Mutex to protect VBO, used for renderChunks map */
-	Mutex				gameMtx;			/* Mutex to protect game, used for game boolean and cam chunk Pos */
-	Mutex				isRunningMtx;		/* Mutex to protect isRunning */
-	Mutex				vboToDestroyMtx;	/* Mutex to protect vboToDestroy list */
-	Mutex				vboToCreateMtx;		/* Mutex to protect vboToCreate list */
-	Mutex				renderDataNeededMtx; /* Mutex to protect renderDataNeeded */
+	Mutex				renderMtx;				/* Mutex to protect VBO, used for renderChunks map */
+	Mutex				gameMtx;				/* Mutex to protect game, used for game boolean and cam chunk Pos */
+	Mutex				isRunningMtx;			/* Mutex to protect isRunning */
+	Mutex				vboToDestroyMtx;		/* Mutex to protect vboToDestroy list */
+	Mutex				vboToCreateMtx;			/* Mutex to protect vboToCreate list */
+	Mutex				renderDataNeededMtx;	/* Mutex to protect renderDataNeeded */
 	/* Opengl ID for shader vao or texture (openGl context) */
 	GLuint				cubeShaderID;		/* shader program ID */
 	GLuint				skyboxShaderID;		/* shader program ID */

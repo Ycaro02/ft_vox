@@ -44,7 +44,7 @@ struct s_chunks {
 void 	chunksMapFree(void *entry);
 u32 	subChunksMaxGet(Chunks *chunk);
 Chunks	*getChunkAt(Context *c, s32 x, s32 z);
-Chunks	*chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, u8 **perlinSnakeCaveNoise);
+Chunks	*chunksLoad(Block *****chunkBlockCache, NoiseGeneration *noise, s32 chunkX, s32 chunkZ);
 s32		chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ);
 
 /* load_chunk.c*/

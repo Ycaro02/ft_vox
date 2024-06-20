@@ -142,7 +142,7 @@ void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
 */
-void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **perlinSnakeCaveNoise) {
+void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chunk) {
 	PerlinData **perlinVal = malloc(sizeof(PerlinData *) * BLOCKS_PER_CHUNK);
 
 	for (u32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
@@ -150,7 +150,7 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **
 		for (u32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			s32 localX = blockLocalToPerlinPos(chunk->x, x, PERLIN_NOISE_WIDTH);
 			s32 localZ = blockLocalToPerlinPos(chunk->z, z, PERLIN_NOISE_WIDTH);
-			perlinVal[x][z].normalise = (s32)perlinNoiseHeight(perlin2D, localX, localZ, &perlinVal[x][z]);
+			perlinVal[x][z].normalise = (s32)perlinNoiseHeight(noise->continental, localX, localZ, &perlinVal[x][z]);
 		}
 	}
 
@@ -169,12 +169,13 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **
 		chunk->continentalVal = perlinVal;
 	}
 
-	perlinCaveDataGet(chunk, perlinSnakeCaveNoise);
+	// perlinCaveDataGet(chunk, perlinSnakeCaveNoise);
+	perlinCaveDataGet(chunk, noise->cave);
 	digCaveCall(chunk, chunkBlockCache, perlinVal);
 	occlusionCullingStatic(chunkBlockCache, chunk);
 }
 
-Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 chunkZ, u8 **perlinSnakeCaveNoise) {
+Chunks *chunksLoad(Block *****chunkBlockCache, NoiseGeneration *noise, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
 		ft_printf_fd(2, "Failed to allocate chunks\n");
@@ -183,7 +184,8 @@ Chunks *chunksLoad(Block *****chunkBlockCache, f32 **perlin2D, s32 chunkX, s32 c
 
 	chunks->x = chunkX;
 	chunks->z = chunkZ;
-	chunkBuild(chunkBlockCache, perlin2D, chunks, perlinSnakeCaveNoise);
+	// chunkBuild(chunkBlockCache, perlin2D, chunks, perlinSnakeCaveNoise);
+	chunkBuild(chunkBlockCache, noise, chunks);
 	chunks->lastUpdate = get_ms_time();
 	return (chunks);
 }
