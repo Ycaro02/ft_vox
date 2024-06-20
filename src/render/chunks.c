@@ -116,9 +116,9 @@ f32 perlinNoiseHeight(f32 **perlin2D, s32 localX, s32 localZ, PerlinData *perlin
         return (150.0f);
     }
 
-    perlinVal->add = (perlinVal->val * scale);
+    // perlinVal->add = (perlinVal->val * scale);
 
-    return ((MIN_HEIGHT) + perlinVal->add);
+    return (MIN_HEIGHT + (perlinVal->val * scale));
 }
 
 
