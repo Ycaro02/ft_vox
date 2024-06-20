@@ -69,17 +69,29 @@
 
 // https://dawnosaur.substack.com/p/how-minecraft-generates-worlds-you Explain how minecraft generate world with different noise
 /* Perlin generation value for continental noise */
-// #define PERLIN_CONTINENTAL_OCTAVE 6
-// #define PERLIN_CONTINENTAL_PERSISTENCE 0.8f
-// #define PERLIN_CONTINENTAL_LACUNARITY 2.0f
-// /* Perlin generation value for erosion noise */
-// #define PERLIN_EROSION_OCTAVE 6 // 6 or 8
-// #define PERLIN_EROSION_PERSISTENCE 0.7f
-// #define PERLIN_EROSION_LACUNARITY 1.6f
-// /* Perlin generation value for picks and valley noise */
-// #define PERLIN_PICKS_VALLEY_OCTAVE 10
-// #define PERLIN_PICKS_VALLEY_PERSISTENCE 2.0f
-// #define PERLIN_PICKS_VALLEY_LACUNARITY 1.4f
+#define PERLIN_CONTINENTAL_OCTAVE 8
+#define PERLIN_CONTINENTAL_PERSISTENCE 0.6f
+#define PERLIN_CONTINENTAL_LACUNARITY 2.0f
+/* Perlin generation value for erosion noise */
+#define PERLIN_EROSION_OCTAVE 8
+#define PERLIN_EROSION_PERSISTENCE 0.6f
+#define PERLIN_EROSION_LACUNARITY 1.8f
+/* Perlin generation value for picks and valley noise */
+#define PERLIN_PICKS_VALLEY_OCTAVE 10
+#define PERLIN_PICKS_VALLEY_PERSISTENCE 0.5f
+#define PERLIN_PICKS_VALLEY_LACUNARITY 3.0f
+/* second test value for peaks and valley */
+// #define PERLIN_PICKS_VALLEY_OCTAVE 6
+// #define PERLIN_PICKS_VALLEY_PERSISTENCE 0.6f
+// #define PERLIN_PICKS_VALLEY_LACUNARITY 2.2f
+// /* Perlin generation value for humidity noise */
+// #define PERLIN_HUMIDITY_OCTAVE 4
+// #define PERLIN_HUMIDITY_PERSISTENCE 1.0f
+// #define PERLIN_HUMIDITY_LACUNARITY 2.0f
+// /* Perlin generation value for temperature noise */
+// #define PERLIN_TEMPERATURE_OCTAVE 6
+// #define PERLIN_TEMPERATURE_PERSISTENCE 0.4f
+// #define PERLIN_TEMPERATURE_LACUNARITY 2.0f
 
 /* Chunk generation */
 #define MIN_HEIGHT 80.0f

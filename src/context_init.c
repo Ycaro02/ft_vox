@@ -15,13 +15,11 @@
 u8 *perlinNoiseGeneration(unsigned int seed) {
 	return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH
 		, PERLIN_OCTAVE, PERLIN_PERSISTENCE, PERLIN_LACUNARITY));
-	// return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_CONTINENTAL_OCTAVE, PERLIN_CONTINENTAL_PERSISTENCE, PERLIN_CONTINENTAL_LACUNARITY));
-	// return (perlinImageGet(seed, PERLIN_NOISE_HEIGHT, PERLIN_NOISE_WIDTH, PERLIN_PICKS_VALLEY_OCTAVE, PERLIN_PICKS_VALLEY_PERSISTENCE, PERLIN_PICKS_VALLEY_LACUNARITY));
 }
 
-u8 *perlinNoiseGenerationWithoutSeed(s32 width, s32 height) {
-	return (perlinImageGetWithoutSeed(height, width, PERLIN_SNAKE_OCTAVE
-		, PERLIN_SNAKE_PERSISTENCE, PERLIN_SNAKE_LACUNARITY));
+u8 *perlinNoiseGenerationWithoutSeed(s32 width, s32 height, s32 octaves, f32 persistence, f32 lacurarity) {
+	return (perlinImageNoSeedGet(height, width, octaves
+		, persistence, lacurarity));
 }
 
 
@@ -111,7 +109,8 @@ f32 **perlin2DInit(u32 seed) {
 u8	**perlinSnakeCave2DGet() {
 	f32 **perlin2D = NULL;
 	u8  **snakePerlin2D = NULL;
-	u8 *perlin1D = perlinNoiseGenerationWithoutSeed(PERLIN_SNAKE_WIDTH, PERLIN_SNAKE_HEIGHT); /* seed 42 */
+	u8 *perlin1D = perlinNoiseGenerationWithoutSeed(PERLIN_SNAKE_WIDTH, PERLIN_SNAKE_HEIGHT
+		, PERLIN_SNAKE_OCTAVE, PERLIN_SNAKE_PERSISTENCE, PERLIN_SNAKE_LACUNARITY); /* seed 42 */
 	if (!perlin1D) {
 		ft_printf_fd(1, "Error: perlinNoise error\n");
 		return (NULL);
