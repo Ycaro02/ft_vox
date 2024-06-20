@@ -24,9 +24,9 @@ void chunksMapFree(void *entry) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
 		for (u32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
-			free(chunks->perlinVal[i]);
+			free(chunks->continentalVal[i]);
 		}
-		free(chunks->perlinVal);
+		free(chunks->continentalVal);
 		/* cave */
 		if (chunks->perlinCave) {
 			for (u32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
@@ -166,7 +166,7 @@ void chunkBuild(Block *****chunkBlockCache, f32 **perlin2D, Chunks *chunk, u8 **
 			return;
 		}
 		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], perlinVal, i);
-		chunk->perlinVal = perlinVal;
+		chunk->continentalVal = perlinVal;
 	}
 
 	perlinCaveDataGet(chunk, perlinSnakeCaveNoise);

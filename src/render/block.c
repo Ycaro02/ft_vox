@@ -13,7 +13,7 @@ Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
 Block *worldPosProtectBlockGet(Chunks *chunk, BlockPos localPos, s32 camY) {
 	Block 	*block = NULL;
 	s32 	subChunkID = camY / 16;
-	s32 	maxSubChunk = chunk->perlinVal[localPos.x][localPos.z].normalise / 16;
+	s32 	maxSubChunk = chunk->continentalVal[localPos.x][localPos.z].normalise / 16;
 	if (subChunkID > maxSubChunk) {
 		return (NULL);
 	}
@@ -205,7 +205,7 @@ void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHe
 	if (!chunk) {
 		return ;
 	}
-	*columnMaxHeight = chunk->perlinVal[localBlockPos->x][localBlockPos->z].normalise;
+	*columnMaxHeight = chunk->continentalVal[localBlockPos->x][localBlockPos->z].normalise;
 	
 
 	camPos[1] -= 0.333333f;

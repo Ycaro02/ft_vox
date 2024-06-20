@@ -12,22 +12,25 @@
 #define BLOCKS_PER_CHUNK   	16	/* Number of block in X */
 #define CAVE_ENTRY_DEPTH	15	/* Cave entry depth */
 
-
 struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
 };
 
 struct s_chunks {
-	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; /* array of sub_chunks */
-	u32				nb_block;					/* nb block (outdated value total of blockmap subchunk) */
-	s32				x;							/* Chunk offset X can be negative  (relative to origine chunks) */	
-	s32				z;							/* Chunk offset Z can be negative (relative to origine chunks) */
-	suseconds_t		lastUpdate;					/* Last update time */
-	PerlinData		**perlinVal;				/* Perlin noise value */
-	u8				**perlinCave;				/* Perlin noise cave value */
-	RenderChunks 	*render;					/* RenderChunks pointer */
-	u8				neighbors;					/* Neighbors */
-	u8				occlusionDone;				/* Neighbors occlusion done */
+	SubChunks		sub_chunks[SUB_CHUNKS_MAX]; 	/* array of sub_chunks */
+	u32				nb_block;						/* nb block (outdated value total of blockmap subchunk) */
+	s32				x;								/* Chunk offset X can be negative  (relative to origine chunks) */	
+	s32				z;								/* Chunk offset Z can be negative (relative to origine chunks) */
+	suseconds_t		lastUpdate;						/* Last update time */
+	PerlinData		**continentalVal;					/* Continental noise value */
+	// PerlinData		**erosionVal;
+	// PerlinData		**peaksVal;
+	// PerlinData		**humidityVal;
+	// PerlinData		**temperatureVal;
+	u8				**perlinCave;					/* Perlin noise cave value */
+	RenderChunks 	*render;						/* RenderChunks pointer */
+	u8				neighbors;						/* Neighbors */
+	u8				occlusionDone;					/* Neighbors occlusion done */
 };
 
 #define CHUNK_NEIGHBOR_BACK 	1U

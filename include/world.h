@@ -4,6 +4,9 @@
 // #include "vox.h"
 #include "typedef_struct.h"
 
+
+// #define CAVE_IDX 5
+
 struct s_noise_generation {
 	f32					**continental;		/* Continental noise 2D */
 	f32					**erosion;			/* Erosion noise */

@@ -142,7 +142,7 @@ void testChunksExist(Context *c) {
 		ft_printf_fd(1, CYAN"Cam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam->position[0], c->cam->position[1], c->cam->position[2]);
 		displayBlockPosition(chunk, blockPos);
 		// ft_printf_fd(1, CYAN"Perlin Height\n");
-		// displayPerlinNoise(blockPos.x,blockPos.z,chunk->perlinVal[blockPos.x][blockPos.z]);
+		// displayPerlinNoise(blockPos.x,blockPos.z,chunk->continentalVal[blockPos.x][blockPos.z]);
 		// if (undergroundBoolUpdate(c, chunk)) {
 		// 	ft_printf_fd(1, GREEN" -> Camera is not underground\n"RESET);
 		// 	c->world->undergroundBlock->isUnderground = FALSE;
