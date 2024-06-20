@@ -92,6 +92,8 @@ clean_lib:
 	@$(MAKE_LIST) fclean
 	@$(MAKE_LIBFT) fclean
 	@make -s -C rsc/perlin_noise fclean
+	@rm -rf rsc/lib_deps/libperlin_noise.a
+	@printf "$(RED)Clean libft, list and perlin$(RESET)\n"
 
 test: $(NAME)
 	@./$(NAME)

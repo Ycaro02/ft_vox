@@ -107,7 +107,7 @@ s32 maxHeightGet(PerlinData **perlinVal) {
 f32 perlinNoiseHeight(f32 **perlin2D, s32 localX, s32 localZ, PerlinData *perlinVal) {
     f32 scale = 60.0f;
     /* Access the interpolated noise value */
-    perlinVal->val = normaliseNoiseGet(perlin2D, localX, localZ, perlinVal);
+    perlinVal->val = interpolateNoiseGet(perlin2D, localX, localZ, perlinVal);
 
     if (perlinVal->val > 0.3 && perlinVal->val <= 0.4) {
 		f32 ret = normalisef32Tof32(perlinVal->val, 0.3, 0.4, 100.0f, 150.0f);
