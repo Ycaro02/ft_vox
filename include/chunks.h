@@ -23,10 +23,6 @@ struct s_chunks {
 	s32				z;								/* Chunk offset Z can be negative (relative to origine chunks) */
 	suseconds_t		lastUpdate;						/* Last update time */
 	PerlinData		**noiseData;					/* Continental noise value */
-	// PerlinData		**erosionVal;
-	// PerlinData		**peaksVal;
-	// PerlinData		**humidityVal;
-	// PerlinData		**temperatureVal;
 	u8				**perlinCave;					/* Perlin noise cave value */
 	RenderChunks 	*render;						/* RenderChunks pointer */
 	u8				neighbors;						/* Neighbors */
