@@ -90,14 +90,15 @@ void act_reseCamera(Context *c) {
 
 
 void displayPerlinNoise(PerlinData perlinData) {
-// 	ft_printf_fd(1, PINK"Perlin Idx0 : X:[%d] Z:[%d]\n"RESET, perlinData.x0, perlinData.z0);
-// 	ft_printf_fd(1, PINK"Perlin Idx1 : X:[%d] Z:[%d]\n"RESET, perlinData.x1, perlinData.z1);
-	ft_printf_fd(1, CYAN"Perlin data:\n-----------------\n"RESET""ORANGE);
-	ft_printf_fd(1, "Continental Val:|%f| -> ", perlinData.valContinent);
-	ft_printf_fd(1, "Erosion Val:|%f| -> ", perlinData.valErosion);
-	ft_printf_fd(1, "PeaksValley Val:|%f| -> ", perlinData.valPeaksValley);
-	ft_printf_fd(1, "Normalise:|%d|\n----\n", perlinData.normalise);
-	ft_printf_fd(1, RESET""PINK"Combined Val:|%f|\n"RESET, perlinData.valCombined);
+	ft_printf_fd(1, PINK"Perlin Idx0 : X:[%d] Z:[%d]\n"RESET, perlinData.x0, perlinData.z0);
+	ft_printf_fd(1, PINK"Perlin Idx1 : X:[%d] Z:[%d]\n"RESET, perlinData.x1, perlinData.z1);
+	ft_printf_fd(1, CYAN"Perlin data:\n-----------------\n"RESET);
+	ft_printf_fd(1, RED"Given X:|%d|, Given Z:|%d|\n"RESET, perlinData.givenX, perlinData.givenZ);
+	ft_printf_fd(1, ORANGE"Continental Val:|%f|\n", perlinData.valContinent);
+	ft_printf_fd(1, "Erosion Val:|%f|\n", perlinData.valErosion);
+	ft_printf_fd(1, "PeaksValley Val:|%f|\n", perlinData.valPeaksValley);
+	ft_printf_fd(1, RESET""PINK"Normalise:|%d| -> ", perlinData.normalise);
+	ft_printf_fd(1, "Combined:|%f|\n"RESET, perlinData.valCombined);
 	ft_printf_fd(1, CYAN"Perlin End :\n-----------------\n"RESET);
 }
 
@@ -143,7 +144,6 @@ void testChunksExist(Context *c) {
 		Chunks	*chunk = hashmap_get(c->world->chunksMap, chunkPos);
 		ft_printf_fd(1, CYAN"Cam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam->position[0], c->cam->position[1], c->cam->position[2]);
 		displayBlockPosition(chunk, blockPos);
-		// ft_printf_fd(1, CYAN"Perlin Height\n");
 		displayPerlinNoise(chunk->continentalVal[blockPos.x][blockPos.z]);
 		// if (undergroundBoolUpdate(c, chunk)) {
 		// 	ft_printf_fd(1, GREEN" -> Camera is not underground\n"RESET);
