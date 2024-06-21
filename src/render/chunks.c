@@ -11,6 +11,11 @@
 // 	return (abs(camChunkX - chunkX) + abs(camChunkZ - chunkZ));
 // }
 
+/**
+ * @brief chunksEuclideanDistanceGet, get euclidean distance between two chunk
+ * @param camChunkX, camChunkZ Camera chunk X/Z position
+ * @param chunkX, chunkZ Chunk X/Z position
+*/
 s32 chunksEuclideanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
     return ((s32)floor(sqrt(pow(camChunkX - chunkX, 2) + pow(camChunkZ - chunkZ, 2))));
 }
@@ -43,10 +48,23 @@ void chunksMapFree(void *entry) {
 	free(e); /* free the entry t_list node */
 }
 
+
+/**
+ * @brief getChunkAt, get chunk at x, z position
+ * @param c Context pointer
+ * @param x X position
+ * @param z Z position
+ * @return Chunks* Chunks pointer
+*/
 Chunks *getChunkAt(Context *c, s32 x, s32 z) {
 	return (hashmap_get(c->world->chunksMap, (BlockPos){0, x, z}));
 }
 
+/**
+ * @brief ocllusionCullingStatic, update block neighbors
+ * @param chunkBlockCache Block cache, pointer on 4D array represent all block in chunk
+ * @param chunk Chunk pointer
+*/
 void occlusionCullingStatic(Block *****chunkBlockCache, Chunks *chunk) {
 	
 	s32 i = 0;
@@ -68,7 +86,7 @@ void occlusionCullingStatic(Block *****chunkBlockCache, Chunks *chunk) {
 }
 
 /**
- * @brief BRUT fill subchunks with block
+ * @brief subchunksInit, create block in each subchunk
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
@@ -90,6 +108,11 @@ size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinDat
 	return (hashmap_size(sub_chunk->block_map));
 }
 
+/**
+ * @brief Get perlin noise max height
+ * @param perlinVal PerlinData pointer
+ * @return s32 Max height
+*/
 s32 maxHeightGet(PerlinData **perlinVal) {
 	s32 max = 0;
 
@@ -104,27 +127,17 @@ s32 maxHeightGet(PerlinData **perlinVal) {
 }
 
 
-// f32 perlinNoiseHeight(f32 **perlin2D, s32 localX, s32 localZ, PerlinData *perlinVal) {
-//     f32 scale = 60.0f;
-//     /* Access the interpolated noise value */
-//     perlinVal->val = interpolateNoiseGet(perlin2D, localX, localZ, perlinVal);
-
-//     if (perlinVal->val > 0.3 && perlinVal->val <= 0.4) {
-// 		f32 ret = normalisef32Tof32(perlinVal->val, 0.3, 0.4, 100.0f, 150.0f);
-// 		return (ret);
-//     } else if (perlinVal->val >= 0.3999f) {
-//         return (150.0f);
-//     }
-
-//     // perlinVal->add = (perlinVal->val * scale);
-
-//     return (MIN_HEIGHT + (perlinVal->val * scale));
-// }
-
+/**
+ * @brief Get perlin noise height
+ * @param noise Perlin noise pointer
+ * @param localX Local X position
+ * @param localZ Local Z position
+ * @param perlinVal PerlinData pointer
+*/
 f32 perlinNoiseHeight(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData *perlinVal) {
     f32 scale = 60.0f;
 
-    // Accès aux valeurs interpolées des bruits de Perlin
+    /* Get multiple noise values */
     f32 continentalVal = interpolateNoiseGet(noise->continental, localX, localZ, perlinVal);
     f32 erosionVal = interpolateNoiseGet(noise->erosion, localX, localZ, perlinVal);
     f32 peaksValleysVal = interpolateNoiseGet(noise->peaksValley, localX, localZ, perlinVal);
@@ -133,17 +146,12 @@ f32 perlinNoiseHeight(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData
 	perlinVal->valErosion = erosionVal;
 	perlinVal->valPeaksValley = peaksValleysVal;
 
-    // Normalisation des valeurs des bruits entre 0 et 1
-    // continentalVal = (continentalVal + 1) / 2;
-    // erosionVal = (erosionVal + 1) / 2;
-    // peaksValleysVal = (peaksValleysVal + 1) / 2;
-
-    // Pondération des bruits
+	/* Weighted noise values */
     f32 continentalWeight = 0.8f;
     f32 erosionWeight = 0.7f;
     f32 peaksValleysWeight = 0.5f;
 
-    // Combinaison des bruits pondérés
+    /* Combined noise value */
     f32 combinedNoise = (continentalVal * continentalWeight) +
                         (erosionVal * erosionWeight) +
                         (peaksValleysVal * peaksValleysWeight);
@@ -152,7 +160,6 @@ f32 perlinNoiseHeight(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData
     
 	if (combinedNoise > 0.4 && combinedNoise <= 0.6) {
         return (normalisef32Tof32(combinedNoise, 0.4, 0.6, 104.0f, 160.0f));
-        // return (normalisef32Tof32(combinedNoise, 0.33, 0.6, 100.0f, 150.0f));
     } else if (combinedNoise >= 0.5999f) {
         return (160.0f);
     }
@@ -161,7 +168,11 @@ f32 perlinNoiseHeight(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData
 }
 
 
-
+/**
+ * @brief perlinCaveDataGet Get perlin cave data, fill chunk->perlinCave field
+ * @param chunk Chunk pointer
+ * @param perlinSnakeCaveNoise Perlin snake cave noise
+*/
 void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
 	u8 **caveData = malloc(sizeof(u8 *) * BLOCKS_PER_CHUNK);
 	s32 width = PERLIN_SNAKE_WIDTH;
@@ -216,6 +227,13 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 	occlusionCullingStatic(chunkBlockCache, chunk);
 }
 
+/**
+ * @brief chunksLoad, load chunk with block (Call by workers thread)
+ * @param chunkBlockCache Block cache, pointer on 4D array represent all block in chunk
+ * @param noise Perlin noise pointer
+ * @param chunkX, chunkZ Chunk X/Z position
+ * @return Chunks* Chunks pointer
+*/
 Chunks *chunksLoad(Block *****chunkBlockCache, NoiseGeneration *noise, s32 chunkX, s32 chunkZ) {
 	Chunks *chunks = ft_calloc(sizeof(Chunks), 1);
 	if (!chunks) {
