@@ -95,7 +95,9 @@
 
 /* Chunk generation */
 #define MIN_HEIGHT 80.0f
-#define SEA_LEVEL  50
+// #define MIN_HEIGHT 64.0f
+// #define SEA_LEVEL  50
+#define SEA_LEVEL 60
 
 /* Chunk neighbor idx */
 #define CHUNK_FRONT 0
