@@ -1,4 +1,4 @@
-CFLAGS			=	-Wall -Wextra -Werror -O3 -g3
+CFLAGS			=	-Wall -Wextra -Werror -O3
 
 OBJ_DIR			=	obj
 
@@ -59,9 +59,9 @@ SRCS += $(MAIN_MANDATORY)
 endif
 
 ifeq ($(findstring leak, $(MAKECMDGOALS)), leak)
-CFLAGS += -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address
 else ifeq ($(findstring thread, $(MAKECMDGOALS)), thread)
-CFLAGS += -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=thread
 endif
 
 

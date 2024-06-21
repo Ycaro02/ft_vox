@@ -104,6 +104,22 @@ s8 mutexMultipleInit(Context *c) {
 	return (TRUE);
 }
 
+s8 multipleNoiseGeneration(Context *context, u32 seed) {
+
+	if (!(context->world->noise.continental = perlin2DInit(seed))
+		|| (!(context->world->noise.cave = perlinSnakeCave2DGet()))
+		|| (!(context->world->noise.erosion = perlin2DGeneration(PERLIN_EROSION_OCTAVE, PERLIN_EROSION_PERSISTENCE, PERLIN_EROSION_LACUNARITY)))
+		|| (!(context->world->noise.peaksValley = perlin2DGeneration(PERLIN_PICKS_VALLEY_OCTAVE, PERLIN_PICKS_VALLEY_PERSISTENCE, PERLIN_PICKS_VALLEY_LACUNARITY)))
+		|| (!(context->world->noise.humidity = perlin2DGeneration(PERLIN_HUMIDITY_OCTAVE, PERLIN_HUMIDITY_PERSISTENCE, PERLIN_HUMIDITY_LACUNARITY)))
+		|| (!(context->world->noise.temperature = perlin2DGeneration(PERLIN_TEMPERATURE_OCTAVE, PERLIN_TEMPERATURE_PERSISTENCE, PERLIN_TEMPERATURE_LACUNARITY)))
+		)
+	{
+		ft_printf_fd(1, "Error: noise generation failed\n");
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
 Context *contextInit() {
 	Context *context;
 
@@ -131,10 +147,7 @@ Context *contextInit() {
 		|| (!(context->win_ptr = init_openGL_context()))
 		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
-		|| (!(context->world->noise.continental = perlin2DInit(42U)))
-		|| (!(context->world->noise.cave = perlinSnakeCave2DGet()))
-		|| (!(context->world->noise.erosion = perlin2DGeneration(PERLIN_EROSION_OCTAVE, PERLIN_EROSION_PERSISTENCE, PERLIN_EROSION_LACUNARITY)))
-		|| (!(context->world->noise.peaksValley = perlin2DGeneration(PERLIN_PICKS_VALLEY_OCTAVE, PERLIN_PICKS_VALLEY_PERSISTENCE, PERLIN_PICKS_VALLEY_LACUNARITY)))
+		|| (!multipleNoiseGeneration(context, 42U)) /* Give seed here */
 		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, hashmap_free_node_only)))
 		|| (!threadSupervisorInit(context))) 
 	{
