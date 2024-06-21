@@ -171,8 +171,8 @@ void drawAllChunksByFace(Context *c) {
     u32 			faceNb = 0;
     
     mtx_lock(&c->renderMtx);
-	c->chunkRenderedNb = hashmap_size(c->world->renderChunksMap);
-	c->faceRendered = 0;
+	c->displayData.chunkRenderedNb = hashmap_size(c->world->renderChunksMap);
+	c->displayData.faceRendered = 0;
     for (u8 i = 0; i < 6; ++i) {
 		glBindVertexArray(c->faceCube[i].VAO);
 
@@ -180,7 +180,7 @@ void drawAllChunksByFace(Context *c) {
         while (hashmap_next(&it)) {
             render = (RenderChunks *)it.value;
             faceNb = render->faceCount[i];
-            c->faceRendered += faceNb;
+            c->displayData.faceRendered += faceNb;
             drawFace(render, 6U, faceNb, i);
         }
 	
@@ -193,7 +193,7 @@ void drawAllChunksByFace(Context *c) {
 			while (hashmap_next(&it)) {
 				render = (RenderChunks *)it.value;
 				faceNb = render->topWaterFaceCount;
-				c->faceRendered += faceNb;
+				c->displayData.faceRendered += faceNb;
 				drawSpecialFace(render->topWaterFaceVBO, render->topWaterTypeVBO, 6U, faceNb);
 			}
 		}

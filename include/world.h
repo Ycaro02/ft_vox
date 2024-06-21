@@ -30,6 +30,25 @@ struct s_thread_context {
 	s64         	workerMax;			/* Maximum of worker thread (size of workers array) */
 };
 
+typedef struct s_noise_data {
+	f32				valContinental;		/* Continental value */
+	f32				valErosion;			/* Erosion value */
+	f32				valPeaksValley;		/* Peaks and valley value */
+	f32				valCombined;		/* Combined value */
+	f32				valHumidity;		/* Humidity value */
+	f32				valTemperature;		/* Temperature value */
+} NoiseData;
+
+typedef struct s_display_data {
+	u32				chunkRenderedNb;	/* Chunk rendered */
+	u32				chunkLoadedNb;		/* Chunk loaded */
+	u32				chunkToLoadInQueue;	/* Chunk to load in queue */
+	u32				faceRendered;		/* Face rendered */
+	// BlockPos		chunkPos;			/* Chunk position */
+	// BlockPos		blockPos;			/* Block position */
+	// NoiseData	noiseData;			/* Noise data */
+} DisplayData;
+
 /* Context structure */
 struct s_context {
 	Camera				*cam;				/* camera structure */
@@ -57,10 +76,7 @@ struct s_context {
 	GLuint				skyTexture;			/* skybox texture ID */
 	mat4				rotation;			/* rotation matrix */
 	/* Data displayed */
-	u32					chunkRenderedNb;	/* Chunk rendered */
-	u32					chunkLoadedNb;		/* Chunk loaded */
-	u32					chunkToLoadInQueue;	/* Chunk to load in queue */
-	u32					faceRendered;		/* Face rendered */
+	DisplayData			displayData;		/* Display data */
 	/* Multiple bool can be in the same var and handle with power of 2 (flag )*/
 	s8					isPlaying;			/* Game is playing */
 	u8					renderDataNeeded; 	/* Render need data, bool to specify render want to lock data (chunkMtx) */

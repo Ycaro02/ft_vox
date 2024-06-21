@@ -43,9 +43,18 @@ void renderChunksLoadNewVBO(Context *c) {
 
 	undergroundBlockcreate(c);
 
+	/*	Here when chunks mtx is lock we can get all wanted information
+		- We need to get current chunk we the camera pos (lock gameMtx before)
+		- When we got chunk ptr we can get data from it
+		- Get local block pos in this chunk: 
+			blockLocalPosFromCam(c->cam->position, &blockPos);
+		Then we can access at chunk->noiseData.NOISE_FIELD[blockPos.x][blockPos.z]
+		Copy all value in a local struct to display it to avoid possible datarace
+	*/
 
-	c->chunkLoadedNb = hashmap_size(c->world->chunksMap);
-	c->chunkToLoadInQueue = hashmap_size(c->threadContext->chunksMapToLoad);
+
+	c->displayData.chunkLoadedNb = hashmap_size(c->world->chunksMap);
+	c->displayData.chunkToLoadInQueue = hashmap_size(c->threadContext->chunksMapToLoad);
 	mtx_lock(&c->vboToCreateMtx);
 	for (t_list *current = c->vboToCreate; current; current = current->next) {
 		BlockPos chunkID = *(BlockPos *)current->content;
@@ -103,20 +112,6 @@ void vox_destroy(Context *c) {
 	free_incomplete_array((void **)c->world->noise.temperature, PERLIN_NOISE_HEIGHT);
 	free_incomplete_array((void **)c->world->noise.cave, PERLIN_SNAKE_HEIGHT);
 
-	// for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; ++i) {
-	// 	free(c->world->noise.continental[i]);
-	// 	free(c->world->noise.erosion[i]);
-	// 	free(c->world->noise.peaksValley[i]);
-	// }
-	// free(c->world->noise.continental);
-	// free(c->world->noise.erosion);
-	// free(c->world->noise.peaksValley);
-	// for (u32 i = 0; i < PERLIN_SNAKE_HEIGHT; ++i) {
-	// 	free(c->world->noise.cave[i]);
-	// }
-	// free(c->world->noise.cave);
-
-
 
 	for (u32 i = 0; i < FACE_VERTEX_ARRAY_SIZE; ++i) {
 		glDeleteVertexArrays(1, &c->faceCube[i].VAO);
@@ -172,9 +167,9 @@ void displayTextCall(Context *c, const char *description, f32 offsetHeight, u32 
 
 void dataDisplay(Context *c) {
 	displayTextCall(c, "FPS: ", 25.0f, fpsGet(), VEC3_YELLOW, VEC3_ORANGE);
-	displayTextCall(c, "Chunk Rendered: ", 50.0f, c->chunkRenderedNb, VEC3_YELLOW, VEC3_GREEN);
-	displayTextCall(c, "Chunk Loaded: ", 75.0f, c->chunkLoadedNb, VEC3_YELLOW, VEC3_RED);
-	displayTextCall(c, "Face Rendered: ", 100.0f, c->faceRendered, VEC3_YELLOW, VEC3_GREEN);
+	displayTextCall(c, "Chunk Rendered: ", 50.0f, c->displayData.chunkRenderedNb, VEC3_YELLOW, VEC3_GREEN);
+	displayTextCall(c, "Chunk Loaded: ", 75.0f, c->displayData.chunkLoadedNb, VEC3_YELLOW, VEC3_RED);
+	displayTextCall(c, "Face Rendered: ", 100.0f, c->displayData.faceRendered, VEC3_YELLOW, VEC3_GREEN);
 }
 
 void renderGame(Context *c, GLuint skyTexture) {
