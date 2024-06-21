@@ -124,18 +124,18 @@ void displayChunkData(Context *c, Chunks *chunk){
 }
 
 
-void context_DisplayData_debug(Context *c) {
-	ft_printf_fd(1, "Display data:\n-----------------\n"RESET);
-	ft_printf_fd(1, RED"Local Block Pos: X|%d|, Z|%d|\n"RESET, c->displayData.blockPos.x, c->displayData.blockPos.z);
-	ft_printf_fd(1, "Noise data:\n-----------------\n"RESET);
-	ft_printf_fd(1, ORANGE"Continental Val:|%f|\n", c->displayData.noiseData.valContinental);
-	ft_printf_fd(1, "Erosion Val:|%f|\n", c->displayData.noiseData.valErosion);
-	ft_printf_fd(1, "PeaksValley Val:|%f|\n", c->displayData.noiseData.valPeaksValley);
-	ft_printf_fd(1, "Combined Val:|%f|\n", c->displayData.noiseData.valCombined);
-	ft_printf_fd(1, GREEN"Humidity Val:|%f|\n", c->displayData.noiseData.valHumidity);
-	ft_printf_fd(1, "Temperature Val:|%f|\n"RESET, c->displayData.noiseData.valTemperature);
-	ft_printf_fd(1, CYAN"Display data end :\n-----------------\n"RESET);
-}
+// void context_DisplayData_debug(Context *c) {
+// 	ft_printf_fd(1, "Display data:\n-----------------\n"RESET);
+// 	ft_printf_fd(1, RED"Local Block Pos: X|%d|, Z|%d|\n"RESET, c->displayData.blockPos.x, c->displayData.blockPos.z);
+// 	ft_printf_fd(1, "Noise data:\n-----------------\n"RESET);
+// 	ft_printf_fd(1, ORANGE"Continental Val:|%f|\n", c->displayData.noiseData.valContinental);
+// 	ft_printf_fd(1, "Erosion Val:|%f|\n", c->displayData.noiseData.valErosion);
+// 	ft_printf_fd(1, "PeaksValley Val:|%f|\n", c->displayData.noiseData.valPeaksValley);
+// 	ft_printf_fd(1, "Combined Val:|%f|\n", c->displayData.noiseData.valCombined);
+// 	ft_printf_fd(1, GREEN"Humidity Val:|%f|\n", c->displayData.noiseData.valHumidity);
+// 	ft_printf_fd(1, "Temperature Val:|%f|\n"RESET, c->displayData.noiseData.valTemperature);
+// 	ft_printf_fd(1, CYAN"Display data end :\n-----------------\n"RESET);
+// }
 
 
 void displayBlockPosition(Chunks *chunk, BlockPos blockPos) {
@@ -160,7 +160,7 @@ void testChunksExist(Context *c) {
 		ft_printf_fd(1, CYAN"Cam position: X|%f, Y:%f Z:|%f\n"RESET, c->cam->position[0], c->cam->position[1], c->cam->position[2]);
 		displayBlockPosition(chunk, blockPos);
 		displayPerlinNoise(chunk->noiseData[blockPos.x][blockPos.z]);
-		context_DisplayData_debug(c);
+		// context_DisplayData_debug(c);
 		// if (undergroundBoolUpdate(c, chunk)) {
 		// 	ft_printf_fd(1, GREEN" -> Camera is not underground\n"RESET);
 		// 	c->world->undergroundBlock->isUnderground = FALSE;

@@ -184,18 +184,43 @@ void updateGame(Context *c) {
 	mtx_unlock(&c->gameMtx);
 }
 
-void displayTextCall(Context *c, const char *description, f32 offsetHeight, u32 dataNumber, vec3 colorDescription, vec3 colorData) {
+
+void displayFloatTextCall(Context *c, const char *description, f32 offsetHeight, f32 floatNumber, vec3 colorDescription, vec3 colorData) {
+	t_sstring floatString = double_to_sstring(floatNumber, 3);
+	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
+	textRender(c, floatString.data, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
+}
+
+void displayUnsigned32TextCall(Context *c, const char *description, f32 offsetHeight, u32 dataNumber, vec3 colorDescription, vec3 colorData) {
 	char *dataString = ft_ultoa(dataNumber);
 	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
 	textRender(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
 	free(dataString);
 }
 
+void displaySignedLongTextCall(Context *c, const char *description, f32 offsetHeight, s32 dataNumber, vec3 colorDescription, vec3 colorData) {
+	char *dataString = ft_ltoa(dataNumber);
+	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
+	textRender(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
+	free(dataString);
+}
+
+
 void dataDisplay(Context *c) {
-	displayTextCall(c, "FPS: ", 25.0f, fpsGet(), VEC3_YELLOW, VEC3_ORANGE);
-	displayTextCall(c, "Chunk Rendered: ", 50.0f, c->displayData.chunkRenderedNb, VEC3_YELLOW, VEC3_GREEN);
-	displayTextCall(c, "Chunk Loaded: ", 75.0f, c->displayData.chunkLoadedNb, VEC3_YELLOW, VEC3_RED);
-	displayTextCall(c, "Face Rendered: ", 100.0f, c->displayData.faceRendered, VEC3_YELLOW, VEC3_GREEN);
+	displayUnsigned32TextCall(c, "FPS: ", 25.0f, fpsGet(), VEC3_YELLOW, VEC3_ORANGE);
+	displayUnsigned32TextCall(c, "Chunk Rendered: ", 50.0f, c->displayData.chunkRenderedNb, VEC3_YELLOW, VEC3_GREEN);
+	displayUnsigned32TextCall(c, "Chunk Loaded: ", 75.0f, c->displayData.chunkLoadedNb, VEC3_YELLOW, VEC3_RED);
+	displayUnsigned32TextCall(c, "Face Rendered: ", 100.0f, c->displayData.faceRendered, VEC3_YELLOW, VEC3_GREEN);
+	displaySignedLongTextCall(c, "Chunk X: ", 125.0f, c->displayData.chunkX, VEC3_YELLOW, VEC3_YELLOW);
+	displaySignedLongTextCall(c, "Chunk Z: ", 150.0f, c->displayData.chunkZ, VEC3_YELLOW, VEC3_YELLOW);
+	displaySignedLongTextCall(c, "Block X: ", 175.0f, c->displayData.blockPos.x + (16 * c->displayData.chunkX), VEC3_YELLOW, VEC3_RED);
+	displaySignedLongTextCall(c, "Block Z: ", 200.0f, c->displayData.blockPos.z + (16 * c->displayData.chunkZ), VEC3_YELLOW, VEC3_RED);
+	displayFloatTextCall(c, "Val Continental: ", 225.0f, c->displayData.noiseData.valContinental, VEC3_YELLOW, VEC3_RED);
+	displayFloatTextCall(c, "Val Erosion: ", 250.0f, c->displayData.noiseData.valErosion, VEC3_YELLOW, VEC3_RED);
+	displayFloatTextCall(c, "Val PeaksValley: ", 275.0f, c->displayData.noiseData.valPeaksValley, VEC3_YELLOW, VEC3_RED);
+	displayFloatTextCall(c, "Val Combined: ", 300.0f, c->displayData.noiseData.valCombined, VEC3_YELLOW, VEC3_RED);
+	displayFloatTextCall(c, "Val Humidity: ", 325.0f, c->displayData.noiseData.valHumidity, VEC3_YELLOW, VEC3_RED);
+	displayFloatTextCall(c, "Val Temperature: ", 350.0f, c->displayData.noiseData.valTemperature, VEC3_YELLOW, VEC3_RED);
 }
 
 void renderGame(Context *c, GLuint skyTexture) {
