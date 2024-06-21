@@ -20,6 +20,39 @@ void chunksRender(Context *c, GLuint shader_id) {
 	drawAllChunksByFace(c);
 }
 
+void localBlockDataUpdate(Context *c) {
+	/*	
+		Here when chunks mtx is lock we can get all wanted information
+		Then we can access at chunk->noiseData.NOISE_FIELD[blockPos.x][blockPos.z]
+		Copy all value in a local struct to display it to avoid possible datarace
+	*/
+	Chunks		*chunk = NULL;
+	BlockPos	localBlockPos = {0};
+	s32			chunkX = 0, chunkZ = 0;
+	vec3		camPos = {0};
+
+	mtx_lock(&c->gameMtx);
+	chunkX = c->cam->chunkPos[0];
+	chunkZ = c->cam->chunkPos[2];
+	glm_vec3_copy(c->cam->position, camPos);
+	mtx_unlock(&c->gameMtx);
+
+	chunk = getChunkAt(c, chunkX, chunkZ);
+	if (!chunk) {
+		return ;
+	}
+	blockLocalPosFromCam(camPos, &localBlockPos);
+	c->displayData.chunkX = chunkX;
+	c->displayData.chunkZ = chunkZ;
+	c->displayData.blockPos = localBlockPos;
+	c->displayData.noiseData.valContinental = chunk->noiseData[localBlockPos.x][localBlockPos.z].valContinent;
+	c->displayData.noiseData.valErosion = chunk->noiseData[localBlockPos.x][localBlockPos.z].valErosion;
+	c->displayData.noiseData.valPeaksValley = chunk->noiseData[localBlockPos.x][localBlockPos.z].valPeaksValley;
+	c->displayData.noiseData.valCombined = chunk->noiseData[localBlockPos.x][localBlockPos.z].valCombined;
+	c->displayData.noiseData.valHumidity = chunk->noiseData[localBlockPos.x][localBlockPos.z].valHumidity;
+	c->displayData.noiseData.valTemperature = chunk->noiseData[localBlockPos.x][localBlockPos.z].valTemperature;
+}
+
 void renderChunksVBODestroy(Context *c) {
 	if (mtx_trylock(&c->vboToDestroyMtx) != thrd_success) {
 		renderNeedDataSet(c, TRUE);
@@ -43,14 +76,7 @@ void renderChunksLoadNewVBO(Context *c) {
 
 	undergroundBlockcreate(c);
 
-	/*	Here when chunks mtx is lock we can get all wanted information
-		- We need to get current chunk we the camera pos (lock gameMtx before)
-		- When we got chunk ptr we can get data from it
-		- Get local block pos in this chunk: 
-			blockLocalPosFromCam(c->cam->position, &blockPos);
-		Then we can access at chunk->noiseData.NOISE_FIELD[blockPos.x][blockPos.z]
-		Copy all value in a local struct to display it to avoid possible datarace
-	*/
+	localBlockDataUpdate(c);
 
 
 	c->displayData.chunkLoadedNb = hashmap_size(c->world->chunksMap);

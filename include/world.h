@@ -44,9 +44,10 @@ typedef struct s_display_data {
 	u32				chunkLoadedNb;		/* Chunk loaded */
 	u32				chunkToLoadInQueue;	/* Chunk to load in queue */
 	u32				faceRendered;		/* Face rendered */
-	// BlockPos		chunkPos;			/* Chunk position */
-	// BlockPos		blockPos;			/* Block position */
-	// NoiseData	noiseData;			/* Noise data */
+	s32				chunkX;				/* Chunk X */
+	s32				chunkZ;				/* Chunk Z */
+	BlockPos		blockPos;			/* Block position */
+	NoiseData		noiseData;			/* Noise data */
 } DisplayData;
 
 /* Context structure */
