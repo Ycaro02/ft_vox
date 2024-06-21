@@ -22,7 +22,7 @@ struct s_chunks {
 	s32				x;								/* Chunk offset X can be negative  (relative to origine chunks) */	
 	s32				z;								/* Chunk offset Z can be negative (relative to origine chunks) */
 	suseconds_t		lastUpdate;						/* Last update time */
-	PerlinData		**continentalVal;					/* Continental noise value */
+	PerlinData		**noiseData;					/* Continental noise value */
 	// PerlinData		**erosionVal;
 	// PerlinData		**peaksVal;
 	// PerlinData		**humidityVal;

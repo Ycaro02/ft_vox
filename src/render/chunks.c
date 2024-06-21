@@ -29,9 +29,9 @@ void chunksMapFree(void *entry) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
 		for (u32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
-			free(chunks->continentalVal[i]);
+			free(chunks->noiseData[i]);
 		}
-		free(chunks->continentalVal);
+		free(chunks->noiseData);
 		/* cave */
 		if (chunks->perlinCave) {
 			for (u32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
@@ -142,6 +142,9 @@ f32 perlinNoiseHeight(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData
     f32 erosionVal = interpolateNoiseGet(noise->erosion, localX, localZ, perlinVal);
     f32 peaksValleysVal = interpolateNoiseGet(noise->peaksValley, localX, localZ, perlinVal);
 
+	perlinVal->valHumidity = interpolateNoiseGet(noise->humidity, localX, localZ, perlinVal);
+	perlinVal->valTemperature = interpolateNoiseGet(noise->temperature, localX, localZ, perlinVal);
+
 	perlinVal->valContinent = continentalVal;
 	perlinVal->valErosion = erosionVal;
 	perlinVal->valPeaksValley = peaksValleysVal;
@@ -218,7 +221,7 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 			return;
 		}
 		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], perlinVal, i);
-		chunk->continentalVal = perlinVal;
+		chunk->noiseData = perlinVal;
 	}
 
 	// perlinCaveDataGet(chunk, perlinSnakeCaveNoise);
