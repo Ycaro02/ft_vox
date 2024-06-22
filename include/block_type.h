@@ -100,4 +100,6 @@ enum newAtlasID {
     NEWAT_ACACIA_LEAF
 };
 
+#define NEWAT_MAX NEWAT_ACACIA_LEAF
+
 #endif /* HEADER_BLOCK_TYPE_H */

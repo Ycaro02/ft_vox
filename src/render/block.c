@@ -37,6 +37,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 	else if (realY <= maxHeight) {
 		blockType = DIRT;
 		if ((realY == maxHeight || realY == maxHeight - 1) && realY >= SEA_LEVEL) { blockType = GRASS;}
+		if (realY < SEA_LEVEL) { blockType = SAND; }
 	} 
 	else if (realY == SEA_LEVEL) {
 		blockType = WATER;
