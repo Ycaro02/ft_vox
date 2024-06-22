@@ -2,6 +2,7 @@
 #define VOX_HEADER_H
 
 #include "typedef_struct.h"		                /* Struct typedef */
+#include "block_type.h"			                /* Block type enum */
 
 /* Screen size */
 #define SCREEN_WIDTH		1920			/* Screen width */
@@ -31,7 +32,8 @@
 #define TRAVEL_INCREMENT 5.0f				/* Travel increment */
 
 /* Texture atlas path */
-#define TEXTURE_ATLAS_PATH "rsc/texture/atlas.bmp"
+// #define TEXTURE_ATLAS_PATH "rsc/texture/atlas.bmp"
+#define TEXTURE_ATLAS_PATH "rsc/texture/atlas_block.bmp"
 
 /* Sky path */
 #define TEXTURE_SKY_PATH "rsc/texture/skybox.bmp"
@@ -105,94 +107,113 @@
 #define CHUNK_RIGHT 2
 #define CHUNK_LEFT 3
 
+// enum AtlasID {
+//     AT_BREAK_STONE=0,     /* Break stone */
+//     AT_BREAK_STONE1,        /* Break stone 1 */
+//     AT_BREAK_STONE2,        /* Break stone 2 */
+//     AT_BREAK_STONE3,        /* Break stone 3 */
+//     AT_BREAK_STONE4,        /* Break stone 4 */
+//     AT_BREAK_STONE5,        /* Break stone 5 */
+//     AT_BREAK_STONE6,        /* Break stone 6 */
+//     AT_BREAK_STONE7,        /* Break stone 7 */
+//     AT_BREAK_STONE8,        /* Break stone 8 */
+//     AT_BREAK_STONE9,        /* Break stone 9 */
+//     AT_WOOL_RED=10,            /* Wool red */
+//     AT_WOOL_ORANGE,         /* Wool orange */
+//     AT_WOOL_YELLOW,         /* Wool yellow */
+//     AT_WOOL_PURPLE,     /* Wool lime */
+//     AT_WOOL_GREEN,          /* Wool green */
+//     AT_WOOL_CYAN,           /* Wool cyan */
+//     AT_WOOL_LIGHT_BLUE,     /* Wool light blue */
+//     AT_WOOL_BLUE,           /* Wool blue */
+//     AT_WOOL_PURPLE,         /* Wool purple */
+//     AT_WOOL_MAGENTA,        /* Wool magenta */
+//     AT_WOOL_LIGHTMAGENTA,   /* Wool magenta */
+//     AT_WOOL_PINK,           /* Wool pink */
+//     AT_WOOL_DARKPINK,       /* Wool pink */
+//     AT_WOOL_GRAY,           /* Wool gray */
+//     AT_WOOL_LIGHT_GRAY,     /* Wool light gray */
+//     AT_WOOL_WHITE,          /* Wool white */
+//     AT_SPONGE=26,           /* Sponge */
+//     AT_GLASS,               /* Glass */
+// 	AT_EMPTYTOREMOVE=28,	/* Empty to remove */
+//     AT_FULL_WHITE_START,    /* Full white start */
+//     AT_FULL_GOLD_START,     /* Full gold start */
+//     AT_GOLD_ORE=31,         /* Gold ore */
+//     AT_IRON_ORE,            /* Iron ore */
+//     AT_COAL_ORE,            /* Coal ore */
+//     AT_BOOKSHELF,           /* Bookshelf */
+//     AT_STONE_WITH_VINES,    /* Stone with vines */
+//     AT_OBSIDIAN,            /* Obsidian */
+//     AT_SEMI_FULL_WHITE,     /* Semi full white */
+//     AT_SEMI_FULL_GOLD,      /* Semi full gold */
+//     AT_COBBLESTONE=39,      /* Cobblestone */
+//     AT_BEDROCK,             /* Bedrock */
+//     AT_SAND,                /* Sand */
+//     AT_GRAVEL,              /* Gravel */
+//     AT_LOG_SIDE,            /* Log side */
+//     AT_LOG_INTERIOR,        /* Log interior */
+//     AT_LEAVES,				/* Leaves */
+//     AT_FULL_WHITE=46,       /* Full white */
+// 	AT_FULLGOLD=47,			/* Full gold */
+// 	AT_SHROOM_REDW=48,		/* Red White mushroom */
+// 	AT_SHROOM_BROWN=49,		/* Brown mushroom */
+// 	AT_LAVE=50,				/* Lava */
+// 	AT_GRASS_TOP=51,		/* Grass top */
+// 	AT_GRASS_TOP2=52,		/* Grass top */
+// 	AT_STONE=53,			/* Stone */
+// 	AT_DIRT=54,				/* Dirt */
+// 	AT_GRASS_SIDE=55,		/* Grass side */
+// 	AT_WOOD_PLANK=56,		/* Wood plank */
+// 	AT_STONE_CUT=57,		/* Stone cut */
+// 	AT_FULLGREY=58,			/* Full grey */
+// 	AT_BRICK=59,			/* Brick */
+// 	AT_TNT_SIDE=60,			/* TNT side */
+// 	AT_TNT_TOP=61,			/* TNT top */
+// 	AT_TNT_BOTTOM=62,		/* TNT bottom */
+// 	AT_SPIDERWEB=63,		/* Spider web */
+// 	AT_ROSE=64,				/* Rose */
+// 	AT_SUNFLOWER=65,		/* Sunflower */
+// 	AT_WATER=66,			/* Water */
+// 	AT_LITTLE_TREE=67,		/* Little tree */
+// };
 
-enum AtlasID {
-    AT_BREAK_STONE=0,     /* Break stone */
-    AT_BREAK_STONE1,        /* Break stone 1 */
-    AT_BREAK_STONE2,        /* Break stone 2 */
-    AT_BREAK_STONE3,        /* Break stone 3 */
-    AT_BREAK_STONE4,        /* Break stone 4 */
-    AT_BREAK_STONE5,        /* Break stone 5 */
-    AT_BREAK_STONE6,        /* Break stone 6 */
-    AT_BREAK_STONE7,        /* Break stone 7 */
-    AT_BREAK_STONE8,        /* Break stone 8 */
-    AT_BREAK_STONE9,        /* Break stone 9 */
-    AT_WOOL_RED=10,            /* Wool red */
-    AT_WOOL_ORANGE,         /* Wool orange */
-    AT_WOOL_YELLOW,         /* Wool yellow */
-    AT_WOOL_LIGHTGREEN,     /* Wool lime */
-    AT_WOOL_GREEN,          /* Wool green */
-    AT_WOOL_CYAN,           /* Wool cyan */
-    AT_WOOL_LIGHT_BLUE,     /* Wool light blue */
-    AT_WOOL_BLUE,           /* Wool blue */
-    AT_WOOL_PURPLE,         /* Wool purple */
-    AT_WOOL_MAGENTA,        /* Wool magenta */
-    AT_WOOL_LIGHTMAGENTA,   /* Wool magenta */
-    AT_WOOL_PINK,           /* Wool pink */
-    AT_WOOL_DARKPINK,       /* Wool pink */
-    AT_WOOL_GRAY,           /* Wool gray */
-    AT_WOOL_LIGHT_GRAY,     /* Wool light gray */
-    AT_WOOL_WHITE,          /* Wool white */
-    AT_SPONGE=26,           /* Sponge */
-    AT_GLASS,               /* Glass */
-	AT_EMPTYTOREMOVE=28,	/* Empty to remove */
-    AT_FULL_WHITE_START,    /* Full white start */
-    AT_FULL_GOLD_START,     /* Full gold start */
-    AT_GOLD_ORE=31,         /* Gold ore */
-    AT_IRON_ORE,            /* Iron ore */
-    AT_COAL_ORE,            /* Coal ore */
-    AT_BOOKSHELF,           /* Bookshelf */
-    AT_STONE_WITH_VINES,    /* Stone with vines */
-    AT_OBSIDIAN,            /* Obsidian */
-    AT_SEMI_FULL_WHITE,     /* Semi full white */
-    AT_SEMI_FULL_GOLD,      /* Semi full gold */
-    AT_COBBLESTONE=39,      /* Cobblestone */
-    AT_BEDROCK,             /* Bedrock */
-    AT_SAND,                /* Sand */
-    AT_GRAVEL,              /* Gravel */
-    AT_LOG_SIDE,            /* Log side */
-    AT_LOG_INTERIOR,        /* Log interior */
-    AT_LEAVES,				/* Leaves */
-    AT_FULL_WHITE=46,       /* Full white */
-	AT_FULLGOLD=47,			/* Full gold */
-	AT_SHROOM_REDW=48,		/* Red White mushroom */
-	AT_SHROOM_BROWN=49,		/* Brown mushroom */
-	AT_LAVE=50,				/* Lava */
-	AT_GRASS_TOP=51,		/* Grass top */
-	AT_GRASS_TOP2=52,		/* Grass top */
-	AT_STONE=53,			/* Stone */
-	AT_DIRT=54,				/* Dirt */
-	AT_GRASS_SIDE=55,		/* Grass side */
-	AT_WOOD_PLANK=56,		/* Wood plank */
-	AT_STONE_CUT=57,		/* Stone cut */
-	AT_FULLGREY=58,			/* Full grey */
-	AT_BRICK=59,			/* Brick */
-	AT_TNT_SIDE=60,			/* TNT side */
-	AT_TNT_TOP=61,			/* TNT top */
-	AT_TNT_BOTTOM=62,		/* TNT bottom */
-	AT_SPIDERWEB=63,		/* Spider web */
-	AT_ROSE=64,				/* Rose */
-	AT_SUNFLOWER=65,		/* Sunflower */
-	AT_WATER=66,			/* Water */
-	AT_LITTLE_TREE=67,		/* Little tree */
-};
+// enum BlockType {
+//     AIR=0,								/* Air block (Empty) */
+//     STONE=53,							/* Stone block (Underground) */
+//     DIRT=54,							/* Dirt block (Exposed to light) */
+// 	GRASS=55,							/* Grass block (Exposed to light) */
+// 	GRASS_TOP=AT_GRASS_TOP,				/* Grass top */
+// 	WATER=AT_WATER,						/* Water */
+// 	WOOL_RED=AT_WOOL_RED,				/* Wool red */
+// 	WOOL_ORANGE=AT_WOOL_ORANGE,			/* Wool orange */
+// 	WOOL_YELLOW=AT_WOOL_YELLOW,			/* Wool yellow */
+// 	WOOL_PURPLE=AT_WOOL_PURPLE,	/* Wool lime */
+// 	WOOL_GREEN=AT_WOOL_GREEN,			/* Wool green */
+// 	WOOL_CYAN=AT_WOOL_CYAN,				/* Wool cyan */
+// 	WOOL_LIGHT_BLUE=AT_WOOL_LIGHT_BLUE,	/* Wool light blue */
+// 	WOOL_BLUE=AT_WOOL_BLUE,				/* Wool blue */
+// 	GLASS=AT_GLASS,						/* Glass */
+// };
+
 
 enum BlockType {
     AIR=0,								/* Air block (Empty) */
-    STONE=53,							/* Stone block (Underground) */
-    DIRT=54,							/* Dirt block (Exposed to light) */
-	GRASS=55,							/* Grass block (Exposed to light) */
-	GRASS_TOP=AT_GRASS_TOP,				/* Grass top */
-	WATER=AT_WATER,						/* Water */
-	WOOL_RED=AT_WOOL_RED,				/* Wool red */
-	WOOL_ORANGE=AT_WOOL_ORANGE,			/* Wool orange */
-	WOOL_YELLOW=AT_WOOL_YELLOW,			/* Wool yellow */
-	WOOL_LIGHTGREEN=AT_WOOL_LIGHTGREEN,	/* Wool lime */
-	WOOL_GREEN=AT_WOOL_GREEN,			/* Wool green */
-	WOOL_CYAN=AT_WOOL_CYAN,				/* Wool cyan */
-	WOOL_LIGHT_BLUE=AT_WOOL_LIGHT_BLUE,	/* Wool light blue */
-	WOOL_BLUE=AT_WOOL_BLUE,				/* Wool blue */
-	GLASS=AT_GLASS,						/* Glass */
+    STONE=NEWAT_STONE,							/* Stone block (Underground) */
+	STONE_BRICK=NEWAT_STONE_BRICK,
+    DIRT=NEWAT_DIRT,							/* Dirt block (Exposed to light) */
+	GRASS=NEWAT_GRASS_SIDE,							/* Grass block (Exposed to light) */
+	GRASS_TOP=NEWAT_GRASS_TOP,				/* Grass top */
+	WATER=NEWAT_WATER,						/* Water */
+	WOOL_RED=NEWAT_RED_WOOL,				/* Wool red */
+	WOOL_ORANGE=NEWAT_ORANGE_WOOL,			/* Wool orange */
+	WOOL_YELLOW=NEWAT_YELLOW_WOOL,			/* Wool yellow */
+	WOOL_PURPLE=NEWAT_PURPLE_WOOL,	/* Wool lime */
+	WOOL_GREEN=NEWAT_GREEN_WOOL,			/* Wool green */
+	WOOL_CYAN=NEWAT_CYAN_WOOL,				/* Wool cyan */
+	WOOL_LIGHT_BLUE=NEWAT_LIGHT_BLUE_WOOL,	/* Wool light blue */
+	WOOL_BLUE=NEWAT_BLUE_WOOL,				/* Wool blue */
+	GLASS=NEWAT_GLASS,						/* Glass */
 };
 
 /* texture load_texture */

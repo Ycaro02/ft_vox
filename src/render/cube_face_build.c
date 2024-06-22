@@ -46,7 +46,7 @@ void woolHelpDebug(f32 x, f32 z, f32 *type) {
 	} else if ((x == 4 || x == 12) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_LIGHT_BLUE;
 	} else if ((x == 5 || x == 13) && (z == 0 || z == 1)) {
-		*type = (f32)WOOL_LIGHTGREEN;
+		*type = (f32)WOOL_PURPLE;
 	} else if ((x == 6 || x == 14) && (z == 0 || z == 1)) {
 		*type = (f32)WOOL_YELLOW;
 	} else if ((x == 7 || x == 15) && (z == 0 || z == 1)) {

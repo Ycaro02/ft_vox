@@ -70,6 +70,7 @@
 		"fterrors.h": "c",
 		"ftconfig.h": "c",
 		"text_render.h": "c",
-		"skybox.h": "c"
+		"skybox.h": "c",
+		"block_type.h": "c"
 	}
 }
