@@ -24,7 +24,7 @@ void main()
 	
 
 	if (biomeType == PLAIN_BIOME && isGray) {
-		vec3 biomeColor = vec3(0.75, 1.0, 0.0);
+		vec3 biomeColor = vec3(0.9, 1.0, 0.0);
 		baseColor = vec4(baseColor.rgb * biomeColor, baseColor.a);
 	}
 

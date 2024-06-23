@@ -77,7 +77,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->faceArray[i][idx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->faceArray[i][idx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][idx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->faceTypeID[i][idx[i]] = s32StoreValues(block->type, 0, 0, 0);
+					render->faceTypeID[i][idx[i]] = s32StoreValues(block->type, i, 0, 0);
 					if (chunks->x == 0 && chunks->z == 0 && subID == 0 && block->y == 0) {
 						displayAllAtlasBlock(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
 					}
@@ -86,7 +86,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->topTransparencyFaceArray[count][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->topTransparencyFaceArray[count][1] = (f32)block->y + (f32)(subID * 16);
 					render->topTransparencyFaceArray[count][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->topTransparencyTypeId[count] = s32StoreValues(block->type, 0, 0, 0);
+					render->topTransparencyTypeId[count] = s32StoreValues(block->type, i, 0, 0);
 					count++;
 				}
 			}
@@ -119,37 +119,16 @@ void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 	render->topTransparencyTypeVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->topTransparencyCount * sizeof(GLuint), (void *)&render->topTransparencyTypeId[0]);
 }
 
-void drawFace(RenderChunks *render, u32 vertex_nb, u32 faceNb, u8 faceIdx) {
+void drawFace(GLuint faceVBO, GLuint metadataVBO, u32 vertex_nb, u32 faceNb) {
 	/* Bind Block instance VBO */
-	glBindBuffer(GL_ARRAY_BUFFER, render->faceVBO[faceIdx]);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glVertexAttribDivisor(1, 1);
-	
-	/* Bind Block type VBO */
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, render->faceTypeVBO[faceIdx]);
-	glEnableVertexAttribArray(3);
-	/* Care here we need to use glVertexAttribIPointer */
-	glVertexAttribIPointer(3, 1, GL_INT, sizeof(s32), (void*)0);
-	glVertexAttribDivisor(3, 1);
-
-	glDrawElementsInstanced(GL_TRIANGLES, vertex_nb, GL_UNSIGNED_INT, 0, faceNb);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-	// glBindVertexArray(0);
-}
-
-void drawSpecialFace(GLuint faceVBO, GLuint typeVBO, u32 vertex_nb, u32 faceNb) {
-	/* Bind Block instance VBO */
-	
 	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glVertexAttribDivisor(1, 1);
 
-	/* Bind Block type VBO */
+	/* Bind Metadata VBO */
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, typeVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, metadataVBO);
 	glEnableVertexAttribArray(3);
 	/* Care here we need to use glVertexAttribIPointer */
 	glVertexAttribIPointer(3, 1, GL_INT, sizeof(s32), (void*)0);
@@ -160,7 +139,10 @@ void drawSpecialFace(GLuint faceVBO, GLuint typeVBO, u32 vertex_nb, u32 faceNb) 
 	// glBindVertexArray(0);
 }
 
-/* TO CALL in chunksRender in main  -> DONE */
+/**
+ * @brief Draw all chunks by face
+ * @param *c Context
+*/
 void drawAllChunksByFace(Context *c) {
     HashMap_it		it;
 	RenderChunks	*render = NULL;
@@ -171,26 +153,26 @@ void drawAllChunksByFace(Context *c) {
 	c->displayData.faceRendered = 0;
     for (u8 i = 0; i < 6; ++i) {
 		glBindVertexArray(c->faceCube[i].VAO);
-
         it = hashmap_iterator(c->world->renderChunksMap);
+		/* Basic face display */
         while (hashmap_next(&it)) {
             render = (RenderChunks *)it.value;
             faceNb = render->faceCount[i];
             c->displayData.faceRendered += faceNb;
-            drawFace(render, 6U, faceNb, i);
+			drawFace(render->faceVBO[i], render->faceTypeVBO[i], 6U, faceNb);
         }
-	
+		/* Underground face display */
 		if (c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
-			drawSpecialFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, TOTAL_UNDERGROUND_FACE);			
+			drawFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, TOTAL_UNDERGROUND_FACE);			
 		}
-
-		if (i == 5U) { /* 5 == TOP face */
+		/* Transparency top face display */
+		if (i == (u32)TOP_FACE) {
 			it = hashmap_iterator(c->world->renderChunksMap);
 			while (hashmap_next(&it)) {
 				render = (RenderChunks *)it.value;
 				faceNb = render->topTransparencyCount;
 				c->displayData.faceRendered += faceNb;
-				drawSpecialFace(render->topTransparencyFaceVBO, render->topTransparencyTypeVBO, 6U, faceNb);
+				drawFace(render->topTransparencyFaceVBO, render->topTransparencyTypeVBO, 6U, faceNb);
 			}
 		}
 		glBindVertexArray(0);

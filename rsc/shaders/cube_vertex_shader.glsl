@@ -10,7 +10,8 @@
 #define ATLAS_SIZE 105
 
 /* Define the block faces */
-#define TOP_FACE 5.0
+// #define TOP_FACE 5.0
+#define TOP_FACE 5
 
 /* Define the biomes */
 #define PLAIN_BIOME 0
@@ -22,8 +23,8 @@ layout (location = 2) in vec3 aTexCoord;
 /**
  * aMetadata is a 32 bit integer that contains the following information:
  * byte 3: texture ID 
- * byte 2: biome ID --> to implement
- * byte 1: block face --> to implement -> move from aTexCoord.z
+ * byte 2: block face --> to implement -> move from aTexCoord.z
+ * byte 1: biome ID --> to implement
  * byte 0: light level	--> to implement
 */
 layout (location = 3) in int aMetadata;
@@ -38,7 +39,7 @@ uniform mat4 projection;
 uniform mat4 model;
 
 
-int topBlockFaceHandling(int textureID, float blockFace) {
+int topBlockFaceHandling(int textureID, int blockFace) {
 	
 	if (blockFace == TOP_FACE) {
 		if (textureID == GRASS_SIDE) {
@@ -59,9 +60,10 @@ int s32ByteGet(int value, int byte) {
 void main()
 {
     vec2 realTexCoord = aTexCoord.xy;
-    float blockFace = aTexCoord.z;
+    // float blockFace = aTexCoord.z;
     // int textureID = aMetadata;
     int textureIdExtracted = s32ByteGet(aMetadata, 3);
+    int blockFace = s32ByteGet(aMetadata, 2);
 
 	biomeType = 99; /* To implementent give it at second value in int */
 

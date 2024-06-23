@@ -214,7 +214,7 @@ void undergroundBlockFree(UndergroundBlock *udg) {
  * @param faceTypeID The face type array
  * @param camPos The camera position
 */
-void underGroundBlockDataFill(s32 columnMaxHeight, vec3 *faceArray, s32 *faceTypeID, vec3 camPos) {
+void underGroundBlockDataFill(s32 columnMaxHeight, vec3 *faceArray, s32 *faceTypeID, vec3 camPos, u8 face) {
 	BlockPos	increment = {-1.0f, -1.0f, -1.0f};
 	s32			blockType = STONE;
 	s32 		idx = 0;
@@ -235,7 +235,7 @@ void underGroundBlockDataFill(s32 columnMaxHeight, vec3 *faceArray, s32 *faceTyp
 			faceArray[idx][1] = (camPos[1] * 2.0f) + increment.y;
 			faceArray[idx][2] = (camPos[2] * 2.0f) + increment.z;
 			// faceTypeID[idx] = blockType;
-			faceTypeID[idx] = s32StoreValues(blockType, 0, 0, 0);
+			faceTypeID[idx] = s32StoreValues(blockType, face, 0, 0);
 			increment.z += 1.0f;
 			firstIter = FALSE;
 		}
@@ -281,7 +281,7 @@ void undergroundBlockcreate(Context *c) {
 	for (u8 i = 0; i < 6; ++i) {
 		udg->udgFaceArray[i] = ft_calloc(sizeof(vec3), TOTAL_UNDERGROUND_FACE);
 		udg->udgTypeID[i] = ft_calloc(sizeof(vec3), TOTAL_UNDERGROUND_FACE);
-		underGroundBlockDataFill(columnMaxHeight, udg->udgFaceArray[i], udg->udgTypeID[i], camPos);
+		underGroundBlockDataFill(columnMaxHeight, udg->udgFaceArray[i], udg->udgTypeID[i], camPos, i);
 		udg->udgFaceVBO[i] = faceInstanceVBOCreate(udg->udgFaceArray[i], TOTAL_UNDERGROUND_FACE);
 		udg->udgTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, TOTAL_UNDERGROUND_FACE * sizeof(GLuint), (void *)udg->udgTypeID[i]);
 		udg->udgFaceCount += TOTAL_UNDERGROUND_FACE;
