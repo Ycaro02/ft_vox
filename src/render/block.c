@@ -22,6 +22,7 @@ Block *worldPosProtectBlockGet(Chunks *chunk, BlockPos localPos, s32 camY) {
 }
 
 typedef struct s_biom_block {
+	s32		biomeId;
 	s32		dirt;			/* Dirt for plain Biom */
 	s32		top;			/* Grass top for plau Biom*/
 	s32		water;			/* Water for plain biom */
@@ -36,21 +37,21 @@ typedef struct s_biom_block {
 	- If temperature is above 0.0f, then it's a plain biom
 	- If temperature is above 0.5f and humidity is below 0.0f, then it's a desert biom 
 	-------------------------------------------------------------
-	- Snow biom:
-		- Dirt: DIRT
-		- Top: SNOW_GRASS
-		- Water: ICE
-		- Underwater: SNOW
-		- Stone: STONE
-	-------------------------------------------------------------
-	- Plain biom:
+	- Plain biom: ID 0
 		- Dirt: DIRT
 		- Top: GRASS
 		- Water: WATER
 		- Underwater: SAND
 		- Stone: STONE
 	-------------------------------------------------------------
-	- Desert biom:
+	- Snow biom: ID 1
+		- Dirt: DIRT
+		- Top: SNOW_GRASS
+		- Water: ICE
+		- Underwater: SNOW
+		- Stone: STONE
+	-------------------------------------------------------------
+	- Desert biom: ID 2
 		- Dirt: SANDSTONE
 		- Top: SAND
 		- Water: WATER
@@ -58,8 +59,13 @@ typedef struct s_biom_block {
 		- Stone: BEDROCK
  */
 
+#define BIOME_PLAIN 0
+#define BIOME_SNOW 1
+#define BIOME_DESERT 2
+
 void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise) {
 	if (dataNoise.valTemperature < 0.0f) { /* Snow BIOM */
+		biomBlock->biomeId = BIOME_SNOW;
 		biomBlock->dirt = DIRT;
 		biomBlock->top = SNOW_GRASS;
 		biomBlock->water = ICE;
@@ -68,6 +74,7 @@ void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise) {
 		return;
 	}
 	if (dataNoise.valTemperature > 0.5f && dataNoise.valHumidity < 0.0f) { /* Desert BIOM */
+		biomBlock->biomeId = BIOME_DESERT;
 		biomBlock->dirt = SANDSTONE;
 		biomBlock->top = SANDSTONE;
 		biomBlock->water = WATER;
@@ -75,6 +82,7 @@ void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise) {
 		biomBlock->stone = SANDSTONE;
 		return;
 	}
+	biomBlock->biomeId = BIOME_PLAIN;
 	biomBlock->dirt = DIRT;
 	biomBlock->top = GRASS;
 	biomBlock->water = WATER;
@@ -102,7 +110,7 @@ Block *blockCreate(PerlinData **dataNoise, s32 x, s32 y, s32 z, s32 maxHeight, s
 	} 
 	else if (realY <= maxHeight) {
 		blockType = biomBlock.dirt;
-		if ((realY == maxHeight || realY == maxHeight - 1) && realY >= SEA_LEVEL) { blockType = biomBlock.top;}
+		if (realY == maxHeight) { blockType = biomBlock.top;}
 		if (realY < SEA_LEVEL) { blockType = biomBlock.underWater; }
 	} 
 	else if (realY == SEA_LEVEL) {

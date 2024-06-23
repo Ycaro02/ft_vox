@@ -6,6 +6,7 @@
 #define GRASS_SIDE 97.0
 #define GRASS_TOP 96.0
 
+#define PLAIN_BIOME 0
 
 #define SNOW_SIDE 104.0
 #define SNOW_TOP 103.0
@@ -36,10 +37,10 @@ void main()
     float blockFace = aTexCoord.z;
     float textureID = aTextureID;
 
-	biomeType = 0;
+	biomeType = 99; /* To implementent give it at uniform value */
 
 	if (aTextureID == GRASS_SIDE) {
-		biomeType = 1;
+		biomeType = PLAIN_BIOME;
 	}
 
 	if (aTextureID == GRASS_SIDE && blockFace == TOP_FACE) {

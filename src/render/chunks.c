@@ -214,7 +214,7 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 		chunkMaxY = (s32)MIN_HEIGHT;
 	}
 
-	for (s32 i = 0; (i * BLOCKS_PER_CHUNK) < chunkMaxY; ++i) {
+	for (s32 i = 0; (i * BLOCKS_PER_CHUNK) <= chunkMaxY; ++i) {
 		chunk->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
 		if (!chunk->sub_chunks[i].block_map) {
 			ft_printf_fd(2, "Failed to allocate hashmap\n");

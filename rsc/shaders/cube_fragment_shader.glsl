@@ -1,5 +1,7 @@
 #version 330 core
 
+#define PLAIN_BIOME 0
+
 out vec4 FragColor;
 
 in vec3 TexCoord;
@@ -19,8 +21,9 @@ void main()
 	float grayTolerance = 0.01; // Ajustez cette valeur en fonction de vos besoins
     bool isGray = abs(baseColor.r - baseColor.g) < grayTolerance && abs(baseColor.g - baseColor.b) < grayTolerance && abs(baseColor.r - baseColor.b) < grayTolerance;
 
+	
 
-	if (biomeType == 1 && isGray) {
+	if (biomeType == PLAIN_BIOME && isGray) {
 		vec3 biomeColor = vec3(0.75, 1.0, 0.0);
 		baseColor = vec4(baseColor.rgb * biomeColor, baseColor.a);
 	}
