@@ -30,8 +30,29 @@ typedef struct s_biom_block {
 } BiomBlock;
 
 
+/*
+	BIOM DETECTION RULE
+	- If temperature is below 0.0f, then it's a snow biom
+	- If temperature is above 0.0f, then it's a plain biom
+	-------------------------------------------------------------
+	- Snow biom:
+		- Dirt: DIRT
+		- Top: SNOW_GRASS
+		- Water: ICE
+		- Underwater: SNOW
+		- Stone: STONE
+	-------------------------------------------------------------
+	- Plain biom:
+		- Dirt: DIRT
+		- Top: GRASS
+		- Water: WATER
+		- Underwater: SAND
+		- Stone: STONE
+	-------------------------------------------------------------
+ */
+
 void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise) {
-	if (dataNoise.valTemperature < 0.25f) { /* Snow BIOM */
+	if (dataNoise.valTemperature < 0.0f) { /* Snow BIOM */
 		biomBlock->dirt = DIRT;
 		biomBlock->top = SNOW_GRASS;
 		biomBlock->water = ICE;

@@ -104,6 +104,25 @@ s8 mutexMultipleInit(Context *c) {
 	return (TRUE);
 }
 
+void scanNoiseGetMinMax(f32 **noise, f32 *min, f32 *max, vec2_u32 pos_min) {
+	*min = noise[0][0];
+	*max = noise[0][0];
+	pos_min[0] = 0;
+	pos_min[1] = 0;
+	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; i++) {
+		for (u32 j = 0; j < PERLIN_NOISE_WIDTH; j++) {
+			if (noise[i][j] < *min) {
+				*min = noise[i][j];
+				pos_min[0] = i;
+				pos_min[1] = j;
+			}
+			if (noise[i][j] > *max) {
+				*max = noise[i][j];
+			}
+		}
+	}
+}
+
 s8 multipleNoiseGeneration(Context *context, u32 seed) {
 
 	if (!(context->world->noise.continental = perlin2DInit(seed))
@@ -117,6 +136,13 @@ s8 multipleNoiseGeneration(Context *context, u32 seed) {
 		ft_printf_fd(1, "Error: noise generation failed\n");
 		return (FALSE);
 	}
+	// f32 min, max;
+	// vec3_u32 pos = {0};
+	// scanNoiseGetMinMax(context->world->noise.temperature, &min, &max, pos);
+	// ft_printf_fd(1, RED"Temperature min: %f max: %f, pos: %u %u\n"RESET, min, max, pos[0], pos[1]);
+	// scanNoiseGetMinMax(context->world->noise.humidity, &min, &max, pos);
+	// ft_printf_fd(1, YELLOW"Humidity min: %f max: %f\n"RESET, min, max);
+
 	return (TRUE);
 }
 

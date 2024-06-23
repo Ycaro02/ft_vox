@@ -51,6 +51,8 @@ void localBlockDataUpdate(Context *c) {
 	c->displayData.noiseData.valCombined = chunk->noiseData[localBlockPos.x][localBlockPos.z].valCombined;
 	c->displayData.noiseData.valHumidity = chunk->noiseData[localBlockPos.x][localBlockPos.z].valHumidity;
 	c->displayData.noiseData.valTemperature = chunk->noiseData[localBlockPos.x][localBlockPos.z].valTemperature;
+	c->displayData.posNoise[0] = chunk->noiseData[localBlockPos.x][localBlockPos.z].x0;
+	c->displayData.posNoise[1] = chunk->noiseData[localBlockPos.x][localBlockPos.z].z0;
 }
 
 void renderChunksVBODestroy(Context *c) {
@@ -184,13 +186,18 @@ void updateGame(Context *c) {
 	mtx_unlock(&c->gameMtx);
 }
 
-
+/**
+ * @brief Display a float number with a description
+*/
 void displayFloatTextCall(Context *c, const char *description, f32 offsetHeight, f32 floatNumber, vec3 colorDescription, vec3 colorData) {
 	t_sstring floatString = double_to_sstring(floatNumber, 3);
 	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
 	textRender(c, floatString.data, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
 }
 
+/**
+ * @brief Display a unsigned 32 number with a description
+*/
 void displayUnsigned32TextCall(Context *c, const char *description, f32 offsetHeight, u32 dataNumber, vec3 colorDescription, vec3 colorData) {
 	char *dataString = ft_ultoa(dataNumber);
 	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
@@ -198,6 +205,9 @@ void displayUnsigned32TextCall(Context *c, const char *description, f32 offsetHe
 	free(dataString);
 }
 
+/**
+ * @brief Display a signed long number with a description
+*/
 void displaySignedLongTextCall(Context *c, const char *description, f32 offsetHeight, s32 dataNumber, vec3 colorDescription, vec3 colorData) {
 	char *dataString = ft_ltoa(dataNumber);
 	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
@@ -205,22 +215,36 @@ void displaySignedLongTextCall(Context *c, const char *description, f32 offsetHe
 	free(dataString);
 }
 
+/**
+ * @brief Display a double axis position with a description
+*/
+void displayDoublePosition(Context* c, const char *description, float startY, long posX, long posZ, vec3 color) {
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), "X %ld / Z %ld", posX, posZ);
+    textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(startY), FPS_SCALE, color);
+    textRender(c, buffer, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(startY), FPS_SCALE, VEC3_PINK);
+}
 
+/**
+ * @brief Display data on screen
+*/
 void dataDisplay(Context *c) {
 	displayUnsigned32TextCall(c, "FPS: ", 25.0f, fpsGet(), VEC3_YELLOW, VEC3_ORANGE);
 	displayUnsigned32TextCall(c, "Chunk Rendered: ", 50.0f, c->displayData.chunkRenderedNb, VEC3_YELLOW, VEC3_GREEN);
 	displayUnsigned32TextCall(c, "Chunk Loaded: ", 75.0f, c->displayData.chunkLoadedNb, VEC3_YELLOW, VEC3_RED);
 	displayUnsigned32TextCall(c, "Face Rendered: ", 100.0f, c->displayData.faceRendered, VEC3_YELLOW, VEC3_GREEN);
-	displaySignedLongTextCall(c, "Chunk X: ", 125.0f, c->displayData.chunkX, VEC3_YELLOW, VEC3_YELLOW);
-	displaySignedLongTextCall(c, "Chunk Z: ", 150.0f, c->displayData.chunkZ, VEC3_YELLOW, VEC3_YELLOW);
-	displaySignedLongTextCall(c, "Block X: ", 175.0f, c->displayData.blockPos.x + (16 * c->displayData.chunkX), VEC3_YELLOW, VEC3_RED);
-	displaySignedLongTextCall(c, "Block Z: ", 200.0f, c->displayData.blockPos.z + (16 * c->displayData.chunkZ), VEC3_YELLOW, VEC3_RED);
-	displayFloatTextCall(c, "Val Continental: ", 225.0f, c->displayData.noiseData.valContinental, VEC3_YELLOW, VEC3_RED);
-	displayFloatTextCall(c, "Val Erosion: ", 250.0f, c->displayData.noiseData.valErosion, VEC3_YELLOW, VEC3_RED);
-	displayFloatTextCall(c, "Val PeaksValley: ", 275.0f, c->displayData.noiseData.valPeaksValley, VEC3_YELLOW, VEC3_RED);
-	displayFloatTextCall(c, "Val Combined: ", 300.0f, c->displayData.noiseData.valCombined, VEC3_YELLOW, VEC3_RED);
-	displayFloatTextCall(c, "Val Humidity: ", 325.0f, c->displayData.noiseData.valHumidity, VEC3_YELLOW, VEC3_RED);
-	displayFloatTextCall(c, "Val Temperature: ", 350.0f, c->displayData.noiseData.valTemperature, VEC3_YELLOW, VEC3_RED);
+	/* Diplay chunk position */
+	displayDoublePosition(c, "Chunk Pos: ", 125.0f, c->displayData.chunkX, c->displayData.chunkZ, VEC3_YELLOW);
+	/* Display Block position */
+	displayDoublePosition(c, "Block Pos: ", 150.0f, c->displayData.blockPos.x + (16 * c->displayData.chunkX)
+		, c->displayData.blockPos.z + (16 * c->displayData.chunkZ), VEC3_YELLOW);
+	displayFloatTextCall(c, "Val Continental: ", 175.0f, c->displayData.noiseData.valContinental, VEC3_YELLOW, VEC3_BLACK);
+	displayFloatTextCall(c, "Val Erosion: ", 200.0f, c->displayData.noiseData.valErosion, VEC3_YELLOW, VEC3_BLACK);
+	displayFloatTextCall(c, "Val PeaksValley: ", 225.0f, c->displayData.noiseData.valPeaksValley, VEC3_YELLOW, VEC3_BLACK);
+	displayFloatTextCall(c, "Val Combined: ", 250.0f, c->displayData.noiseData.valCombined, VEC3_YELLOW, VEC3_BLACK);
+	displayFloatTextCall(c, "Val Humidity: ", 275.0f, c->displayData.noiseData.valHumidity, VEC3_YELLOW, VEC3_BLACK);
+	displayFloatTextCall(c, "Val Temperature: ", 300.0f, c->displayData.noiseData.valTemperature, VEC3_YELLOW, VEC3_BLACK);
+	displayDoublePosition(c, "Noise Pos: ", 325.0f, c->displayData.posNoise[0], c->displayData.posNoise[1], VEC3_YELLOW);
 }
 
 void renderGame(Context *c, GLuint skyTexture) {

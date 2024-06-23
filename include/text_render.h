@@ -16,6 +16,9 @@
 #define VEC3_CYAN (vec3){0.0, 1.0, 1.0}
 #define VEC3_YELLOW (vec3){1.0, 1.0, 0.0}
 #define VEC3_ORANGE (vec3){1.0, 0.7, 0.0}
+#define VEC3_WHITE (vec3){1.0, 1.0, 1.0}
+#define VEC3_BLACK (vec3){0.0, 0.0, 0.0}
+#define VEC3_PINK (vec3){1.0, 0.0, 1.0}
 
 struct s_font_context {
 	GLuint 			VAO, VBO;
