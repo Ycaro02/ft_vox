@@ -61,15 +61,15 @@ void main()
     vec2 realTexCoord = aTexCoord.xy;
     float blockFace = aTexCoord.z;
     // int textureID = aMetadata;
-    int textureIdExtract = s32ByteGet(aMetadata, 3);
+    int textureIdExtracted = s32ByteGet(aMetadata, 3);
 
 	biomeType = 99; /* To implementent give it at second value in int */
 
-	if (textureIdExtract == GRASS_SIDE) {
+	if (textureIdExtracted == GRASS_SIDE) {
 		biomeType = PLAIN_BIOME;
 	}
 
-	int realTextureId = topBlockFaceHandling(textureIdExtract, blockFace);
+	int realTextureId = topBlockFaceHandling(textureIdExtracted, blockFace);
 
 	TexCoord = vec3(realTexCoord, float(realTextureId) / float(ATLAS_SIZE));
     mat4 m = model;

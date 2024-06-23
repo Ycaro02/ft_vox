@@ -15,7 +15,7 @@ s8 faceHidden(u8 neighbors, u8 face) {
 	return (neighbors & (1U << face));
 }
 
-u32 *faceVisibleCount(Chunks *chunks, u32 *waterFaceCount) {
+u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount) {
 	u32 *count = ft_calloc(sizeof(u32), 6);
     // s8 	next = TRUE;
 
@@ -29,7 +29,7 @@ u32 *faceVisibleCount(Chunks *chunks, u32 *waterFaceCount) {
 					count[i] += 1U;
 				}
 				if (isTransparentBlock(block->type) && i == 5U && !faceHidden(block->neighbors, i)) {
-					*waterFaceCount += 1U;
+					*transparentFaceCount += 1U;
 				}
 			}
 		}
@@ -50,23 +50,23 @@ void displayAllAtlasBlock(f32 x, f32 z, s32 *type) {
 void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 {
 	u32 idx[6] = {0};
-	u32 waterFaceCount = 0;
+	u32 transparentFaceCount = 0;
+	u32 count = 0;
 
 	ft_bzero(idx, sizeof(u32) * 6);
 
 	(void)chunkMtx;
 
-	render->faceCount = faceVisibleCount(chunks, &waterFaceCount);
+	render->faceCount = faceVisibleCount(chunks, &transparentFaceCount);
 	for (u8 i = 0; i < 6; ++i) {
 		render->faceArray[i] = ft_calloc(sizeof(vec3), render->faceCount[i]);
 		render->faceTypeID[i] = ft_calloc(sizeof(f32), render->faceCount[i]);
 	}
 
 	/* Water face init */
-	render->topTransparencyFaceArray = ft_calloc(sizeof(vec3), waterFaceCount);
-	render->topTransparencyTypeId = ft_calloc(sizeof(f32), waterFaceCount);
-	render->topTransparencyCount = waterFaceCount;
-	waterFaceCount = 0;
+	render->topTransparencyFaceArray = ft_calloc(sizeof(vec3), transparentFaceCount);
+	render->topTransparencyTypeId = ft_calloc(sizeof(f32), transparentFaceCount);
+	render->topTransparencyCount = transparentFaceCount;
 
 	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
 		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
@@ -77,21 +77,17 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->faceArray[i][idx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->faceArray[i][idx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][idx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-					// render->faceTypeID[i][idx[i]] = (s32)block->type;
 					render->faceTypeID[i][idx[i]] = s32StoreValues(block->type, 0, 0, 0);
-					// ft_printf_fd(1, "block->type: %d\n", block->type);
-					// ft_printf_fd(1, "After bitshift: %d\n", s32ValueGetByte(render->faceTypeID[i][idx[i]], 3));
 					if (chunks->x == 0 && chunks->z == 0 && subID == 0 && block->y == 0) {
 						displayAllAtlasBlock(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
 					}
 					idx[i] += 1;
 				} else if (i == 5U && isTransparentBlock(block->type)) { /* Water face fill */
-					render->topTransparencyFaceArray[waterFaceCount][0] = (f32)block->x + (f32)(chunks->x * 16);
-					render->topTransparencyFaceArray[waterFaceCount][1] = (f32)block->y + (f32)(subID * 16);
-					render->topTransparencyFaceArray[waterFaceCount][2] = (f32)block->z + (f32)(chunks->z * 16);
-					// render->topTransparencyTypeId[waterFaceCount] = (s32)block->type; // useless for now  but mandatory for shader can refact it
-					render->topTransparencyTypeId[waterFaceCount] = s32StoreValues(block->type, 0, 0, 0);
-					waterFaceCount++;
+					render->topTransparencyFaceArray[count][0] = (f32)block->x + (f32)(chunks->x * 16);
+					render->topTransparencyFaceArray[count][1] = (f32)block->y + (f32)(subID * 16);
+					render->topTransparencyFaceArray[count][2] = (f32)block->z + (f32)(chunks->z * 16);
+					render->topTransparencyTypeId[count] = s32StoreValues(block->type, 0, 0, 0);
+					count++;
 				}
 			}
 		}
