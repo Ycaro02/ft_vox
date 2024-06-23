@@ -2,11 +2,13 @@
 
 #define GRASS_SIDE 55.0
 #define GRASS_TOP 54.0
-#define SNOW_SIDE 100.0
-#define SNOW_TOP 99.0
+
+#define SNOW_SIDE 104.0
+#define SNOW_TOP 103.0
 
 #define TOP_FACE 5.0
-#define ATLAS_SIZE 101.0
+// #define ATLAS_SIZE 101.0
+#define ATLAS_SIZE 105.0
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aInstancePos;

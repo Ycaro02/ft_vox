@@ -31,8 +31,11 @@
 // #define TRAVEL_INCREMENT CHUNK_FLOAT_SIZE	/* Travel increment */
 #define TRAVEL_INCREMENT 5.0f				/* Travel increment */
 
-/* Texture atlas path size 101 */
+/* Texture atlas path size 105 */
 #define TEXTURE_ATLAS_PATH "rsc/texture/atlas_block.bmp"
+
+/* Texture atlas path size 105 */
+// #define TEXTURE_ATLAS_PATH "rsc/texture/test_atlas.bmp"
 
 /*TEST for rebuild atlas*/
 // #define TEXTURE_ATLAS_PATH "rsc/texture/TESTatlas_block.bmp"
