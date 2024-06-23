@@ -6,7 +6,7 @@
 
 struct PACKED_STRUCT s_vertex_texture {
     vec3_f32 position;
-    vec3_f32 texCoord;
+    vec2_f32 texCoord;
 };
 
 /* Model structure */

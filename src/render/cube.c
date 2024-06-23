@@ -20,19 +20,19 @@ GLuint bufferGlCreate(GLenum type, u32 size, void *data)
 
 FaceCubeModel *cubeFaceVAOinit() {
 	FaceCubeModel *cubeFace = NULL;
-    static const VertexTexture backFace[] = { CUBE_BACK_FACE_VERTEX };
-    static const VertexTexture frontFace[] = { CUBE_FRONT_FACE_VERTEX };
-    static const VertexTexture leftFace[] = { CUBE_LEFT_FACE_VERTEX };
-    static const VertexTexture rightFace[] = { CUBE_RIGHT_FACE_VERTEX };
-    static const VertexTexture bottomFace[] = { CUBE_BOTTOM_FACE_VERTEX };
-    static const VertexTexture topFace[] = { CUBE_TOP_FACE_VERTEX };
+    const VertexTexture backFace[] = { CUBE_BACK_FACE_VERTEX };
+    const VertexTexture frontFace[] = { CUBE_FRONT_FACE_VERTEX };
+    const VertexTexture leftFace[] = { CUBE_LEFT_FACE_VERTEX };
+    const VertexTexture rightFace[] = { CUBE_RIGHT_FACE_VERTEX };
+    const VertexTexture bottomFace[] = { CUBE_BOTTOM_FACE_VERTEX };
+    const VertexTexture topFace[] = { CUBE_TOP_FACE_VERTEX };
 
-    static const vec3_u32 backIndices[] = { CUBE_BACK_FACE(0, 1, 2, 3) };
-    static const vec3_u32 frontIndices[] = { CUBE_FRONT_FACE(0, 1, 2, 3) };
-    static const vec3_u32 leftIndices[] = { CUBE_LEFT_FACE(0, 1, 2, 3) };
-    static const vec3_u32 rightIndices[] = { CUBE_RIGHT_FACE(0, 1, 2, 3) };
-    static const vec3_u32 bottomIndices[] = { CUBE_BOTTOM_FACE(0, 1, 2, 3) };
-    static const vec3_u32 topIndices[] = { CUBE_TOP_FACE(0, 1, 2, 3) };
+    const vec3_u32 backIndices[] = { CUBE_BACK_FACE(0, 1, 2, 3) };
+    const vec3_u32 frontIndices[] = { CUBE_FRONT_FACE(0, 1, 2, 3) };
+    const vec3_u32 leftIndices[] = { CUBE_LEFT_FACE(0, 1, 2, 3) };
+    const vec3_u32 rightIndices[] = { CUBE_RIGHT_FACE(0, 1, 2, 3) };
+    const vec3_u32 bottomIndices[] = { CUBE_BOTTOM_FACE(0, 1, 2, 3) };
+    const vec3_u32 topIndices[] = { CUBE_TOP_FACE(0, 1, 2, 3) };
 
     const VertexTexture *faces[] = { backFace, frontFace, leftFace, rightFace, bottomFace, topFace };
     const vec3_u32 *indices[] = { backIndices, frontIndices, leftIndices, rightIndices, bottomIndices, topIndices };
@@ -59,7 +59,7 @@ FaceCubeModel *cubeFaceVAOinit() {
         glEnableVertexAttribArray(0);
 
 		/* Texture Coordinate attribute */
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)sizeof(vec3));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexTexture), (GLvoid*)sizeof(vec3));
         glEnableVertexAttribArray(2);
 
         glBindVertexArray(0);
