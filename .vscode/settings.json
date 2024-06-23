@@ -71,6 +71,7 @@
 		"ftconfig.h": "c",
 		"text_render.h": "c",
 		"skybox.h": "c",
-		"block_type.h": "c"
+		"block_type.h": "c",
+		"bitshift_utils.h": "c"
 	}
 }

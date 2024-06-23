@@ -137,7 +137,6 @@ void chunkNeighborMaskUpdate(Context *c, Chunks *chunk) {
 			chunk->neighbors |= chunkMask[i];
 		}
 	}
-
 }
 
 void updateChunkNeighbors(Context *c, Chunks *chunk, Block *****chunkBlockCache, Chunks *neighborChunksCache[4]) {
