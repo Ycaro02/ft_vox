@@ -182,6 +182,8 @@ void chunksViewHandling(Context *c) {
     f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV);
 	f32 			radiusEnd = (CAM_FOV);
+	// f32 			radiusStart = (-90.0f);
+	// f32 			radiusEnd = (90.0f);
 	s8 				inView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;
 	u8				neightborChunkLoaded = 0;
 	s8				renderVBOisLoaded = FALSE;
@@ -195,7 +197,7 @@ void chunksViewHandling(Context *c) {
 
 
 	/* Loop on the complete camera fov */
-    for (f32 angle = radiusStart; angle <= radiusEnd; angle += ANGLE_INCREMENT) {
+    for (f32 angle = radiusStart - ANGLE_INCREMENT; angle <= radiusEnd + ANGLE_INCREMENT; angle += ANGLE_INCREMENT) {
 		
 		mtx_lock(&c->gameMtx);
 		glm_vec3_copy(c->cam->viewVector, camViewVector);

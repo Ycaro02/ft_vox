@@ -11,8 +11,8 @@ BoundingBox chunkBoundingBoxGet(s32 chunkX, s32 chunkZ, f32 chunkSize) {
     glm_vec3_copy((vec3){chunkX * chunkSize, 0, chunkZ * chunkSize}, box.min);
 
     /* Compute top right corner */
-	/* Hardcode 80.0f need to refact this */
-    glm_vec3_copy((vec3){box.min[0] + chunkSize, 80.0f, box.min[2] + chunkSize}, box.max);
+	/* Hardcode 90.0f for max chunk height */
+    glm_vec3_copy((vec3){box.min[0] + chunkSize, 90.0f, box.min[2] + chunkSize}, box.max);
     return (box);
 }
 
@@ -51,7 +51,7 @@ void extractFrustumPlanes(Frustum *frustum, mat4 projection, mat4 view) {
 
 s8 isChunkInFrustum(Mutex *gameMtx, Frustum *frustum, BoundingBox *box) {
     // Calculate the 8 corners of the bounding box
-    vec3 corners[8];
+	vec3 corners[8];
     glm_vec3_copy((vec3){box->min[0], box->min[1], box->min[2]}, corners[0]);
     glm_vec3_copy((vec3){box->max[0], box->min[1], box->min[2]}, corners[1]);
     glm_vec3_copy((vec3){box->min[0], box->max[1], box->min[2]}, corners[2]);
