@@ -63,9 +63,9 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 	}
 
 	/* Water face init */
-	render->topWaterFaceArray = ft_calloc(sizeof(vec3), waterFaceCount);
-	render->topWaterTypeID = ft_calloc(sizeof(f32), waterFaceCount);
-	render->topWaterFaceCount = waterFaceCount;
+	render->topTransparencyFaceArray = ft_calloc(sizeof(vec3), waterFaceCount);
+	render->topTransparencyTypeId = ft_calloc(sizeof(f32), waterFaceCount);
+	render->topTransparencyCount = waterFaceCount;
 	waterFaceCount = 0;
 
 	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
@@ -84,10 +84,10 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					}
 					idx[i] += 1;
 				} else if (i == 5U && isTransparentBlock(block->type)) { /* Water face fill */
-					render->topWaterFaceArray[waterFaceCount][0] = (f32)block->x + (f32)(chunks->x * 16);
-					render->topWaterFaceArray[waterFaceCount][1] = (f32)block->y + (f32)(subID * 16);
-					render->topWaterFaceArray[waterFaceCount][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->topWaterTypeID[waterFaceCount] = (s32)block->type; // useless for now  but mandatory for shader can refact it
+					render->topTransparencyFaceArray[waterFaceCount][0] = (f32)block->x + (f32)(chunks->x * 16);
+					render->topTransparencyFaceArray[waterFaceCount][1] = (f32)block->y + (f32)(subID * 16);
+					render->topTransparencyFaceArray[waterFaceCount][2] = (f32)block->z + (f32)(chunks->z * 16);
+					render->topTransparencyTypeId[waterFaceCount] = (s32)block->type; // useless for now  but mandatory for shader can refact it
 					waterFaceCount++;
 				}
 			}
@@ -116,8 +116,8 @@ void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 		render->faceTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, render->faceCount[i] * sizeof(GLuint), (void *)&render->faceTypeID[i][0]);
 	}
 
-	render->topWaterFaceVBO = faceInstanceVBOCreate(render->topWaterFaceArray, render->topWaterFaceCount);
-	render->topWaterTypeVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->topWaterFaceCount * sizeof(GLuint), (void *)&render->topWaterTypeID[0]);
+	render->topTransparencyFaceVBO = faceInstanceVBOCreate(render->topTransparencyFaceArray, render->topTransparencyCount);
+	render->topTransparencyTypeVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->topTransparencyCount * sizeof(GLuint), (void *)&render->topTransparencyTypeId[0]);
 }
 
 void drawFace(RenderChunks *render, u32 vertex_nb, u32 faceNb, u8 faceIdx) {
@@ -189,9 +189,9 @@ void drawAllChunksByFace(Context *c) {
 			it = hashmap_iterator(c->world->renderChunksMap);
 			while (hashmap_next(&it)) {
 				render = (RenderChunks *)it.value;
-				faceNb = render->topWaterFaceCount;
+				faceNb = render->topTransparencyCount;
 				c->displayData.faceRendered += faceNb;
-				drawSpecialFace(render->topWaterFaceVBO, render->topWaterTypeVBO, 6U, faceNb);
+				drawSpecialFace(render->topTransparencyFaceVBO, render->topTransparencyTypeVBO, 6U, faceNb);
 			}
 		}
 		glBindVertexArray(0);

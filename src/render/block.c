@@ -329,3 +329,18 @@ void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHe
 		c->world->undergroundBlock->isUnderground = TRUE;
 	}
 }
+
+
+// void blockWorldSpaceGet(Chunks *chunk, Block *block, s32 subChunkId, vec3 blockPos) {
+// 	f32 x = ((f32)block->x * 0.5f) + (8.0f * (f32)chunk->x);
+// 	f32 y = ((f32)block->y * 0.5f) + (f32)subChunkId * 8.0f;
+// 	f32 z = ((f32)block->z * 0.5f) + (8.0f * (f32)chunk->z);
+// 	// if (block->x == 0 && block->y == 0) {
+// 	// 	ft_printf_fd(1, "Sub [%d] Block at [%d][%d][%d] (%f, %f, %f)\n", subChunkId, block->x, block->y, block->z ,x, y, z);
+// 	// }
+// 	blockPos[0] = x;
+// 	blockPos[1] = y;
+// 	blockPos[2] = z;
+// }
+
+

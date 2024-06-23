@@ -10,8 +10,8 @@ void renderChunkFree(RenderChunks *render) {
 		free(render->faceArray[i]);
 		free(render->faceTypeID[i]);
 	}
-	free(render->topWaterFaceArray);
-	free(render->topWaterTypeID);
+	free(render->topTransparencyFaceArray);
+	free(render->topTransparencyTypeId);
 	/* Care here we can't destroy VBO in sub thread */
 	free(render);
 }

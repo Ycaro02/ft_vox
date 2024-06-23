@@ -10,11 +10,11 @@ struct s_render_chunks {
 	GLuint		faceTypeVBO[6];
 	u32			*faceCount;
 
-	vec3		*topWaterFaceArray;
-	s32			*topWaterTypeID;
-	u32 		topWaterFaceCount;
-	GLuint		topWaterFaceVBO;
-	GLuint		topWaterTypeVBO;
+	vec3		*topTransparencyFaceArray;
+	s32			*topTransparencyTypeId;
+	u32 		topTransparencyCount;
+	GLuint		topTransparencyFaceVBO;
+	GLuint		topTransparencyTypeVBO;
 
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
 	suseconds_t lastUpdate;			/* Last update time */
@@ -31,7 +31,6 @@ struct s_underground_block {
 
 /* render/render_chunks.c */
 void			renderChunkFree(RenderChunks *render);
-
 void			addRenderToVBOCreate(Context *c, BlockPos chunkID);
 
 /* Render chunks.c */
@@ -46,15 +45,12 @@ void 			renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap);
 void 			renderChunksVBODestroyListBuild(Context *c, Chunks *chunk);
 
 /* render/occlusion_culling */
-// u32				checkHiddenBlock(Chunks *chunks, u32 subChunksID);
 void			updateNeighbors(Block *block, Block ****blockCache);
 void			updateTopBotNeighbors(SubChunks *botSubChunk, Block ****topBlockCache);
 void			chunkNeighborsGet(Context *c, Chunks *chunk, Chunks *neighborChunksCache[4]);
 void			updateChunkNeighbors(Context *c, Chunks *chunk, Block *****chunkBlockCache, Chunks *neighborChunksCache[4]);
 void			chunkNeighborMaskUpdate(Context *c, Chunks *chunk);
 
-
-void updateHiddenFaces(Chunks *chunk, Camera *camera);
 
 /* render/loadchunks.c */
 s8 				chunkIsLoaded(HashMap *chunksMap, BlockPos chunkID);

@@ -72,8 +72,8 @@ void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
 	}
 
 	if ((waterVBO = malloc(sizeof(GLuint))) && (waterTypeVBO = malloc(sizeof(GLuint)))) {
-		*waterVBO = chunk->render->topWaterFaceVBO;
-		*waterTypeVBO = chunk->render->topWaterTypeVBO;
+		*waterVBO = chunk->render->topTransparencyFaceVBO;
+		*waterTypeVBO = chunk->render->topTransparencyTypeVBO;
 		if (*waterVBO != 0) {
 			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterVBO));
 		}
