@@ -3,7 +3,7 @@
 #define GRASS_SIDE 55.0
 #define GRASS_TOP 54.0
 #define TOP_FACE 5.0
-#define ATLAS_SIZE 95.0
+#define ATLAS_SIZE 101.0
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aInstancePos;
@@ -33,15 +33,3 @@ void main()
     vec4 worldPosition = m * vec4(aPos, 1.0);
     gl_Position = projection * view * worldPosition;
 }
-
-/*	Magic number : OLD atlas
-	// const float textureAtlasSize = 67.0;
-	- 55 is grass side
-	- 51 grass top 
-	- 5.0 is the face top of the block
-	- 67 is the number of texture in the texture atlas
-	// if (aTextureID == 55.0 && blockFace == 5.0) {
-	//     textureID = 51.0;
-	// }
-	// TexCoord = vec3(realTexCoord, textureID / 67.0);
-*/

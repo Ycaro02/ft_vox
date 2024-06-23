@@ -33,6 +33,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
 
 	if (realY < maxHeight - 2) {
 		blockType = STONE;
+		if (realY == 0) { blockType = BEDROCK; }
 	} 
 	else if (realY <= maxHeight) {
 		blockType = DIRT;

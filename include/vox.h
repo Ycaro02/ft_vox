@@ -31,7 +31,7 @@
 // #define TRAVEL_INCREMENT CHUNK_FLOAT_SIZE	/* Travel increment */
 #define TRAVEL_INCREMENT 5.0f				/* Travel increment */
 
-/* Texture atlas path */
+/* Texture atlas path size 101 */
 #define TEXTURE_ATLAS_PATH "rsc/texture/atlas_block.bmp"
 
 /*TEST for rebuild atlas*/
@@ -108,23 +108,16 @@
 #define CHUNK_LEFT 3
 
 enum BlockType {
-    AIR=0,								/* Air block (Empty) */
-    STONE=NEWAT_STONE,							/* Stone block (Underground) */
-	STONE_BRICK=NEWAT_STONE_BRICK,
-    DIRT=NEWAT_DIRT,							/* Dirt block (Exposed to light) */
-	GRASS=NEWAT_GRASS_SIDE,							/* Grass block (Exposed to light) */
+    AIR=0,									/* Air block (Empty) */
+    STONE=NEWAT_STONE,						/* Stone block (Underground) */
+    DIRT=NEWAT_DIRT,						/* Dirt block (Exposed to light) */
+	GRASS=NEWAT_GRASS_SIDE,					/* Grass block (Exposed to light) */
 	GRASS_TOP=NEWAT_GRASS_TOP,				/* Grass top */
 	WATER=NEWAT_WATER,						/* Water */
 	SAND=NEWAT_SAND,						/* Sand */
-	WOOL_RED=NEWAT_RED_WOOL,				/* Wool red */
-	WOOL_ORANGE=NEWAT_ORANGE_WOOL,			/* Wool orange */
-	WOOL_YELLOW=NEWAT_YELLOW_WOOL,			/* Wool yellow */
-	WOOL_PURPLE=NEWAT_PURPLE_WOOL,	/* Wool lime */
-	WOOL_GREEN=NEWAT_GREEN_WOOL,			/* Wool green */
-	WOOL_CYAN=NEWAT_CYAN_WOOL,				/* Wool cyan */
-	WOOL_LIGHT_BLUE=NEWAT_LIGHT_BLUE_WOOL,	/* Wool light blue */
-	WOOL_BLUE=NEWAT_BLUE_WOOL,				/* Wool blue */
-	GLASS=NEWAT_GLASS,						/* Glass */
+	BEDROCK=NEWAT_BEDROCK,					/* Bedrock */
+	STONE_BRICK=NEWAT_STONE_BRICK,			/* Stone brick --> Unused */
+	GLASS=NEWAT_GLASS,						/* Glass --> Unused */
 };
 
 /* texture load_texture */
