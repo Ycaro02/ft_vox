@@ -113,15 +113,17 @@
 enum BlockType {
     AIR=0,									/* Air block (Empty) */
     STONE=NEWAT_STONE,						/* Stone block (Underground) */
-    DIRT=NEWAT_DIRT,						/* Dirt block (Exposed to light) */
-	GRASS=NEWAT_GRASS_SIDE,					/* Grass block (Exposed to light) */
-	GRASS_TOP=NEWAT_GRASS_TOP,				/* Grass top */
+    DIRT=NEWAT_DIRT,						/* Dirt block */
+	GRASS=NEWAT_GREY_GRASS_SIDE,			/* Grass block */
+	GRASS_TOP=NEWAT_GREY_GRASS_TOP,			/* Grass top */
 	WATER=NEWAT_WATER,						/* Water */
 	SAND=NEWAT_SAND,						/* Sand */
 	BEDROCK=NEWAT_BEDROCK,					/* Bedrock */
 	SNOW=NEWAT_SNOW,						/* Snow */
 	ICE=NEWAT_ICE,							/* Ice */
 	SNOW_GRASS=NEWAT_SNOW_GRASS_SIDE,		/* Snow grass */
+	SANDSTONE=NEWAT_SANDSTONE_SIDE,			/* Sandstone */
+	SANDSTONE_TOP=NEWAT_SANDSTONE_TOP,		/* Sandstone top */
 	STONE_BRICK=NEWAT_STONE_BRICK,			/* Stone brick --> Unused */
 	GLASS=NEWAT_GLASS,						/* Glass --> Unused */
 };

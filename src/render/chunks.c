@@ -138,12 +138,12 @@ f32 perlinNoiseHeight(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData
     f32 scale = 60.0f;
 
     /* Get multiple noise values */
-    f32 continentalVal = interpolateNoiseGet(noise->continental, localX, localZ, perlinVal);
-    f32 erosionVal = interpolateNoiseGet(noise->erosion, localX, localZ, perlinVal);
-    f32 peaksValleysVal = interpolateNoiseGet(noise->peaksValley, localX, localZ, perlinVal);
+    f32 continentalVal = interpolateNoiseGet(noise->continental, localX, localZ, perlinVal, 8.0f);
+    f32 erosionVal = interpolateNoiseGet(noise->erosion, localX, localZ, perlinVal, 8.0f);
+    f32 peaksValleysVal = interpolateNoiseGet(noise->peaksValley, localX, localZ, perlinVal, 8.0f);
 
-	perlinVal->valHumidity = interpolateNoiseGet(noise->humidity, localX, localZ, perlinVal);
-	perlinVal->valTemperature = interpolateNoiseGet(noise->temperature, localX, localZ, perlinVal);
+	perlinVal->valHumidity = interpolateNoiseGet(noise->humidity, localX, localZ, perlinVal, 4.0f);
+	perlinVal->valTemperature = interpolateNoiseGet(noise->temperature, localX, localZ, perlinVal, 4.0f);
 
 	perlinVal->valContinent = continentalVal;
 	perlinVal->valErosion = erosionVal;
