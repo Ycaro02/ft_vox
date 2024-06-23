@@ -234,7 +234,8 @@ void underGroundBlockDataFill(s32 columnMaxHeight, vec3 *faceArray, s32 *faceTyp
 			faceArray[idx][0] = (camPos[0] * 2.0f) + increment.x;
 			faceArray[idx][1] = (camPos[1] * 2.0f) + increment.y;
 			faceArray[idx][2] = (camPos[2] * 2.0f) + increment.z;
-			faceTypeID[idx] = blockType;
+			// faceTypeID[idx] = blockType;
+			faceTypeID[idx] = s32StoreValues(blockType, 0, 0, 0);
 			increment.z += 1.0f;
 			firstIter = FALSE;
 		}

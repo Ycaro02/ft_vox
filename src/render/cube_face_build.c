@@ -42,7 +42,7 @@ void displayAllAtlasBlock(f32 x, f32 z, s32 *type) {
 	// (void)x, (void)z;
 	int textureIdx = x + z * 16;
 	if (textureIdx <= NEWAT_MAX) {
-		*type = (s32)textureIdx;
+		*type = s32StoreValues(textureIdx, 0, 0, 0);
 	} 
 }
 
@@ -77,8 +77,10 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->faceArray[i][idx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->faceArray[i][idx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][idx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->faceTypeID[i][idx[i]] = (s32)block->type;
-					// woolHelpDebug(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
+					// render->faceTypeID[i][idx[i]] = (s32)block->type;
+					render->faceTypeID[i][idx[i]] = s32StoreValues(block->type, 0, 0, 0);
+					// ft_printf_fd(1, "block->type: %d\n", block->type);
+					// ft_printf_fd(1, "After bitshift: %d\n", s32ValueGetByte(render->faceTypeID[i][idx[i]], 3));
 					if (chunks->x == 0 && chunks->z == 0 && subID == 0 && block->y == 0) {
 						displayAllAtlasBlock(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
 					}
@@ -87,7 +89,8 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->topTransparencyFaceArray[waterFaceCount][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->topTransparencyFaceArray[waterFaceCount][1] = (f32)block->y + (f32)(subID * 16);
 					render->topTransparencyFaceArray[waterFaceCount][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->topTransparencyTypeId[waterFaceCount] = (s32)block->type; // useless for now  but mandatory for shader can refact it
+					// render->topTransparencyTypeId[waterFaceCount] = (s32)block->type; // useless for now  but mandatory for shader can refact it
+					render->topTransparencyTypeId[waterFaceCount] = s32StoreValues(block->type, 0, 0, 0);
 					waterFaceCount++;
 				}
 			}
