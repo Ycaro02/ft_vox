@@ -98,7 +98,7 @@ size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinDat
     for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
         for (s32 y = 0; y < BLOCKS_PER_CHUNK; ++y) {
             for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
-				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld))) {
+				if ((block = blockCreate(perlinVal, x ,y ,z , perlinVal[x][z].normalise, startYWorld))) {
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){x, y, z}, block);
 					chunkBlockCache[layer][x][y][z] = block;
 				}

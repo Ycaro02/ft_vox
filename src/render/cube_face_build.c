@@ -7,6 +7,10 @@
 #include "../../include/block.h"
 #include "../../include/cube.h"
 
+s8 isTransparentBlock(u8 type) {
+	return (type == WATER || type == ICE);
+}
+
 s8 faceHidden(u8 neighbors, u8 face) {
 	return (neighbors & (1U << face));
 }
@@ -21,10 +25,10 @@ u32 *faceVisibleCount(Chunks *chunks, u32 *waterFaceCount) {
 		while (hashmap_next(&it)) {
 			Block *block = (Block *)it.value;
 			for (u8 i = 0; i < 6; ++i) {
-				if (!faceHidden(block->neighbors, i) && block->type != WATER) {
+				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
 					count[i] += 1U;
 				}
-				if (block->type == WATER && i == 5U && !faceHidden(block->neighbors, i)) {
+				if (isTransparentBlock(block->type) && i == 5U && !faceHidden(block->neighbors, i)) {
 					*waterFaceCount += 1U;
 				}
 			}
@@ -69,7 +73,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 		while (hashmap_next(&it)) {
 			Block *block = (Block *)it.value;
 			for (u8 i = 0; i < 6; ++i) {
-				if (!faceHidden(block->neighbors, i) && block->type != WATER) {
+				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
 					render->faceArray[i][idx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->faceArray[i][idx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][idx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
@@ -79,7 +83,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 						displayAllAtlasBlock(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
 					}
 					idx[i] += 1;
-				} else if (i == 5U && block->type == WATER) { /* Water face fill */
+				} else if (i == 5U && isTransparentBlock(block->type)) { /* Water face fill */
 					render->topWaterFaceArray[waterFaceCount][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->topWaterFaceArray[waterFaceCount][1] = (f32)block->y + (f32)(subID * 16);
 					render->topWaterFaceArray[waterFaceCount][2] = (f32)block->z + (f32)(chunks->z * 16);

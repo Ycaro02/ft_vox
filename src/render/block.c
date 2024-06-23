@@ -21,27 +21,56 @@ Block *worldPosProtectBlockGet(Chunks *chunk, BlockPos localPos, s32 camY) {
 	return (block);
 }
 
+typedef struct s_biom_block {
+	s32		dirt;			/* Dirt for plain Biom */
+	s32		top;			/* Grass top for plau Biom*/
+	s32		water;			/* Water for plain biom */
+	s32		underWater;		/* Underwater sand for plain biom */
+	s32		stone;			/* Stone for plain biom */
+} BiomBlock;
+
+
+void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise) {
+	if (dataNoise.valTemperature < 0.25f) { /* Snow BIOM */
+		biomBlock->dirt = DIRT;
+		biomBlock->top = SNOW_GRASS;
+		biomBlock->water = ICE;
+		biomBlock->underWater = SNOW;
+		biomBlock->stone = STONE;
+		return;
+	}
+	biomBlock->dirt = DIRT;
+	biomBlock->top = GRASS;
+	biomBlock->water = WATER;
+	biomBlock->underWater = SAND;
+	biomBlock->stone = STONE;
+
+}
+
 /* Set local X and Z coordinates based on the center of the Perlin noise array */
 s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
 	return ((chunkOffset * BLOCKS_PER_CHUNK + localPos) + (width / 2));
 }
 
-Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
-    Block   *block = NULL;
-    s32     blockType = AIR;
-    s32     realY = startYWorld + y;
+Block *blockCreate(PerlinData **dataNoise, s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
+    Block   	*block = NULL;
+	BiomBlock	biomBlock = {0};
+    s32     	blockType = AIR;
+    s32     	realY = startYWorld + y;
+
+	biomDetection(&biomBlock, dataNoise[x][z]); /* need perlin val here */
 
 	if (realY < maxHeight - 2) {
-		blockType = STONE;
+		blockType = biomBlock.stone;
 		if (realY == 0) { blockType = BEDROCK; }
 	} 
 	else if (realY <= maxHeight) {
-		blockType = DIRT;
-		if ((realY == maxHeight || realY == maxHeight - 1) && realY >= SEA_LEVEL) { blockType = GRASS;}
-		if (realY < SEA_LEVEL) { blockType = SAND; }
+		blockType = biomBlock.dirt;
+		if ((realY == maxHeight || realY == maxHeight - 1) && realY >= SEA_LEVEL) { blockType = biomBlock.top;}
+		if (realY < SEA_LEVEL) { blockType = biomBlock.underWater; }
 	} 
 	else if (realY == SEA_LEVEL) {
-		blockType = WATER;
+		blockType = biomBlock.water;
 	} 
 	else {
 		return (NULL);

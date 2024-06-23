@@ -116,6 +116,9 @@ enum BlockType {
 	WATER=NEWAT_WATER,						/* Water */
 	SAND=NEWAT_SAND,						/* Sand */
 	BEDROCK=NEWAT_BEDROCK,					/* Bedrock */
+	SNOW=NEWAT_SNOW,						/* Snow */
+	ICE=NEWAT_ICE,							/* Ice */
+	SNOW_GRASS=NEWAT_SNOW_GRASS_SIDE,		/* Snow grass */
 	STONE_BRICK=NEWAT_STONE_BRICK,			/* Stone brick --> Unused */
 	GLASS=NEWAT_GLASS,						/* Glass --> Unused */
 };

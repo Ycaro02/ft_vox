@@ -6,8 +6,8 @@
 
 
 void ocllusionHandleTransparent(Block *block, Block *neighbor, u8 blockMask, u8 neighborMask) {
-	s8 blockIsTransparent = block->type == WATER || block->type == GLASS;
-	s8 neighborIsTransparent = neighbor->type == WATER || neighbor->type == GLASS;
+	s8 blockIsTransparent = block->type == WATER || block->type == ICE;
+	s8 neighborIsTransparent = neighbor->type == WATER || neighbor->type == ICE;
 	s8 notApply = (blockIsTransparent && !neighborIsTransparent) || (!blockIsTransparent && neighborIsTransparent);
 	if (notApply == FALSE) {
 		block->neighbors |= blockMask;
