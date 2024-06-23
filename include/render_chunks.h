@@ -5,13 +5,13 @@
 
 struct s_render_chunks {
 	vec3		*faceArray[6];
-	f32			*faceTypeID[6];
+	s32			*faceTypeID[6];
 	GLuint		faceVBO[6];
 	GLuint		faceTypeVBO[6];
 	u32			*faceCount;
 
 	vec3		*topWaterFaceArray;
-	f32			*topWaterTypeID;
+	s32			*topWaterTypeID;
 	u32 		topWaterFaceCount;
 	GLuint		topWaterFaceVBO;
 	GLuint		topWaterTypeVBO;
@@ -23,7 +23,7 @@ struct s_render_chunks {
 struct s_underground_block {
 	u8		isUnderground;
 	vec3	*udgFaceArray[6];
-	f32		*udgTypeID[6];
+	s32		*udgTypeID[6];
 	u32 	udgFaceCount;
 	GLuint	udgFaceVBO[6];
 	GLuint	udgTypeVBO[6];

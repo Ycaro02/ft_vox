@@ -214,9 +214,9 @@ void undergroundBlockFree(UndergroundBlock *udg) {
  * @param faceTypeID The face type array
  * @param camPos The camera position
 */
-void underGroundBlockDataFill(s32 columnMaxHeight, vec3 *faceArray, f32 *faceTypeID, vec3 camPos) {
+void underGroundBlockDataFill(s32 columnMaxHeight, vec3 *faceArray, s32 *faceTypeID, vec3 camPos) {
 	BlockPos	increment = {-1.0f, -1.0f, -1.0f};
-	f32			blockType = STONE;
+	s32			blockType = STONE;
 	s32 		idx = 0;
 	s8 			firstIter = TRUE;
 
