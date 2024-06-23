@@ -11,6 +11,7 @@
 #define CAM_FOV				80.0f			/* Camera field of view */
 #define CHUNK_FLOAT_SIZE	8.0f			/* Chunk float size, cause one block is 0.5, 0.5 * 16 = 8.0f */
 #define ANGLE_INCREMENT		3.0f			/* Angle increment in chunk veiw handling */
+#define TRAVEL_INCREMENT 	3.0f				/* Travel increment */
 
 /* Basic value */
 #define CHUNKS_LOAD_RADIUS 16							/* Chunks load radius */
@@ -28,8 +29,6 @@
 // #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 2.0f)
 
 
-// #define TRAVEL_INCREMENT CHUNK_FLOAT_SIZE	/* Travel increment */
-#define TRAVEL_INCREMENT 5.0f				/* Travel increment */
 
 /* Texture atlas path size 105 */
 #define TEXTURE_ATLAS_PATH "rsc/texture/atlas_block.bmp"
