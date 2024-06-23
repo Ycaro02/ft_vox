@@ -20,6 +20,11 @@ Block *worldPosProtectBlockGet(Chunks *chunk, BlockPos localPos, s32 camY) {
 	block = getBlockAt(chunk, localPos.x, localPos.y, localPos.z, subChunkID);
 	return (block);
 }
+#define BIOME_PLAIN 0
+#define BIOME_SNOW 1
+#define BIOME_DESERT 2
+#define BIOME_JUNGLE 3
+#define BIOME_SWAMP 4
 
 typedef struct s_biom_block {
 	s32		biomeId;
@@ -30,12 +35,38 @@ typedef struct s_biom_block {
 	s32		stone;			/* Stone for plain biom */
 } BiomBlock;
 
+s32 getBiomeMapIndex(float value) {
+	if (value < -0.6) return 0;
+	else if (value < -0.2) return 1;
+	else if (value < 0.2) return 2;
+	else if (value < 0.6) return 3;
+	else return 4;
+}
 
+s32 getBiomeId(float temperature, float humidity) {
+    static s32 biomeMap[5][5] = {
+        {BIOME_SNOW,  BIOME_SNOW,  BIOME_SNOW,  BIOME_PLAIN,  BIOME_PLAIN},
+        {BIOME_SNOW,  BIOME_SNOW,  BIOME_PLAIN, BIOME_PLAIN,  BIOME_SWAMP},
+        {BIOME_SNOW,  BIOME_PLAIN, BIOME_PLAIN, BIOME_SWAMP,  BIOME_SWAMP},
+        {BIOME_PLAIN, BIOME_PLAIN, BIOME_SWAMP, BIOME_JUNGLE, BIOME_JUNGLE},
+        {BIOME_DESERT, BIOME_DESERT, BIOME_JUNGLE, BIOME_JUNGLE, BIOME_JUNGLE}
+    };
+
+    s32 tempIndex = getBiomeMapIndex(temperature);
+    s32 humidIndex = getBiomeMapIndex(humidity);
+    
+    return biomeMap[tempIndex][humidIndex];
+}
 /*
-	BIOM DETECTION RULE
-	- If temperature is below 0.0f, then it's a snow biom
-	- If temperature is above 0.0f, then it's a plain biom
-	- If temperature is above 0.5f and humidity is below 0.0f, then it's a desert biom 
+	|-------------------------------------------------------------------------------------------|
+	| Temperature \ Humidity | -1 to -0.6 | -0.6 to -0.2 | -0.2 to 0.2 | 0.2 to 0.6 | 0.6 to 1  |
+	|------------------------|------------|--------------|-------------|------------|-----------|
+	| -1 to -0.6             | Snow       | Snow         | Snow        | Plains     | Plains    |
+	| -0.6 to -0.2           | Snow       | Snow         | Plains      | Plains     | Swamp     |
+	| -0.2 to 0.2            | Snow       | Plains       | Plains      | Swamp      | Swamp     |
+	| 0.2 to 0.6             | Plains     | Plains       | Swamp       | Jungle     | Jungle    |
+	| 0.6 to 1               | Desert     | Desert       | Jungle      | Jungle     | Jungle    |
+	|-------------------------------------------------------------------------------------------|
 	-------------------------------------------------------------
 	- Plain biom: ID 0
 		- Dirt: DIRT
@@ -56,35 +87,34 @@ typedef struct s_biom_block {
 		- Top: SAND
 		- Water: WATER
 		- Underwater: SAND
-		- Stone: BEDROCK
+		- Stone: STONE
  */
 
-#define BIOME_PLAIN 0
-#define BIOME_SNOW 1
-#define BIOME_DESERT 2
-
 void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise) {
-	if (dataNoise.valTemperature < 0.0f) { /* Snow BIOM */
-		biomBlock->biomeId = BIOME_SNOW;
-		biomBlock->dirt = DIRT;
+	biomBlock->biomeId = getBiomeId(dataNoise.valTemperature, dataNoise.valHumidity);
+	if (biomBlock->biomeId == BIOME_SNOW) { /* Snow BIOM */
 		biomBlock->top = SNOW_GRASS;
+		biomBlock->dirt = DIRT;
 		biomBlock->water = ICE;
 		biomBlock->underWater = SNOW;
 		biomBlock->stone = STONE;
 		return;
 	}
-	if (dataNoise.valTemperature > 0.5f && dataNoise.valHumidity < 0.0f) { /* Desert BIOM */
-		biomBlock->biomeId = BIOME_DESERT;
-		biomBlock->dirt = SANDSTONE;
+	if (biomBlock->biomeId == BIOME_DESERT) { /* Desert BIOM */
 		biomBlock->top = SANDSTONE;
+		biomBlock->dirt = SANDSTONE;
 		biomBlock->water = WATER;
 		biomBlock->underWater = SAND;
 		biomBlock->stone = SANDSTONE;
 		return;
 	}
-	biomBlock->biomeId = BIOME_PLAIN;
-	biomBlock->dirt = DIRT;
+	/**
+	 * Need to implement jungle and swamp
+	*/
+
+	/* Plain BIOM */
 	biomBlock->top = GRASS;
+	biomBlock->dirt = DIRT;
 	biomBlock->water = WATER;
 	biomBlock->underWater = SAND;
 	biomBlock->stone = STONE;

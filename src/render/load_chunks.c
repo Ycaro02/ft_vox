@@ -140,8 +140,6 @@ void renderChunksFrustrumRemove(Context *c, HashMap *renderChunksMap) {
 	BlockPos 		tmpChunkID;
 	t_list			*toRemoveList = NULL;
 	BlockPos		*chunkIDToRemove = NULL;
-	// s8 				next = FALSE;
-	// Chunks 			*chunks;
 	
 	mtx_lock(&c->renderMtx);
 	
