@@ -37,7 +37,7 @@ void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, int x, int y,
 	| 0.6 to 1               | Desert     | Desert       | Jungle      | Jungle     | Jungle    |
 	|-------------------------------------------------------------------------------------------|
 	-------------------------------------------------------------
-	- Plain biom: ID 0
+	- Plain biom: ID 0, Jungle biom: ID 3, Swamp biom: ID 4
 		- Dirt: DIRT
 		- Top: GRASS
 		- Water: WATER

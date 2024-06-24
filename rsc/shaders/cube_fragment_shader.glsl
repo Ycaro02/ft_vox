@@ -13,6 +13,7 @@ out vec4 FragColor;
 in vec3 TexCoord;
 flat in int biomeType;
 flat in int isGrass;
+flat in int isTopFace;
 
 
 
@@ -43,6 +44,11 @@ void main()
 	
 	if (isGray && isGrass == 1) {
 		baseColor = grassColorHandling(baseColor);
+	}
+
+	/* Reduce light if not top face */
+	if (isTopFace != 1) {
+		baseColor = vec4(baseColor.rgb * 0.8, baseColor.a);
 	}
 
 

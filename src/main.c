@@ -294,7 +294,7 @@ void mainLoopFpsUnlock(Context *c, GLuint skyTexture) {
     f64 updatePerSec = 60.0;
 
 	/* Disable VSync to avoid fps locking */
-	// glfwSwapInterval(0);
+	glfwSwapInterval(0);
 
     while (!glfwWindowShouldClose(c->win_ptr)) {
         nowTime = glfwGetTime();

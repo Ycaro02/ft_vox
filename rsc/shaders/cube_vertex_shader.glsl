@@ -24,7 +24,7 @@ layout (location = 2) in vec2 aTexCoord;
  * aMetadata is a 32 bit integer that contains the following information:
  * byte 3: texture ID 
  * byte 2: block face
- * byte 1: biome ID --> to implement
+ * byte 1: biome ID
  * byte 0: light level	--> to implement
 */
 layout (location = 3) in int aMetadata;
@@ -33,6 +33,7 @@ layout (location = 3) in int aMetadata;
 out vec3 TexCoord;
 flat out int biomeType;
 flat out int isGrass;
+flat out int isTopFace;
 
 /* Define the uniforms variables */
 uniform mat4 view;
@@ -43,6 +44,7 @@ uniform mat4 model;
 int topBlockFaceHandling(int textureID, int blockFace) {
 	
 	if (blockFace == TOP_FACE) {
+		isTopFace = 1;
 		if (textureID == GRASS_SIDE) {
 			return (GRASS_TOP);
 		} else if (textureID == SNOW_SIDE) {
@@ -62,11 +64,11 @@ void main()
 {
     int textureIdExtracted = s32ByteGet(aMetadata, 3);
     int blockFace = s32ByteGet(aMetadata, 2);
-
-	biomeType = s32ByteGet(aMetadata, 1); /* To implementent give it at second value in int */
+	
+	biomeType = s32ByteGet(aMetadata, 1);
+	isTopFace = 0;
 
 	if (textureIdExtracted == GRASS_SIDE) {
-		// biomeType = PLAIN_BIOME;
 		isGrass = 1;
 	}
 
