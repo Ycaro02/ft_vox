@@ -95,7 +95,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->faceArray[i][opqIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->faceArray[i][opqIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][opqIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, block->biomeId, 0);
+					render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, 0);
 					if (chunks->x == 0 && chunks->z == 0 && subID == 0 && block->y == 0) {
 						displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]]);
 					}
@@ -106,7 +106,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->trspFaceArray[i][trspIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->trspFaceArray[i][trspIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->trspFaceArray[i][trspIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->trspTypeId[i][trspIdx[i]] = s32StoreValues(block->type, i, block->biomeId, 0);
+					render->trspTypeId[i][trspIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, 0);
 					trspIdx[i] += 1;
 				}
 			}

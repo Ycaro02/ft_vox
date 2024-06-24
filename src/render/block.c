@@ -27,13 +27,13 @@ s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
 	return ((chunkOffset * BLOCKS_PER_CHUNK + localPos) + (width / 2));
 }
 
-Block *blockCreate(PerlinData **dataNoise, s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld) {
+Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, s8 chunkBiomeId) {
     Block   	*block = NULL;
 	BiomBlock	biomBlock = {0};
     s32     	blockType = AIR;
     s32     	realY = startYWorld + y;
 
-	biomDetection(&biomBlock, dataNoise[x][z]); /* need perlin val here */
+	biomDetection(&biomBlock, chunkBiomeId); /* need perlin val here */
 
 
 	if (realY < maxHeight - 2) {

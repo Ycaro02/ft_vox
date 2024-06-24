@@ -104,7 +104,7 @@ s8 mutexMultipleInit(Context *c) {
 	return (TRUE);
 }
 
-void scanNoiseGetMinMax(f32 **noise, f32 *min, f32 *max, vec2_u32 pos_min) {
+void scanNoiseGetMinMax(f32 **noise, f32 *min, f32 *max, vec2_u32 pos_min, vec2_u32 pos_max) {
 	*min = noise[0][0];
 	*max = noise[0][0];
 	pos_min[0] = 0;
@@ -118,6 +118,8 @@ void scanNoiseGetMinMax(f32 **noise, f32 *min, f32 *max, vec2_u32 pos_min) {
 			}
 			if (noise[i][j] > *max) {
 				*max = noise[i][j];
+				pos_max[0] = i;
+				pos_max[1] = j;
 			}
 		}
 	}
@@ -136,12 +138,14 @@ s8 multipleNoiseGeneration(Context *context, u32 seed) {
 		ft_printf_fd(1, "Error: noise generation failed\n");
 		return (FALSE);
 	}
-	// f32 min, max;
-	// vec3_u32 pos = {0};
-	// scanNoiseGetMinMax(context->world->noise.temperature, &min, &max, pos);
-	// ft_printf_fd(1, RED"Temperature min: %f max: %f, pos: %u %u\n"RESET, min, max, pos[0], pos[1]);
-	// scanNoiseGetMinMax(context->world->noise.humidity, &min, &max, pos);
-	// ft_printf_fd(1, YELLOW"Humidity min: %f max: %f\n"RESET, min, max);
+	f32 min, max;
+	vec3_u32 min_pos = {0};
+	vec3_u32 max_pos = {0};
+	scanNoiseGetMinMax(context->world->noise.temperature, &min, &max, min_pos, max_pos);
+	ft_printf_fd(1, RED"Temperature min: %f max: %f, min_pos: %u %u, max_pos %u %u\n"RESET,
+	 min, max, min_pos[0], min_pos[1], max_pos[0], max_pos[1]);
+	scanNoiseGetMinMax(context->world->noise.humidity, &min, &max, min_pos, max_pos);
+	ft_printf_fd(1, YELLOW"Humidity min: %f max: %f\n"RESET, min, max);
 
 	return (TRUE);
 }

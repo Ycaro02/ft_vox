@@ -91,7 +91,7 @@ void occlusionCullingStatic(Block *****chunkBlockCache, Chunks *chunk) {
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinData **perlinVal, s32 layer)
+size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinData **perlinVal, s32 layer, s8 chunkBiomeId)
 {
 	Block *block = NULL;
 	s32 startYWorld = layer * BLOCKS_PER_CHUNK;
@@ -99,7 +99,7 @@ size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinDat
     for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
         for (s32 y = 0; y < BLOCKS_PER_CHUNK; ++y) {
             for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
-				if ((block = blockCreate(perlinVal, x ,y ,z , perlinVal[x][z].normalise, startYWorld))) {
+				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld, chunkBiomeId))) {
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){x, y, z}, block);
 					chunkBlockCache[layer][x][y][z] = block;
 				}
@@ -207,6 +207,26 @@ s8 blockExist(Block *****chunkBlockCache, BlockPos pos) {
 	return (chunkBlockCache[subId][pos.x][localY][pos.z] != NULL);
 }
 
+/* Do the average between all block column BiomeId to determine the entire chunk biome Id*/
+s8 chunkBiomeIdGet(PerlinData **perlinVal) {
+	f32 count = 0.0f;
+	f32 totalHumidity = 0.0f;
+	f32 totalTemperature = 0.0f;
+
+
+	for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
+		for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
+			totalHumidity += perlinVal[x][z].valHumidity;
+			totalTemperature += perlinVal[x][z].valTemperature;
+			count += 1.0f;
+		}
+	}
+	f32 averageHumidity = totalHumidity / count;
+	f32 averageTemperature = totalTemperature / count;
+	s8 biomeId = blockBiomeIdGet(averageTemperature, averageHumidity);
+	return (biomeId);
+}
+
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
@@ -219,10 +239,11 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 		for (u32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			s32 localX = blockLocalToPerlinPos(chunk->x, x, PERLIN_NOISE_WIDTH);
 			s32 localZ = blockLocalToPerlinPos(chunk->z, z, PERLIN_NOISE_WIDTH);
-			// perlinVal[x][z].normalise = (s32)perlinNoiseHeight(noise->continental, localX, localZ, &perlinVal[x][z]);
 			perlinVal[x][z].normalise = (s32)perlinNoiseHeight(noise, localX, localZ, &perlinVal[x][z]);
 		}
 	}
+
+	chunk->biomeId = chunkBiomeIdGet(perlinVal);
 
 	s32 chunkMaxY = maxHeightGet(perlinVal);
 	if (chunkMaxY < (s32)MIN_HEIGHT) {
@@ -235,7 +256,7 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 			ft_printf_fd(2, "Failed to allocate hashmap\n");
 			return;
 		}
-		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], perlinVal, i);
+		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], perlinVal, i, chunk->biomeId);
 		chunk->noiseData = perlinVal;
 	}
 

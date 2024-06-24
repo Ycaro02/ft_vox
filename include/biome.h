@@ -18,24 +18,46 @@ struct s_biome_block {
 	s32		stone;			/* Stone for plain biom */
 };
 
+
+/*
+    Biome array rules:
+    |-------------------------------------------------------------------------------------------|
+    | Temperature \ Humidity | -1 to -0.4 | -0.4 to 0.0 | 0.0 to 0.4  | 0.4 to 0.7 | 0.7 to 1   |
+    |------------------------|------------|-------------|-------------|------------|------------|
+    | -1 to -0.4             | Snow       | Snow        | Snow        | Plains     | Plains     |
+    | -0.4 to 0.0            | Snow       | Snow        | Plains      | Plains     | Swamp      |
+    | 0.0 to 0.4             | Plains     | Plains      | Swamp       | Swamp      | Jungle     |
+    | 0.4 to 0.7             | Plains     | Swamp       | Swamp       | Jungle     | Desert     |
+    | 0.7 to 1               | Jungle     | Jungle      | Jungle      | Desert     | Desert     |
+    |-------------------------------------------------------------------------------------------|
+*/
+
+#define BIOME_ARRAY_INIT {\
+    {BIOME_SNOW,  BIOME_SNOW,  BIOME_SNOW,  BIOME_PLAIN,  BIOME_PLAIN},\
+    {BIOME_SNOW,  BIOME_SNOW,  BIOME_PLAIN, BIOME_PLAIN,  BIOME_SWAMP},\
+    {BIOME_PLAIN, BIOME_PLAIN, BIOME_SWAMP, BIOME_SWAMP,  BIOME_JUNGLE},\
+    {BIOME_PLAIN, BIOME_SWAMP, BIOME_SWAMP, BIOME_JUNGLE, BIOME_DESERT},\
+    {BIOME_JUNGLE, BIOME_JUNGLE, BIOME_JUNGLE, BIOME_DESERT, BIOME_DESERT}\
+}
+
+FT_INLINE s8 biomeMapIndexGet(float value) {
+    if (value <= -0.4) { return 0; }
+    else if (value <= 0.0) { return 1; }
+    else if (value <= 0.4) { return 2; }
+    else if (value <= 0.7) { return 3; }
+    return 4;
+}
+
+s32 blockBiomeIdGet(float temperature, float humidity);
 /**
  * @brief biomeDetection, detect the biome of the block
  * @param biomBlock BiomBlock pointer (output)
- * @param dataNoise PerlinData, contain temperature and humidity for this block
+ * @param biomeId Biome ID
 */
-void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise);
+void biomDetection(BiomBlock *biomBlock, s8 biomeId);
 // void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, int x, int y, int z, int treeId);
 void treeCreate(Block *****chunkBlockCache, Chunks *Chunk, BlockPos pos, s32 treeId);
 /*
-	|-------------------------------------------------------------------------------------------|
-	| Temperature \ Humidity | -1 to -0.6 | -0.6 to -0.2 | -0.2 to 0.2 | 0.2 to 0.6 | 0.6 to 1  |
-	|------------------------|------------|--------------|-------------|------------|-----------|
-	| -1 to -0.6             | Snow       | Snow         | Snow        | Plains     | Plains    |
-	| -0.6 to -0.2           | Snow       | Snow         | Plains      | Plains     | Swamp     |
-	| -0.2 to 0.2            | Snow       | Plains       | Plains      | Swamp      | Swamp     |
-	| 0.2 to 0.6             | Plains     | Plains       | Swamp       | Jungle     | Jungle    |
-	| 0.6 to 1               | Desert     | Desert       | Jungle      | Jungle     | Jungle    |
-	|-------------------------------------------------------------------------------------------|
 	-------------------------------------------------------------
 	- Plain biom: ID 0, Jungle biom: ID 3, Swamp biom: ID 4
 		- Dirt: DIRT
