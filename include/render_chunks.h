@@ -10,11 +10,11 @@ struct s_render_chunks {
 	GLuint		faceTypeVBO[6];
 	u32			*faceCount;
 
-	vec3		*topTransparencyFaceArray;
-	s32			*topTransparencyTypeId;
-	u32 		topTransparencyCount;
-	GLuint		topTransparencyFaceVBO;
-	GLuint		topTransparencyTypeVBO;
+	vec3		*trspFaceArray[6];
+	s32			*trspTypeId[6];
+	GLuint		trspFaceVBO[6];
+	GLuint		trspTypeVBO[6];
+	u32 		*trspFaceCount;
 
 	BlockPos 	chunkID;			/* Chunk ID, (0, offsetX, offsetZ) */
 	suseconds_t lastUpdate;			/* Last update time */

@@ -59,6 +59,7 @@ void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
 
 
 	for (u32 i = 0; i < 6; ++i) {
+		/* opaque face */
 		if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
 			*instanceVBO = chunk->render->faceVBO[i];
 			*typeBlockVBO = chunk->render->faceTypeVBO[i];
@@ -69,18 +70,19 @@ void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
 				ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
 			}
 		}
+		/* transparency face */
+		if ((waterVBO = malloc(sizeof(GLuint))) && (waterTypeVBO = malloc(sizeof(GLuint)))) {
+			*waterVBO = chunk->render->trspFaceVBO[i];
+			*waterTypeVBO = chunk->render->trspTypeVBO[i];
+			if (*waterVBO != 0) {
+				ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterVBO));
+			}
+			if (*waterTypeVBO != 0) {
+				ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterTypeVBO));
+			}
+		}
 	}
 
-	if ((waterVBO = malloc(sizeof(GLuint))) && (waterTypeVBO = malloc(sizeof(GLuint)))) {
-		*waterVBO = chunk->render->topTransparencyFaceVBO;
-		*waterTypeVBO = chunk->render->topTransparencyTypeVBO;
-		if (*waterVBO != 0) {
-			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterVBO));
-		}
-		if (*waterTypeVBO != 0) {
-			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterTypeVBO));
-		}
-	}
 }
 
 void unloadChunkHandler(Context *c) {

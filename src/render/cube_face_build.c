@@ -41,11 +41,11 @@ u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount) {
 		while (hashmap_next(&it)) {
 			Block *block = (Block *)it.value;
 			for (u8 i = 0; i < 6; ++i) {
-				if (!faceHidden(block->neighbors, i) && !isWaterIce(block->type)) {
+				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
 					opaqueCount[i] += 1U;
 				}
-				if (isWaterIce(block->type) && i == 5U && !faceHidden(block->neighbors, i)) {
-					*transparentFaceCount += 1U;
+				if (isTransparentBlock(block->type) && !faceHidden(block->neighbors, i)) {
+					transparentFaceCount[i] += 1U;
 				}
 			}
 		}
@@ -65,45 +65,49 @@ void displayAllAtlasBlock(f32 x, f32 z, s32 *type) {
 /* To call in create render chunk -> DONE */
 void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 {
-	u32 idx[6] = {0};
-	u32 transparentFaceCount = 0;
-	u32 count = 0;
-
-	ft_bzero(idx, sizeof(u32) * 6);
-
 	(void)chunkMtx;
 
-	render->faceCount = faceVisibleCount(chunks, &transparentFaceCount);
+	u32 opqIdx[6] = {0};
+	u32 trspIdx[6] = {0};
+
+	// ft_bzero(opqIdx, sizeof(u32) * 6);
+	// ft_bzero(trspIdx, sizeof(u32) * 6);
+
+
+	render->trspFaceCount = ft_calloc(sizeof(u32), 6);
+	render->faceCount = faceVisibleCount(chunks, render->trspFaceCount);
 	for (u8 i = 0; i < 6; ++i) {
+		/* Opaque face init */
 		render->faceArray[i] = ft_calloc(sizeof(vec3), render->faceCount[i]);
 		render->faceTypeID[i] = ft_calloc(sizeof(f32), render->faceCount[i]);
+		/* Trsp face init */
+		render->trspFaceArray[i] = ft_calloc(sizeof(vec3), render->trspFaceCount[i]);
+		render->trspTypeId[i] = ft_calloc(sizeof(f32), render->trspFaceCount[i]);
 	}
 
-	/* Water face init */
-	render->topTransparencyFaceArray = ft_calloc(sizeof(vec3), transparentFaceCount);
-	render->topTransparencyTypeId = ft_calloc(sizeof(f32), transparentFaceCount);
-	render->topTransparencyCount = transparentFaceCount;
 
 	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
 		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
 		while (hashmap_next(&it)) {
 			Block *block = (Block *)it.value;
 			for (u8 i = 0; i < 6; ++i) {
-				if (!faceHidden(block->neighbors, i) && !isWaterIce(block->type)) {
-					render->faceArray[i][idx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
-					render->faceArray[i][idx[i]][1] = (f32)block->y + (f32)(subID * 16);
-					render->faceArray[i][idx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->faceTypeID[i][idx[i]] = s32StoreValues(block->type, i, block->biomeId, 0);
+				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
+					render->faceArray[i][opqIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
+					render->faceArray[i][opqIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
+					render->faceArray[i][opqIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
+					render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, block->biomeId, 0);
 					if (chunks->x == 0 && chunks->z == 0 && subID == 0 && block->y == 0) {
-						displayAllAtlasBlock(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
+						displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]]);
 					}
-					idx[i] += 1;
-				} else if (i == 5U && isWaterIce(block->type)) { /* Water face fill */
-					render->topTransparencyFaceArray[count][0] = (f32)block->x + (f32)(chunks->x * 16);
-					render->topTransparencyFaceArray[count][1] = (f32)block->y + (f32)(subID * 16);
-					render->topTransparencyFaceArray[count][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->topTransparencyTypeId[count] = s32StoreValues(block->type, i, block->biomeId, 0);
-					count++;
+					opqIdx[i] += 1;
+				} 
+				// TOREFACT
+				else if (!faceHidden(block->neighbors, i) && isTransparentBlock(block->type)) { /* Water face fill */
+					render->trspFaceArray[i][trspIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
+					render->trspFaceArray[i][trspIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
+					render->trspFaceArray[i][trspIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
+					render->trspTypeId[i][trspIdx[i]] = s32StoreValues(block->type, i, block->biomeId, 0);
+					trspIdx[i] += 1;
 				}
 			}
 		}
@@ -129,10 +133,11 @@ void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 	for (u8 i = 0; i < 6; ++i) {
 		render->faceVBO[i] = faceInstanceVBOCreate(render->faceArray[i], render->faceCount[i]);
 		render->faceTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, render->faceCount[i] * sizeof(GLuint), (void *)&render->faceTypeID[i][0]);
+	
+		render->trspFaceVBO[i] = faceInstanceVBOCreate(render->trspFaceArray[i], render->trspFaceCount[i]);
+		render->trspTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, render->trspFaceCount[i] * sizeof(GLuint), (void *)&render->trspTypeId[i][0]);
 	}
 
-	render->topTransparencyFaceVBO = faceInstanceVBOCreate(render->topTransparencyFaceArray, render->topTransparencyCount);
-	render->topTransparencyTypeVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->topTransparencyCount * sizeof(GLuint), (void *)&render->topTransparencyTypeId[0]);
 }
 
 void drawFace(GLuint faceVBO, GLuint metadataVBO, u32 vertex_nb, u32 faceNb) {
@@ -155,44 +160,52 @@ void drawFace(GLuint faceVBO, GLuint metadataVBO, u32 vertex_nb, u32 faceNb) {
 	// glBindVertexArray(0);
 }
 
+
+
+void allFaceDisplay(Context *c, u8 first) {
+	HashMap_it		it;
+	RenderChunks	*render = NULL;
+    u32 			faceNb = 0;
+	GLuint faceVBO = 0, faceTypeVBO = 0;
+
+	for (u8 i = 0; i < 6; ++i) {
+		glBindVertexArray(c->faceCube[i].VAO);
+		it = hashmap_iterator(c->world->renderChunksMap);
+		/* Basic face display */
+		while (hashmap_next(&it)) {
+			render = (RenderChunks *)it.value;
+			c->displayData.faceRendered += faceNb;
+			if (first) {
+				faceNb = render->faceCount[i];
+				faceVBO = render->faceVBO[i];
+				faceTypeVBO = render->faceTypeVBO[i];
+			} else {
+				faceNb = render->trspFaceCount[i];
+				faceVBO = render->trspFaceVBO[i];
+				faceTypeVBO = render->trspTypeVBO[i];
+			}
+			drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
+		}
+		/* Underground face display */
+		if (first && c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
+			drawFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, TOTAL_UNDERGROUND_FACE);			
+		}
+		glBindVertexArray(0);
+
+	}
+}
+
 /**
  * @brief Draw all chunks by face
  * @param *c Context
 */
 void drawAllChunksByFace(Context *c) {
-    HashMap_it		it;
-	RenderChunks	*render = NULL;
-    u32 			faceNb = 0;
+
     
     mtx_lock(&c->renderMtx);
 	c->displayData.chunkRenderedNb = hashmap_size(c->world->renderChunksMap);
 	c->displayData.faceRendered = 0;
-    for (u8 i = 0; i < 6; ++i) {
-		glBindVertexArray(c->faceCube[i].VAO);
-        it = hashmap_iterator(c->world->renderChunksMap);
-		/* Basic face display */
-        while (hashmap_next(&it)) {
-            render = (RenderChunks *)it.value;
-            faceNb = render->faceCount[i];
-            c->displayData.faceRendered += faceNb;
-			drawFace(render->faceVBO[i], render->faceTypeVBO[i], 6U, faceNb);
-        }
-		/* Underground face display */
-		if (c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
-			drawFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, TOTAL_UNDERGROUND_FACE);			
-		}
-		/* Transparency top face display */
-		if (i == (u32)TOP_FACE) {
-			it = hashmap_iterator(c->world->renderChunksMap);
-			while (hashmap_next(&it)) {
-				render = (RenderChunks *)it.value;
-				faceNb = render->topTransparencyCount;
-				c->displayData.faceRendered += faceNb;
-				drawFace(render->topTransparencyFaceVBO, render->topTransparencyTypeVBO, 6U, faceNb);
-			}
-		}
-		glBindVertexArray(0);
-    
-	}
+	allFaceDisplay(c, TRUE);
+	allFaceDisplay(c, FALSE);
     mtx_unlock(&c->renderMtx);
 }

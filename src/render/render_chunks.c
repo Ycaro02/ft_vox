@@ -6,12 +6,13 @@
 
 void renderChunkFree(RenderChunks *render) {
 	free(render->faceCount);
+	free(render->trspFaceCount);
 	for (u8 i = 0; i < 6; ++i) {
 		free(render->faceArray[i]);
 		free(render->faceTypeID[i]);
+		free(render->trspFaceArray[i]);
+		free(render->trspTypeId[i]);
 	}
-	free(render->topTransparencyFaceArray);
-	free(render->topTransparencyTypeId);
 	/* Care here we can't destroy VBO in sub thread */
 	free(render);
 }

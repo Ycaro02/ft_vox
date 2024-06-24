@@ -230,9 +230,9 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 	perlinCaveDataGet(chunk, noise->cave);
 	digCaveCall(chunk, chunkBlockCache, perlinVal);
 
-	if (chunk->x == 0 && chunk->z == 0) {
+	if ((chunk->x >= 0 && chunk->x < 7) && chunk->z == 0) {
 		s32 subId = perlinVal[5][5].normalise / 16;
-		treeCreate(chunkBlockCache[subId] , &chunk->sub_chunks[subId], 5, perlinVal[5][5].normalise, 5);
+		treeCreate(chunkBlockCache[subId] , &chunk->sub_chunks[subId], 5, perlinVal[5][5].normalise, 5, chunk->x);
 	}
 	
 	occlusionCullingStatic(chunkBlockCache, chunk);

@@ -81,21 +81,25 @@ Block *basicBlockCreate(int x, int y, int z, int type) {
 }
 
 void treeLeafGeneration(Block ****subChunkBlockCache, SubChunks *subChunk, int vertexX, int vertexY, int vertexZ, int leafTexture) {
-    int cubeLen = 3;
-    int startX = vertexX - 1;
-    int startY = vertexY - 1;
-    int startZ = vertexZ - 1;
-    int x, y, z;
-	ft_printf_fd(1, "Input data for treeLeafGeneration: vertexX: %d, vertexY: %d, vertexZ: %d\n"RESET, vertexX, vertexY, vertexZ);
+    Block *block = NULL;
+	s32 cubeLen = 3;
+    s32 startX = vertexX - 1;
+    s32 startY = vertexY - 1;
+    s32 startZ = vertexZ - 1;
+    s32 x, y, z;
+	// ft_printf_fd(1, "Input data for treeLeafGeneration: vertexX: %d, vertexY: %d, vertexZ: %d\n"RESET, vertexX, vertexY, vertexZ);
 
     for (x = startX; x < startX + cubeLen; x++) {
         for (y = startY; y < startY + cubeLen; y++) {
             for (z = startZ; z < startZ + cubeLen; z++) {
-				int localY = y % 16;
-				Block *block = basicBlockCreate(x, localY, z, leafTexture);
+				s32 localY = y % 16;
+				if ((x == vertexX && y == vertexY && z == vertexZ) || (x == vertexX && y == startY && z == vertexZ)) {
+					continue;
+				}
+				block = basicBlockCreate(x, localY, z, leafTexture);
 				hashmap_set_entry(subChunk->block_map, (BlockPos){x, localY, z}, block);
 				subChunkBlockCache[x][localY][z] = block;
-                ft_printf_fd(1, GREEN"Leaf: (%d, %d, %d)\n"RESET, x, y, z);
+                // ft_printf_fd(1, GREEN"Leaf: (%d, %d, %d)\n"RESET, x, y, z);
             }
         }
     }
@@ -103,7 +107,7 @@ void treeLeafGeneration(Block ****subChunkBlockCache, SubChunks *subChunk, int v
 
 
 
-void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, int x, int y, int z) {
+void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, s32 x, s32 y, s32 z, s32 treeId) {
 	static TreeTexture treeTexture[] = {
 		{TREE_SPRUCE_LOG, TREE_SPRUCE_LEAF},
 		{TREE_OAK_LOG, TREE_OAK_LEAF},
@@ -114,24 +118,24 @@ void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, int x, int y,
 		{TREE_ACACIA_LOG, TREE_ACACIA_LEAF}
 		};
 
-	int treeHeight = 4;
-	int vertexX = x;
-	int vertexY = y + treeHeight;
-	int vertexZ = z;
+	s32 treeHeight = 4;
+	s32 vertexX = x;
+	s32 vertexY = y + treeHeight;
+	s32 vertexZ = z;
 
 	/* Build tree log */
-	for (int i = 0; i < treeHeight; i++) {
-		int localY = y % 16;
+	for (s32 i = 0; i < treeHeight; i++) {
+		s32 localY = y % 16;
 		if (localY > BLOCKS_PER_CHUNK) {
-			break;
+			return ;
 		}
-		ft_printf_fd(1, "Tree log: x: %d, y: %d, z: %d: LocalY %d\n", x, y, z, localY);
-		Block *block = basicBlockCreate(x, localY, z, treeTexture[4].log);
-		if (!block) { break; }
+		// ft_printf_fd(1, "Tree log: x: %d, y: %d, z: %d: LocalY %d\n", x, y, z, localY);
+		Block *block = basicBlockCreate(x, localY, z, treeTexture[treeId].log);
+		if (!block) { return ; }
 		hashmap_set_entry(subChunk->block_map, (BlockPos){x, localY, z}, block);
 		subChunkBlockCache[x][localY][z] = block;
 		y++;
 	}
-	treeLeafGeneration(subChunkBlockCache, subChunk, vertexX, vertexY, vertexZ, treeTexture[4].leaf);
+	treeLeafGeneration(subChunkBlockCache, subChunk, vertexX, vertexY, vertexZ, treeTexture[treeId].leaf);
 
 }
