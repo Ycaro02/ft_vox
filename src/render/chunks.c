@@ -135,40 +135,30 @@ s32 maxHeightGet(PerlinData **perlinVal) {
  * @param localZ Local Z position
  * @param perlinVal PerlinData pointer
 */
-f32 perlinNoiseHeight(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData *perlinVal) {
-    f32 scale = 60.0f;
+void perlinValueFill(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData *perlinVal) {
+    /* Combined noise value */
+    f32 combinedNoise = 0.0f;
 
     /* Get multiple noise values */
-    f32 continentalVal = interpolateNoiseGet(noise->continental, localX, localZ, perlinVal, 8.0f);
-    f32 erosionVal = interpolateNoiseGet(noise->erosion, localX, localZ, perlinVal, 8.0f);
-    f32 peaksValleysVal = interpolateNoiseGet(noise->peaksValley, localX, localZ, perlinVal, 8.0f);
-
+    perlinVal->valContinent = interpolateNoiseGet(noise->continental, localX, localZ, perlinVal, 8.0f);
+    perlinVal->valErosion  = interpolateNoiseGet(noise->erosion, localX, localZ, perlinVal, 8.0f);
+    perlinVal->valPeaksValley = interpolateNoiseGet(noise->peaksValley, localX, localZ, perlinVal, 8.0f);
 	perlinVal->valHumidity = interpolateNoiseGet(noise->humidity, localX, localZ, perlinVal, PERLIN_BIOME_SCALE);
 	perlinVal->valTemperature = interpolateNoiseGet(noise->temperature, localX, localZ, perlinVal, PERLIN_BIOME_SCALE);
-
-	perlinVal->valContinent = continentalVal;
-	perlinVal->valErosion = erosionVal;
-	perlinVal->valPeaksValley = peaksValleysVal;
-
-	/* Weighted noise values */
-    f32 continentalWeight = 0.8f;
-    f32 erosionWeight = 0.7f;
-    f32 peaksValleysWeight = 0.5f;
-
-    /* Combined noise value */
-    f32 combinedNoise = (continentalVal * continentalWeight) +
-                        (erosionVal * erosionWeight) +
-                        (peaksValleysVal * peaksValleysWeight);
+	
+	combinedNoise = (perlinVal->valContinent * CONTINENTAL_WEIGHT) +
+					(perlinVal->valErosion * EROSION_WEIGHT) +
+					(perlinVal->valPeaksValley * PEAKS_VALLEYS_WEIGHT);
 
 	perlinVal->valCombined = combinedNoise;
     
-	if (combinedNoise > 0.4 && combinedNoise <= 0.6) {
-        return (normalisef32Tof32(combinedNoise, 0.4, 0.6, 104.0f, 160.0f));
+	if (combinedNoise >= 0.4 && combinedNoise <= 0.6) {
+        perlinVal->normalise = normalisef32Tof32(combinedNoise, 0.4, 0.6, 104.0f, 160.0f);
     } else if (combinedNoise >= 0.5999f) {
-        return (160.0f);
-    }
-
-    return ((f32)MIN_HEIGHT + (combinedNoise * scale));
+        perlinVal->normalise = 160.0f;
+    } else {
+    	perlinVal->normalise = (s32)roundf((f32)MIN_HEIGHT + (combinedNoise * SCALE_NOISE_HEIGHT));
+	}
 }
 
 
@@ -239,7 +229,8 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 		for (u32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			s32 localX = blockLocalToPerlinPos(chunk->x, x, PERLIN_NOISE_WIDTH);
 			s32 localZ = blockLocalToPerlinPos(chunk->z, z, PERLIN_NOISE_WIDTH);
-			perlinVal[x][z].normalise = (s32)perlinNoiseHeight(noise, localX, localZ, &perlinVal[x][z]);
+			// perlinVal[x][z].normalise = (s32)perlinValueFill(noise, localX, localZ, &perlinVal[x][z]);
+			perlinValueFill(noise, localX, localZ, &perlinVal[x][z]);
 		}
 	}
 

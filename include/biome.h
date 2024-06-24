@@ -81,5 +81,12 @@ void treeCreate(Block *****chunkBlockCache, Chunks *Chunk, BlockPos pos, s32 tre
 		- Stone: STONE
  */
 
+/*
+	TO DO:
+		- add tree selection depend of biome
+		- add flower render and selection depend of biome
+		- add mouse move camera on x and y axis
+*/
+
 
 #endif /* HEADER_BIOME_H */

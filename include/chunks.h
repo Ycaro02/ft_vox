@@ -12,6 +12,14 @@
 #define BLOCKS_PER_CHUNK   	16	/* Number of block in X */
 #define CAVE_ENTRY_DEPTH	15	/* Cave entry depth */
 
+/* Weighted noise values */
+#define CONTINENTAL_WEIGHT		0.8f
+#define EROSION_WEIGHT			0.7f
+#define PEAKS_VALLEYS_WEIGHT	0.5f
+
+/* Scale noise value for height */
+#define SCALE_NOISE_HEIGHT		60.0f
+
 struct s_sub_chunks {
 	HashMap 		*block_map;		/* Blocks map, use HashMap API to set/get block */
 };
