@@ -192,6 +192,8 @@ void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
 	chunk->perlinCave = caveData;
 }
 
+#include "../../include/biome.h"
+
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
@@ -214,6 +216,7 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 		chunkMaxY = (s32)MIN_HEIGHT;
 	}
 
+
 	for (s32 i = 0; (i * BLOCKS_PER_CHUNK) <= chunkMaxY; ++i) {
 		chunk->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
 		if (!chunk->sub_chunks[i].block_map) {
@@ -224,10 +227,16 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 		chunk->noiseData = perlinVal;
 	}
 
-	// perlinCaveDataGet(chunk, perlinSnakeCaveNoise);
 	perlinCaveDataGet(chunk, noise->cave);
 	digCaveCall(chunk, chunkBlockCache, perlinVal);
+
+	if (chunk->x == 0 && chunk->z == 0) {
+		s32 subId = perlinVal[5][5].normalise / 16;
+		treeCreate(chunkBlockCache[subId] , &chunk->sub_chunks[subId], 5, perlinVal[5][5].normalise, 5);
+	}
+	
 	occlusionCullingStatic(chunkBlockCache, chunk);
+
 }
 
 /**

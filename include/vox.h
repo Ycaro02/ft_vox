@@ -125,6 +125,22 @@ enum BlockType {
 	SNOW_GRASS=NEWAT_SNOW_GRASS_SIDE,		/* Snow grass */
 	SANDSTONE=NEWAT_SANDSTONE_SIDE,			/* Sandstone */
 	SANDSTONE_TOP=NEWAT_SANDSTONE_TOP,		/* Sandstone top */
+	/* TREE */
+	TREE_SPRUCE_LOG=NEWAT_SPRUCE_LOG,		/* Spruce log */
+	TREE_SPRUCE_LEAF=NEWAT_SPRUCE_LEAF,		/* Spruce leaf */
+	TREE_OAK_LOG=NEWAT_OAK_LOG,				/* Oak log */
+	TREE_OAK_LEAF=NEWAT_OAK_LEAF,			/* Oak leaf */
+	TREE_MANGROVE_LOG=NEWAT_MANGROVE_LOG,	/* Mangrove log */
+	TREE_MANGROVE_LEAF=NEWAT_MANGROVE_LEAF,	/* Mangrove leaf */
+	TREE_JUNGLE_LOG=NEWAT_JUNGLE_LOG,		/* Jungle log */
+	TREE_JUNGLE_LEAF=NEWAT_JUNGLE_LEAF,		/* Jungle leaf */
+	TREE_DARK_OAK_LOG=NEWAT_DARK_OAK_LOG,	/* Dark oak log */
+	TREE_DARK_OAK_LEAF=NEWAT_DARK_OAK_LEAF,	/* Dark oak leaf */
+	TREE_BIRCH_LOG=NEWAT_BIRCH_LOG,			/* Birch log */
+	TREE_BIRCH_LEAF=NEWAT_BIRCH_LEAF,		/* Birch leaf */
+	TREE_ACACIA_LOG=NEWAT_ACACIA_LOG,		/* Acacia log */
+	TREE_ACACIA_LEAF=NEWAT_ACACIA_LEAF,		/* Acacia leaf */
+	/* Unused block */
 	STONE_BRICK=NEWAT_STONE_BRICK,			/* Stone brick --> Unused */
 	GLASS=NEWAT_GLASS,						/* Glass --> Unused */
 };
