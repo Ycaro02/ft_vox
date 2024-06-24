@@ -24,8 +24,8 @@ struct s_biome_block {
  * @param dataNoise PerlinData, contain temperature and humidity for this block
 */
 void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise);
-void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, int x, int y, int z, int treeId);
-
+// void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, int x, int y, int z, int treeId);
+void treeCreate(Block *****chunkBlockCache, Chunks *Chunk, BlockPos pos, s32 treeId);
 /*
 	|-------------------------------------------------------------------------------------------|
 	| Temperature \ Humidity | -1 to -0.6 | -0.6 to -0.2 | -0.2 to 0.2 | 0.2 to 0.6 | 0.6 to 1  |

@@ -194,6 +194,19 @@ void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
 
 #include "../../include/biome.h"
 
+s8 blockExist(Block *****chunkBlockCache, BlockPos pos) {
+	s32 subId = pos.y / BLOCKS_PER_CHUNK;
+	s32 localY = pos.y % BLOCKS_PER_CHUNK;
+
+	if (pos.x < 0 || pos.x >= BLOCKS_PER_CHUNK || pos.z < 0 || pos.z >= BLOCKS_PER_CHUNK) {
+		return (FALSE);
+	}
+	if (subId < 0 || subId >= 16) {
+		return (FALSE);
+	}
+	return (chunkBlockCache[subId][pos.x][localY][pos.z] != NULL);
+}
+
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
@@ -216,7 +229,6 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 		chunkMaxY = (s32)MIN_HEIGHT;
 	}
 
-
 	for (s32 i = 0; (i * BLOCKS_PER_CHUNK) <= chunkMaxY; ++i) {
 		chunk->sub_chunks[i].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
 		if (!chunk->sub_chunks[i].block_map) {
@@ -230,10 +242,30 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 	perlinCaveDataGet(chunk, noise->cave);
 	digCaveCall(chunk, chunkBlockCache, perlinVal);
 
-	if ((chunk->x >= 0 && chunk->x < 7) && chunk->z == 0) {
-		s32 subId = perlinVal[5][5].normalise / 16;
-		treeCreate(chunkBlockCache[subId] , &chunk->sub_chunks[subId], 5, perlinVal[5][5].normalise, 5, chunk->x);
-	}
+	/* Tree generation 3 and 4 cause of cubeLeaf size is 3 */
+	u32 chunkSeed = ((u32)chunk->x ^ (u32)chunk->z) ^ 65536;
+    srand(chunkSeed);
+	s32 spawnRate = rand() % 40;
+
+    for (u32 x = 3; x < BLOCKS_PER_CHUNK; x += 4) {
+        for (u32 z = 3; z < BLOCKS_PER_CHUNK; z += 4) {
+            s32 y = perlinVal[x][z].normalise + 1;
+
+			if (x + 3 > BLOCKS_PER_CHUNK || z + 3 > BLOCKS_PER_CHUNK) continue;
+            if (y > 100 || y <= SEA_LEVEL + 5) break;
+
+      		if (blockExist(chunkBlockCache, (BlockPos){x, perlinVal[x][z].normalise, z})
+				&& (rand() % 100) < spawnRate) {
+                treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z}, (abs(chunk->x) + abs(chunk->z)) % 7);
+            }
+        }
+    }
+
+	// if ((chunk->x >= 0 && chunk->x < 7) && chunk->z == 0) {
+	// 	treeCreate(chunkBlockCache , chunk, (BlockPos){3, perlinVal[3][3].normalise + 1, 3}, chunk->x);
+	// 	treeCreate(chunkBlockCache , chunk, (BlockPos){7, perlinVal[7][7].normalise + 1, 7}, chunk->x);
+	// 	treeCreate(chunkBlockCache , chunk, (BlockPos){11, perlinVal[11][11].normalise + 1, 11}, chunk->x);
+	// }
 	
 	occlusionCullingStatic(chunkBlockCache, chunk);
 

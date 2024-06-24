@@ -65,6 +65,12 @@ typedef struct s_tree_texture {
 } TreeTexture;
 
 
+void expandSubChunkCheck(Chunks *chunk, s32 subChunkId) {
+	if (!chunk->sub_chunks[subChunkId].block_map) {
+		chunk->sub_chunks[subChunkId].block_map = hashmap_init(HASHMAP_SIZE_4000, hashmap_entry_free);
+	}
+}
+
 Block *basicBlockCreate(int x, int y, int z, int type) {
 	Block *block = malloc(sizeof(Block));
 	if (!block) {
@@ -80,34 +86,45 @@ Block *basicBlockCreate(int x, int y, int z, int type) {
 	return (block);
 }
 
-void treeLeafGeneration(Block ****subChunkBlockCache, SubChunks *subChunk, int vertexX, int vertexY, int vertexZ, int leafTexture) {
+void treeLeafGeneration(Block *****chunkBlockCache, Chunks *chunk, int vertexX, int vertexY, int vertexZ, int leafTexture) {
     Block *block = NULL;
 	s32 cubeLen = 3;
     s32 startX = vertexX - 1;
     s32 startY = vertexY - 1;
     s32 startZ = vertexZ - 1;
-    s32 x, y, z;
+	s32 endX = startX + cubeLen;
+	s32 endY = startY + cubeLen;
+	s32 endZ = startZ + cubeLen;
+
+    s32 subChunkId = startY / 16;
+	
+	s32 x, y, z;
 	// ft_printf_fd(1, "Input data for treeLeafGeneration: vertexX: %d, vertexY: %d, vertexZ: %d\n"RESET, vertexX, vertexY, vertexZ);
 
-    for (x = startX; x < startX + cubeLen; x++) {
-        for (y = startY; y < startY + cubeLen; y++) {
-            for (z = startZ; z < startZ + cubeLen; z++) {
+	if (startX < 0 || startY < 0 || startZ < 0
+		|| endX > BLOCKS_PER_CHUNK || endZ > BLOCKS_PER_CHUNK) {
+		return ;
+	}
+
+    for (x = startX; x < endX; x++) {
+        for (y = startY; y < endY; y++) {
+			subChunkId = y / 16;
+			expandSubChunkCheck(chunk, subChunkId);
+            for (z = startZ; z < endZ; z++) {
 				s32 localY = y % 16;
 				if ((x == vertexX && y == vertexY && z == vertexZ) || (x == vertexX && y == startY && z == vertexZ)) {
 					continue;
 				}
 				block = basicBlockCreate(x, localY, z, leafTexture);
-				hashmap_set_entry(subChunk->block_map, (BlockPos){x, localY, z}, block);
-				subChunkBlockCache[x][localY][z] = block;
-                // ft_printf_fd(1, GREEN"Leaf: (%d, %d, %d)\n"RESET, x, y, z);
+				if (!block) { continue ; }
+				hashmap_set_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){x, localY, z}, block);
+				chunkBlockCache[subChunkId][x][localY][z] = block;
             }
         }
     }
 }
 
-
-
-void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, s32 x, s32 y, s32 z, s32 treeId) {
+void treeCreate(Block *****chunkBlockCache, Chunks *chunk, BlockPos pos, s32 treeId) {
 	static TreeTexture treeTexture[] = {
 		{TREE_SPRUCE_LOG, TREE_SPRUCE_LEAF},
 		{TREE_OAK_LOG, TREE_OAK_LEAF},
@@ -116,26 +133,25 @@ void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, s32 x, s32 y,
 		{TREE_DARK_OAK_LOG, TREE_DARK_OAK_LEAF},
 		{TREE_BIRCH_LOG, TREE_BIRCH_LEAF},
 		{TREE_ACACIA_LOG, TREE_ACACIA_LEAF}
-		};
-
-	s32 treeHeight = 4;
-	s32 vertexX = x;
-	s32 vertexY = y + treeHeight;
-	s32 vertexZ = z;
+	};
+	Block	*block = NULL;
+	s32 	subChunkId = 0;
+	s32 	treeHeight = 5;
+	s32 	vertexX = pos.x;
+	s32 	vertexY = pos.y + treeHeight;
+	s32 	vertexZ = pos.z;
 
 	/* Build tree log */
 	for (s32 i = 0; i < treeHeight; i++) {
-		s32 localY = y % 16;
-		if (localY > BLOCKS_PER_CHUNK) {
-			return ;
-		}
-		// ft_printf_fd(1, "Tree log: x: %d, y: %d, z: %d: LocalY %d\n", x, y, z, localY);
-		Block *block = basicBlockCreate(x, localY, z, treeTexture[treeId].log);
+		s32 localY = pos.y % 16;
+		subChunkId = pos.y / 16;
+		expandSubChunkCheck(chunk, subChunkId);
+		block = basicBlockCreate(pos.x, localY, pos.z, treeTexture[treeId].log);
 		if (!block) { return ; }
-		hashmap_set_entry(subChunk->block_map, (BlockPos){x, localY, z}, block);
-		subChunkBlockCache[x][localY][z] = block;
-		y++;
+		hashmap_set_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){pos.x, localY, pos.z}, block);
+		chunkBlockCache[subChunkId][pos.x][localY][pos.z] = block;
+		pos.y += 1;
 	}
-	treeLeafGeneration(subChunkBlockCache, subChunk, vertexX, vertexY, vertexZ, treeTexture[treeId].leaf);
+	treeLeafGeneration(chunkBlockCache, chunk, vertexX, vertexY, vertexZ, treeTexture[treeId].leaf);
 
 }

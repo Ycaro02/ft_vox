@@ -316,10 +316,6 @@ void mainLoopFpsUnlock(Context *c, GLuint skyTexture) {
 }
 
 
-
-
-
-
 /* We need special logic to destroy renderChunksCacheMap cause data store is shared with renderChunksMap */
 // renderChunkCacheMapDestroy(c->world->renderChunksCacheMap, c->world->renderChunksMap);
 // void renderChunkCacheMapDestroy(HashMap *renderChunkCache, HashMap *renderChunks) {
