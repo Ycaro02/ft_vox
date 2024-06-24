@@ -58,7 +58,7 @@ void chunksMapFree(void *entry) {
  * @return Chunks* Chunks pointer
 */
 Chunks *getChunkAt(Context *c, s32 x, s32 z) {
-	return (hashmap_get(c->world->chunksMap, (BlockPos){0, x, z}));
+	return (hashmap_get(c->world->chunksMap, CHUNKS_MAP_ID_GET(x, z)));
 }
 
 /**
