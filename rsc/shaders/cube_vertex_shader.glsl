@@ -19,7 +19,7 @@
 /* Define the input variables */
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aInstancePos;
-layout (location = 2) in vec3 aTexCoord;
+layout (location = 2) in vec2 aTexCoord;
 /**
  * aMetadata is a 32 bit integer that contains the following information:
  * byte 3: texture ID 
@@ -32,6 +32,7 @@ layout (location = 3) in int aMetadata;
 /* Define the output variables */
 out vec3 TexCoord;
 flat out int biomeType;
+flat out int isGrass;
 
 /* Define the uniforms variables */
 uniform mat4 view;
@@ -59,9 +60,7 @@ int s32ByteGet(int value, int byte) {
 
 void main()
 {
-    vec2 realTexCoord = aTexCoord.xy;
-    // float blockFace = aTexCoord.z;
-    // int textureID = aMetadata;
+    // vec2 realTexCoord = aTexCoord.xy;
     int textureIdExtracted = s32ByteGet(aMetadata, 3);
     int blockFace = s32ByteGet(aMetadata, 2);
 
@@ -69,11 +68,12 @@ void main()
 
 	if (textureIdExtracted == GRASS_SIDE) {
 		biomeType = PLAIN_BIOME;
+		isGrass = 1;
 	}
 
 	int realTextureId = topBlockFaceHandling(textureIdExtracted, blockFace);
 
-	TexCoord = vec3(realTexCoord, float(realTextureId) / float(ATLAS_SIZE));
+	TexCoord = vec3(aTexCoord, float(realTextureId) / float(ATLAS_SIZE));
     mat4 m = model;
     m[3] = vec4(aInstancePos, 1.0) + model[3];
     vec4 worldPosition = m * vec4(aPos, 1.0);
