@@ -139,12 +139,15 @@ void perlinValueFill(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData 
     /* Combined noise value */
     f32 combinedNoise = 0.0f;
 
+	s32 h = PERLIN_NOISE_HEIGHT;
+	s32 w = PERLIN_NOISE_WIDTH;
+
     /* Get multiple noise values */
-    perlinVal->valContinent = interpolateNoiseGet(noise->continental, localX, localZ, perlinVal, 8.0f);
-    perlinVal->valErosion  = interpolateNoiseGet(noise->erosion, localX, localZ, perlinVal, 8.0f);
-    perlinVal->valPeaksValley = interpolateNoiseGet(noise->peaksValley, localX, localZ, perlinVal, 8.0f);
-	perlinVal->valHumidity = interpolateNoiseGet(noise->humidity, localX, localZ, perlinVal, PERLIN_BIOME_SCALE);
-	perlinVal->valTemperature = interpolateNoiseGet(noise->temperature, localX, localZ, perlinVal, PERLIN_BIOME_SCALE);
+    perlinVal->valContinent = interpolateNoiseGet(noise->continental, localX, localZ, 8.0f, w, h);
+    perlinVal->valErosion  = interpolateNoiseGet(noise->erosion, localX, localZ, 8.0f, w, h);
+    perlinVal->valPeaksValley = interpolateNoiseGet(noise->peaksValley, localX, localZ, 8.0f, w, h);
+	perlinVal->valHumidity = interpolateNoiseGet(noise->humidity, localX, localZ, PERLIN_BIOME_SCALE, w, h);
+	perlinVal->valTemperature = interpolateNoiseGet(noise->temperature, localX, localZ, PERLIN_BIOME_SCALE, w, h);
 	
 	combinedNoise = (perlinVal->valContinent * CONTINENTAL_WEIGHT) +
 					(perlinVal->valErosion * EROSION_WEIGHT) +
@@ -254,7 +257,10 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 	perlinCaveDataGet(chunk, noise->cave);
 	digCaveCall(chunk, chunkBlockCache, perlinVal);
 
-	/* Tree generation 3 and 4 cause of cubeLeaf size is 3 */
+	/*	Tree generation 3 and 4 cause of cubeLeaf size is 3 
+		To refactor
+		- We can generate array of random value before to avoid multiple call to srand()/rand()
+	*/
 	u32 chunkSeed = ((u32)chunk->x ^ (u32)chunk->z) ^ 65536;
     srand(chunkSeed);
 	s32 spawnRate = rand() % 40;
