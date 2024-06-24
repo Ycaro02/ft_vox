@@ -5,6 +5,7 @@
 #include "../../include/thread_load.h"
 #include "../../include/block.h"
 #include "../../include/world.h"
+#include "../../include/biome.h"
 
 
 // s32 chunksManhattanDistanceGet(s32 camChunkX, s32 camChunkZ, s32 chunkX, s32 chunkZ) {
@@ -192,7 +193,6 @@ void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
 	chunk->perlinCave = caveData;
 }
 
-#include "../../include/biome.h"
 
 s8 blockExist(Block *****chunkBlockCache, BlockPos pos) {
 	s32 subId = pos.y / BLOCKS_PER_CHUNK;
@@ -260,15 +260,7 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
             }
         }
     }
-
-	// if ((chunk->x >= 0 && chunk->x < 7) && chunk->z == 0) {
-	// 	treeCreate(chunkBlockCache , chunk, (BlockPos){3, perlinVal[3][3].normalise + 1, 3}, chunk->x);
-	// 	treeCreate(chunkBlockCache , chunk, (BlockPos){7, perlinVal[7][7].normalise + 1, 7}, chunk->x);
-	// 	treeCreate(chunkBlockCache , chunk, (BlockPos){11, perlinVal[11][11].normalise + 1, 11}, chunk->x);
-	// }
-	
 	occlusionCullingStatic(chunkBlockCache, chunk);
-
 }
 
 /**
