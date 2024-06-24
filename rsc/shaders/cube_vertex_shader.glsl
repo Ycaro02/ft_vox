@@ -23,7 +23,7 @@ layout (location = 2) in vec2 aTexCoord;
 /**
  * aMetadata is a 32 bit integer that contains the following information:
  * byte 3: texture ID 
- * byte 2: block face --> to implement -> move from aTexCoord.z
+ * byte 2: block face
  * byte 1: biome ID --> to implement
  * byte 0: light level	--> to implement
 */
@@ -60,14 +60,13 @@ int s32ByteGet(int value, int byte) {
 
 void main()
 {
-    // vec2 realTexCoord = aTexCoord.xy;
     int textureIdExtracted = s32ByteGet(aMetadata, 3);
     int blockFace = s32ByteGet(aMetadata, 2);
 
-	biomeType = 99; /* To implementent give it at second value in int */
+	biomeType = s32ByteGet(aMetadata, 1); /* To implementent give it at second value in int */
 
 	if (textureIdExtracted == GRASS_SIDE) {
-		biomeType = PLAIN_BIOME;
+		// biomeType = PLAIN_BIOME;
 		isGrass = 1;
 	}
 

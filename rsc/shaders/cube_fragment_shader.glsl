@@ -43,13 +43,6 @@ void main()
 	
 	if (isGray && isGrass == 1) {
 		baseColor = grassColorHandling(baseColor);
-		// vec3 grassColor = PLAIN_GRASS_COLOR; /* Plain */
-		// if (biomeType == BIOME_JUNGLE) {
-		// 	grassColor = JUNGLE_GRASS_COLOR; /* Jungle */
-		// } else if (biomeType == BIOME_SWAMP) {
-		// 	grassColor = SWAMP_GRASS_COLOR; /* Swamp */
-		// }
-		// baseColor = vec4(baseColor.rgb * grassColor, baseColor.a);
 	}
 
 

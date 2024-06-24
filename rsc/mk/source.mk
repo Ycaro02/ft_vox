@@ -36,6 +36,7 @@ SRCS			=	context_init.c\
 					render/block.c\
 					render/text_render.c\
 					render/dig_cave.c\
+					render/biome.c\
 
 # SRCS_BONUS		=	main_bonus.c
 

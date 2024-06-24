@@ -26,8 +26,9 @@ struct s_block {
     s8 	z;          /* Block z position */
     s8	type;       /* Block type */
 	u8  neighbors;  /* Block flag */
+	s8	biomeId;	/* Biome ID */
 	/* padding */
-	s8 pad1, pad2, pad3;
+	s8 pad1, pad2;
 };
 
 

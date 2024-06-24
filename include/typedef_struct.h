@@ -28,6 +28,7 @@ typedef struct	s_thread_data 			ThreadData;
 /* chunks.h */
 typedef struct	s_chunks				Chunks;
 typedef struct	s_sub_chunks 			SubChunks;
+typedef struct	s_biome_block 			BiomBlock;
 
 /* render_chunks.h*/
 typedef struct	s_render_chunks			RenderChunks;

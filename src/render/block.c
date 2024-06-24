@@ -5,6 +5,7 @@
 #include "../../rsc/perlin_noise/include/perlin_noise.h"
 #include "../../include/chunks.h"
 #include "../../include/block.h"
+#include "../../include/biome.h"
 
 Block *getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID) {
 	return (hashmap_get(chunk->sub_chunks[subChunkID].block_map, (BlockPos){x, y, z}));
@@ -20,106 +21,6 @@ Block *worldPosProtectBlockGet(Chunks *chunk, BlockPos localPos, s32 camY) {
 	block = getBlockAt(chunk, localPos.x, localPos.y, localPos.z, subChunkID);
 	return (block);
 }
-#define BIOME_PLAIN 0
-#define BIOME_SNOW 1
-#define BIOME_DESERT 2
-#define BIOME_JUNGLE 3
-#define BIOME_SWAMP 4
-
-typedef struct s_biom_block {
-	s32		biomeId;
-	s32		dirt;			/* Dirt for plain Biom */
-	s32		top;			/* Grass top for plau Biom*/
-	s32		water;			/* Water for plain biom */
-	s32		underWater;		/* Underwater sand for plain biom */
-	s32		stone;			/* Stone for plain biom */
-} BiomBlock;
-
-s32 getBiomeMapIndex(float value) {
-	if (value < -0.6) return 0;
-	else if (value < -0.2) return 1;
-	else if (value < 0.2) return 2;
-	else if (value < 0.6) return 3;
-	else return 4;
-}
-
-s32 getBiomeId(float temperature, float humidity) {
-    static s32 biomeMap[5][5] = {
-        {BIOME_SNOW,  BIOME_SNOW,  BIOME_SNOW,  BIOME_PLAIN,  BIOME_PLAIN},
-        {BIOME_SNOW,  BIOME_SNOW,  BIOME_PLAIN, BIOME_PLAIN,  BIOME_SWAMP},
-        {BIOME_SNOW,  BIOME_PLAIN, BIOME_PLAIN, BIOME_SWAMP,  BIOME_SWAMP},
-        {BIOME_PLAIN, BIOME_PLAIN, BIOME_SWAMP, BIOME_JUNGLE, BIOME_JUNGLE},
-        {BIOME_DESERT, BIOME_DESERT, BIOME_JUNGLE, BIOME_JUNGLE, BIOME_JUNGLE}
-    };
-
-    s32 tempIndex = getBiomeMapIndex(temperature);
-    s32 humidIndex = getBiomeMapIndex(humidity);
-    
-    return biomeMap[tempIndex][humidIndex];
-}
-/*
-	|-------------------------------------------------------------------------------------------|
-	| Temperature \ Humidity | -1 to -0.6 | -0.6 to -0.2 | -0.2 to 0.2 | 0.2 to 0.6 | 0.6 to 1  |
-	|------------------------|------------|--------------|-------------|------------|-----------|
-	| -1 to -0.6             | Snow       | Snow         | Snow        | Plains     | Plains    |
-	| -0.6 to -0.2           | Snow       | Snow         | Plains      | Plains     | Swamp     |
-	| -0.2 to 0.2            | Snow       | Plains       | Plains      | Swamp      | Swamp     |
-	| 0.2 to 0.6             | Plains     | Plains       | Swamp       | Jungle     | Jungle    |
-	| 0.6 to 1               | Desert     | Desert       | Jungle      | Jungle     | Jungle    |
-	|-------------------------------------------------------------------------------------------|
-	-------------------------------------------------------------
-	- Plain biom: ID 0
-		- Dirt: DIRT
-		- Top: GRASS
-		- Water: WATER
-		- Underwater: SAND
-		- Stone: STONE
-	-------------------------------------------------------------
-	- Snow biom: ID 1
-		- Dirt: DIRT
-		- Top: SNOW_GRASS
-		- Water: ICE
-		- Underwater: SNOW
-		- Stone: STONE
-	-------------------------------------------------------------
-	- Desert biom: ID 2
-		- Dirt: SANDSTONE
-		- Top: SAND
-		- Water: WATER
-		- Underwater: SAND
-		- Stone: STONE
- */
-
-void biomDetection(BiomBlock *biomBlock, PerlinData dataNoise) {
-	biomBlock->biomeId = getBiomeId(dataNoise.valTemperature, dataNoise.valHumidity);
-	if (biomBlock->biomeId == BIOME_SNOW) { /* Snow BIOM */
-		biomBlock->top = SNOW_GRASS;
-		biomBlock->dirt = DIRT;
-		biomBlock->water = ICE;
-		biomBlock->underWater = SNOW;
-		biomBlock->stone = STONE;
-		return;
-	}
-	if (biomBlock->biomeId == BIOME_DESERT) { /* Desert BIOM */
-		biomBlock->top = SANDSTONE;
-		biomBlock->dirt = SANDSTONE;
-		biomBlock->water = WATER;
-		biomBlock->underWater = SAND;
-		biomBlock->stone = SANDSTONE;
-		return;
-	}
-	/**
-	 * Need to implement jungle and swamp
-	*/
-
-	/* Plain BIOM */
-	biomBlock->top = GRASS;
-	biomBlock->dirt = DIRT;
-	biomBlock->water = WATER;
-	biomBlock->underWater = SAND;
-	biomBlock->stone = STONE;
-
-}
 
 /* Set local X and Z coordinates based on the center of the Perlin noise array */
 s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
@@ -133,6 +34,7 @@ Block *blockCreate(PerlinData **dataNoise, s32 x, s32 y, s32 z, s32 maxHeight, s
     s32     	realY = startYWorld + y;
 
 	biomDetection(&biomBlock, dataNoise[x][z]); /* need perlin val here */
+
 
 	if (realY < maxHeight - 2) {
 		blockType = biomBlock.stone;
@@ -159,6 +61,7 @@ Block *blockCreate(PerlinData **dataNoise, s32 x, s32 y, s32 z, s32 maxHeight, s
     block->y = y;
     block->z = z;
     block->neighbors = 0;
+	block->biomeId = biomBlock.biomeId;
     return (block);
 }
 
@@ -234,7 +137,7 @@ void underGroundBlockDataFill(s32 columnMaxHeight, vec3 *faceArray, s32 *faceTyp
 			faceArray[idx][0] = (camPos[0] * 2.0f) + increment.x;
 			faceArray[idx][1] = (camPos[1] * 2.0f) + increment.y;
 			faceArray[idx][2] = (camPos[2] * 2.0f) + increment.z;
-			// faceTypeID[idx] = blockType;
+			/* Don't need biomeId here */
 			faceTypeID[idx] = s32StoreValues(blockType, face, 0, 0);
 			increment.z += 1.0f;
 			firstIter = FALSE;
