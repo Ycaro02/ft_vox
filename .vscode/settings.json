@@ -73,6 +73,8 @@
 		"skybox.h": "c",
 		"block_type.h": "c",
 		"bitshift_utils.h": "c",
-		"biome.h": "c"
+		"biome.h": "c",
+		"algorithm": "c",
+		"format": "c"
 	}
 }

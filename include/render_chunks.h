@@ -63,5 +63,5 @@ void			chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render);
 GLuint			faceInstanceVBOCreate(vec3 *faceArray, u32 faceNb);
 void			renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID);
 void			drawAllChunksByFace(Context *c);
-
+s8				isTransparentBlock(s32 type);
 #endif /* HEADER_RENDER_CHUNKS_H */

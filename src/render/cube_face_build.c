@@ -7,7 +7,23 @@
 #include "../../include/block.h"
 #include "../../include/cube.h"
 
-s8 isTransparentBlock(u8 type) {
+s8 isTransparentBlock(s32 type) {
+	const static s32 transparentBlock[] = {
+		WATER, ICE, GLASS, TREE_SPRUCE_LEAF, TREE_OAK_LEAF
+		, TREE_MANGROVE_LEAF, TREE_JUNGLE_LEAF, TREE_DARK_OAK_LEAF
+		, TREE_BIRCH_LEAF, TREE_ACACIA_LEAF};
+
+	s32 len = sizeof(transparentBlock) / sizeof(s32);
+
+	for (u8 i = 0; i < len; ++i) {
+		if (type == transparentBlock[i]) {
+			return (TRUE);
+		}
+	}
+	return (FALSE);
+}
+
+s8 isWaterIce(s32 type) {
 	return (type == WATER || type == ICE);
 }
 
@@ -16,7 +32,7 @@ s8 faceHidden(u8 neighbors, u8 face) {
 }
 
 u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount) {
-	u32 *count = ft_calloc(sizeof(u32), 6);
+	u32 *opaqueCount = ft_calloc(sizeof(u32), 6);
     // s8 	next = TRUE;
 
 
@@ -25,17 +41,17 @@ u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount) {
 		while (hashmap_next(&it)) {
 			Block *block = (Block *)it.value;
 			for (u8 i = 0; i < 6; ++i) {
-				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
-					count[i] += 1U;
+				if (!faceHidden(block->neighbors, i) && !isWaterIce(block->type)) {
+					opaqueCount[i] += 1U;
 				}
-				if (isTransparentBlock(block->type) && i == 5U && !faceHidden(block->neighbors, i)) {
+				if (isWaterIce(block->type) && i == 5U && !faceHidden(block->neighbors, i)) {
 					*transparentFaceCount += 1U;
 				}
 			}
 		}
 	}
 
-	return (count);
+	return (opaqueCount);
 }
 
 void displayAllAtlasBlock(f32 x, f32 z, s32 *type) {
@@ -73,7 +89,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 		while (hashmap_next(&it)) {
 			Block *block = (Block *)it.value;
 			for (u8 i = 0; i < 6; ++i) {
-				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
+				if (!faceHidden(block->neighbors, i) && !isWaterIce(block->type)) {
 					render->faceArray[i][idx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->faceArray[i][idx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][idx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
@@ -82,7 +98,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 						displayAllAtlasBlock(render->faceArray[i][idx[i]][0], render->faceArray[i][idx[i]][2], &render->faceTypeID[i][idx[i]]);
 					}
 					idx[i] += 1;
-				} else if (i == 5U && isTransparentBlock(block->type)) { /* Water face fill */
+				} else if (i == 5U && isWaterIce(block->type)) { /* Water face fill */
 					render->topTransparencyFaceArray[count][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->topTransparencyFaceArray[count][1] = (f32)block->y + (f32)(subID * 16);
 					render->topTransparencyFaceArray[count][2] = (f32)block->z + (f32)(chunks->z * 16);

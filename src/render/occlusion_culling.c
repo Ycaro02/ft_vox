@@ -3,11 +3,12 @@
 #include "../../include/world.h"
 #include "../../include/chunks.h"
 #include "../../include/block.h"
+#include "../../include/render_chunks.h"
 
 
 void ocllusionHandleTransparent(Block *block, Block *neighbor, u8 blockMask, u8 neighborMask) {
-	s8 blockIsTransparent = block->type == WATER || block->type == ICE;
-	s8 neighborIsTransparent = neighbor->type == WATER || neighbor->type == ICE;
+	s8 blockIsTransparent = isTransparentBlock(block->type);
+	s8 neighborIsTransparent = isTransparentBlock(neighbor->type);
 	s8 notApply = (blockIsTransparent && !neighborIsTransparent) || (!blockIsTransparent && neighborIsTransparent);
 	if (notApply == FALSE) {
 		block->neighbors |= blockMask;
