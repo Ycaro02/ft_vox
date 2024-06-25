@@ -150,6 +150,18 @@ s8 multipleNoiseGeneration(Context *context, u32 seed) {
 	return (TRUE);
 }
 
+void uniformBlockShaderSet(GLuint shaderID) {
+	glUseProgram(shaderID);
+	set_shader_var_int(shaderID, "GRASS_SIDE", GRASS);
+	set_shader_var_int(shaderID, "GRASS_TOP", GRASS_TOP);
+	set_shader_var_int(shaderID, "SNOW_SIDE", SNOW_GRASS);
+	set_shader_var_int(shaderID, "SNOW_TOP", SNOW);
+	set_shader_var_int(shaderID, "SANDSTONE_SIDE", SANDSTONE);
+	set_shader_var_int(shaderID, "SANDSTONE_TOP", SANDSTONE_TOP);
+	set_shader_var_int(shaderID, "ATLAS_SIZE", NEWAT_MAX);
+	glUseProgram(0);
+}
+
 Context *contextInit() {
 	Context *context;
 
@@ -191,5 +203,8 @@ Context *contextInit() {
 	if (!freeTypeFontInit(context)) {
 		return (NULL);
 	}
+
+	uniformBlockShaderSet(context->cubeShaderID);
+	
 	return (context);
 }

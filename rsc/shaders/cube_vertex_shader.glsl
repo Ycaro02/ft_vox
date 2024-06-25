@@ -1,16 +1,5 @@
 #version 330 core
 
-/* Define the texture atlas */
-#define GRASS_SIDE 104
-#define GRASS_TOP 96
-
-#define SNOW_SIDE 111
-#define SNOW_TOP 110
-
-#define SANDSTONE_SIDE 105
-#define SANDSTONE_TOP 106
-// #define ATLAS_SIZE 105
-#define ATLAS_SIZE 112
 
 /* Define the block faces */
 #define TOP_FACE 5
@@ -41,6 +30,17 @@ flat out int isTopFace;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 model;
+
+/* Define the texture atlas */
+uniform int GRASS_SIDE;
+uniform int GRASS_TOP;
+
+uniform int SNOW_SIDE;
+uniform int SNOW_TOP;
+
+uniform int SANDSTONE_SIDE;
+uniform int SANDSTONE_TOP;
+uniform int ATLAS_SIZE;
 
 
 int topBlockFaceHandling(int textureID, int blockFace) {
