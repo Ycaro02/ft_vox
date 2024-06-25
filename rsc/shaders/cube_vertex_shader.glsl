@@ -1,16 +1,18 @@
 #version 330 core
 
 /* Define the texture atlas */
-#define GRASS_SIDE 97
+#define GRASS_SIDE 104
 #define GRASS_TOP 96
-#define SNOW_SIDE 104
-#define SNOW_TOP 103
-#define SANDSTONE_SIDE 98
-#define SANDSTONE_TOP 99
-#define ATLAS_SIZE 105
+
+#define SNOW_SIDE 111
+#define SNOW_TOP 110
+
+#define SANDSTONE_SIDE 105
+#define SANDSTONE_TOP 106
+// #define ATLAS_SIZE 105
+#define ATLAS_SIZE 112
 
 /* Define the block faces */
-// #define TOP_FACE 5.0
 #define TOP_FACE 5
 
 /* Define the biomes */

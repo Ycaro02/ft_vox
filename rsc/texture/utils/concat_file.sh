@@ -38,4 +38,7 @@ fi
 # Concatenate all BMP files in the source directory into the target file
 convert "${SOURCE_DIR}"/*.bmp ${APPEND_MODE} "${TARGET_FILE}"
 
-display_color_msg ${LIGHT_MAGENTA} "Concatenated all BMP files in ${SOURCE_DIR} into ${TARGET_FILE}"
+#Number of BMP files in the source directory
+NUM_FILES=$(ls -1q ${SOURCE_DIR}/*.bmp | wc -l)
+
+display_color_msg ${LIGHT_MAGENTA} "Concatenated all BMP files in ${SOURCE_DIR} into ${TARGET_FILE}: ${NUM_FILES} files"

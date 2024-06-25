@@ -32,11 +32,6 @@
 
 
 
-/* Texture atlas path size 105 */
-#define TEXTURE_ATLAS_PATH "rsc/texture/atlas_block.bmp"
-
-/* Texture atlas path size 105 */
-// #define TEXTURE_ATLAS_PATH "rsc/texture/test_atlas.bmp"
 
 /*TEST for rebuild atlas*/
 // #define TEXTURE_ATLAS_PATH "rsc/texture/TESTatlas_block.bmp"
@@ -111,6 +106,13 @@
 #define CHUNK_RIGHT 2
 #define CHUNK_LEFT 3
 
+/* Texture atlas path size 105 */
+// #define TEXTURE_ATLAS_PATH "rsc/texture/atlas_block.bmp"
+
+/* Texture atlas path size 112 */
+#define TEXTURE_ATLAS_PATH "rsc/texture/test_atlas.bmp"
+
+
 enum BlockType {
     AIR=0,									/* Air block (Empty) */
     STONE=NEWAT_STONE,						/* Stone block (Underground) */
@@ -120,8 +122,8 @@ enum BlockType {
 	WATER=NEWAT_WATER,						/* Water */
 	SAND=NEWAT_SAND,						/* Sand */
 	BEDROCK=NEWAT_BEDROCK,					/* Bedrock */
-	SNOW=NEWAT_SNOW,						/* Snow */
 	ICE=NEWAT_ICE,							/* Ice */
+	SNOW=NEWAT_SNOW,						/* Snow */
 	SNOW_GRASS=NEWAT_SNOW_GRASS_SIDE,		/* Snow grass */
 	SANDSTONE=NEWAT_SANDSTONE_SIDE,			/* Sandstone */
 	SANDSTONE_TOP=NEWAT_SANDSTONE_TOP,		/* Sandstone top */
