@@ -7,15 +7,21 @@
 #define JUNGLE_GRASS_COLOR vec3(0.5, 1.0, 0.5)
 #define SWAMP_GRASS_COLOR vec3(0.0, 0.5, 0.5)
 
+/* Define the block faces */
+#define BACK_FACE	0
+#define FRONT_FACE	1
+#define LEFT_FACE	2
+#define RIGHT_FACE	3
+#define BOTTOM_FACE 4
+#define TOP_FACE	5
 
 out vec4 FragColor;
 
 in vec3 TexCoord;
 flat in int biomeType;
 flat in int isGrass;
-flat in int isTopFace;
-
-
+flat in int blockFace;
+flat in int isFlower;
 
 uniform sampler3D textureAtlas;
 
@@ -41,13 +47,17 @@ void main()
 
     bool isGray = abs(baseColor.r - baseColor.g) < grayTolerance && abs(baseColor.g - baseColor.b) < grayTolerance && abs(baseColor.r - baseColor.b) < grayTolerance;
 
-	
+	if (isFlower == 1 && (blockFace != FRONT_FACE && blockFace != RIGHT_FACE)) {
+		discard ;
+	}
+
+
 	if (isGray && isGrass == 1) {
 		baseColor = grassColorHandling(baseColor);
 	}
 
 	/* Reduce light if not top face */
-	if (isTopFace != 1) {
+	if (blockFace != TOP_FACE) {
 		baseColor = vec4(baseColor.rgb * 0.8, baseColor.a);
 	}
 

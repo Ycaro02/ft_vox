@@ -11,9 +11,11 @@ GLFWwindow *window_create(int width, int height, const char *title)
 
 
 
+	/* Enable 8x antialiasing */
+    glfwWindowHint(GLFW_SAMPLES, 8);
+
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	win = glfwCreateWindow(width, height, title, monitor, NULL);
-	// win = glfwCreateWindow(width, height, title, NULL, NULL);
     if (!win) {
 		ft_printf_fd(2, "Error: Failed to create GLFW window\n");
 		glfwTerminate();
@@ -53,17 +55,13 @@ GLFWwindow *init_openGL_context()
         return (NULL);
     }
 
-	/* Enable 8x antialiasing */
-    glfwWindowHint(GLFW_SAMPLES, 8);
 
 	/* Enable multisampling for antialiasing */
     glEnable(GL_MULTISAMPLE);
 	
 	/* Enable depth testing */
 	glEnable(GL_DEPTH_TEST);
-
-	/* Enable face culling */
-	// glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LESS);
 
 	/* Enable blending, make water transparent and fog too, needed for freetype font */
     glEnable(GL_BLEND);

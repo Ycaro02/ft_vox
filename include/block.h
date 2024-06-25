@@ -35,6 +35,8 @@ struct s_block {
 Block	*getBlockAt(Chunks *chunk, u32 x, u32 y, u32 z, u32 subChunkID);
 Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, s8 chunkBiomeId);
 s32		blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width);
+Block *basicBlockCreate(s32 x, s32 y, s32 z, s32 type);
+
 
 void blockLocalPosFromCam(vec3 camPos, BlockPos *blockPos);
 void undergroundBlockcreate(Context *c);

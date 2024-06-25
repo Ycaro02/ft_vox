@@ -18,7 +18,7 @@ struct s_biome_block {
 	s32		water;				/* Water for plain biom */
 	s32		underWater;			/* Underwater sand for plain biom */
 	s32		stone;				/* Stone for plain biom */
-	s8		tree[TREE_IDX_MAX]	/* Tree texture */
+	s8		tree[TREE_IDX_MAX];	/* Tree texture */
 };
 
 

@@ -220,6 +220,16 @@ s8 chunkBiomeIdGet(PerlinData **perlinVal) {
 	return (biomeId);
 }
 
+void flowerCreate(Block *****chunkBlockCache,Chunks * chunk, s32 x, s32 y, s32 z) {
+	s32 localY = y % 16;
+	s32 subId = y / 16;
+	if (blockExist(chunkBlockCache, (BlockPos){x, y - 1, z}) && ((y - 1) % 16) < 15) {
+		Block *block = basicBlockCreate(x, localY, z, FLOWER_ALLIUM);
+		hashmap_set_entry(chunk->sub_chunks[subId].block_map, (BlockPos){x, localY, z}, block);
+		chunkBlockCache[subId][x][localY][z] = block;
+	}
+}
+
 /**
  * @brief Brut fill chunks with block and set his cardinal offset
  * @param chunks Chunks array pointer
@@ -272,9 +282,14 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 			if (x + 3 > BLOCKS_PER_CHUNK || z + 3 > BLOCKS_PER_CHUNK) continue;
             if (y > 100 || y <= SEA_LEVEL + 5) break;
 
-      		if (blockExist(chunkBlockCache, (BlockPos){x, perlinVal[x][z].normalise, z})
-				&& (rand() % 100) < spawnRate) {
-                treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z}, (abs(chunk->x) + abs(chunk->z)) % TREE_IDX_MAX);
+			// (void)spawnRate;
+
+      		if (blockExist(chunkBlockCache, (BlockPos){x, perlinVal[x][z].normalise, z})) {
+				if ((rand() % 100) < spawnRate) {
+                	treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z}, (abs(chunk->x) + abs(chunk->z)) % TREE_IDX_MAX);
+				} else {
+					flowerCreate(chunkBlockCache, chunk, x, y, z);
+				}
             }
         }
     }

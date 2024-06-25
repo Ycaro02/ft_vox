@@ -27,6 +27,21 @@ s32 blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width) {
 	return ((chunkOffset * BLOCKS_PER_CHUNK + localPos) + (width / 2));
 }
 
+Block *basicBlockCreate(s32 x, s32 y, s32 z, s32 type) {
+	Block *block = malloc(sizeof(Block));
+	if (!block) {
+		ft_printf_fd(2, "Failed to allocate block\n");
+		return (NULL);
+	}
+	block->x = x;
+	block->y = y;
+	block->z = z;
+	block->neighbors = 0;
+	block->biomeId = 0;
+	block->type = type;
+	return (block);
+}
+
 Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, s8 chunkBiomeId) {
     Block   	*block = NULL;
 	BiomBlock	biomBlock = {0};

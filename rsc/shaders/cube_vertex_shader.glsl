@@ -2,7 +2,12 @@
 
 
 /* Define the block faces */
-#define TOP_FACE 5
+#define BACK_FACE	0
+#define FRONT_FACE	1
+#define LEFT_FACE	2
+#define RIGHT_FACE	3
+#define BOTTOM_FACE 4
+#define TOP_FACE	5
 
 /* Define the biomes */
 #define PLAIN_BIOME 0
@@ -16,7 +21,7 @@ layout (location = 2) in vec2 aTexCoord;
  * byte 3: texture ID 
  * byte 2: block face
  * byte 1: biome ID
- * byte 0: light level	--> to implement
+ * byte 0: bool is plant or flower
 */
 layout (location = 3) in int aMetadata;
 
@@ -24,7 +29,8 @@ layout (location = 3) in int aMetadata;
 out vec3 TexCoord;
 flat out int biomeType;
 flat out int isGrass;
-flat out int isTopFace;
+flat out int blockFace;
+flat out int isFlower;
 
 /* Define the uniforms variables */
 uniform mat4 view;
@@ -46,7 +52,6 @@ uniform int ATLAS_SIZE;
 int topBlockFaceHandling(int textureID, int blockFace) {
 	
 	if (blockFace == TOP_FACE) {
-		isTopFace = 1;
 		if (textureID == GRASS_SIDE) {
 			return (GRASS_TOP);
 		} else if (textureID == SNOW_SIDE) {
@@ -65,10 +70,18 @@ int s32ByteGet(int value, int byte) {
 void main()
 {
     int textureIdExtracted = s32ByteGet(aMetadata, 3);
-    int blockFace = s32ByteGet(aMetadata, 2);
-	
+
+    blockFace = s32ByteGet(aMetadata, 2);
 	biomeType = s32ByteGet(aMetadata, 1);
-	isTopFace = 0;
+	isFlower = s32ByteGet(aMetadata, 0);
+
+	vec3 instancePosition = aInstancePos;
+
+	if (isFlower == 1) {
+		if (blockFace == FRONT_FACE) { instancePosition.z -= 0.5; }
+		else if (blockFace == RIGHT_FACE) { instancePosition.x -= 0.5; }
+	}
+	
 
 	if (textureIdExtracted == GRASS_SIDE) {
 		isGrass = 1;
@@ -78,7 +91,7 @@ void main()
 
 	TexCoord = vec3(aTexCoord, float(realTextureId) / float(ATLAS_SIZE));
     mat4 m = model;
-    m[3] = vec4(aInstancePos, 1.0) + model[3];
+    m[3] = vec4(instancePosition, 1.0) + model[3];
     vec4 worldPosition = m * vec4(aPos, 1.0);
     gl_Position = projection * view * worldPosition;
 }

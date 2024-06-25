@@ -61,21 +61,6 @@ void expandSubChunkCheck(Chunks *chunk, s32 subChunkId) {
 	}
 }
 
-Block *basicBlockCreate(int x, int y, int z, int type) {
-	Block *block = malloc(sizeof(Block));
-	if (!block) {
-		ft_printf_fd(2, "Failed to allocate block\n");
-		return (NULL);
-	}
-	block->x = x;
-	block->y = y;
-	block->z = z;
-	block->neighbors = 0;
-	block->biomeId = 0;
-	block->type = type;
-	return (block);
-}
-
 void treeLeafGeneration(Block *****chunkBlockCache, Chunks *chunk, int vertexX, int vertexY, int vertexZ, int leafTexture) {
     Block *block = NULL;
 	s32 cubeLen = 3;
