@@ -168,6 +168,9 @@ typedef struct s_render_chunk_cache {
 	s32				distance;
 } RenderChunkCache;
 
+#define OPACITY_FACE 		TRUE
+#define TRANSPARENT_FACE 	FALSE
+
 
 void renderChunksCacheFill(RenderChunks *render, RenderChunkCache *cache,  vec2_s32 cameraChunk, u32 *cacheIdx) {
 	cache[*cacheIdx].render = render;
@@ -254,9 +257,9 @@ void drawAllChunksByFace(Context *c) {
 	cache = malloc(sizeof(RenderChunkCache) * (c->displayData.chunkRenderedNb + 1));
 	cache[c->displayData.chunkRenderedNb].render = NULL;
 	cache[c->displayData.chunkRenderedNb].distance = -1;
-	allFaceDisplay(c, cache, cameraChunk, TRUE);
+	allFaceDisplay(c, cache, cameraChunk, OPACITY_FACE);
 	renderCacheSort(cache, c->displayData.chunkRenderedNb);
-	allFaceDisplay(c, cache, cameraChunk, FALSE);
+	allFaceDisplay(c, cache, cameraChunk, TRANSPARENT_FACE);
 	free(cache);
     mtx_unlock(&c->renderMtx);
 }

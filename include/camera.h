@@ -57,7 +57,6 @@ struct s_camera {
     vec3_s32    chunkPos;          /* Chunk position */
 	Frustum		frustum;			/* Frustum */
 	f32			camSpeed;			/* Camera speed */
-	// mat4		view_no_translation;
 }; 
 
 /* Frustrum */
