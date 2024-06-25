@@ -9,13 +9,16 @@
 #define BIOME_JUNGLE 3
 #define BIOME_SWAMP 4
 
+#define TREE_IDX_MAX 8
+
 struct s_biome_block {
 	s32		biomeId;
-	s32		dirt;			/* Dirt for plain Biom */
-	s32		top;			/* Grass top for plau Biom*/
-	s32		water;			/* Water for plain biom */
-	s32		underWater;		/* Underwater sand for plain biom */
-	s32		stone;			/* Stone for plain biom */
+	s32		dirt;				/* Dirt for plain Biom */
+	s32		top;				/* Grass top for plau Biom*/
+	s32		water;				/* Water for plain biom */
+	s32		underWater;			/* Underwater sand for plain biom */
+	s32		stone;				/* Stone for plain biom */
+	s8		tree[TREE_IDX_MAX]	/* Tree texture */
 };
 
 
@@ -56,7 +59,6 @@ s32 blockBiomeIdGet(float temperature, float humidity);
 */
 void biomDetection(BiomBlock *biomBlock, s8 biomeId);
 
-#define TREE_IDX_MAX 8
 
 void treeCreate(Block *****chunkBlockCache, Chunks *Chunk, BlockPos pos, s32 treeId);
 /*

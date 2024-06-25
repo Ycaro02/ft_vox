@@ -139,6 +139,25 @@ enum BlockType {
 	TREE_ACACIA_LEAF=NEWAT_ACACIA_LEAF,		/* Acacia leaf */
 	TREE_CHERRY_LOG=NEWAT_CHERRY_LOG,		/* Cherry log */
 	TREE_CHERRY_LEAF=NEWAT_CHERRY_LEAF,		/* Cherry leaf */
+	/* FLOWER and Plants */
+	FLOWER_DANDELION=NEWAT_DANDELION,		/* Dandelion */
+	FLOWER_BLUE_ORCHID=NEWAT_BLUE_ORCHID,	/* Blue orchid */
+	FLOWER_AZURE=NEWAT_AZURE,				/* Azure */
+	FLOWER_ALLIUM=NEWAT_ALLIUM,				/* Allium */
+	FLOWER_CORNFLOWER=NEWAT_CORNFLOWER,		/* Cornflower */
+	FLOWER_CHERRY=NEWAT_CHERRY_PLANTS,		/* Cherry */
+	FLOWER_WHITE_TULIP=NEWAT_WHITE_TULIP,	/* White tulip */
+	FLOWER_RED_TULIP=NEWAT_RED_TULIP,		/* Red tulip */
+	FLOWER_PINK_TULIP=NEWAT_PINK_TULIP,		/* Pink tulip */
+	FLOWER_DAYSIE=NEWAT_OXEYE_DAISY,		/* Daysie */
+	FLOWER_POPPY=NEWAT_POPPY,				/* Poppy */
+	FLOWER_LILY=NEWAT_LILY_OF_THE_VALLEY,	/* Lily of the valley */
+	/* Plant */
+	PLANT_FERN=NEWAT_FERN,					/* Fern */
+	PLANT_GRASS=NEWAT_GRASS,				/* Grass */
+	/* MUSHROOM */
+	MUSHROOM_RED=NEWAT_MUSHROOM_RED,		/* Red mushroom */
+	MUSHROOM_BROWN=NEWAT_MUSHROOM_BROWN,	/* Brown mushroom */
 	/* Unused block */
 	STONE_BRICK=NEWAT_STONE_BRICK,			/* Stone brick --> Unused */
 	GLASS=NEWAT_GLASS,						/* Glass --> Unused */

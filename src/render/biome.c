@@ -15,6 +15,11 @@ s32 blockBiomeIdGet(float temperature, float humidity) {
 
 
 void biomDetection(BiomBlock *biomBlock, s8 biomeId) {
+	
+	for (s32 i = 0; i < TREE_IDX_MAX; i++) {
+		biomBlock->tree[i] = -1; /* No tree */
+	}
+
 	if (biomeId == BIOME_SNOW) { /* Snow BIOM */
 		biomBlock->top = SNOW_GRASS;
 		biomBlock->dirt = DIRT;
