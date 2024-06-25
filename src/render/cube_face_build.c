@@ -6,6 +6,7 @@
 #include "../../include/thread_load.h"
 #include "../../include/block.h"
 #include "../../include/cube.h"
+#include "../../include/camera.h"
 
 s8 isTransparentBlock(s32 type) {
 	const static s32 transparentBlock[] = {
@@ -162,30 +163,53 @@ void drawFace(GLuint faceVBO, GLuint metadataVBO, u32 vertex_nb, u32 faceNb) {
 }
 
 
+typedef struct s_render_chunk_cache {
+	RenderChunks	*render;
+	s32				distance;
+} RenderChunkCache;
 
-void allFaceDisplay(Context *c, u8 first) {
+
+void renderChunksCacheFill(RenderChunks *render, RenderChunkCache *cache,  vec2_s32 cameraChunk, u32 *cacheIdx) {
+	cache[*cacheIdx].render = render;
+	cache[*cacheIdx].distance = chunksEuclideanDistanceGet(cameraChunk[0], cameraChunk[1], cache[*cacheIdx].render->chunkID.x, cache[*cacheIdx].render->chunkID.z);
+	*cacheIdx += 1U;
+}
+
+void allFaceDisplay(Context *c, RenderChunkCache *cache, vec2_s32 cameraChunk, u8 first) {
 	HashMap_it		it;
 	RenderChunks	*render = NULL;
     u32 			faceNb = 0;
-	GLuint faceVBO = 0, faceTypeVBO = 0;
+	GLuint 			faceVBO = 0, faceTypeVBO = 0;
+	u32				cacheIdx = 0;
+	s32 			count = 0;
 
 	for (u8 i = 0; i < 6; ++i) {
+		count = 0;
 		glBindVertexArray(c->faceCube[i].VAO);
-		it = hashmap_iterator(c->world->renderChunksMap);
-		/* Basic face display */
-		while (hashmap_next(&it)) {
-			render = (RenderChunks *)it.value;
-			c->displayData.faceRendered += faceNb;
-			if (first) {
+		if (first) {
+			it = hashmap_iterator(c->world->renderChunksMap);
+			/* Basic face display */
+			while (hashmap_next(&it)) {
+				render = (RenderChunks *)it.value;
 				faceNb = render->faceCount[i];
 				faceVBO = render->faceVBO[i];
 				faceTypeVBO = render->faceTypeVBO[i];
-			} else {
+				c->displayData.faceRendered += faceNb;
+				if (i == 0) {
+					renderChunksCacheFill(render, cache, cameraChunk, &cacheIdx);
+				}
+				drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
+			}
+		} else {
+			while (cache[count].render) {
+				render = cache[count].render;
 				faceNb = render->trspFaceCount[i];
 				faceVBO = render->trspFaceVBO[i];
 				faceTypeVBO = render->trspTypeVBO[i];
+				c->displayData.faceRendered += faceNb;
+				drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
+				count++;
 			}
-			drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
 		}
 		/* Underground face display */
 		if (first && c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
@@ -196,17 +220,43 @@ void allFaceDisplay(Context *c, u8 first) {
 	}
 }
 
+void renderCacheSort(RenderChunkCache *array, int n) {
+    RenderChunkCache	tmp;
+    s32					i, j;
+    
+	for (i = 1; i < n; i++) {
+        tmp = array[i];
+        j = i - 1;
+        while (j >= 0 && array[j].distance < tmp.distance) {
+            array[j + 1] = array[j];
+            j = j - 1;
+        }
+        array[j + 1] = tmp;
+    }
+}
+
 /**
  * @brief Draw all chunks by face
  * @param *c Context
 */
 void drawAllChunksByFace(Context *c) {
+	RenderChunkCache 	*cache = NULL;
+	vec2_s32			cameraChunk = {0, 0};
 
-    
+	mtx_lock(&c->gameMtx);
+	cameraChunk[0] = c->cam->chunkPos[0]; /* x */
+	cameraChunk[1] = c->cam->chunkPos[2]; /* z */
+	mtx_unlock(&c->gameMtx);
+
     mtx_lock(&c->renderMtx);
 	c->displayData.chunkRenderedNb = hashmap_size(c->world->renderChunksMap);
 	c->displayData.faceRendered = 0;
-	allFaceDisplay(c, TRUE);
-	allFaceDisplay(c, FALSE);
+	cache = malloc(sizeof(RenderChunkCache) * (c->displayData.chunkRenderedNb + 1));
+	cache[c->displayData.chunkRenderedNb].render = NULL;
+	cache[c->displayData.chunkRenderedNb].distance = -1;
+	allFaceDisplay(c, cache, cameraChunk, TRUE);
+	renderCacheSort(cache, c->displayData.chunkRenderedNb);
+	allFaceDisplay(c, cache, cameraChunk, FALSE);
+	free(cache);
     mtx_unlock(&c->renderMtx);
 }

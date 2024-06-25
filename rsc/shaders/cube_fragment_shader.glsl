@@ -58,7 +58,12 @@ void main()
 
 	/* Reduce light if not top face */
 	if (blockFace != TOP_FACE) {
-		baseColor = vec4(baseColor.rgb * 0.8, baseColor.a);
+		if (blockFace == BOTTOM_FACE) {
+			baseColor = vec4(baseColor.rgb * 0.85, baseColor.a);
+
+		} else {
+			baseColor = vec4(baseColor.rgb * 0.9, baseColor.a);
+		}
 	}
 
 
