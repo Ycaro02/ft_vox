@@ -9,7 +9,8 @@ FT_INLINE s8 isCaveValue(u8 val) {
 }
 
 FT_INLINE s8 digHeightGuard(s32 startY) {
-	return (startY <= 0 || (startY >= SEA_LEVEL - 2  && startY <= SEA_LEVEL + 2));
+	// return (startY <= 0 || (startY >= SEA_LEVEL - 2  && startY <= SEA_LEVEL + 2));
+	return (startY <= 0);
 }
 
 FT_INLINE s8 digAxisGuard(s32 value) {
@@ -65,11 +66,13 @@ void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinV
 			if (isCaveValue(chunk->perlinCave[x][z])) {
 				startX = x;
 				startY = perlinVal[x][z].normalise - CAVE_ENTRY_DEPTH; /* 80 - 15 = 65*/
-				if (startY > 65 ) { 
-					startY = 65;
+				if (startY > SEA_LEVEL + 5) { 
+					// startY = 65;
+					continue ;
 				}
 				startZ = z;
-				maxDepth = 4;
+				// maxDepth = 6;
+				maxDepth = (perlinVal[x][z].normalise / ((s32)(fabs(perlinVal[x][z].valErosion) * 10.0f) + 4));
 				for (s32 depth = 0 ; depth < maxDepth; depth++) {
 					verticalDepth = startY - depth;
 					for (s32 horizontalDepth = 0; horizontalDepth < BLOCKS_PER_CHUNK; horizontalDepth++) {

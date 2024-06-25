@@ -180,7 +180,10 @@ void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
 		for (u32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			s32 localX = blockLocalToPerlinPos(chunk->x, x, width);
 			s32 localZ = blockLocalToPerlinPos(chunk->z, z, height);
-			caveData[x][z] = perlinSnakeCaveNoise[abs(localX % width)][abs(localZ % height)];
+			s32 scaleX = abs((localX / 2) % width);
+			s32 scaleZ = abs((localZ / 2) % height);
+			// caveData[x][z] = perlinSnakeCaveNoise[abs(localX % width) / ][abs(localZ % height)];
+			caveData[x][z] = perlinSnakeCaveNoise[scaleX][scaleZ];
 		}
 	}
 	chunk->perlinCave = caveData;
