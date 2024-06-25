@@ -122,7 +122,7 @@ s8 freeTypeFontInit(Context *c) {
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
 
-	glm_ortho(0.0f, (f32)SCREEN_WIDTH, 0.0f, (f32)SCREEN_HEIGHT, -1.0f, 1.0f, c->fontContext->projection);
+	glm_ortho(0.0f, (f32)c->screenWidth, 0.0f, (f32)c->screenHeight, -1.0f, 1.0f, c->fontContext->projection);
 	set_shader_var_mat4(c->fontContext->fontShaderID, "projection", c->fontContext->projection);
 	set_shader_texture(c->fontContext->fontShaderID, c->fontContext->font[0].TextureID, GL_TEXTURE_2D, "text");
 

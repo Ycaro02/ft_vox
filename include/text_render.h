@@ -7,7 +7,7 @@
 #include "typedef_struct.h"
 
 
-#define TEXT_HEIGHT_OFFSET_GET(x) ((f32)SCREEN_HEIGHT - (f32)x)
+#define TEXT_HEIGHT_OFFSET_GET(screenHeight, x) ((f32)screenHeight - (f32)x)
 #define FPS_SCALE 0.3f
 #define TEXT_DESCRIBED_WIDTH_OFFSET 15.0f
 #define TEXT_DATA_WIDTH_OFFSET 150.0f

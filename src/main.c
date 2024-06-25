@@ -191,8 +191,8 @@ void updateGame(Context *c) {
 */
 void displayFloatTextCall(Context *c, const char *description, f32 offsetHeight, f32 floatNumber, vec3 colorDescription, vec3 colorData) {
 	t_sstring floatString = double_to_sstring(floatNumber, 3);
-	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
-	textRender(c, floatString.data, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
+	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, offsetHeight), FPS_SCALE, colorDescription);
+	textRender(c, floatString.data, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, offsetHeight), FPS_SCALE, colorData);
 }
 
 /**
@@ -200,8 +200,8 @@ void displayFloatTextCall(Context *c, const char *description, f32 offsetHeight,
 */
 void displayUnsigned32TextCall(Context *c, const char *description, f32 offsetHeight, u32 dataNumber, vec3 colorDescription, vec3 colorData) {
 	char *dataString = ft_ultoa(dataNumber);
-	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
-	textRender(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
+	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, offsetHeight), FPS_SCALE, colorDescription);
+	textRender(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, offsetHeight), FPS_SCALE, colorData);
 	free(dataString);
 }
 
@@ -210,8 +210,8 @@ void displayUnsigned32TextCall(Context *c, const char *description, f32 offsetHe
 */
 void displaySignedLongTextCall(Context *c, const char *description, f32 offsetHeight, s32 dataNumber, vec3 colorDescription, vec3 colorData) {
 	char *dataString = ft_ltoa(dataNumber);
-	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorDescription);
-	textRender(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(offsetHeight), FPS_SCALE, colorData);
+	textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, offsetHeight), FPS_SCALE, colorDescription);
+	textRender(c, (const char *)dataString, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, offsetHeight), FPS_SCALE, colorData);
 	free(dataString);
 }
 
@@ -221,8 +221,8 @@ void displaySignedLongTextCall(Context *c, const char *description, f32 offsetHe
 void displayDoublePosition(Context* c, const char *description, float startY, long posX, long posZ, vec3 color) {
     char buffer[256];
     snprintf(buffer, sizeof(buffer), "X %ld / Z %ld", posX, posZ);
-    textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(startY), FPS_SCALE, color);
-    textRender(c, buffer, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(startY), FPS_SCALE, VEC3_PINK);
+    textRender(c, description, TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, startY), FPS_SCALE, color);
+    textRender(c, buffer, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, startY), FPS_SCALE, VEC3_PINK);
 }
 
 /**

@@ -1,6 +1,6 @@
 #include "../../include/vox.h"
 
-GLFWwindow *window_create(int width, int height, const char *title)
+GLFWwindow *window_create(s32 *width, s32 *height, const char *title)
 {
 	GLFWwindow *win;
 
@@ -15,7 +15,21 @@ GLFWwindow *window_create(int width, int height, const char *title)
     glfwWindowHint(GLFW_SAMPLES, 8);
 
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	win = glfwCreateWindow(width, height, title, monitor, NULL);
+    
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+    if (mode == NULL) {
+		ft_printf_fd(2, "Error: Failed to get video mode\n");
+		glfwTerminate();
+		return (NULL);
+	}
+
+	*height = mode->height;
+	*width = mode->width;
+	ft_printf_fd(1, ORANGE"Screen width: %d\n", *width);
+	ft_printf_fd(1, "Screen height: %d\n"RESET, *height);
+
+	win = glfwCreateWindow(*width, *height, title, monitor, NULL);
     if (!win) {
 		ft_printf_fd(2, "Error: Failed to create GLFW window\n");
 		glfwTerminate();
@@ -33,12 +47,12 @@ GLFWwindow *window_create(int width, int height, const char *title)
  * @brief Initialize the openGL context
  * @return GLFWwindow* return the window struct pointer
 */
-GLFWwindow *init_openGL_context() 
+GLFWwindow *init_openGL_context(s32 *height, s32 *width, const char *title) 
 {
     GLFWwindow *win = NULL;
 	int version = 0;
 	
-	win = window_create(SCREEN_WIDTH, SCREEN_HEIGHT, "VOX");
+	win = window_create(width, height, title);
 	if (!win) {
 		return (NULL);
 	}
@@ -68,7 +82,7 @@ GLFWwindow *init_openGL_context()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Set the viewport */
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glViewport(0, 0, *width, *height);
 	
 	const GLubyte* renderer = glGetString(GL_RENDERER);
 	ft_printf_fd(1, CYAN"Renderer device: %s\n"RESET, renderer);

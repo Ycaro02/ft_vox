@@ -71,6 +71,8 @@ struct s_context {
 	Mutex				vboToCreateMtx;			/* Mutex to protect vboToCreate list */
 	Mutex				renderDataNeededMtx;	/* Mutex to protect renderDataNeeded */
 	/* Opengl ID for shader vao or texture (openGl context) */
+	s32					screenHeight;		/* Screen height */
+	s32					screenWidth;		/* Screen width */
 	GLuint				cubeShaderID;		/* shader program ID */
 	GLuint				skyboxShaderID;		/* shader program ID */
 	GLuint				skyboxVAO;			/* skybox VAO */

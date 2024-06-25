@@ -179,20 +179,25 @@ Context *contextInit() {
 	context->displayUndergroundBlock = TRUE;
 
 
-	mtx_lock(&context->gameMtx);
-	context->cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(SCREEN_WIDTH, SCREEN_HEIGHT), CAM_NEAR, CAM_FAR);
-	extractFrustumPlanes(&context->cam->frustum, context->cam->projection, context->cam->view);
-	mtx_unlock(&context->gameMtx);
 
 	if (!(context->world = ft_calloc(sizeof(World), 1))
 		|| (!((context->world->undergroundBlock = ft_calloc(sizeof(UndergroundBlock), 1))))
-		|| (!(context->win_ptr = init_openGL_context()))
-		|| (!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
+		|| (!(context->win_ptr = init_openGL_context(&context->screenHeight, &context->screenWidth, "VOX")))
+	) {
+		return (NULL);
+	}
+
+	mtx_lock(&context->gameMtx);
+	context->cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(context->screenWidth, context->screenHeight), CAM_NEAR, CAM_FAR);
+	extractFrustumPlanes(&context->cam->frustum, context->cam->projection, context->cam->view);
+	mtx_unlock(&context->gameMtx);
+
+	if ((!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
 		|| (!multipleNoiseGeneration(context, 42U)) /* Give seed here */
 		|| (!(context->world->renderChunksMap = hashmap_init(HASHMAP_SIZE_1000, hashmap_free_node_only)))
-		|| (!threadSupervisorInit(context))) 
-	{
+		|| (!threadSupervisorInit(context))
+	) {
 		return (NULL);
 	} 
 

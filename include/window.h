@@ -7,7 +7,7 @@
 /* openGL_glw_init.c */
 
 GLFWwindow  *window_create(int width, int height, const char *title);
-GLFWwindow  *init_openGL_context();
+GLFWwindow *init_openGL_context(s32 *height, s32 *width, const char *title);
 void        glfw_destroy(GLFWwindow *win);
 
 FT_INLINE  u32 fpsGet() {
