@@ -55,7 +55,9 @@ s32 blockBiomeIdGet(float temperature, float humidity);
  * @param biomeId Biome ID
 */
 void biomDetection(BiomBlock *biomBlock, s8 biomeId);
-// void treeCreate(Block ****subChunkBlockCache, SubChunks *subChunk, int x, int y, int z, int treeId);
+
+#define TREE_IDX_MAX 8
+
 void treeCreate(Block *****chunkBlockCache, Chunks *Chunk, BlockPos pos, s32 treeId);
 /*
 	-------------------------------------------------------------

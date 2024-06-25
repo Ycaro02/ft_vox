@@ -117,7 +117,8 @@ void treeCreate(Block *****chunkBlockCache, Chunks *chunk, BlockPos pos, s32 tre
 		{TREE_JUNGLE_LOG, TREE_JUNGLE_LEAF},
 		{TREE_DARK_OAK_LOG, TREE_DARK_OAK_LEAF},
 		{TREE_BIRCH_LOG, TREE_BIRCH_LEAF},
-		{TREE_ACACIA_LOG, TREE_ACACIA_LEAF}
+		{TREE_ACACIA_LOG, TREE_ACACIA_LEAF},
+		{TREE_CHERRY_LOG, TREE_CHERRY_LEAF}
 	};
 	Block	*block = NULL;
 	s32 	subChunkId = 0;

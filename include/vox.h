@@ -30,12 +30,6 @@
 // #define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS + 5)
 // #define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 2.0f)
 
-
-
-
-/*TEST for rebuild atlas*/
-// #define TEXTURE_ATLAS_PATH "rsc/texture/TESTatlas_block.bmp"
-
 /* Sky path */
 #define TEXTURE_SKY_PATH "rsc/texture/skybox.bmp"
 
@@ -106,11 +100,12 @@
 #define CHUNK_RIGHT 2
 #define CHUNK_LEFT 3
 
-/* Texture atlas path size 105 */
-// #define TEXTURE_ATLAS_PATH "rsc/texture/atlas_block.bmp"
+/* Texture atlas path size 112*/
+#define TEXTURE_ATLAS_PATH "rsc/texture/atlas_block.bmp"
 
 /* Texture atlas path size 112 */
-#define TEXTURE_ATLAS_PATH "rsc/texture/test_atlas.bmp"
+// #define TEXTURE_ATLAS_PATH "rsc/texture/test_atlas.bmp"
+// #define TEXTURE_ATLAS_PATH "rsc/texture/TESTatlas_block.bmp"
 
 
 enum BlockType {
@@ -142,6 +137,8 @@ enum BlockType {
 	TREE_BIRCH_LEAF=NEWAT_BIRCH_LEAF,		/* Birch leaf */
 	TREE_ACACIA_LOG=NEWAT_ACACIA_LOG,		/* Acacia log */
 	TREE_ACACIA_LEAF=NEWAT_ACACIA_LEAF,		/* Acacia leaf */
+	TREE_CHERRY_LOG=NEWAT_CHERRY_LOG,		/* Cherry log */
+	TREE_CHERRY_LEAF=NEWAT_CHERRY_LEAF,		/* Cherry leaf */
 	/* Unused block */
 	STONE_BRICK=NEWAT_STONE_BRICK,			/* Stone brick --> Unused */
 	GLASS=NEWAT_GLASS,						/* Glass --> Unused */

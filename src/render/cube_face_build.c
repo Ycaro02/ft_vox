@@ -11,7 +11,7 @@ s8 isTransparentBlock(s32 type) {
 	const static s32 transparentBlock[] = {
 		WATER, ICE, GLASS, TREE_SPRUCE_LEAF, TREE_OAK_LEAF
 		, TREE_MANGROVE_LEAF, TREE_JUNGLE_LEAF, TREE_DARK_OAK_LEAF
-		, TREE_BIRCH_LEAF, TREE_ACACIA_LEAF};
+		, TREE_BIRCH_LEAF, TREE_ACACIA_LEAF, TREE_CHERRY_LEAF};
 
 	s32 len = sizeof(transparentBlock) / sizeof(s32);
 

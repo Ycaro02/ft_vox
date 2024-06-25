@@ -274,7 +274,7 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 
       		if (blockExist(chunkBlockCache, (BlockPos){x, perlinVal[x][z].normalise, z})
 				&& (rand() % 100) < spawnRate) {
-                treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z}, (abs(chunk->x) + abs(chunk->z)) % 7);
+                treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z}, (abs(chunk->x) + abs(chunk->z)) % TREE_IDX_MAX);
             }
         }
     }
