@@ -63,6 +63,8 @@ ifeq ($(findstring leak, $(MAKECMDGOALS)), leak)
 CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address
 else ifeq ($(findstring thread, $(MAKECMDGOALS)), thread)
 CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=thread
+else ifeq ($(findstring debug, $(MAKECMDGOALS)), debug)
+CFLAGS = -Wall -Wextra -Werror -g3
 endif
 
 

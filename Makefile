@@ -99,7 +99,7 @@ test: $(NAME)
 	@./$(NAME)
 
 # @ulimit -c unlimited
-leak thread: clean $(NAME)
+leak thread debug: clean $(NAME)
 	@printf	"$(CYAN)CFLAGS: $(CFLAGS)$(RESET)\n"
 	@./$(NAME)
 

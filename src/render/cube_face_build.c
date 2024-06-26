@@ -228,13 +228,10 @@ void opaqueFaceDisplay(Context *c, RenderChunkCache *cache, vec2_s32 cameraChunk
     u32 			faceNb = 0;
 	GLuint 			faceVBO = 0, faceTypeVBO = 0;
 	u32				cacheIdx = 0;
-	// s32 			count = 0;
 
 	for (u8 i = 0; i < 6; ++i) {
-		// count = 0;
 		glBindVertexArray(c->faceCube[i].VAO);
 		it = hashmap_iterator(c->world->renderChunksMap);
-		/* Basic face display */
 		while (hashmap_next(&it)) {
 			render = (RenderChunks *)it.value;
 			faceNb = render->faceCount[i];
