@@ -3,7 +3,6 @@
 #include "../../include/chunks.h"		/* Main project header */
 #include "../../include/render_chunks.h"	/* Main project header */
 
-
 void renderChunkFree(RenderChunks *render) {
 	free(render->faceCount);
 	free(render->trspFaceCount);

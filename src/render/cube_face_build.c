@@ -39,25 +39,24 @@ s8 faceHidden(u8 neighbors, u8 face) {
 
 u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount, u32 *waterFaceCount) {
 	u32 *opaqueCount = ft_calloc(sizeof(u32), 6);
-    // s8 	next = TRUE;
-
 
 	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
 		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
 		while (hashmap_next(&it)) {
 			Block *block = (Block *)it.value;
 			for (u8 i = 0; i < 6; ++i) {
-				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
-					opaqueCount[i] += 1U;
-				} else if (!faceHidden(block->neighbors, i) && isTransparentNotWaterIce(block->type)) {
-					transparentFaceCount[i] += 1U;
-				} else if (!faceHidden(block->neighbors, i) && isWaterIce(block->type)) {
-					*waterFaceCount += 1U;
+				if (!faceHidden(block->neighbors, i)) {
+					if (!isTransparentBlock(block->type)) {
+						opaqueCount[i] += 1U;
+					} else if (isTransparentNotWaterIce(block->type)) {
+						transparentFaceCount[i] += 1U;
+					} else if (isWaterIce(block->type) && i == TOP_FACE) {
+						*waterFaceCount += 1U;
+					}
 				}
 			}
 		}
 	}
-
 	return (opaqueCount);
 }
 
@@ -103,10 +102,11 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 
 	ft_bzero(opqIdx, sizeof(u32) * 6);
 	ft_bzero(trspIdx, sizeof(u32) * 6);
-
-
+	render->topFaceWaterCount = 0;
 	render->trspFaceCount = ft_calloc(sizeof(u32), 6);
 	render->faceCount = faceVisibleCount(chunks, render->trspFaceCount, &render->topFaceWaterCount);
+
+
 	for (u8 i = 0; i < 6; ++i) {
 		/* Opaque face init */
 		render->faceArray[i] = ft_calloc(sizeof(vec3), render->faceCount[i]);
@@ -115,8 +115,6 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 		render->trspFaceArray[i] = ft_calloc(sizeof(vec3), render->trspFaceCount[i]);
 		render->trspTypeId[i] = ft_calloc(sizeof(f32), render->trspFaceCount[i]);
 	}
-
-
 	render->topFaceWater = ft_calloc(sizeof(vec3), render->topFaceWaterCount);
 	render->topFaceWaterTypeID = ft_calloc(sizeof(f32), render->topFaceWaterCount);
 
@@ -125,31 +123,33 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 		while (hashmap_next(&it)) {
 			Block *block = (Block *)it.value;
 			for (u8 i = 0; i < 6; ++i) {
-				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
-					render->faceArray[i][opqIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
-					render->faceArray[i][opqIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
-					render->faceArray[i][opqIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
-					// if (chunks->x == 0 && chunks->z == 0 && render->faceArray[i][opqIdx[i]][1] == 0) {
-					// 	displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]], i);
-					// }
-					// woolDebugFog(chunks->x, chunks->z, &render->faceTypeID[i][opqIdx[i]]);
-					opqIdx[i] += 1;
-				} 
-				// TOREFACT
-				else if (!faceHidden(block->neighbors, i) && isTransparentNotWaterIce(block->type)) { /* Water face fill */
-					render->trspFaceArray[i][trspIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
-					render->trspFaceArray[i][trspIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
-					render->trspFaceArray[i][trspIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->trspTypeId[i][trspIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
-					trspIdx[i] += 1;
-				} else if (!faceHidden(block->neighbors, i) && isWaterIce(block->type) && i == TOP_FACE) { /* Water face fill */
-					render->topFaceWater[waterFaceIdx][0] = (f32)block->x + (f32)(chunks->x * 16);
-					render->topFaceWater[waterFaceIdx][1] = (f32)block->y + (f32)(subID * 16);
-					render->topFaceWater[waterFaceIdx][2] = (f32)block->z + (f32)(chunks->z * 16);
-					render->topFaceWaterTypeID[waterFaceIdx] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
-					waterFaceIdx++;
+				if (!faceHidden(block->neighbors, i)) {
+					if (!isTransparentBlock(block->type)) {
+						render->faceArray[i][opqIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
+						render->faceArray[i][opqIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
+						render->faceArray[i][opqIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
+						render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
+						// if (chunks->x == 0 && chunks->z == 0 && render->faceArray[i][opqIdx[i]][1] == 0) {
+						// 	displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]], i);
+						// }
+						// woolDebugFog(chunks->x, chunks->z, &render->faceTypeID[i][opqIdx[i]]);
+						opqIdx[i] += 1;
+					} else if (isTransparentNotWaterIce(block->type)) { /* Water face fill */
+						render->trspFaceArray[i][trspIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
+						render->trspFaceArray[i][trspIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
+						render->trspFaceArray[i][trspIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
+						render->trspTypeId[i][trspIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
+						trspIdx[i] += 1;
+					} else if (isWaterIce(block->type) && i == TOP_FACE) { /* Water face fill */
+						render->topFaceWater[waterFaceIdx][0] = (f32)block->x + (f32)(chunks->x * 16);
+						render->topFaceWater[waterFaceIdx][1] = (f32)block->y + (f32)(subID * 16);
+						render->topFaceWater[waterFaceIdx][2] = (f32)block->z + (f32)(chunks->z * 16);
+						render->topFaceWaterTypeID[waterFaceIdx] = s32StoreValues(block->type, i, chunks->biomeId, 0);
+						waterFaceIdx++;
+					}
+
 				}
+
 			}
 		}
 	}
@@ -268,6 +268,8 @@ void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
 	}
 	glBindVertexArray(0);
 	
+
+
 	for (int i = 5; i >= 0; --i) {
 		count = 0;
 		glBindVertexArray(c->faceCube[i].VAO);

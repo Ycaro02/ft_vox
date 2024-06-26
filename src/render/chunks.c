@@ -95,7 +95,7 @@ size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinDat
 {
 	Block *block = NULL;
 	s32 startYWorld = layer * BLOCKS_PER_CHUNK;
-
+	
     for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
         for (s32 y = 0; y < BLOCKS_PER_CHUNK; ++y) {
             for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
@@ -188,7 +188,6 @@ void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
 			s32 localZ = blockLocalToPerlinPos(chunk->z, z, height);
 			s32 scaleX = abs((localX / 2) % width);
 			s32 scaleZ = abs((localZ / 2) % height);
-			// caveData[x][z] = perlinSnakeCaveNoise[abs(localX % width) / ][abs(localZ % height)];
 			caveData[x][z] = perlinSnakeCaveNoise[scaleX][scaleZ];
 		}
 	}
@@ -270,12 +269,12 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 		for (u32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
 			s32 localX = blockLocalToPerlinPos(chunk->x, x, PERLIN_NOISE_WIDTH);
 			s32 localZ = blockLocalToPerlinPos(chunk->z, z, PERLIN_NOISE_WIDTH);
-			// perlinVal[x][z].normalise = (s32)perlinValueFill(noise, localX, localZ, &perlinVal[x][z]);
 			perlinValueFill(noise, localX, localZ, &perlinVal[x][z]);
 		}
 	}
 
 	chunk->biomeId = chunkBiomeIdGet(perlinVal);
+	chunk->noiseData = perlinVal;
 
 	s32 chunkMaxY = maxHeightGet(perlinVal);
 	if (chunkMaxY < (s32)MIN_HEIGHT) {
@@ -288,8 +287,7 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 			ft_printf_fd(2, "Failed to allocate hashmap\n");
 			return;
 		}
-		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], perlinVal, i, chunk->biomeId);
-		chunk->noiseData = perlinVal;
+		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], chunk->noiseData, i, chunk->biomeId);
 	}
 
 	perlinCaveDataGet(chunk, noise->cave);
@@ -309,8 +307,6 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 
 			if (x + 3 > BLOCKS_PER_CHUNK || z + 3 > BLOCKS_PER_CHUNK) continue;
             if (y > 100 || y <= SEA_LEVEL + 5) break;
-
-			// (void)spawnRate;
 
       		if (blockExist(chunkBlockCache, (BlockPos){x, perlinVal[x][z].normalise, z})) {
 				if ((rand() % 100) < spawnRate) {
