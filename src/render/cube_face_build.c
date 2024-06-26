@@ -64,6 +64,29 @@ void displayAllAtlasBlock(f32 x, f32 z, s32 *type) {
 	} 
 }
 
+void woolDebugFog(s32 chunkX,s32 chunkZ, s32 *type) {
+	static s8 woolArray[] = {
+		NEWAT_RED_WOOL,
+		NEWAT_ORANGE_WOOL,
+		NEWAT_YELLOW_WOOL,
+		NEWAT_LIME_WOOL,
+		NEWAT_GREEN_WOOL,
+		NEWAT_CYAN_WOOL,
+		NEWAT_LIGHT_BLUE_WOOL,
+		NEWAT_BLUE_WOOL,
+		NEWAT_PURPLE_WOOL,
+		NEWAT_MAGENTA_WOOL,
+		NEWAT_PINK_WOOL,
+		NEWAT_BLACK_WOOL,
+		NEWAT_BROWN_WOOL
+	};
+	s32 len = sizeof(woolArray) / sizeof(s8);
+
+	if (chunkZ == 0) {
+		*type = s32StoreValues(woolArray[abs(chunkX) % len], 0, 0, 0);
+	}
+}
+
 /* To call in create render chunk -> DONE */
 void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 {
@@ -98,9 +121,10 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->faceArray[i][opqIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][opqIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
 					render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
-					if (chunks->x == 0 && chunks->z == 0 && subID == 0 && block->y == 0) {
-						displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]]);
-					}
+					// if (chunks->x == 0 && chunks->z == 0 && subID == 0 && block->y == 0) {
+					// 	displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]]);
+					// }
+					// woolDebugFog(chunks->x, chunks->z, &render->faceTypeID[i][opqIdx[i]]);
 					opqIdx[i] += 1;
 				} 
 				// TOREFACT

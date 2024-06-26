@@ -12,7 +12,8 @@
 /* Basic value */
 #define CHUNKS_LOAD_RADIUS 16							/* Chunks load radius */
 #define CHUNKS_UNLOAD_RADIUS (CHUNKS_LOAD_RADIUS * 2)	/* Chunks unload max radius */
-#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * 16.0f)	/* Max render distance */
+#define MAX_RENDER_DISTANCE (CHUNK_FLOAT_SIZE * (f32)CHUNKS_LOAD_RADIUS)	/* Max render distance */
+
 
 #define PERLIN_BIOME_SCALE 4.0f
 
