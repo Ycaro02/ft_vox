@@ -285,6 +285,8 @@ int main(void) {
     return (0);
 }
 
+#define NO_FPS_LIMIT 0
+#define VSYNC_FPS_LIMIT 1
 
 void mainLoopFpsUnlock(Context *c, GLuint skyTexture) {
     f64 lastTime = glfwGetTime();
@@ -294,7 +296,8 @@ void mainLoopFpsUnlock(Context *c, GLuint skyTexture) {
     f64 updatePerSec = 60.0;
 
 	/* Disable VSync to avoid fps locking */
-	glfwSwapInterval(0);
+	// glfwSwapInterval(NO_FPS_LIMIT);
+	glfwSwapInterval(VSYNC_FPS_LIMIT);
 
     while (!glfwWindowShouldClose(c->win_ptr)) {
         nowTime = glfwGetTime();

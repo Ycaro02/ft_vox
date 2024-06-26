@@ -159,6 +159,8 @@ enum BlockType {
 	GLASS=NEWAT_GLASS,						/* Glass --> Unused */
 };
 
+#define FLOWER_IDX_MAX 16
+
 FT_INLINE s8 blockIsFlowerPlants(s8 type) {
 	s8 flowerArray[] = {
 		FLOWER_DANDELION, FLOWER_BLUE_ORCHID, FLOWER_AZURE, FLOWER_ALLIUM, FLOWER_CORNFLOWER,

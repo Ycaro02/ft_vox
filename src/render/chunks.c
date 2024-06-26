@@ -223,11 +223,30 @@ s8 chunkBiomeIdGet(PerlinData **perlinVal) {
 	return (biomeId);
 }
 
-void flowerCreate(Block *****chunkBlockCache,Chunks * chunk, s32 x, s32 y, s32 z) {
+void flowerCreate(Block *****chunkBlockCache,Chunks * chunk, s32 x, s32 y, s32 z, s32 flowerId) {
+	static s8 flowerTypeArray[] = {
+		FLOWER_DANDELION,
+		FLOWER_BLUE_ORCHID,
+		FLOWER_AZURE,	
+		FLOWER_ALLIUM,
+		FLOWER_CORNFLOWER,
+		FLOWER_CHERRY,
+		FLOWER_WHITE_TULIP,
+		FLOWER_RED_TULIP,
+		FLOWER_PINK_TULIP,
+		FLOWER_DAYSIE,
+		FLOWER_POPPY,
+		FLOWER_LILY,
+		PLANT_FERN,
+		PLANT_GRASS,
+		MUSHROOM_RED,
+		MUSHROOM_BROWN,
+	};
+
 	s32 localY = y % 16;
 	s32 subId = y / 16;
 	if (blockExist(chunkBlockCache, (BlockPos){x, y - 1, z}) && ((y - 1) % 16) < 15) {
-		Block *block = basicBlockCreate(x, localY, z, FLOWER_ALLIUM);
+		Block *block = basicBlockCreate(x, localY, z, flowerTypeArray[flowerId]);
 		hashmap_set_entry(chunk->sub_chunks[subId].block_map, (BlockPos){x, localY, z}, block);
 		chunkBlockCache[subId][x][localY][z] = block;
 	}
@@ -291,7 +310,7 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 				if ((rand() % 100) < spawnRate) {
                 	treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z}, (abs(chunk->x) + abs(chunk->z)) % TREE_IDX_MAX);
 				} else {
-					flowerCreate(chunkBlockCache, chunk, x, y, z);
+					flowerCreate(chunkBlockCache, chunk, x, y, z, (abs(chunk->x) + abs(chunk->z)) % FLOWER_IDX_MAX);
 				}
             }
         }

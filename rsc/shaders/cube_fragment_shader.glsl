@@ -44,34 +44,43 @@ vec4 grassColorHandling(vec4 baseColor) {
 void main()
 {
     vec4 baseColor = texture(textureAtlas, TexCoord);
-
+	vec4 finalColor = baseColor;
     bool isGray = abs(baseColor.r - baseColor.g) < grayTolerance && abs(baseColor.g - baseColor.b) < grayTolerance && abs(baseColor.r - baseColor.b) < grayTolerance;
-
+	float fogFactor = 0.0;
+	// if (isFlower == 1 && (blockFace != RIGHT_FACE)) {
 	if (isFlower == 1 && (blockFace != FRONT_FACE && blockFace != RIGHT_FACE)) {
 		discard ;
 	}
+
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	fogFactor = smoothstep(fogStart, fogEnd, depth);
 
 
 	if (isGray && isGrass == 1) {
 		baseColor = grassColorHandling(baseColor);
 	}
 
-	/* Reduce light if not top face */
-	if (blockFace != TOP_FACE) {
-		if (blockFace == BOTTOM_FACE) {
-			baseColor = vec4(baseColor.rgb * 0.85, baseColor.a);
+	if (isFlower == 0) {
+		/* Reduce light if not top face */
+		if (blockFace != TOP_FACE) {
+			if (blockFace == BOTTOM_FACE) {
+				baseColor = vec4(baseColor.rgb * 0.85, baseColor.a);
 
-		} else {
-			baseColor = vec4(baseColor.rgb * 0.9, baseColor.a);
+			} else {
+				baseColor = vec4(baseColor.rgb * 0.9, baseColor.a);
+			}
 		}
+
+
+		fogColor = vec4(baseColor.xyz, 0.0);
+
+		finalColor = mix(baseColor, fogColor, fogFactor);
+	} 
+	
+	if (isFlower == 1 && fogFactor > 0.2) {
+		discard;
 	}
 
-
-	fogColor = vec4(baseColor.xyz, 0.0);
-
-    float depth = gl_FragCoord.z / gl_FragCoord.w;
-    float fogFactor = smoothstep(fogStart, fogEnd, depth);
-    vec4 finalColor = mix(baseColor, fogColor, fogFactor);
 
     FragColor = finalColor;
 }

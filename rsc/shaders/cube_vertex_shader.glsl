@@ -79,7 +79,7 @@ void main()
 
 	if (isFlower == 1) {
 		if (blockFace == FRONT_FACE) { instancePosition.z -= 0.5; }
-		else if (blockFace == RIGHT_FACE) { instancePosition.x -= 0.5; }
+		if (blockFace == RIGHT_FACE) { instancePosition.x -= 0.5; }
 	}
 	
 
