@@ -22,6 +22,10 @@ layout (location = 2) in vec2 aTexCoord;
  * byte 2: block face
  * byte 1: biome ID
  * byte 0: bool is plant or flower
+ Todo split byte 0 to store more information
+ 	We use the last byte to store the following information:
+		- 0: isFlower
+		- 1: isUnderground (To adapt fog color and maybe range too)
 */
 layout (location = 3) in int aMetadata;
 

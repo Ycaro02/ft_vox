@@ -2,7 +2,7 @@
 
 source ../sh/color.sh
 
-# This script is used change to add index in a name of a file
+# This script is used to add index in a name of a file
 # Usage: ./indexFile.sh ${1} ${2} ${3}
 
 # Example in directory rsc, foo.png, bar.png, baz.png

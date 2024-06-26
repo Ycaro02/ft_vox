@@ -13,6 +13,11 @@ fi
 
 NAME="$1"
 
+# Check if the backup folder exists
+if [ ! -d "backup" ]; then
+	mkdir backup
+fi
+
 # Check if the texture file exists
 if [ ! -f "block_bmp/$NAME.bmp" ]; then
 	echo "The texture file $NAME.bmp does not exist in block_bmp."

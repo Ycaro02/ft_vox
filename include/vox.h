@@ -2,7 +2,7 @@
 #define VOX_HEADER_H
 
 #include "typedef_struct.h"		                /* Struct typedef */
-#include "block_type.h"			                /* Block type enum */
+#include "block_type_enum.h"			                /* Block type enum */
 
 #define CAM_FOV				80.0f			/* Camera field of view */
 #define CHUNK_FLOAT_SIZE	8.0f			/* Chunk float size, cause one block is 0.5, 0.5 * 16 = 8.0f */
@@ -116,7 +116,8 @@ enum BlockType {
 	BEDROCK=NEWAT_BEDROCK,					/* Bedrock */
 	ICE=NEWAT_ICE,							/* Ice */
 	SNOW=NEWAT_SNOW,						/* Snow */
-	SNOW_GRASS=NEWAT_SNOW_GRASS_SIDE,		/* Snow grass */
+	// SNOW_GRASS=NEWAT_SNOW_GRASS_SIDE,		/* Snow grass */
+	SNOW_GRASS=NEWAT_GRASS_BLOCK_SNOW,		/* Snow grass */
 	SANDSTONE=NEWAT_SANDSTONE_SIDE,			/* Sandstone */
 	SANDSTONE_TOP=NEWAT_SANDSTONE_TOP,		/* Sandstone top */
 	/* TREE */
@@ -142,7 +143,7 @@ enum BlockType {
 	FLOWER_AZURE=NEWAT_AZURE,				/* Azure */
 	FLOWER_ALLIUM=NEWAT_ALLIUM,				/* Allium */
 	FLOWER_CORNFLOWER=NEWAT_CORNFLOWER,		/* Cornflower */
-	FLOWER_CHERRY=NEWAT_CHERRY_PLANTS,		/* Cherry */
+	FLOWER_CHERRY=NEWAT_CHERRY_SAPLING,		/* Cherry */
 	FLOWER_WHITE_TULIP=NEWAT_WHITE_TULIP,	/* White tulip */
 	FLOWER_RED_TULIP=NEWAT_RED_TULIP,		/* Red tulip */
 	FLOWER_PINK_TULIP=NEWAT_PINK_TULIP,		/* Pink tulip */
@@ -153,8 +154,8 @@ enum BlockType {
 	PLANT_FERN=NEWAT_FERN,					/* Fern */
 	PLANT_GRASS=NEWAT_GRASS,				/* Grass */
 	/* MUSHROOM */
-	MUSHROOM_RED=NEWAT_MUSHROOM_RED,		/* Red mushroom */
-	MUSHROOM_BROWN=NEWAT_MUSHROOM_BROWN,	/* Brown mushroom */
+	MUSHROOM_RED=NEWAT_RED_MUSHROOM,		/* Red mushroom */
+	MUSHROOM_BROWN=NEWAT_BROWN_MUSHROOM,	/* Brown mushroom */
 	/* Unused block */
 	STONE_BRICK=NEWAT_STONE_BRICK,			/* Stone brick --> Unused */
 	GLASS=NEWAT_GLASS,						/* Glass --> Unused */

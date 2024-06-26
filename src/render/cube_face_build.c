@@ -61,11 +61,11 @@ u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount, u32 *waterFaceC
 	return (opaqueCount);
 }
 
-void displayAllAtlasBlock(f32 x, f32 z, s32 *type) {
+void displayAllAtlasBlock(f32 x, f32 z, s32 *type, u8 face) {
 	// (void)x, (void)z;
 	int textureIdx = x + z * 16;
 	if (textureIdx <= NEWAT_MAX) {
-		*type = s32StoreValues(textureIdx, 0, 0, 0);
+		*type = s32StoreValues(textureIdx, face, 0, 0);
 	} 
 }
 
@@ -88,7 +88,7 @@ void woolDebugFog(s32 chunkX,s32 chunkZ, s32 *type) {
 	s32 len = sizeof(woolArray) / sizeof(s8);
 
 	if (chunkZ == 0) {
-		*type = s32StoreValues(woolArray[abs(chunkX) % len], 0, 0, 0);
+		*type = s32StoreValues(woolArray[abs(chunkX) % len], BOTTOM_FACE, 0, 0);
 	}
 }
 
@@ -101,10 +101,8 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 	u32 trspIdx[6] = {0};
 	u32 waterFaceIdx = 0;
 
-
-
-	// ft_bzero(opqIdx, sizeof(u32) * 6);
-	// ft_bzero(trspIdx, sizeof(u32) * 6);
+	ft_bzero(opqIdx, sizeof(u32) * 6);
+	ft_bzero(trspIdx, sizeof(u32) * 6);
 
 
 	render->trspFaceCount = ft_calloc(sizeof(u32), 6);
@@ -132,8 +130,8 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					render->faceArray[i][opqIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->faceArray[i][opqIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
 					render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
-					// if (chunks->x == 0 && chunks->z == 0 && subID == 0 && block->y == 0) {
-					// 	displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]]);
+					// if (chunks->x == 0 && chunks->z == 0 && render->faceArray[i][opqIdx[i]][1] == 0) {
+					// 	displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]], i);
 					// }
 					// woolDebugFog(chunks->x, chunks->z, &render->faceTypeID[i][opqIdx[i]]);
 					opqIdx[i] += 1;
