@@ -75,6 +75,7 @@
 		"bitshift_utils.h": "c",
 		"biome.h": "c",
 		"algorithm": "c",
-		"format": "c"
+		"format": "c",
+		"cstddef": "c"
 	}
 }
