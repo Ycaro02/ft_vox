@@ -129,9 +129,9 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 						render->faceArray[i][opqIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
 						render->faceArray[i][opqIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
 						render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
-						// if (chunks->x == 0 && chunks->z == 0 && render->faceArray[i][opqIdx[i]][1] == 0) {
-						// 	displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]], i);
-						// }
+						if (chunks->x == 0 && chunks->z == 0 && render->faceArray[i][opqIdx[i]][1] == 0) {
+							displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]], i);
+						}
 						// woolDebugFog(chunks->x, chunks->z, &render->faceTypeID[i][opqIdx[i]]);
 						opqIdx[i] += 1;
 					} else if (isTransparentNotWaterIce(block->type)) { /* Water face fill */
@@ -201,7 +201,6 @@ void drawFace(GLuint faceVBO, GLuint metadataVBO, u32 vertex_nb, u32 faceNb) {
 	
 	glDrawElementsInstanced(GL_TRIANGLES, vertex_nb, GL_UNSIGNED_INT, 0, faceNb);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	// glBindVertexArray(0);
 }
 
 
@@ -209,9 +208,6 @@ typedef struct s_render_chunk_cache {
 	RenderChunks	*render;
 	s32				distance;
 } RenderChunkCache;
-
-#define OPACITY_FACE 		TRUE
-#define TRANSPARENT_FACE 	FALSE
 
 
 void renderChunksCacheFill(RenderChunks *render, RenderChunkCache *cache,  vec2_s32 cameraChunk, u32 *cacheIdx) {
@@ -270,7 +266,7 @@ void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
 	
 
 
-	for (int i = 5; i >= 0; --i) {
+	for (s32 i = 5; i >= 0; --i) {
 		count = 0;
 		glBindVertexArray(c->faceCube[i].VAO);
 		while (cache[count].render) {
@@ -286,7 +282,7 @@ void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
 	}
 }
 
-void renderCacheSort(RenderChunkCache *array, int n) {
+void renderCacheSort(RenderChunkCache *array, s32 n) {
     RenderChunkCache	tmp;
     s32					i, j;
     
@@ -323,12 +319,6 @@ void drawAllChunksByFace(Context *c) {
 	opaqueFaceDisplay(c, cache, cameraChunk);
 	renderCacheSort(cache, c->displayData.chunkRenderedNb);
 	trspFaceDisplay(c, cache);
-	/* Display cahe render distance */
-	// for (s32 i = 0; cache[i].render; ++i) {
-	// 	ft_printf_fd(1, "Distance: %d\n", cache[i].distance);
-	// }
-
-	// allFaceDisplay(c, cache, cameraChunk, TRANSPARENT_FACE);
 	free(cache);
     mtx_unlock(&c->renderMtx);
 }

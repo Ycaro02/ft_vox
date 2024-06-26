@@ -10,6 +10,7 @@
 #define BIOME_SWAMP 4
 
 #define TREE_IDX_MAX 8
+#define FLOWER_IDX_MAX 16
 
 struct s_biome_block {
 	s32		biomeId;
@@ -18,7 +19,10 @@ struct s_biome_block {
 	s32		water;				/* Water for plain biom */
 	s32		underWater;			/* Underwater sand for plain biom */
 	s32		stone;				/* Stone for plain biom */
-	s8		tree[TREE_IDX_MAX];	/* Tree texture */
+	s32		tree[TREE_IDX_MAX];	/* Tree texture */
+	s32		flowers[FLOWER_IDX_MAX]; /* Flower texture */
+	s32		treeMax;
+	s32		flowersMax;
 };
 
 

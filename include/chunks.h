@@ -36,6 +36,7 @@ struct s_chunks {
 	u8				neighbors;						/* Neighbors */
 	u8				occlusionDone;					/* Neighbors occlusion done */
 	s8				biomeId;						/* Chunk biomeId */
+	BiomBlock		*biomeBlock;						/* Biome block */
 };
 
 #define CHUNK_NEIGHBOR_BACK 	1U

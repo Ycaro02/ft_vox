@@ -44,6 +44,7 @@ void chunksMapFree(void *entry) {
 		if (chunks->render) {
 			renderChunkFree(chunks->render);
 		}
+		free(chunks->biomeBlock);
 		free(e->value); /* free the value (allocaated ptr) */
 	}
 	free(e); /* free the entry t_list node */
@@ -91,7 +92,7 @@ void occlusionCullingStatic(Block *****chunkBlockCache, Chunks *chunk) {
  * @param sub_chunk Subchunk pointer
  * @return size_t Number of block filled (hashmap size)
 */
-size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinData **perlinVal, s32 layer, s8 chunkBiomeId)
+size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinData **perlinVal, s32 layer, BiomBlock *biomeBlock)
 {
 	Block *block = NULL;
 	s32 startYWorld = layer * BLOCKS_PER_CHUNK;
@@ -99,7 +100,7 @@ size_t subchunksInit(Block *****chunkBlockCache, SubChunks *sub_chunk, PerlinDat
     for (s32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
         for (s32 y = 0; y < BLOCKS_PER_CHUNK; ++y) {
             for (s32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
-				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld, chunkBiomeId))) {
+				if ((block = blockCreate(x ,y ,z , perlinVal[x][z].normalise, startYWorld, biomeBlock))) {
 					hashmap_set_entry(sub_chunk->block_map, (BlockPos){x, y, z}, block);
 					chunkBlockCache[layer][x][y][z] = block;
 				}
@@ -229,32 +230,67 @@ s8 chunkBiomeIdGet(PerlinData **perlinVal) {
 }
 
 void flowerCreate(Block *****chunkBlockCache,Chunks * chunk, s32 x, s32 y, s32 z, s32 flowerId) {
-	static s8 flowerTypeArray[] = {
-		FLOWER_DANDELION,
-		FLOWER_BLUE_ORCHID,
-		FLOWER_AZURE,	
-		FLOWER_ALLIUM,
-		FLOWER_CORNFLOWER,
-		FLOWER_CHERRY,
-		FLOWER_WHITE_TULIP,
-		FLOWER_RED_TULIP,
-		FLOWER_PINK_TULIP,
-		FLOWER_DAYSIE,
-		FLOWER_POPPY,
-		FLOWER_LILY,
-		PLANT_FERN,
-		PLANT_GRASS,
-		MUSHROOM_RED,
-		MUSHROOM_BROWN,
-	};
+	// static s8 flowerTypeArray[] = {
+	// 	FLOWER_DANDELION,
+	// 	FLOWER_BLUE_ORCHID,
+	// 	FLOWER_AZURE,	
+	// 	FLOWER_ALLIUM,
+	// 	FLOWER_CORNFLOWER,
+	// 	FLOWER_CHERRY,
+	// 	FLOWER_WHITE_TULIP,
+	// 	FLOWER_RED_TULIP,
+	// 	FLOWER_PINK_TULIP,
+	// 	FLOWER_DAYSIE,
+	// 	FLOWER_POPPY,
+	// 	FLOWER_LILY,
+	// 	PLANT_FERN,
+	// 	PLANT_GRASS,
+	// 	MUSHROOM_RED,
+	// 	MUSHROOM_BROWN,
+	// };
 
 	s32 localY = y % 16;
 	s32 subId = y / 16;
 	if (blockExist(chunkBlockCache, (BlockPos){x, y - 1, z}) && ((y - 1) % 16) < 15) {
-		Block *block = basicBlockCreate(x, localY, z, flowerTypeArray[flowerId]);
+		// Block *block = basicBlockCreate(x, localY, z, flowerTypeArray[flowerId]);
+		Block *block = basicBlockCreate(x, localY, z, flowerId);
 		hashmap_set_entry(chunk->sub_chunks[subId].block_map, (BlockPos){x, localY, z}, block);
 		chunkBlockCache[subId][x][localY][z] = block;
 	}
+}
+
+void flowerTreeGeneration(Block *****chunkBlockCache, Chunks *chunk, PerlinData **perlinVal)
+{
+		/*	Tree generation 3 and 4 cause of cubeLeaf size is 3 
+		To refactor
+		- We can generate array of random value before to avoid multiple call to srand()/rand()
+	*/
+	u32 chunkSeed = ((u32)chunk->x ^ (u32)chunk->z) ^ 65536;
+    srand(chunkSeed);
+	s32 spawnRate = rand() % 40;
+
+    for (u32 x = 3; x < BLOCKS_PER_CHUNK; x += 4) {
+        for (u32 z = 3; z < BLOCKS_PER_CHUNK; z += 4) {
+            s32 y = perlinVal[x][z].normalise + 1;
+
+			if (x + 3 > BLOCKS_PER_CHUNK || z + 3 > BLOCKS_PER_CHUNK) continue;
+            if (y > 100 || y <= SEA_LEVEL + 5) break;
+
+      		if (blockExist(chunkBlockCache, (BlockPos){x, perlinVal[x][z].normalise, z})) {
+				if ((rand() % 100) < spawnRate) {
+					s32 treeId = (abs(chunk->x) + abs(chunk->z)) % chunk->biomeBlock->treeMax;
+                	treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z},\
+					 chunk->biomeBlock->tree[treeId]);
+					//  (abs(chunk->x) + abs(chunk->z)) % TREE_IDX_MAX);
+				} else {
+					s32 flowerId = (abs(chunk->x) + abs(chunk->z)) % chunk->biomeBlock->flowersMax;
+					flowerCreate(chunkBlockCache, chunk, x, y, z,\
+					 chunk->biomeBlock->flowers[flowerId]);
+					//  (abs(chunk->x) + abs(chunk->z)) % FLOWER_IDX_MAX);
+				}
+            }
+        }
+    }
 }
 
 /**
@@ -272,8 +308,14 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 			perlinValueFill(noise, localX, localZ, &perlinVal[x][z]);
 		}
 	}
+	
+	if (!(chunk->biomeBlock = malloc(sizeof(BiomBlock)))) {
+		ft_printf_fd(2, "Failed to allocate biomeBlock\n");
+		return;
+	}
 
 	chunk->biomeId = chunkBiomeIdGet(perlinVal);
+	biomDetection(chunk->biomeBlock, chunk->biomeId);
 	chunk->noiseData = perlinVal;
 
 	s32 chunkMaxY = maxHeightGet(perlinVal);
@@ -287,36 +329,15 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 			ft_printf_fd(2, "Failed to allocate hashmap\n");
 			return;
 		}
-		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], chunk->noiseData, i, chunk->biomeId);
+		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], chunk->noiseData, i, chunk->biomeBlock);
 	}
 
 	perlinCaveDataGet(chunk, noise->cave);
 	digCaveCall(chunk, chunkBlockCache, perlinVal);
 
-	/*	Tree generation 3 and 4 cause of cubeLeaf size is 3 
-		To refactor
-		- We can generate array of random value before to avoid multiple call to srand()/rand()
-	*/
-	u32 chunkSeed = ((u32)chunk->x ^ (u32)chunk->z) ^ 65536;
-    srand(chunkSeed);
-	s32 spawnRate = rand() % 40;
 
-    for (u32 x = 3; x < BLOCKS_PER_CHUNK; x += 4) {
-        for (u32 z = 3; z < BLOCKS_PER_CHUNK; z += 4) {
-            s32 y = perlinVal[x][z].normalise + 1;
+	flowerTreeGeneration(chunkBlockCache, chunk, perlinVal);
 
-			if (x + 3 > BLOCKS_PER_CHUNK || z + 3 > BLOCKS_PER_CHUNK) continue;
-            if (y > 100 || y <= SEA_LEVEL + 5) break;
-
-      		if (blockExist(chunkBlockCache, (BlockPos){x, perlinVal[x][z].normalise, z})) {
-				if ((rand() % 100) < spawnRate) {
-                	treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z}, (abs(chunk->x) + abs(chunk->z)) % TREE_IDX_MAX);
-				} else {
-					flowerCreate(chunkBlockCache, chunk, x, y, z, (abs(chunk->x) + abs(chunk->z)) % FLOWER_IDX_MAX);
-				}
-            }
-        }
-    }
 	occlusionCullingStatic(chunkBlockCache, chunk);
 }
 

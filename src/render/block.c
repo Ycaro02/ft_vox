@@ -42,26 +42,26 @@ Block *basicBlockCreate(s32 x, s32 y, s32 z, s32 type) {
 	return (block);
 }
 
-Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, s8 chunkBiomeId) {
+Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, BiomBlock *biomeBlock) {
     Block   	*block = NULL;
-	BiomBlock	biomBlock = {0};
+	// BiomBlock	biomBlock = {0};
     s32     	blockType = AIR;
     s32     	realY = startYWorld + y;
 
-	biomDetection(&biomBlock, chunkBiomeId); /* need perlin val here */
+	// biomDetection(&biomBlock, chunkBiomeId); /* need perlin val here */
 
 
 	if (realY < maxHeight - 2) {
-		blockType = biomBlock.stone;
+		blockType = biomeBlock->stone;
 		if (realY == 0) { blockType = BEDROCK; }
 	} 
 	else if (realY <= maxHeight) {
-		blockType = biomBlock.dirt;
-		if (realY == maxHeight) { blockType = biomBlock.top;}
-		if (realY < SEA_LEVEL) { blockType = biomBlock.underWater; }
+		blockType = biomeBlock->dirt;
+		if (realY == maxHeight) { blockType = biomeBlock->top;}
+		if (realY < SEA_LEVEL) { blockType = biomeBlock->underWater; }
 	} 
 	else if (realY == SEA_LEVEL) {
-		blockType = biomBlock.water;
+		blockType = biomeBlock->water;
 	} 
 	else {
 		return (NULL);
@@ -76,7 +76,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, s8 chunk
     block->y = y;
     block->z = z;
     block->neighbors = 0;
-	block->biomeId = biomBlock.biomeId;
+	block->biomeId = biomeBlock->biomeId;
     return (block);
 }
 
