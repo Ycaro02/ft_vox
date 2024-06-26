@@ -7,6 +7,8 @@
 void renderChunkFree(RenderChunks *render) {
 	free(render->faceCount);
 	free(render->trspFaceCount);
+	free(render->topFaceWater);
+	free(render->topFaceWaterTypeID);
 	for (u8 i = 0; i < 6; ++i) {
 		free(render->faceArray[i]);
 		free(render->faceTypeID[i]);

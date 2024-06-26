@@ -10,6 +10,12 @@ struct s_render_chunks {
 	GLuint		faceTypeVBO[6];
 	u32			*faceCount;
 
+	vec3		*topFaceWater;
+	s32			*topFaceWaterTypeID;
+	GLuint		topFaceWaterVBO;
+	GLuint		topFaceWaterTypeVBO;
+	u32			topFaceWaterCount;
+
 	vec3		*trspFaceArray[6];
 	s32			*trspTypeId[6];
 	GLuint		trspFaceVBO[6];

@@ -29,11 +29,15 @@ s8 isWaterIce(s32 type) {
 	return (type == WATER || type == ICE);
 }
 
+s8 isTransparentNotWaterIce(s32 type) {
+	return (isTransparentBlock(type) && !isWaterIce(type));
+}
+
 s8 faceHidden(u8 neighbors, u8 face) {
 	return (neighbors & (1U << face));
 }
 
-u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount) {
+u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount, u32 *waterFaceCount) {
 	u32 *opaqueCount = ft_calloc(sizeof(u32), 6);
     // s8 	next = TRUE;
 
@@ -45,9 +49,10 @@ u32 *faceVisibleCount(Chunks *chunks, u32 *transparentFaceCount) {
 			for (u8 i = 0; i < 6; ++i) {
 				if (!faceHidden(block->neighbors, i) && !isTransparentBlock(block->type)) {
 					opaqueCount[i] += 1U;
-				}
-				if (isTransparentBlock(block->type) && !faceHidden(block->neighbors, i)) {
+				} else if (!faceHidden(block->neighbors, i) && isTransparentNotWaterIce(block->type)) {
 					transparentFaceCount[i] += 1U;
+				} else if (!faceHidden(block->neighbors, i) && isWaterIce(block->type)) {
+					*waterFaceCount += 1U;
 				}
 			}
 		}
@@ -94,13 +99,16 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 
 	u32 opqIdx[6] = {0};
 	u32 trspIdx[6] = {0};
+	u32 waterFaceIdx = 0;
+
+
 
 	// ft_bzero(opqIdx, sizeof(u32) * 6);
 	// ft_bzero(trspIdx, sizeof(u32) * 6);
 
 
 	render->trspFaceCount = ft_calloc(sizeof(u32), 6);
-	render->faceCount = faceVisibleCount(chunks, render->trspFaceCount);
+	render->faceCount = faceVisibleCount(chunks, render->trspFaceCount, &render->topFaceWaterCount);
 	for (u8 i = 0; i < 6; ++i) {
 		/* Opaque face init */
 		render->faceArray[i] = ft_calloc(sizeof(vec3), render->faceCount[i]);
@@ -110,6 +118,9 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 		render->trspTypeId[i] = ft_calloc(sizeof(f32), render->trspFaceCount[i]);
 	}
 
+
+	render->topFaceWater = ft_calloc(sizeof(vec3), render->topFaceWaterCount);
+	render->topFaceWaterTypeID = ft_calloc(sizeof(f32), render->topFaceWaterCount);
 
 	for (s32 subID = 0; chunks->sub_chunks[subID].block_map != NULL; ++subID) {
 		HashMap_it it = hashmap_iterator(chunks->sub_chunks[subID].block_map);
@@ -128,12 +139,18 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 					opqIdx[i] += 1;
 				} 
 				// TOREFACT
-				else if (!faceHidden(block->neighbors, i) && isTransparentBlock(block->type)) { /* Water face fill */
+				else if (!faceHidden(block->neighbors, i) && isTransparentNotWaterIce(block->type)) { /* Water face fill */
 					render->trspFaceArray[i][trspIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 					render->trspFaceArray[i][trspIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
 					render->trspFaceArray[i][trspIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
 					render->trspTypeId[i][trspIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
 					trspIdx[i] += 1;
+				} else if (!faceHidden(block->neighbors, i) && isWaterIce(block->type) && i == TOP_FACE) { /* Water face fill */
+					render->topFaceWater[waterFaceIdx][0] = (f32)block->x + (f32)(chunks->x * 16);
+					render->topFaceWater[waterFaceIdx][1] = (f32)block->y + (f32)(subID * 16);
+					render->topFaceWater[waterFaceIdx][2] = (f32)block->z + (f32)(chunks->z * 16);
+					render->topFaceWaterTypeID[waterFaceIdx] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
+					waterFaceIdx++;
 				}
 			}
 		}
@@ -163,6 +180,9 @@ void renderChunkCreateFaceVBO(HashMap *chunksMap, BlockPos chunkID) {
 		render->trspFaceVBO[i] = faceInstanceVBOCreate(render->trspFaceArray[i], render->trspFaceCount[i]);
 		render->trspTypeVBO[i] = bufferGlCreate(GL_ARRAY_BUFFER, render->trspFaceCount[i] * sizeof(GLuint), (void *)&render->trspTypeId[i][0]);
 	}
+
+	render->topFaceWaterVBO = faceInstanceVBOCreate(render->topFaceWater, render->topFaceWaterCount);
+	render->topFaceWaterTypeVBO = bufferGlCreate(GL_ARRAY_BUFFER, render->topFaceWaterCount * sizeof(GLuint), (void *)&render->topFaceWaterTypeID[0]);
 
 }
 
@@ -235,14 +255,28 @@ void opaqueFaceDisplay(Context *c, RenderChunkCache *cache, vec2_s32 cameraChunk
 }
 
 void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
+	
+	RenderChunks	*render = NULL;
+	u32 			faceNb = 0;
+	GLuint 			faceVBO = 0, faceTypeVBO = 0;
+	s32 			count = 0;
+	/* Display water face before */
+	glBindVertexArray(c->faceCube[TOP_FACE].VAO);
+	while (cache[count].render) {
+		render = cache[count].render;
+		faceNb = render->topFaceWaterCount;
+		faceVBO = render->topFaceWaterVBO;
+		faceTypeVBO = render->topFaceWaterTypeVBO;
+		c->displayData.faceRendered += faceNb;
+		drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
+		count++;
+	}
+	glBindVertexArray(0);
+	
 	for (int i = 5; i >= 0; --i) {
-		RenderChunks	*render = NULL;
-		u32 			faceNb = 0;
-		GLuint 			faceVBO = 0, faceTypeVBO = 0;
-		s32 			count = 0;
+		count = 0;
 		glBindVertexArray(c->faceCube[i].VAO);
 		while (cache[count].render) {
-			// ft_printf_fd(1, "i: %d\n", i);
 			render = cache[count].render;
 			faceNb = render->trspFaceCount[i];
 			faceVBO = render->trspFaceVBO[i];
@@ -254,28 +288,6 @@ void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
 		glBindVertexArray(0);
 	}
 }
-
-// void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
-// 	RenderChunks	*render = NULL;
-// 	u32 			faceNb = 0;
-// 	GLuint 			faceVBO = 0, faceTypeVBO = 0;
-// 	s32 			count = 0;
-
-// 	while (cache[count].render) {
-// 		for (int i = 0; i < 6; ++i) {
-// 			glBindVertexArray(c->faceCube[i].VAO);
-// 			// ft_printf_fd(1, "i: %d\n", i);
-// 			render = cache[count].render;
-// 			faceNb = render->trspFaceCount[i];
-// 			faceVBO = render->trspFaceVBO[i];
-// 			faceTypeVBO = render->trspTypeVBO[i];
-// 			c->displayData.faceRendered += faceNb;
-// 			drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
-// 			glBindVertexArray(0);
-// 		}
-// 		count++;
-// 	}
-// }
 
 void renderCacheSort(RenderChunkCache *array, int n) {
     RenderChunkCache	tmp;
