@@ -161,6 +161,12 @@ void perlinValueFill(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData 
         perlinVal->normalise = 160.0f;
     } else {
     	perlinVal->normalise = (s32)roundf((f32)MIN_HEIGHT + (combinedNoise * SCALE_NOISE_HEIGHT));
+		if (perlinVal->normalise < 20) {
+			perlinVal->normalise = abs(perlinVal->normalise);
+		}
+		if (perlinVal->normalise > 160) {
+			perlinVal->normalise = 160;
+		}
 	}
 }
 

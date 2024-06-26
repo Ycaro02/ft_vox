@@ -112,9 +112,13 @@ void displayChunkData(Context *c, Chunks *chunk){
 		char *isRender = (chunksIsRenderer(c->world->renderChunksMap, renderChunk->chunkID)) ? GREEN"YES"RESET : RED"NO"RESET;
 		ft_printf_fd(1, YELLOW"Is in render map == "RESET"%s\n", isRender);
 		for (u32 i = 0; i < 6; ++i) {
-			ft_printf_fd(1, YELLOW"Face:|%u| Count %u-> "RESET, i, renderChunk->faceCount[i]);
+			// ft_printf_fd(1, YELLOW"Face:|%u| Count %u-> "RESET, i, renderChunk->faceCount[i]);
+			// ft_printf_fd(1, YELLOW"Trsp:|%u| Count %u-> "RESET, i, renderChunk->trspFaceCount[i]);
 			ft_printf_fd(1, ORANGE"Face VBO %u, TypeVBO %u\n"RESET, renderChunk->faceVBO[i], renderChunk->faceTypeVBO[i]);
+			ft_printf_fd(1, ORANGE"Trsp VBO %u, TypeVBO %u\n"RESET, renderChunk->trspFaceVBO[i], renderChunk->trspTypeVBO[i]);
 		}
+		ft_printf_fd(1, YELLOW"Top Face Water:|%u|\n"RESET, renderChunk->topFaceWaterCount);
+		ft_printf_fd(1, ORANGE"Top Face Water VBO:|%u|, Top Face Water Type VBO:|%u|\n"RESET, renderChunk->topFaceWaterVBO, renderChunk->topFaceWaterTypeVBO);
 		ft_printf_fd(1, GREEN"Last update %u\n"RESET, (suseconds_t)(renderChunk->lastUpdate - get_ms_time()));
 	} else {
 		ft_printf_fd(1, RED"Render chunk is NULL\n"RESET);
@@ -168,9 +172,9 @@ void testChunksExist(Context *c) {
 		// 	ft_printf_fd(1, RED" -> Camera is underground\n"RESET);
 		// 	c->world->undergroundBlock->isUnderground = TRUE;
 		// }
-		// mtx_lock(&c->vboToCreateMtx);
-		// displayChunkData(c, chunk);
-		// mtx_unlock(&c->vboToCreateMtx);
+		mtx_lock(&c->vboToCreateMtx);
+		displayChunkData(c, chunk);
+		mtx_unlock(&c->vboToCreateMtx);
 		/* TO restore now u8 val */
 		// ft_printf_fd(1, RED"Perlin cave\n");
 		// ft_printf_fd(1, "Val: %u\n"RESET, chunk->perlinCave[blockPos.x][blockPos.z]);

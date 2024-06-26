@@ -53,46 +53,25 @@ void worldToChunksPos(vec3 current, vec3 chunkOffset) {
 }
 
 
-void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
-	GLuint		*instanceVBO = NULL, *typeBlockVBO = NULL;
-	GLuint		*trspVBO = NULL, *trspTypeVBO = NULL;
-	GLuint		*waterVBO = NULL, *waterTypeVBO = NULL;
+void destroyVBOListAdd(Context *c, GLuint vbo) {
+	GLuint *vboToDestroy = NULL;
 
+	if ((vboToDestroy = malloc(sizeof(GLuint)))) {
+		*vboToDestroy = vbo;
+		ft_lstadd_back(&c->vboToDestroy, ft_lstnew(vboToDestroy));
+	}
+}
+
+void renderChunksVBODestroyListBuild(Context *c, Chunks *chunk) {
 
 	for (u32 i = 0; i < 6; ++i) {
-		/* opaque face */
-		if ((instanceVBO = malloc(sizeof(GLuint))) && (typeBlockVBO = malloc(sizeof(GLuint)))) {
-			*instanceVBO = chunk->render->faceVBO[i];
-			*typeBlockVBO = chunk->render->faceTypeVBO[i];
-			if (*instanceVBO != 0) {
-				ft_lstadd_back(&c->vboToDestroy, ft_lstnew(instanceVBO));
-			}
-			if (*typeBlockVBO != 0) {
-				ft_lstadd_back(&c->vboToDestroy, ft_lstnew(typeBlockVBO));
-			}
-		}
-		/* transparency face */
-		if ((trspVBO = malloc(sizeof(GLuint))) && (trspTypeVBO = malloc(sizeof(GLuint)))) {
-			*trspVBO = chunk->render->trspFaceVBO[i];
-			*trspTypeVBO = chunk->render->trspTypeVBO[i];
-			if (*trspVBO != 0) {
-				ft_lstadd_back(&c->vboToDestroy, ft_lstnew(trspVBO));
-			}
-			if (*trspTypeVBO != 0) {
-				ft_lstadd_back(&c->vboToDestroy, ft_lstnew(trspTypeVBO));
-			}
-		}
+		destroyVBOListAdd(c, chunk->render->faceVBO[i]);
+		destroyVBOListAdd(c, chunk->render->faceTypeVBO[i]);
+		destroyVBOListAdd(c, chunk->render->trspFaceVBO[i]);
+		destroyVBOListAdd(c, chunk->render->trspTypeVBO[i]);
 	}
-	if ((waterVBO = malloc(sizeof(GLuint))) && (waterTypeVBO = malloc(sizeof(GLuint)))) {
-		*waterVBO = chunk->render->topFaceWaterVBO;
-		*waterTypeVBO = chunk->render->topFaceWaterTypeVBO;
-		if (*waterVBO != 0) {
-			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterVBO));
-		}
-		if (*waterTypeVBO != 0) {
-			ft_lstadd_back(&c->vboToDestroy, ft_lstnew(waterTypeVBO));
-		}
-	}
+	destroyVBOListAdd(c, chunk->render->topFaceWaterVBO);
+	destroyVBOListAdd(c, chunk->render->topFaceWaterTypeVBO);
 }
 
 void unloadChunkHandler(Context *c) {

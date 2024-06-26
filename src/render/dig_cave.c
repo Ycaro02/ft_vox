@@ -37,6 +37,10 @@ static void caveEntryMark(Chunks *chunk, Block *****chunkBlockCache, s32 startX,
 
 	for (s32 tmpY = startY; tmpY > maxDepth; --tmpY) {
 		subChunkId = tmpY / BLOCKS_PER_CHUNK;
+		if (subChunkId < 0 || subChunkId >= 16) {
+			ft_printf_fd(2, "Subchunk id out of range rejected, %d, Start y %d, tmp y %d\n", subChunkId, startY, tmpY);
+			return ;
+		}
 		if (chunkBlockCache[subChunkId][startX][tmpY % BLOCKS_PER_CHUNK][startZ]) {
 			hashmap_remove_entry(chunk->sub_chunks[subChunkId].block_map, (BlockPos){startX, tmpY % BLOCKS_PER_CHUNK, startZ}, HASHMAP_FREE_DATA);
 			chunkBlockCache[subChunkId][startX][tmpY % BLOCKS_PER_CHUNK][startZ] = NULL;
@@ -54,7 +58,7 @@ void digCaveCall(Chunks *chunk, Block *****chunkBlockCache, PerlinData **perlinV
 				startX = x;
 				startY = perlinVal[x][z].normalise; // Assuming the height map can provide an initial Y value
 				startZ = z;
-				if (startY < 80) {
+				if (startY < 80 && startY > CAVE_ENTRY_DEPTH + 2) {
 					caveEntryMark(chunk, chunkBlockCache, startX, startY, startZ);
 				}
 			}
