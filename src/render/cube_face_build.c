@@ -202,50 +202,80 @@ void renderChunksCacheFill(RenderChunks *render, RenderChunkCache *cache,  vec2_
 	*cacheIdx += 1U;
 }
 
-void allFaceDisplay(Context *c, RenderChunkCache *cache, vec2_s32 cameraChunk, u8 first) {
+void opaqueFaceDisplay(Context *c, RenderChunkCache *cache, vec2_s32 cameraChunk) {
 	HashMap_it		it;
 	RenderChunks	*render = NULL;
     u32 			faceNb = 0;
 	GLuint 			faceVBO = 0, faceTypeVBO = 0;
 	u32				cacheIdx = 0;
-	s32 			count = 0;
+	// s32 			count = 0;
 
 	for (u8 i = 0; i < 6; ++i) {
-		count = 0;
+		// count = 0;
 		glBindVertexArray(c->faceCube[i].VAO);
-		if (first) {
-			it = hashmap_iterator(c->world->renderChunksMap);
-			/* Basic face display */
-			while (hashmap_next(&it)) {
-				render = (RenderChunks *)it.value;
-				faceNb = render->faceCount[i];
-				faceVBO = render->faceVBO[i];
-				faceTypeVBO = render->faceTypeVBO[i];
-				c->displayData.faceRendered += faceNb;
-				if (i == 0) {
-					renderChunksCacheFill(render, cache, cameraChunk, &cacheIdx);
-				}
-				drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
+		it = hashmap_iterator(c->world->renderChunksMap);
+		/* Basic face display */
+		while (hashmap_next(&it)) {
+			render = (RenderChunks *)it.value;
+			faceNb = render->faceCount[i];
+			faceVBO = render->faceVBO[i];
+			faceTypeVBO = render->faceTypeVBO[i];
+			c->displayData.faceRendered += faceNb;
+			if (i == 0) {
+				renderChunksCacheFill(render, cache, cameraChunk, &cacheIdx);
 			}
-		} else {
-			while (cache[count].render) {
-				render = cache[count].render;
-				faceNb = render->trspFaceCount[i];
-				faceVBO = render->trspFaceVBO[i];
-				faceTypeVBO = render->trspTypeVBO[i];
-				c->displayData.faceRendered += faceNb;
-				drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
-				count++;
-			}
+			drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
 		}
 		/* Underground face display */
-		if (first && c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
+		if (c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
 			drawFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, TOTAL_UNDERGROUND_FACE);			
 		}
 		glBindVertexArray(0);
-
 	}
 }
+
+void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
+	for (int i = 5; i >= 0; --i) {
+		RenderChunks	*render = NULL;
+		u32 			faceNb = 0;
+		GLuint 			faceVBO = 0, faceTypeVBO = 0;
+		s32 			count = 0;
+		glBindVertexArray(c->faceCube[i].VAO);
+		while (cache[count].render) {
+			// ft_printf_fd(1, "i: %d\n", i);
+			render = cache[count].render;
+			faceNb = render->trspFaceCount[i];
+			faceVBO = render->trspFaceVBO[i];
+			faceTypeVBO = render->trspTypeVBO[i];
+			c->displayData.faceRendered += faceNb;
+			drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
+			count++;
+		}
+		glBindVertexArray(0);
+	}
+}
+
+// void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
+// 	RenderChunks	*render = NULL;
+// 	u32 			faceNb = 0;
+// 	GLuint 			faceVBO = 0, faceTypeVBO = 0;
+// 	s32 			count = 0;
+
+// 	while (cache[count].render) {
+// 		for (int i = 0; i < 6; ++i) {
+// 			glBindVertexArray(c->faceCube[i].VAO);
+// 			// ft_printf_fd(1, "i: %d\n", i);
+// 			render = cache[count].render;
+// 			faceNb = render->trspFaceCount[i];
+// 			faceVBO = render->trspFaceVBO[i];
+// 			faceTypeVBO = render->trspTypeVBO[i];
+// 			c->displayData.faceRendered += faceNb;
+// 			drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
+// 			glBindVertexArray(0);
+// 		}
+// 		count++;
+// 	}
+// }
 
 void renderCacheSort(RenderChunkCache *array, int n) {
     RenderChunkCache	tmp;
@@ -281,9 +311,15 @@ void drawAllChunksByFace(Context *c) {
 	cache = malloc(sizeof(RenderChunkCache) * (c->displayData.chunkRenderedNb + 1));
 	cache[c->displayData.chunkRenderedNb].render = NULL;
 	cache[c->displayData.chunkRenderedNb].distance = -1;
-	allFaceDisplay(c, cache, cameraChunk, OPACITY_FACE);
+	opaqueFaceDisplay(c, cache, cameraChunk);
 	renderCacheSort(cache, c->displayData.chunkRenderedNb);
-	allFaceDisplay(c, cache, cameraChunk, TRANSPARENT_FACE);
+	trspFaceDisplay(c, cache);
+	/* Display cahe render distance */
+	// for (s32 i = 0; cache[i].render; ++i) {
+	// 	ft_printf_fd(1, "Distance: %d\n", cache[i].distance);
+	// }
+
+	// allFaceDisplay(c, cache, cameraChunk, TRANSPARENT_FACE);
 	free(cache);
     mtx_unlock(&c->renderMtx);
 }
