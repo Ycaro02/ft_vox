@@ -51,8 +51,8 @@ void localBlockDataUpdate(Context *c) {
 	c->displayData.noiseData.valCombined = chunk->noiseData[localBlockPos.x][localBlockPos.z].valCombined;
 	c->displayData.noiseData.valHumidity = chunk->noiseData[localBlockPos.x][localBlockPos.z].valHumidity;
 	c->displayData.noiseData.valTemperature = chunk->noiseData[localBlockPos.x][localBlockPos.z].valTemperature;
-	// c->displayData.posNoise[0] = chunk->noiseData[localBlockPos.x][localBlockPos.z].x0;
-	// c->displayData.posNoise[1] = chunk->noiseData[localBlockPos.x][localBlockPos.z].z0;
+	c->displayData.posNoise[0] = chunk->noiseData[localBlockPos.x][localBlockPos.z].x0;
+	c->displayData.posNoise[1] = chunk->noiseData[localBlockPos.x][localBlockPos.z].z0;
 }
 
 void renderChunksVBODestroy(Context *c) {
@@ -244,7 +244,7 @@ void dataDisplay(Context *c) {
 	displayFloatTextCall(c, "Val Combined: ", 250.0f, c->displayData.noiseData.valCombined, VEC3_YELLOW, VEC3_BLACK);
 	displayFloatTextCall(c, "Val Humidity: ", 275.0f, c->displayData.noiseData.valHumidity, VEC3_YELLOW, VEC3_BLACK);
 	displayFloatTextCall(c, "Val Temperature: ", 300.0f, c->displayData.noiseData.valTemperature, VEC3_YELLOW, VEC3_BLACK);
-	// displayDoublePosition(c, "Noise Pos: ", 325.0f, c->displayData.posNoise[0], c->displayData.posNoise[1], VEC3_YELLOW);
+	displayDoublePosition(c, "Noise Pos: ", 325.0f, c->displayData.posNoise[0], c->displayData.posNoise[1], VEC3_YELLOW);
 }
 
 void renderGame(Context *c, GLuint skyTexture) {

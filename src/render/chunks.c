@@ -143,11 +143,11 @@ void perlinValueFill(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData 
 	s32 w = PERLIN_NOISE_WIDTH;
 
     /* Get multiple noise values */
-    perlinVal->valContinent = interpolateNoiseGet(noise->continental, localX, localZ, 8.0f, w, h);
-    perlinVal->valErosion  = interpolateNoiseGet(noise->erosion, localX, localZ, 8.0f, w, h);
-    perlinVal->valPeaksValley = interpolateNoiseGet(noise->peaksValley, localX, localZ, 8.0f, w, h);
-	perlinVal->valHumidity = interpolateNoiseGet(noise->humidity, localX, localZ, PERLIN_BIOME_SCALE, w, h);
-	perlinVal->valTemperature = interpolateNoiseGet(noise->temperature, localX, localZ, PERLIN_BIOME_SCALE, w, h);
+    perlinVal->valContinent = interpolateNoiseGet(noise->continental, localX, localZ, 8.0f, w, h, perlinVal);
+    perlinVal->valErosion  = interpolateNoiseGet(noise->erosion, localX, localZ, 8.0f, w, h, perlinVal);
+    perlinVal->valPeaksValley = interpolateNoiseGet(noise->peaksValley, localX, localZ, 8.0f, w, h, perlinVal);
+	perlinVal->valHumidity = interpolateNoiseGet(noise->humidity, localX, localZ, PERLIN_BIOME_SCALE, w, h, perlinVal);
+	perlinVal->valTemperature = interpolateNoiseGet(noise->temperature, localX, localZ, PERLIN_BIOME_SCALE, w, h, perlinVal);
 	
 	combinedNoise = (perlinVal->valContinent * CONTINENTAL_WEIGHT) +
 					(perlinVal->valErosion * EROSION_WEIGHT) +
