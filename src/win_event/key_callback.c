@@ -207,6 +207,34 @@ void act_change_polygon_mode(Context *c) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE + fill_mode);
 }
 
+/*
+ * Key Bindings and Actions
+ * -------------------------------------------------------------------------------------------------|
+ * |   Key    |         Action           		|                Description                		|
+ * -------------------------------------------------------------------------------------------------|
+ * |  ESC     | act_escape               		|		Closes the application window.				|
+ * |  P       | act_change_polygon_mode  		|		Toggles polygon rendering mode.				|
+ * |  W       | act_zoom                 		|		Moves the camera forward.					|
+ * |  S       | act_unzoom               		|		Moves the camera backward.					|
+ * |  D       | act_move_right           		|		Moves the camera to the right.				|
+ * |  A       | act_move_left            		|		Moves the camera to the left.				|
+ * |  SPACE   | act_up_camera            		|		Moves the camera upward.					|
+ * |  Q       | act_down_camera          		|		Moves the camera downward.					|
+ * |  LEFT    | act_rotate_camera_left   		|		Rotates the camera to the left.				|
+ * |  RIGHT   | act_rotate_camera_right  		|		Rotates the camera to the right.			|
+ * |  UP      | act_rotate_camera_top    		|		Rotates the camera upward.					|
+ * |  DOWN    | act_rotate_camera_down   		|		Rotates the camera downward.				|
+ * |  ENTER   | act_reseCamera           		|		Resets the camera position.					|
+ * |  C       | act_display_camera_value 		|		Displays current camera position.			|
+ * |  E       | testChunksExist          		|		Tests and displays chunk information.		|
+ * |  L       | act_change_cam_speed     		|		Toggles camera movement speed.				|
+ * |  M       | act_autoMoveTrigger      		|		Toggles automatic camera movement.			|
+ * |  N       | act_autoRotateTrigger    		|		Toggles automatic camera rotation.			|
+ * |  U       | act_displayUnderGroundTrigger	|		Toggles underground block display.			|
+ * |  TAB     | act_displayDataTrigger   		|		Toggles debug data display.					|
+ * |------------------------------------------------------------------------------------------------|
+ */
+
 /**
  * @brief Set key callback for the window
  * @param window 

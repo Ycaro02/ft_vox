@@ -39,7 +39,6 @@ Block *basicBlockCreate(s32 x, s32 y, s32 z, s32 type) {
 	block->neighbors = 0;
 	block->biomeId = 0;
 	block->type = type;
-	block->isUnderground = FALSE;
 	return (block);
 }
 
@@ -47,13 +46,11 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, BiomBloc
     Block   	*block = NULL;
     s32     	blockType = AIR;
     s32     	realY = startYWorld + y;
-	u8			isUnderground = 0;
 
 
 
 	if (realY < maxHeight - 2) {
 		blockType = biomeBlock->stone;
-		isUnderground = TRUE;
 		if (realY == 0) { blockType = BEDROCK; }
 	} 
 	else if (realY <= maxHeight) {
@@ -77,7 +74,6 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, BiomBloc
     block->y = y;
     block->z = z;
     block->neighbors = 0;
-	block->isUnderground = isUnderground;
 	block->biomeId = biomeBlock->biomeId;
     return (block);
 }

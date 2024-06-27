@@ -24,8 +24,6 @@ flat in int biomeType;
 flat in int isGrass;
 flat in int blockFace;
 flat in int isFlower;
-// flat in int isUnderground;
-
 
 #define CAMERA_IN_CAVE 2
 
@@ -86,8 +84,8 @@ void main()
 			}
 		}
 		if (camIsUnderground == CAMERA_IN_CAVE || camIsUnderground == 1) {
-			fogStart = 60.0;
-			fogEnd = 100.0;
+			fogStart = 40.0;
+			fogEnd = 120.0;
 			fogFactor = smoothstep(fogStart, fogEnd, depth);
 			fogColor = vec4(0.0,0.0,0.0, 1.0);
 		} else {

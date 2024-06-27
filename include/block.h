@@ -27,9 +27,8 @@ struct s_block {
     s8	type;       /* Block type */
 	u8  neighbors;  /* Block flag */
 	s8	biomeId;	/* Biome ID */
-	s8 	isUnderground; /* Underground block flag */
 	/* padding */
-	s8 pad1;
+	s8 pad1, pad2;
 };
 
 

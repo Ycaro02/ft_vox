@@ -19,13 +19,11 @@ layout (location = 2) in vec2 aTexCoord;
 /**
  * aMetadata is a 32 bit integer that contains the following information:
  * byte 3: texture ID 
- * byte 2: block face
+ * byte 2: block face --> We can store this in last bool and use it for Y position instead of float in aInstancePos
  * byte 1: biome ID
- * byte 0: bool is plant or flower
- Todo split byte 0 to store more information
- 	We use the last byte to store the following information:
-		- 0: isFlower
-		- 1: isUnderground (To adapt fog color and maybe range too)
+ * byte 0: We use the last byte to store the following boolean information:
+	- 0: isFlower
+		
 */
 layout (location = 3) in int aMetadata;
 
@@ -35,7 +33,6 @@ flat out int biomeType;
 flat out int isGrass;
 flat out int blockFace;
 flat out int isFlower;
-// flat out int isUnderground;
 
 /* Define the uniforms variables */
 uniform mat4 view;
@@ -85,7 +82,6 @@ void main()
 	int lastByte = s32ByteGet(aMetadata, 0);
 	
 	isFlower = u8ValueGet(lastByte, 7);
-	// isUnderground = u8ValueGet(lastByte, 6); /* useless for now */
 
 	vec3 instancePosition = aInstancePos;
 
