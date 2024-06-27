@@ -25,6 +25,10 @@ void act_autoRotateTrigger(Context *c) {
 	c->autoRotate = (c->autoRotate == FALSE) ? TRUE : FALSE;
 }
 
+void act_displayDataTrigger(Context *c) {
+	c->displayData.displayBool = (c->displayData.displayBool == FALSE) ? TRUE : FALSE;
+}
+
 void act_displayUnderGroundTrigger(Context *c) {
 	c->displayUndergroundBlock = (c->displayUndergroundBlock == FALSE) ? TRUE : FALSE;
 }
@@ -234,7 +238,8 @@ void handle_input(void *context)
 		{GLFW_KEY_L, act_change_cam_speed, SINGLE_PRESS},
 		{GLFW_KEY_M, act_autoMoveTrigger, SINGLE_PRESS},
 		{GLFW_KEY_N, act_autoRotateTrigger, SINGLE_PRESS},
-		{GLFW_KEY_U, act_displayUnderGroundTrigger, SINGLE_PRESS}
+		{GLFW_KEY_U, act_displayUnderGroundTrigger, SINGLE_PRESS},
+		{GLFW_KEY_TAB, act_displayDataTrigger, SINGLE_PRESS}
 	};
 	u32 			max = (sizeof(key_actions) / sizeof(KeyAction));
 	s32				state = GLFW_RELEASE;

@@ -49,6 +49,7 @@ typedef struct s_display_data {
 	BlockPos		blockPos;			/* Block position */
 	NoiseData		noiseData;			/* Noise data */
 	vec2_s32		posNoise;			/* Position */
+	s8				displayBool;		/* Display boolean */
 } DisplayData;
 
 /* Context structure */

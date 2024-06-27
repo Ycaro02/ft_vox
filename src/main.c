@@ -230,6 +230,9 @@ void displayDoublePosition(Context* c, const char *description, float startY, lo
 */
 void dataDisplay(Context *c) {
 	displayUnsigned32TextCall(c, "FPS: ", 25.0f, fpsGet(), VEC3_YELLOW, VEC3_ORANGE);
+	if (c->displayData.displayBool == FALSE) {
+		return ;
+	}
 	displayUnsigned32TextCall(c, "Chunk Rendered: ", 50.0f, c->displayData.chunkRenderedNb, VEC3_YELLOW, VEC3_GREEN);
 	displayUnsigned32TextCall(c, "Chunk Loaded: ", 75.0f, c->displayData.chunkLoadedNb, VEC3_YELLOW, VEC3_RED);
 	displayUnsigned32TextCall(c, "Face Rendered: ", 100.0f, c->displayData.faceRendered, VEC3_YELLOW, VEC3_GREEN);
@@ -296,8 +299,8 @@ void mainLoopFpsUnlock(Context *c, GLuint skyTexture) {
     f64 updatePerSec = 60.0;
 
 	/* Disable VSync to avoid fps locking */
-	// glfwSwapInterval(NO_FPS_LIMIT);
-	glfwSwapInterval(VSYNC_FPS_LIMIT);
+	glfwSwapInterval(NO_FPS_LIMIT);
+	// glfwSwapInterval(VSYNC_FPS_LIMIT);
 
     while (!glfwWindowShouldClose(c->win_ptr)) {
         nowTime = glfwGetTime();
