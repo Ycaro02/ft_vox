@@ -99,6 +99,7 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 	u32 opqIdx[6] = {0};
 	u32 trspIdx[6] = {0};
 	u32 waterFaceIdx = 0;
+	u8  lastDataByte = 0;
 
 	ft_bzero(opqIdx, sizeof(u32) * 6);
 	ft_bzero(trspIdx, sizeof(u32) * 6);
@@ -128,7 +129,8 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 						render->faceArray[i][opqIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 						render->faceArray[i][opqIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
 						render->faceArray[i][opqIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-						render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
+						lastDataByte = u8StoreValues(blockIsFlowerPlants(block->type), block->isUnderground,0,0,0,0,0,0);
+						render->faceTypeID[i][opqIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, lastDataByte);
 						if (chunks->x == 0 && chunks->z == 0 && render->faceArray[i][opqIdx[i]][1] == 0) {
 							displayAllAtlasBlock(render->faceArray[i][opqIdx[i]][0], render->faceArray[i][opqIdx[i]][2], &render->faceTypeID[i][opqIdx[i]], i);
 						}
@@ -138,7 +140,8 @@ void chunksCubeFaceGet(Mutex *chunkMtx, Chunks *chunks, RenderChunks *render)
 						render->trspFaceArray[i][trspIdx[i]][0] = (f32)block->x + (f32)(chunks->x * 16);
 						render->trspFaceArray[i][trspIdx[i]][1] = (f32)block->y + (f32)(subID * 16);
 						render->trspFaceArray[i][trspIdx[i]][2] = (f32)block->z + (f32)(chunks->z * 16);
-						render->trspTypeId[i][trspIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, blockIsFlowerPlants(block->type));
+						lastDataByte = u8StoreValues(blockIsFlowerPlants(block->type), block->isUnderground,0,0,0,0,0,0);
+						render->trspTypeId[i][trspIdx[i]] = s32StoreValues(block->type, i, chunks->biomeId, lastDataByte);
 						trspIdx[i] += 1;
 					} else if (isWaterIce(block->type) && i == TOP_FACE) { /* Water face fill */
 						render->topFaceWater[waterFaceIdx][0] = (f32)block->x + (f32)(chunks->x * 16);
@@ -238,7 +241,7 @@ void opaqueFaceDisplay(Context *c, RenderChunkCache *cache, vec2_s32 cameraChunk
 			drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
 		}
 		/* Underground face display */
-		if (c->world->undergroundBlock->isUnderground && c->displayUndergroundBlock) {
+		if (c->world->undergroundBlock->isUnderground == TRUE && c->displayUndergroundBlock) {
 			drawFace(c->world->undergroundBlock->udgFaceVBO[i], c->world->undergroundBlock->udgTypeVBO[i], 6U, TOTAL_UNDERGROUND_FACE);			
 		}
 		glBindVertexArray(0);

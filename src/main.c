@@ -254,7 +254,7 @@ void renderGame(Context *c, GLuint skyTexture) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* Render logic */
-	displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam->projection, c->cam->view);
+	displaySkybox(c->skyboxVAO, skyTexture, c->skyboxShaderID, c->cam->projection, c->cam->view, c->world->undergroundBlock->isUnderground);
 	chunksRender(c, c->cubeShaderID);
 	dataDisplay(c);
 	/* glFlush forces the execution of all previous GL commands */

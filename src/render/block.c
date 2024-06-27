@@ -39,20 +39,21 @@ Block *basicBlockCreate(s32 x, s32 y, s32 z, s32 type) {
 	block->neighbors = 0;
 	block->biomeId = 0;
 	block->type = type;
+	block->isUnderground = FALSE;
 	return (block);
 }
 
 Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, BiomBlock *biomeBlock) {
     Block   	*block = NULL;
-	// BiomBlock	biomBlock = {0};
     s32     	blockType = AIR;
     s32     	realY = startYWorld + y;
+	u8			isUnderground = 0;
 
-	// biomDetection(&biomBlock, chunkBiomeId); /* need perlin val here */
 
 
 	if (realY < maxHeight - 2) {
 		blockType = biomeBlock->stone;
+		isUnderground = TRUE;
 		if (realY == 0) { blockType = BEDROCK; }
 	} 
 	else if (realY <= maxHeight) {
@@ -76,6 +77,7 @@ Block *blockCreate(s32 x, s32 y, s32 z, s32 maxHeight, s32 startYWorld, BiomBloc
     block->y = y;
     block->z = z;
     block->neighbors = 0;
+	block->isUnderground = isUnderground;
 	block->biomeId = biomeBlock->biomeId;
     return (block);
 }
@@ -178,7 +180,7 @@ void undergroundBlockcreate(Context *c) {
 	s32					columnMaxHeight = 0;
 
 
-	undergroundBoolUpdate(c, &currentBloc, &columnMaxHeight);
+	c->world->undergroundBlock->isUnderground = undergroundBoolUpdate(c, &currentBloc, &columnMaxHeight);
 	if (!c->world->undergroundBlock->isUnderground
 		|| BLOCKPOS_CMP(lastBlockPos, currentBloc)) {
 		return ;
@@ -207,16 +209,19 @@ void undergroundBlockcreate(Context *c) {
 	ft_memcpy(&lastBlockPos, &currentBloc, sizeof(BlockPos));
 }
 
+#define CAM_INCAVE 2
+
 /**
  * @brief Update the underground block boolean
  * @param c The game context
  * @param blockPos The block position to set [out]
 */
-void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHeight) {
+u8 undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHeight) {
 	vec3		camPos = {0.0f};
 	Chunks		*chunk = NULL;
 	Block 		*block = NULL;
 	s32			currentCamY = 0, chunkPosx = 0, chunkPosz = 0;
+
 	
 	mtx_lock(&c->gameMtx);
 	glm_vec3_copy(c->cam->position, camPos);
@@ -227,25 +232,30 @@ void undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHe
 	blockLocalPosFromCam(camPos, localBlockPos);
 	chunk = hashmap_get(c->world->chunksMap, CHUNKS_MAP_ID_GET(chunkPosx, chunkPosz));
 	if (!chunk) {
-		return ;
+		return (FALSE);
 	}
 	*columnMaxHeight = chunk->noiseData[localBlockPos->x][localBlockPos->z].normalise;
 	
 
 	camPos[1] -= 0.333333f;
 	if (camPos[1] < 0) {
-		c->world->undergroundBlock->isUnderground = FALSE;
-		return ;
+		return (FALSE);
+		// c->world->undergroundBlock->isUnderground = FALSE;
+		// return ;
 	}
 	currentCamY = (s32)floor(camPos[1] *  2);
 	
 	block = worldPosProtectBlockGet(chunk, *localBlockPos, currentCamY);
-	if (!block) {
-		c->world->undergroundBlock->isUnderground = FALSE;
-	} else if (*columnMaxHeight <= currentCamY) {
-		c->world->undergroundBlock->isUnderground = FALSE;
-	} else {
-		c->world->undergroundBlock->isUnderground = TRUE;
+	if (*columnMaxHeight <= currentCamY) {
+		return (FALSE);
+		// c->world->undergroundBlock->isUnderground = FALSE;
+	}  else if (!block) {
+		return (CAM_INCAVE);
+		// c->world->undergroundBlock->isUnderground = FALSE;
+	} 
+	else {
+		return (TRUE);
+		// c->world->undergroundBlock->isUnderground = TRUE;
 	}
 }
 

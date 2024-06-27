@@ -76,6 +76,7 @@
 		"biome.h": "c",
 		"algorithm": "c",
 		"format": "c",
-		"cstddef": "c"
+		"cstddef": "c",
+		"block.h": "c"
 	}
 }

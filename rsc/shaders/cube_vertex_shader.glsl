@@ -35,6 +35,7 @@ flat out int biomeType;
 flat out int isGrass;
 flat out int blockFace;
 flat out int isFlower;
+// flat out int isUnderground;
 
 /* Define the uniforms variables */
 uniform mat4 view;
@@ -71,13 +72,20 @@ int s32ByteGet(int value, int byte) {
 	return (value & (0xFF << (byte * 8))) >> (byte * 8);
 }
 
+int u8ValueGet(int container, int shift) {
+	return ((container & (1 << shift)) >> shift);
+}
+
 void main()
 {
     int textureIdExtracted = s32ByteGet(aMetadata, 3);
-
-    blockFace = s32ByteGet(aMetadata, 2);
+    
+	blockFace = s32ByteGet(aMetadata, 2);
 	biomeType = s32ByteGet(aMetadata, 1);
-	isFlower = s32ByteGet(aMetadata, 0);
+	int lastByte = s32ByteGet(aMetadata, 0);
+	
+	isFlower = u8ValueGet(lastByte, 7);
+	// isUnderground = u8ValueGet(lastByte, 6); /* useless for now */
 
 	vec3 instancePosition = aInstancePos;
 

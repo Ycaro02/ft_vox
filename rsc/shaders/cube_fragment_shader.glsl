@@ -24,7 +24,12 @@ flat in int biomeType;
 flat in int isGrass;
 flat in int blockFace;
 flat in int isFlower;
+// flat in int isUnderground;
 
+
+#define CAMERA_IN_CAVE 2
+
+uniform int camIsUnderground;
 uniform sampler3D textureAtlas;
 
 /* render distance is 16 and we need minimum 14, one chunks is 16.0 len, so we end fog at 16.0 * 14 = 224.0 */
@@ -38,8 +43,8 @@ uniform sampler3D textureAtlas;
 #define END_FOG (CHUNKS_SIZE * RENDER_DISTANCE_MAX)
 
 const float grayTolerance = 0.01;
-const float fogStart = START_FOG;
-const float fogEnd = END_FOG; 
+float fogStart = START_FOG;
+float fogEnd = END_FOG; 
 vec4 fogColor = vec4(1.0, 1.0, 1.0, 0.0);
 
 vec4 grassColorHandling(vec4 baseColor) {
@@ -51,7 +56,6 @@ vec4 grassColorHandling(vec4 baseColor) {
 	}
 	return (vec4(baseColor.rgb * grassColor, baseColor.a));
 }
-
 
 void main()
 {
@@ -81,7 +85,14 @@ void main()
 				baseColor = vec4(baseColor.rgb * 0.9, baseColor.a);
 			}
 		}
-		fogColor = vec4(baseColor.xyz, 0.0);
+		if (camIsUnderground == CAMERA_IN_CAVE || camIsUnderground == 1) {
+			fogStart = 60.0;
+			fogEnd = 100.0;
+			fogFactor = smoothstep(fogStart, fogEnd, depth);
+			fogColor = vec4(0.0,0.0,0.0, 1.0);
+		} else {
+			fogColor = vec4(baseColor.xyz, 0.0);
+		}
 		finalColor = mix(baseColor, fogColor, fogFactor);
 	} 
 

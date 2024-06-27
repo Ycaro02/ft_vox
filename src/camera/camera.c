@@ -3,6 +3,7 @@
 #include "../../include/cube.h"
 #include "../../include/chunks.h"
 #include "../../include/shader_utils.h"
+#include "../../include/render_chunks.h"
 
 void chunkPosGet(Camera *camera)
 {
@@ -100,6 +101,7 @@ void update_camera(void *context, GLuint shader_id)
     set_shader_var_mat4(shader_id, "projection", c->cam->projection);
 	set_shader_var_mat4(shader_id, "model", c->rotation);
 	
+	set_shader_var_int(shader_id, "camIsUnderground", c->world->undergroundBlock->isUnderground);
 
 	/* Update view vector */
 	updateViewVec(c->cam);

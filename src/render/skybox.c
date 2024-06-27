@@ -1,5 +1,7 @@
 #include "../../include/skybox.h"
-
+#include "../../include/shader_utils.h"
+#include "../../include/world.h"
+#include "../../include/render_chunks.h"
 
 GLuint skyboxInit()
 {
@@ -70,7 +72,7 @@ GLuint skyboxInit()
 	return (skyboxVAO);
 }
 
-void displaySkybox(GLuint skyboxVAO, GLuint skyboxTexture, GLuint skyboxShader, mat4 projection, mat4 view)
+void displaySkybox(GLuint skyboxVAO, GLuint skyboxTexture, GLuint skyboxShader, mat4 projection, mat4 view, u8 isUnderground)
 {
     // Prepare to draw the skybox: disable depth writing, use the skybox shader, 
     // and set the "skybox" uniform to texture unit 0.
@@ -90,6 +92,7 @@ void displaySkybox(GLuint skyboxVAO, GLuint skyboxTexture, GLuint skyboxShader, 
     // Set the "view" and "projection" uniforms in the skybox shader.
     glUniformMatrix4fv(glGetUniformLocation(skyboxShader, "view"), 1, GL_FALSE, (GLfloat *)&skyView[0]);
     glUniformMatrix4fv(glGetUniformLocation(skyboxShader, "projection"), 1, GL_FALSE, (GLfloat *)&projection[0]);
+	set_shader_var_int(skyboxShader, "camIsUnderground", isUnderground);
     
     // Bind the VAO, set the active texture to texture unit 0, bind the skybox 
     // cubemap texture, then draw the skybox.

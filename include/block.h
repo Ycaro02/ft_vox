@@ -27,8 +27,9 @@ struct s_block {
     s8	type;       /* Block type */
 	u8  neighbors;  /* Block flag */
 	s8	biomeId;	/* Biome ID */
+	s8 	isUnderground; /* Underground block flag */
 	/* padding */
-	s8 pad1, pad2;
+	s8 pad1;
 };
 
 
@@ -38,10 +39,10 @@ s32		blockLocalToPerlinPos(s32 chunkOffset, s32 localPos, s32 width);
 Block *basicBlockCreate(s32 x, s32 y, s32 z, s32 type);
 
 
-void blockLocalPosFromCam(vec3 camPos, BlockPos *blockPos);
-void undergroundBlockcreate(Context *c);
-void undergroundBlockFree(UndergroundBlock *udg);
-void undergroundBoolUpdate(Context *c, BlockPos *blockPos, s32 *columnMaxHeight);
+void 	blockLocalPosFromCam(vec3 camPos, BlockPos *blockPos);
+void 	undergroundBlockcreate(Context *c);
+void 	undergroundBlockFree(UndergroundBlock *udg);
+u8		undergroundBoolUpdate(Context *c, BlockPos *blockPos, s32 *columnMaxHeight);
 
 
 #endif /* HEADER_BLOCK_H */
