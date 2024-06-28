@@ -93,6 +93,27 @@ void act_reseCamera(Context *c) {
 }
 
 
+#define OFFSET_THRESHOLD 0.8
+
+void mouse_callback(GLFWwindow* window, f64 xpos, f64 ypos) {
+    Context	*c = glfwGetWindowUserPointer(window);
+    f64		centerX = c->screenWidth / 2.0;
+    f64		centerY = c->screenHeight / 2.0;
+
+	/* Compute offset */
+    f64 xoffset = xpos - centerX;
+    f64 yoffset = centerY - ypos;
+
+	/* If one offset is greater than threshold */
+	if (fabs(xoffset) > OFFSET_THRESHOLD) {
+		rotate_camera(c->cam, -(xoffset * 0.05), VEC3_ROTATEY);
+	} 
+	if (fabs(yoffset) > OFFSET_THRESHOLD) {
+		rotateTopBot(c->cam, -(yoffset * 0.05));
+	}
+    glfwSetCursorPos(window, centerX, centerY);
+}
+
 void displayPerlinNoise(PerlinData perlinData) {
 	// ft_printf_fd(1, PINK"Perlin Idx0 : X:[%d] Z:[%d]\n"RESET, perlinData.x0, perlinData.z0);
 	// ft_printf_fd(1, PINK"Perlin Idx1 : X:[%d] Z:[%d]\n"RESET, perlinData.x1, perlinData.z1);

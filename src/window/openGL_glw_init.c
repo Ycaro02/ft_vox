@@ -9,25 +9,21 @@ GLFWwindow *window_create(s32 *width, s32 *height, const char *title)
         return (NULL);
 	}
 
-
-
 	/* Enable 8x antialiasing */
     glfwWindowHint(GLFW_SAMPLES, 8);
 
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-
     if (mode == NULL) {
 		ft_printf_fd(2, "Error: Failed to get video mode\n");
 		glfwTerminate();
 		return (NULL);
 	}
-
 	*height = mode->height;
 	*width = mode->width;
 	ft_printf_fd(1, ORANGE"Screen width: %d\n", *width);
 	ft_printf_fd(1, "Screen height: %d\n"RESET, *height);
+
 
 	win = glfwCreateWindow(*width, *height, title, monitor, NULL);
     if (!win) {
@@ -35,11 +31,9 @@ GLFWwindow *window_create(s32 *width, s32 *height, const char *title)
 		glfwTerminate();
         return (NULL);
     }
-
-
-
 	/* Init openGL context on current thread */
     glfwMakeContextCurrent(win);
+
     return (win);
 }
 
@@ -99,13 +93,9 @@ GLFWwindow *init_openGL_context(s32 *height, s32 *width, const char *title)
 */
 void glfw_destroy(GLFWwindow *win)
 {
-
 	ft_printf_fd(2, RED"Destroying glfw\n"RESET);
 	glBindVertexArray(0);
-	// glDeleteVertexArrays(1, &model->vao);
-	// glDeleteProgram(model->shader_id);
 	gladLoaderUnloadGL();
 	glfwDestroyWindow(win);
 	glfwTerminate();
-	// free_obj_model(model);
 }

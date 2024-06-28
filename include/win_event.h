@@ -16,5 +16,6 @@ struct s_key_action {
 };
 
 void handle_input(void *context);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 #endif /* HEADER_WIN_EVENT_H */

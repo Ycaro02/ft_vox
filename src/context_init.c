@@ -162,6 +162,17 @@ void uniformBlockShaderSet(GLuint shaderID) {
 	glUseProgram(0);
 }
 
+
+// void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+//     (void)window;
+// 	(void)mods;
+// 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+//         printf("Left mouse button pressed\n");
+//     }
+// }
+
+#include "../include/win_event.h"
+
 Context *contextInit() {
 	Context *context;
 
@@ -187,10 +198,16 @@ Context *contextInit() {
 		return (NULL);
 	}
 
+	/* Give context struct in win ptr to reuse it callback funct */
+	glfwSetWindowUserPointer(context->win_ptr, context);
+
+
 	mtx_lock(&context->gameMtx);
 	context->cam = create_camera(CAM_FOV, CAM_ASPECT_RATIO(context->screenWidth, context->screenHeight), CAM_NEAR, CAM_FAR);
 	extractFrustumPlanes(&context->cam->frustum, context->cam->projection, context->cam->view);
 	mtx_unlock(&context->gameMtx);
+
+
 
 	if ((!(context->world->chunksMap = hashmap_init(HASHMAP_SIZE_2000, chunksMapFree)))
 		|| (!(context->faceCube = cubeFaceVAOinit()))
@@ -210,6 +227,13 @@ Context *contextInit() {
 	}
 
 	uniformBlockShaderSet(context->cubeShaderID);
-	
+
+	/* Set callback function */
+	glfwSetCursorPosCallback(context->win_ptr, mouse_callback);
+
+	/* Hidden the mouse cursor */
+	glfwSetInputMode(context->win_ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPos(context->win_ptr, context->screenWidth / 2.0, context->screenHeight / 2.0);
+
 	return (context);
 }
