@@ -232,6 +232,8 @@ u8 undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHeig
 	}
 	*columnMaxHeight = chunk->noiseData[localBlockPos->x][localBlockPos->z].normalise;
 	
+	s8 isCaveEntry = (chunk->perlinCave[localBlockPos->x][localBlockPos->z] == ENTRY_EXIT_VAL);
+
 
 	camPos[1] -= 0.333333f;
 	if (camPos[1] < 0) {
@@ -246,6 +248,9 @@ u8 undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHeig
 		return (FALSE);
 		// c->world->undergroundBlock->isUnderground = FALSE;
 	}  else if (!block) {
+		if (isCaveEntry) {
+			return (FALSE);
+		}
 		return (CAM_INCAVE);
 		// c->world->undergroundBlock->isUnderground = FALSE;
 	} 
