@@ -152,21 +152,6 @@ void displayChunkData(Context *c, Chunks *chunk){
 
 }
 
-
-// void context_DisplayData_debug(Context *c) {
-// 	ft_printf_fd(1, "Display data:\n-----------------\n"RESET);
-// 	ft_printf_fd(1, RED"Local Block Pos: X|%d|, Z|%d|\n"RESET, c->displayData.blockPos.x, c->displayData.blockPos.z);
-// 	ft_printf_fd(1, "Noise data:\n-----------------\n"RESET);
-// 	ft_printf_fd(1, ORANGE"Continental Val:|%f|\n", c->displayData.noiseData.valContinental);
-// 	ft_printf_fd(1, "Erosion Val:|%f|\n", c->displayData.noiseData.valErosion);
-// 	ft_printf_fd(1, "PeaksValley Val:|%f|\n", c->displayData.noiseData.valPeaksValley);
-// 	ft_printf_fd(1, "Combined Val:|%f|\n", c->displayData.noiseData.valCombined);
-// 	ft_printf_fd(1, GREEN"Humidity Val:|%f|\n", c->displayData.noiseData.valHumidity);
-// 	ft_printf_fd(1, "Temperature Val:|%f|\n"RESET, c->displayData.noiseData.valTemperature);
-// 	ft_printf_fd(1, CYAN"Display data end :\n-----------------\n"RESET);
-// }
-
-
 void displayBlockPosition(Chunks *chunk, BlockPos blockPos) {
 	ft_printf_fd(1, PURPLE"-----------------\n"RESET);
 	ft_printf_fd(1, YELLOW"Chunk : X|%d|, Z|%d|\n"RESET, chunk->x, chunk->z);

@@ -53,6 +53,8 @@ void localBlockDataUpdate(Context *c) {
 	c->displayData.noiseData.valTemperature = chunk->noiseData[localBlockPos.x][localBlockPos.z].valTemperature;
 	c->displayData.posNoise[0] = chunk->noiseData[localBlockPos.x][localBlockPos.z].x0;
 	c->displayData.posNoise[1] = chunk->noiseData[localBlockPos.x][localBlockPos.z].z0;
+	/* transform to world pos y */
+	c->displayData.blockPos.y = (s32)(camPos[1] * 2.0);
 }
 
 void renderChunksVBODestroy(Context *c) {
@@ -225,6 +227,15 @@ void displayDoublePosition(Context* c, const char *description, float startY, lo
     textRender(c, buffer, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, startY), FPS_SCALE, VEC3_PINK);
 }
 
+void displayBlockPositionText(Context *c, float startY, BlockPos pos, vec3 color) {
+	char buffer[256];
+	pos.x = pos.x + (16 * c->displayData.chunkX);
+	pos.z = pos.z + (16 * c->displayData.chunkZ);
+	snprintf(buffer, sizeof(buffer), "X %d / Y %d / Z %d", pos.x, pos.y, pos.z);
+	textRender(c, "Block Pos: ", TEXT_DESCRIBED_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, startY), FPS_SCALE, VEC3_YELLOW);
+	textRender(c, buffer, TEXT_DATA_WIDTH_OFFSET, TEXT_HEIGHT_OFFSET_GET(c->screenHeight, startY), FPS_SCALE, color);
+}
+
 /**
  * @brief Display data on screen
 */
@@ -239,8 +250,9 @@ void dataDisplay(Context *c) {
 	/* Diplay chunk position */
 	displayDoublePosition(c, "Chunk Pos: ", 125.0f, c->displayData.chunkX, c->displayData.chunkZ, VEC3_YELLOW);
 	/* Display Block position */
-	displayDoublePosition(c, "Block Pos: ", 150.0f, c->displayData.blockPos.x + (16 * c->displayData.chunkX)
-		, c->displayData.blockPos.z + (16 * c->displayData.chunkZ), VEC3_YELLOW);
+	// displayDoublePosition(c, "Block Pos: ", 150.0f, c->displayData.blockPos.x + (16 * c->displayData.chunkX)
+	// 	, c->displayData.blockPos.z + (16 * c->displayData.chunkZ), VEC3_YELLOW);
+	displayBlockPositionText(c, 150.0f, c->displayData.blockPos, VEC3_PINK);
 	displayFloatTextCall(c, "Val Continental: ", 175.0f, c->displayData.noiseData.valContinental, VEC3_YELLOW, VEC3_BLACK);
 	displayFloatTextCall(c, "Val Erosion: ", 200.0f, c->displayData.noiseData.valErosion, VEC3_YELLOW, VEC3_BLACK);
 	displayFloatTextCall(c, "Val PeaksValley: ", 225.0f, c->displayData.noiseData.valPeaksValley, VEC3_YELLOW, VEC3_BLACK);
