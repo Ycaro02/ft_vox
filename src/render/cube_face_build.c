@@ -248,26 +248,35 @@ void opaqueFaceDisplay(Context *c, RenderChunkCache *cache, vec2_s32 cameraChunk
 	}
 }
 
+void renderWater(RenderChunkCache *cache, u32 *faceRenderer, GLuint VAO) {
+	RenderChunks	*render = NULL;
+	u32 			faceNb = 0;
+	s32 			i = 0;
+
+	/* Display water face before */
+	glBindVertexArray(VAO);
+	while (cache[i].render) {
+		render = cache[i].render;
+		faceNb = render->topFaceWaterCount;
+		*faceRenderer += faceNb;
+		drawFace(render->topFaceWaterVBO, render->topFaceWaterTypeVBO, 6U, faceNb);
+		i++;
+	}
+	glBindVertexArray(0);
+}
+
 void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
 	
 	RenderChunks	*render = NULL;
 	u32 			faceNb = 0;
 	GLuint 			faceVBO = 0, faceTypeVBO = 0;
 	s32 			count = 0;
-	/* Display water face before */
-	glBindVertexArray(c->faceCube[TOP_FACE].VAO);
-	while (cache[count].render) {
-		render = cache[count].render;
-		faceNb = render->topFaceWaterCount;
-		faceVBO = render->topFaceWaterVBO;
-		faceTypeVBO = render->topFaceWaterTypeVBO;
-		c->displayData.faceRendered += faceNb;
-		drawFace(faceVBO, faceTypeVBO, 6U, faceNb);
-		count++;
-	}
-	glBindVertexArray(0);
-	
+	s8				waterDisplayBefore = c->displayData.blockPos.y > SEA_LEVEL;
 
+
+	if (waterDisplayBefore) {
+		renderWater(cache, &c->displayData.faceRendered, c->faceCube[TOP_FACE].VAO);
+	}
 
 	for (s32 i = 5; i >= 0; --i) {
 		count = 0;
@@ -282,6 +291,10 @@ void trspFaceDisplay(Context *c, RenderChunkCache *cache) {
 			count++;
 		}
 		glBindVertexArray(0);
+	}
+
+	if (!waterDisplayBefore) {
+		renderWater(cache, &c->displayData.faceRendered, c->faceCube[TOP_FACE].VAO);
 	}
 }
 
