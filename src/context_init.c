@@ -40,6 +40,27 @@ void initAtlasTexture(Context *c) {
 	set_shader_texture(c->cubeShaderID, c->blockAtlasId, GL_TEXTURE_3D, "textureAtlas");
 }
 
+u8 **treeGenerationValueGet(u8 maxVal) {
+	u8  **treePerlin2D = NULL;
+	treePerlin2D = malloc(sizeof(u8 *) * PERLIN_NOISE_HEIGHT);
+	if (!treePerlin2D) {
+		ft_printf_fd(1, "Error: malloc failed\n");
+		return (NULL);
+	}
+	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; i++) {
+		treePerlin2D[i] = malloc(sizeof(u8) * PERLIN_NOISE_WIDTH);
+		if (!treePerlin2D[i]) {
+			ft_printf_fd(1, "Error: malloc failed\n");
+			return (NULL);
+		}
+	}
+	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; i++) {
+		for (u32 j = 0; j < PERLIN_NOISE_WIDTH; j++) {
+			treePerlin2D[i][j] = (u8)(rand()) % maxVal;
+		}
+	}
+	return (treePerlin2D);
+}
 
 f32 **perlin2DInit(u32 seed) {
 	f32 **perlin2D = NULL;
@@ -125,6 +146,22 @@ void scanNoiseGetMinMax(f32 **noise, f32 *min, f32 *max, vec2_u32 pos_min, vec2_
 	}
 }
 
+void scanNoiseU8GetMinMax(u8 **noise, u8 *min, u8 *max) {
+	*min = noise[0][0];
+	*max = noise[0][0];
+	for (u32 i = 0; i < PERLIN_NOISE_HEIGHT; i++) {
+		for (u32 j = 0; j < PERLIN_NOISE_WIDTH; j++) {
+			if (noise[i][j] < *min) {
+				*min = noise[i][j];
+			}
+			if (noise[i][j] > *max) {
+				*max = noise[i][j];
+			}
+		}
+	}
+}
+
+
 s8 multipleNoiseGeneration(Context *context, u32 seed) {
 
 	if (!(context->world->noise.continental = perlin2DInit(seed))
@@ -146,6 +183,17 @@ s8 multipleNoiseGeneration(Context *context, u32 seed) {
 	//  min, max, min_pos[0], min_pos[1], max_pos[0], max_pos[1]);
 	// scanNoiseGetMinMax(context->world->noise.humidity, &min, &max, min_pos, max_pos);
 	// ft_printf_fd(1, YELLOW"Humidity min: %f max: %f\n"RESET, min, max);
+
+	context->world->noise.treeGeneration = treeGenerationValueGet(100U);
+	if (!context->world->noise.treeGeneration) {
+		ft_printf_fd(1, "Error: tree generation failed\n");
+		return (FALSE);
+	}
+	u8 treeMin, treeMax;
+	scanNoiseU8GetMinMax(context->world->noise.treeGeneration, &treeMin, &treeMax);
+	ft_printf_fd(1, GREEN"Tree treeMin: %u treeMax: %u\n"RESET,
+	 treeMin, treeMax);
+	
 
 	return (TRUE);
 }

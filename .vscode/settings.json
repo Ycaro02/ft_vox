@@ -78,6 +78,7 @@
 		"format": "c",
 		"cstddef": "c",
 		"block.h": "c",
-		"internal.h": "c"
+		"internal.h": "c",
+		"chrono": "c"
 	}
 }

@@ -21,8 +21,10 @@ struct s_biome_block {
 	s32		stone;				/* Stone for plain biom */
 	s32		tree[TREE_IDX_MAX];	/* Tree texture */
 	s32		flowers[FLOWER_IDX_MAX]; /* Flower texture */
-	s32		treeMax;
-	s32		flowersMax;
+	s8		treeMax;
+	s8		flowersMax;
+	s8		treeSpawnRate;
+	s8		flowersSpawnRate;
 };
 
 
@@ -89,12 +91,23 @@ void treeCreate(Block *****chunkBlockCache, Chunks *Chunk, BlockPos pos, s32 tre
 		- Stone: STONE
  */
 
-/*
-	TO DO:
-		- add tree selection depend of biome
-		- add flower render and selection depend of biome
-		- add mouse move camera on x and y axis
-*/
+
+
+typedef struct s_tree_texture {
+	int log;
+	int leaf;
+} TreeTexture;
+
+enum TreeId {
+	TREE_SPRUCE=0,
+	TREE_OAK,
+	TREE_MANGROVE,
+	TREE_JUNGLE,
+	TREE_DARK_OAK,
+	TREE_BIRCH,
+	TREE_ACACIA,
+	TREE_CHERRY
+};
 
 
 #endif /* HEADER_BIOME_H */

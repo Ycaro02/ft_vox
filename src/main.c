@@ -104,6 +104,8 @@ void renderChunksVBOhandling(Context *c) {
 
 void vox_destroy(Context *c) {
 	s32 status = 0;
+
+	glfwSetInputMode(c->win_ptr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	mtx_lock(&c->isRunningMtx);
 	c->isPlaying = FALSE;
 	mtx_unlock(&c->isRunningMtx);
@@ -140,6 +142,7 @@ void vox_destroy(Context *c) {
 	free_incomplete_array((void **)c->world->noise.peaksValley, PERLIN_NOISE_HEIGHT);
 	free_incomplete_array((void **)c->world->noise.humidity, PERLIN_NOISE_HEIGHT);
 	free_incomplete_array((void **)c->world->noise.temperature, PERLIN_NOISE_HEIGHT);
+	free_incomplete_array((void **)c->world->noise.treeGeneration, PERLIN_NOISE_HEIGHT);
 	free_incomplete_array((void **)c->world->noise.cave, PERLIN_SNAKE_HEIGHT);
 
 

@@ -32,6 +32,7 @@ struct s_chunks {
 	suseconds_t		lastUpdate;						/* Last update time */
 	PerlinData		**noiseData;					/* Continental noise value */
 	u8				**perlinCave;					/* Perlin noise cave value */
+	u8				**perlinTree;					/* Perlin noise tree value */
 	RenderChunks 	*render;						/* RenderChunks pointer */
 	u8				neighbors;						/* Neighbors */
 	u8				occlusionDone;					/* Neighbors occlusion done */

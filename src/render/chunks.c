@@ -29,18 +29,13 @@ void chunksMapFree(void *entry) {
 		for (u32 i = 0; chunks->sub_chunks[i].block_map ; ++i) {
 			hashmap_destroy(chunks->sub_chunks[i].block_map);
 		}
-		for (u32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
-			free(chunks->noiseData[i]);
-		}
-		free(chunks->noiseData);
-		/* cave */
+		free_incomplete_array((void **)chunks->noiseData, BLOCKS_PER_CHUNK);
 		if (chunks->perlinCave) {
-			for (u32 i = 0; i < BLOCKS_PER_CHUNK; ++i) {
-				free(chunks->perlinCave[i]);
-			}
-			free(chunks->perlinCave);
+			free_incomplete_array((void **)chunks->perlinCave, BLOCKS_PER_CHUNK);
 		}
-		/* cave end */
+		if (chunks->perlinTree) {
+			free_incomplete_array((void **)chunks->perlinTree, BLOCKS_PER_CHUNK);
+		}
 		if (chunks->render) {
 			renderChunkFree(chunks->render);
 		}
@@ -172,29 +167,28 @@ void perlinValueFill(NoiseGeneration *noise, s32 localX, s32 localZ, PerlinData 
 }
 
 
-/**
- * @brief perlinCaveDataGet Get perlin cave data, fill chunk->perlinCave field
- * @param chunk Chunk pointer
- * @param perlinSnakeCaveNoise Perlin snake cave noise
-*/
-void perlinCaveDataGet(Chunks *chunk, u8 **perlinSnakeCaveNoise) {
-	u8 **caveData = malloc(sizeof(u8 *) * BLOCKS_PER_CHUNK);
-	s32 width = PERLIN_SNAKE_WIDTH;
-	s32 height = PERLIN_SNAKE_HEIGHT;
+u8 **specialPerlinDataGet(Chunks *chunk, u8 **noiseGeneration, s32 width, s32 height, s32 scaleVal) {
+	s32 scaleX = 0, scaleZ = 0;
+	u8 **data = malloc(sizeof(u8 *) * BLOCKS_PER_CHUNK);
+	if (!data) {
+		ft_printf_fd(2, "Failed to allocate data\n");
+		return (NULL);
+	}
 
 	for (u32 x = 0; x < BLOCKS_PER_CHUNK; ++x) {
-		caveData[x] = malloc(sizeof(u8) * BLOCKS_PER_CHUNK);
+		data[x] = malloc(sizeof(u8) * BLOCKS_PER_CHUNK);
+		if (!data[x]) {
+			ft_printf_fd(2, "Failed to allocate data[x]\n");
+			return (NULL);
+		}
 		for (u32 z = 0; z < BLOCKS_PER_CHUNK; ++z) {
-			s32 localX = blockLocalToPerlinPos(chunk->x, x, width);
-			s32 localZ = blockLocalToPerlinPos(chunk->z, z, height);
-			s32 scaleX = abs((localX / 2) % width);
-			s32 scaleZ = abs((localZ / 2) % height);
-			caveData[x][z] = perlinSnakeCaveNoise[scaleX][scaleZ];
+			scaleX = (abs(blockLocalToPerlinPos(chunk->x, x, width))  / scaleVal) % width;
+			scaleZ = (abs(blockLocalToPerlinPos(chunk->z, z, height)) / scaleVal) % height;
+			data[x][z] = noiseGeneration[scaleX][scaleZ];
 		}
 	}
-	chunk->perlinCave = caveData;
+	return (data);
 }
-
 
 s8 blockExist(Block *****chunkBlockCache, BlockPos pos) {
 	s32 subId = pos.y / BLOCKS_PER_CHUNK;
@@ -230,25 +224,6 @@ s8 chunkBiomeIdGet(PerlinData **perlinVal) {
 }
 
 void flowerCreate(Block *****chunkBlockCache,Chunks * chunk, s32 x, s32 y, s32 z, s32 flowerId) {
-	// static s8 flowerTypeArray[] = {
-	// 	FLOWER_DANDELION,
-	// 	FLOWER_BLUE_ORCHID,
-	// 	FLOWER_AZURE,	
-	// 	FLOWER_ALLIUM,
-	// 	FLOWER_CORNFLOWER,
-	// 	FLOWER_CHERRY,
-	// 	FLOWER_WHITE_TULIP,
-	// 	FLOWER_RED_TULIP,
-	// 	FLOWER_PINK_TULIP,
-	// 	FLOWER_DAYSIE,
-	// 	FLOWER_POPPY,
-	// 	FLOWER_LILY,
-	// 	PLANT_FERN,
-	// 	PLANT_GRASS,
-	// 	MUSHROOM_RED,
-	// 	MUSHROOM_BROWN,
-	// };
-
 	s32 localY = y % 16;
 	s32 subId = y / 16;
 	if (blockExist(chunkBlockCache, (BlockPos){x, y - 1, z}) && ((y - 1) % 16) < 15) {
@@ -261,32 +236,28 @@ void flowerCreate(Block *****chunkBlockCache,Chunks * chunk, s32 x, s32 y, s32 z
 
 void flowerTreeGeneration(Block *****chunkBlockCache, Chunks *chunk, PerlinData **perlinVal)
 {
-		/*	Tree generation 3 and 4 cause of cubeLeaf size is 3 
-		To refactor
-		- We can generate array of random value before to avoid multiple call to srand()/rand()
-	*/
-	u32 chunkSeed = ((u32)chunk->x ^ (u32)chunk->z) ^ 65536;
-    srand(chunkSeed);
-	s32 spawnRate = rand() % 40;
+	BiomBlock	*biomeData = chunk->biomeBlock;
+	s32			y = 0;
+	u8			randomValGen = 0;
+	// s32			spawnRate = 40; /* Determine spawrate by biome Id and humidity ? */
 
     for (u32 x = 3; x < BLOCKS_PER_CHUNK; x += 4) {
         for (u32 z = 3; z < BLOCKS_PER_CHUNK; z += 4) {
-            s32 y = perlinVal[x][z].normalise + 1;
+            y = perlinVal[x][z].normalise + 1;
+			randomValGen = chunk->perlinTree[x][z] ;
 
 			if (x + 3 > BLOCKS_PER_CHUNK || z + 3 > BLOCKS_PER_CHUNK) continue;
             if (y > 100 || y <= SEA_LEVEL + 5) break;
 
       		if (blockExist(chunkBlockCache, (BlockPos){x, perlinVal[x][z].normalise, z})) {
-				if ((rand() % 100) < spawnRate) {
-					s32 treeId = (abs(chunk->x) + abs(chunk->z)) % chunk->biomeBlock->treeMax;
+				if (randomValGen < biomeData->treeSpawnRate) {
+					s32 treeId = (abs(chunk->x) + abs(chunk->z) + x + z) % biomeData->treeMax;
                 	treeCreate(chunkBlockCache, chunk, (BlockPos){x, y, z},\
-					 chunk->biomeBlock->tree[treeId]);
-					//  (abs(chunk->x) + abs(chunk->z)) % TREE_IDX_MAX);
-				} else {
-					s32 flowerId = (abs(chunk->x) + abs(chunk->z)) % chunk->biomeBlock->flowersMax;
+					 biomeData->tree[treeId]);
+				} else if (randomValGen < biomeData->flowersSpawnRate) {
+					s32 flowerId = (abs(chunk->x) + abs(chunk->z) + x + z) % biomeData->flowersMax;
 					flowerCreate(chunkBlockCache, chunk, x, y, z,\
-					 chunk->biomeBlock->flowers[flowerId]);
-					//  (abs(chunk->x) + abs(chunk->z)) % FLOWER_IDX_MAX);
+					 biomeData->flowers[flowerId]);
 				}
             }
         }
@@ -332,9 +303,19 @@ void chunkBuild(Block *****chunkBlockCache, NoiseGeneration *noise, Chunks *chun
 		chunk->nb_block += subchunksInit(chunkBlockCache, &chunk->sub_chunks[i], chunk->noiseData, i, chunk->biomeBlock);
 	}
 
-	perlinCaveDataGet(chunk, noise->cave);
+	// perlinCaveDataGet(chunk, noise->cave);
+	chunk->perlinCave = specialPerlinDataGet(chunk, noise->cave, PERLIN_SNAKE_WIDTH, PERLIN_SNAKE_HEIGHT, 2);
+	if (!chunk->perlinCave) {
+		ft_printf_fd(2, "Failed to allocate chunk perlinCave\n");
+		return;
+	}
 	digCaveCall(chunk, chunkBlockCache, perlinVal);
 
+	chunk->perlinTree = specialPerlinDataGet(chunk, noise->treeGeneration, PERLIN_NOISE_WIDTH, PERLIN_NOISE_HEIGHT, 1);
+	if (!chunk->perlinTree) {
+		ft_printf_fd(2, "Failed to allocate chunk perlinTree\n");
+		return;
+	}
 
 	flowerTreeGeneration(chunkBlockCache, chunk, perlinVal);
 

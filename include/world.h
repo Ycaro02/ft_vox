@@ -10,6 +10,7 @@ struct s_noise_generation {
 	f32					**humidity;			/* Humidity noise */
 	f32					**temperature;		/* Temperature noise */
 	u8					**cave;				/* 2D noise for cave */
+	u8					**treeGeneration;	/* 2D noise for tree generation */
 } ;
 
 struct s_world {

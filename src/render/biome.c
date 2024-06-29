@@ -13,148 +13,133 @@ s32 blockBiomeIdGet(float temperature, float humidity) {
     return biomeMap[tempIndex][humidIndex];
 }
 
+void biomeBlockSnowFill(BiomBlock *biomBlock) {
+	biomBlock->top = SNOW_GRASS;
+	biomBlock->dirt = DIRT;
+	biomBlock->water = ICE;
+	biomBlock->underWater = SNOW;
+	biomBlock->stone = STONE;
 
-void biomDetection(BiomBlock *biomBlock, s8 biomeId) {
-	
-	for (s32 i = 0; i < TREE_IDX_MAX; i++) {
-		biomBlock->tree[i] = -1; /* No tree */
-	}
-	for (s32 i = 0; i < FLOWER_IDX_MAX; i++) {
-		biomBlock->flowers[i] = -1; /* No flower */
-	}
+	biomBlock->treeMax = 1;
+	biomBlock->treeSpawnRate = 35;
+	biomBlock->flowersSpawnRate = biomBlock->treeSpawnRate + 20;
+	biomBlock->tree[0] = TREE_SPRUCE;
 
-	if (biomeId == BIOME_SNOW) { /* Snow BIOM */
-		biomBlock->top = SNOW_GRASS;
-		biomBlock->dirt = DIRT;
-		biomBlock->water = ICE;
-		biomBlock->underWater = SNOW;
-		biomBlock->stone = STONE;
-	
+	biomBlock->flowersMax = 3;
+	biomBlock->flowers[0] = FLOWER_WHITE_TULIP;
+	biomBlock->flowers[1] = FLOWER_DAYSIE;
+	biomBlock->flowers[2] = PLANT_GRASS;
+}
 
+void biomeBlockDesertFill(BiomBlock *biomBlock) {
+	biomBlock->top = SANDSTONE;
+	biomBlock->dirt = SANDSTONE;
+	biomBlock->water = WATER;
+	biomBlock->underWater = SAND;
+	biomBlock->stone = SANDSTONE;
 
-		/* Trees */
-		biomBlock->treeMax = 1;
-		biomBlock->flowersMax = 3;
-		// biomBlock->tree[0] = TREE_SPRUCE_LOG;
-		biomBlock->tree[0] = 0;
+	biomBlock->treeMax = 2;
+	biomBlock->treeSpawnRate = 12;
+	biomBlock->flowersSpawnRate = biomBlock->treeSpawnRate + 30;
+	biomBlock->tree[0] = TREE_ACACIA;
+	biomBlock->tree[1] = TREE_MANGROVE;
 
-		/* Flowers/Plants */
-		biomBlock->flowers[0] = FLOWER_WHITE_TULIP;
-		biomBlock->flowers[1] = FLOWER_DAYSIE;
-		biomBlock->flowers[2] = PLANT_GRASS;
-		
-		return;
-	}
-	if (biomeId == BIOME_DESERT) { /* Desert BIOM */
-		biomBlock->top = SANDSTONE;
-		biomBlock->dirt = SANDSTONE;
-		biomBlock->water = WATER;
-		biomBlock->underWater = SAND;
-		biomBlock->stone = SANDSTONE;
-		
-		biomBlock->treeMax = 2;
-		biomBlock->flowersMax = 3;
-		/* Trees */
-		// biomBlock->tree[0] = TREE_ACACIA_LOG;
-		// biomBlock->tree[1] = TREE_MANGROVE_LOG;
-		biomBlock->tree[0] = 6;
-		biomBlock->tree[1] = 2;
+	biomBlock->flowersMax = 3;
+	biomBlock->flowers[0] = PLANT_GRASS;
+	biomBlock->flowers[1] = MUSHROOM_RED;
+	biomBlock->flowers[2] = MUSHROOM_BROWN;
+}
 
-		/* Flowers/Plants */
-		biomBlock->flowers[0] = PLANT_GRASS;
-		biomBlock->flowers[1] = MUSHROOM_RED;
-		biomBlock->flowers[2] = MUSHROOM_BROWN;
-
-		
-		return;
-	}
-	if (biomeId == BIOME_JUNGLE) { /* Jungle BIOM */
-		biomBlock->top = GRASS;
-		biomBlock->dirt = DIRT;
-		biomBlock->water = WATER;
-		biomBlock->underWater = SAND;
-		biomBlock->stone = STONE;
-
-		biomBlock->treeMax = 2;
-		biomBlock->flowersMax = 6;
-		/* Trees */
-		// biomBlock->tree[0] = TREE_JUNGLE_LOG;
-		// biomBlock->tree[1] = TREE_OAK_LOG;
-		biomBlock->tree[0] = 3;
-		biomBlock->tree[1] = 1;
-
-
-		/* Flowers/Plants */
-		biomBlock->flowers[0] = FLOWER_BLUE_ORCHID;
-		biomBlock->flowers[1] = FLOWER_PINK_TULIP;
-		biomBlock->flowers[2] = PLANT_FERN;
-		biomBlock->flowers[3] = PLANT_GRASS;
-		biomBlock->flowers[4] = MUSHROOM_RED;
-		biomBlock->flowers[5] = MUSHROOM_BROWN;
-		
-		return;
-	}
-	if (biomeId == BIOME_SWAMP) { /* Swamp BIOM */
-		biomBlock->top = GRASS;
-		biomBlock->dirt = DIRT;
-		biomBlock->water = WATER;
-		biomBlock->underWater = SAND;
-		biomBlock->stone = STONE;
-
-		biomBlock->treeMax = 2;
-		biomBlock->flowersMax = 6;
-		/* Trees */
-		// biomBlock->tree[0] = TREE_DARK_OAK_LOG;
-		// biomBlock->tree[1] = TREE_OAK_LOG;
-		biomBlock->tree[0] = 4;
-		biomBlock->tree[1] = 1;
-
-
-		/* Flowers/Plants */
-		biomBlock->flowers[0] = FLOWER_BLUE_ORCHID;
-		biomBlock->flowers[1] = FLOWER_LILY;
-		biomBlock->flowers[2] = PLANT_FERN;
-		biomBlock->flowers[3] = PLANT_GRASS;
-		biomBlock->flowers[4] = MUSHROOM_RED;
-		biomBlock->flowers[5] = MUSHROOM_BROWN;
-		
-		return;
-	}
-	/* Plain BIOM */
+void biomeBlockJungleFill(BiomBlock *biomBlock) {
 	biomBlock->top = GRASS;
 	biomBlock->dirt = DIRT;
 	biomBlock->water = WATER;
 	biomBlock->underWater = SAND;
 	biomBlock->stone = STONE;
 
-	biomBlock->treeMax = 3;
-	biomBlock->flowersMax = 10;
-	/* Trees */
-	// biomBlock->tree[0] = TREE_OAK_LOG;
-	// biomBlock->tree[1] = TREE_BIRCH_LOG;
-	// biomBlock->tree[2] = TREE_CHERRY_LOG;
-	biomBlock->tree[0] = 1;
-	biomBlock->tree[1] = 5;
-	biomBlock->tree[2] = 7;
+	biomBlock->treeMax = 2;
+	biomBlock->treeSpawnRate = 40;
+	biomBlock->flowersSpawnRate = 60;
+	biomBlock->tree[0] = TREE_JUNGLE;
+	biomBlock->tree[1] = TREE_OAK;
 
-	/* Flowers/Plants */
-	biomBlock->flowers[0] = FLOWER_DANDELION;
-	biomBlock->flowers[1] = FLOWER_AZURE;
-	biomBlock->flowers[2] = FLOWER_ALLIUM;
-	biomBlock->flowers[3] = FLOWER_CORNFLOWER;
-	biomBlock->flowers[4] = FLOWER_WHITE_TULIP;
-	biomBlock->flowers[5] = FLOWER_RED_TULIP;
-	biomBlock->flowers[6] = FLOWER_PINK_TULIP;
-	biomBlock->flowers[7] = FLOWER_DAYSIE;
-	biomBlock->flowers[8] = FLOWER_POPPY;
-	biomBlock->flowers[9] = PLANT_GRASS;
+	biomBlock->flowersMax = 4;
+	biomBlock->flowers[0] = FLOWER_BLUE_ORCHID;
+	biomBlock->flowers[1] = FLOWER_PINK_TULIP;
+	biomBlock->flowers[2] = PLANT_FERN;
+	biomBlock->flowers[3] = PLANT_GRASS;
 }
 
+void biomeBlockSwampFill(BiomBlock *biomBlock) {
+	biomBlock->top = GRASS;
+	biomBlock->dirt = DIRT;
+	biomBlock->water = WATER;
+	biomBlock->underWater = SAND;
+	biomBlock->stone = STONE;
 
-typedef struct s_tree_texture {
-	int log;
-	int leaf;
-} TreeTexture;
+	biomBlock->treeMax = 2;
+	biomBlock->treeSpawnRate = 30;
+	biomBlock->flowersSpawnRate = 70;
+	biomBlock->tree[0] = TREE_DARK_OAK;
+	biomBlock->tree[1] = TREE_OAK;
+	
+	biomBlock->flowersMax = 6;
+	biomBlock->flowers[0] = FLOWER_BLUE_ORCHID;
+	biomBlock->flowers[1] = FLOWER_LILY;
+	biomBlock->flowers[2] = PLANT_FERN;
+	biomBlock->flowers[3] = PLANT_GRASS;
+	biomBlock->flowers[4] = MUSHROOM_RED;
+	biomBlock->flowers[5] = MUSHROOM_BROWN;
+}
+
+void biomeBlockPlainFill(BiomBlock *biomBlock) {
+    biomBlock->top = GRASS;
+    biomBlock->dirt = DIRT;
+    biomBlock->water = WATER;
+    biomBlock->underWater = SAND;
+    biomBlock->stone = STONE;
+
+    biomBlock->treeMax = 3;
+    biomBlock->treeSpawnRate = 30;
+    biomBlock->flowersSpawnRate = 70;
+    biomBlock->tree[0] = TREE_OAK;
+    biomBlock->tree[1] = TREE_BIRCH;
+    biomBlock->tree[2] = TREE_CHERRY;
+
+    biomBlock->flowersMax = 10;
+    biomBlock->flowers[0] = FLOWER_DANDELION;
+    biomBlock->flowers[1] = FLOWER_AZURE;
+    biomBlock->flowers[2] = FLOWER_ALLIUM;
+    biomBlock->flowers[3] = FLOWER_CORNFLOWER;
+    biomBlock->flowers[4] = FLOWER_WHITE_TULIP;
+    biomBlock->flowers[5] = FLOWER_RED_TULIP;
+    biomBlock->flowers[6] = FLOWER_PINK_TULIP;
+    biomBlock->flowers[7] = FLOWER_DAYSIE;
+    biomBlock->flowers[8] = FLOWER_POPPY;
+    biomBlock->flowers[9] = PLANT_GRASS;
+}
+
+void biomDetection(BiomBlock *biomBlock, s8 biomeId) {
+    
+    for (s32 i = 0; i < TREE_IDX_MAX; i++) {
+        biomBlock->tree[i] = -1; /* No tree */
+    }
+    for (s32 i = 0; i < FLOWER_IDX_MAX; i++) {
+        biomBlock->flowers[i] = -1; /* No flower */
+    }
+
+    if (biomeId == BIOME_SNOW) { /* Snow BIOM */
+		biomeBlockSnowFill(biomBlock);
+    } else if (biomeId == BIOME_DESERT) { /* Desert BIOM */
+		biomeBlockDesertFill(biomBlock);
+    } else if (biomeId == BIOME_JUNGLE) { /* Jungle BIOM */
+		biomeBlockJungleFill(biomBlock);
+    } else if (biomeId == BIOME_SWAMP) { /* Swamp BIOM */
+		biomeBlockSwampFill(biomBlock);
+    } else {
+		biomeBlockPlainFill(biomBlock);
+	}
+}
 
 
 void expandSubChunkCheck(Chunks *chunk, s32 subChunkId) {
