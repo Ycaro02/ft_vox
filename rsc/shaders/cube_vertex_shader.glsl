@@ -13,6 +13,11 @@
 #define PLAIN_BIOME 0
 
 /* Define the input variables */
+/**
+ * aPos: The position of the vertex define for each face of the block
+ * aInstancePos: The position of the block/face in the world
+ * aTexCoord: The texture coordinates of the block
+*/
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aInstancePos;
 layout (location = 2) in vec2 aTexCoord;
@@ -27,7 +32,7 @@ layout (location = 2) in vec2 aTexCoord;
 */
 layout (location = 3) in int aMetadata;
 
-/* Define the output variables */
+/* Define the output variables for the fragment shader */
 out vec3 TexCoord;
 flat out int biomeType;
 flat out int isGrass;
@@ -50,7 +55,12 @@ uniform int SANDSTONE_SIDE;
 uniform int SANDSTONE_TOP;
 uniform int ATLAS_SIZE;
 
-
+/**
+ * This function is used to handle the top face of the block
+ * @param textureID: The base texture ID of the block
+ * @param blockFace: The face of the block
+ * @return The texture ID of the block
+*/
 int topBlockFaceHandling(int textureID, int blockFace) {
 	
 	if (blockFace == TOP_FACE) {
@@ -65,10 +75,23 @@ int topBlockFaceHandling(int textureID, int blockFace) {
 	return (textureID);
 }
 
+/**
+ * This function is used to get the byte value from a 32 bit integer
+ * @param value: The 32 bit integer
+ * @param byte: The byte to get
+ * @return The byte value
+*/
 int s32ByteGet(int value, int byte) {
 	return (value & (0xFF << (byte * 8))) >> (byte * 8);
 }
 
+
+/**
+ * This function is used to get the bit value from a 8 bit integer
+ * @param container: The 8 bit integer
+ * @param shift: The shift to get the value
+ * @return The bit value
+*/
 int u8ValueGet(int container, int shift) {
 	return ((container & (1 << shift)) >> shift);
 }
