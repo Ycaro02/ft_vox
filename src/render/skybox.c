@@ -5,70 +5,139 @@
 
 GLuint skyboxInit()
 {
-	    float skyboxVertices[] = {
-        // BACK
-        -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
+	//     f32 skyboxVertices[] = {
+    //     // BACK
+    //     -1.0f,  1.0f, -1.0f,
+    //     -1.0f, -1.0f, -1.0f,
+    //     1.0f, -1.0f, -1.0f,
+    //     1.0f, -1.0f, -1.0f,
+    //     1.0f,  1.0f, -1.0f,
+    //     -1.0f,  1.0f, -1.0f,
 
-        // FRONT
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+    //     // FRONT
+    //     -1.0f, -1.0f,  1.0f,
+    //     -1.0f, -1.0f, -1.0f,
+    //     -1.0f,  1.0f, -1.0f,
+    //     -1.0f,  1.0f, -1.0f,
+    //     -1.0f,  1.0f,  1.0f,
+    //     -1.0f, -1.0f,  1.0f,
 
-        // RIGHT
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
+    //     // RIGHT
+    //     1.0f, -1.0f, -1.0f,
+    //     1.0f, -1.0f,  1.0f,
+    //     1.0f,  1.0f,  1.0f,
+    //     1.0f,  1.0f,  1.0f,
+    //     1.0f,  1.0f, -1.0f,
+    //     1.0f, -1.0f, -1.0f,
 
-        // LEFT
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+    //     // LEFT
+    //     -1.0f, -1.0f,  1.0f,
+    //     -1.0f,  1.0f,  1.0f,
+    //     1.0f,  1.0f,  1.0f,
+    //     1.0f,  1.0f,  1.0f,
+    //     1.0f, -1.0f,  1.0f,
+    //     -1.0f, -1.0f,  1.0f,
 
-        // BOT
-        -1.0f,  1.0f, -1.0f,
-        1.0f,  1.0f, -1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
+    //     // BOT
+    //     -1.0f,  1.0f, -1.0f,
+    //     1.0f,  1.0f, -1.0f,
+    //     1.0f,  1.0f,  1.0f,
+    //     1.0f,  1.0f,  1.0f,
+    //     -1.0f,  1.0f,  1.0f,
+    //     -1.0f,  1.0f, -1.0f,
 
-        // TOP
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f,  1.0f
-    };
+    //     // TOP
+    //     -1.0f, -1.0f, -1.0f,
+    //     -1.0f, -1.0f,  1.0f,
+    //     1.0f, -1.0f, -1.0f,
+    //     1.0f, -1.0f, -1.0f,
+    //     -1.0f, -1.0f,  1.0f,
+    //     1.0f, -1.0f,  1.0f
+    // };
+	// GLuint skyboxVAO, skyboxVBO;
+
+    // // Create a Vertex Array Object (VAO) for the skybox and a Vertex Buffer Object (VBO)
+    // // to hold vertex data.
+    // glGenVertexArrays(1, &skyboxVAO);
+    // glGenBuffers(1, &skyboxVBO);
+
+    // // Bind the VAO and VBO, then load the skybox vertices into the VBO.
+    // glBindVertexArray(skyboxVAO);
+    // glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+
+    // // Enable the first attribute (0), then define it as 3-component f32 vertices.
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(f32), (void*)0);
+	f32 skyboxVertices[] = {
+    // Positions        // Face ID (1.0 = TOP)
+    // BACK
+		-1.0f,  1.0f, -1.0f, 0.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 0.0f,
+		1.0f,  1.0f, -1.0f, 0.0f,
+		-1.0f,  1.0f, -1.0f, 0.0f,
+
+		// FRONT
+		-1.0f, -1.0f,  1.0f, 0.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f,
+		-1.0f,  1.0f, -1.0f, 0.0f,
+		-1.0f,  1.0f, -1.0f, 0.0f,
+		-1.0f,  1.0f,  1.0f, 0.0f,
+		-1.0f, -1.0f,  1.0f, 0.0f,
+
+		// RIGHT
+		1.0f, -1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 0.0f,
+
+		// LEFT
+		-1.0f, -1.0f,  1.0f, 0.0f,
+		-1.0f,  1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+		-1.0f, -1.0f,  1.0f, 0.0f,
+
+		// TOP
+		-1.0f,  1.0f, -1.0f, 1.0f,
+		1.0f,  1.0f, -1.0f, 1.0f,
+		1.0f,  1.0f,  1.0f, 1.0f,
+		1.0f,  1.0f,  1.0f, 1.0f,
+		-1.0f,  1.0f,  1.0f, 1.0f,
+		-1.0f,  1.0f, -1.0f, 1.0f,
+
+		// BOTTOM
+		-1.0f, -1.0f, -1.0f, 0.0f,
+		-1.0f, -1.0f,  1.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 0.0f,
+		-1.0f, -1.0f,  1.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 0.0f
+	};
+
 	GLuint skyboxVAO, skyboxVBO;
 
-    // Create a Vertex Array Object (VAO) for the skybox and a Vertex Buffer Object (VBO)
-    // to hold vertex data.
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
 
-    // Bind the VAO and VBO, then load the skybox vertices into the VBO.
-    glBindVertexArray(skyboxVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
 
-    // Enable the first attribute (0), then define it as 3-component float vertices.
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// Position attribute
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+
+	// Face ID attribute
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(3 * sizeof(float)));
+
+
 	return (skyboxVAO);
 }
 

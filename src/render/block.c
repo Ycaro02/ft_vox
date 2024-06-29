@@ -211,6 +211,9 @@ void undergroundBlockcreate(Context *c) {
  * @brief Update the underground block boolean
  * @param c The game context
  * @param blockPos The block position to set [out]
+ * @param columnMaxHeight The column max height
+ * @return FALSE if the camera is not underground, TRUE if the camera is underground 
+ * and CAM_INCAVE if the camera is in a cave
 */
 u8 undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHeight) {
 	vec3		camPos = {0.0f};
@@ -238,25 +241,20 @@ u8 undergroundBoolUpdate(Context *c, BlockPos *localBlockPos, s32 *columnMaxHeig
 	camPos[1] -= 0.333333f;
 	if (camPos[1] < 0) {
 		return (FALSE);
-		// c->world->undergroundBlock->isUnderground = FALSE;
-		// return ;
 	}
 	currentCamY = (s32)floor(camPos[1] *  2);
 	
 	block = worldPosProtectBlockGet(chunk, *localBlockPos, currentCamY);
 	if (*columnMaxHeight <= currentCamY) {
 		return (FALSE);
-		// c->world->undergroundBlock->isUnderground = FALSE;
 	}  else if (!block) {
-		if (isCaveEntry) {
+		if (isCaveEntry && currentCamY >= *columnMaxHeight - 4) {
 			return (FALSE);
 		}
 		return (CAM_INCAVE);
-		// c->world->undergroundBlock->isUnderground = FALSE;
 	} 
 	else {
 		return (TRUE);
-		// c->world->undergroundBlock->isUnderground = TRUE;
 	}
 }
 

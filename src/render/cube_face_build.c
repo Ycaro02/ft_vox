@@ -8,15 +8,17 @@
 #include "../../include/cube.h"
 #include "../../include/camera.h"
 
+#define TRANSPARENT_BLOCK_MAX 11
+
 s8 isTransparentBlock(s32 type) {
 	const static s32 transparentBlock[] = {
 		WATER, ICE, GLASS, TREE_SPRUCE_LEAF, TREE_OAK_LEAF
 		, TREE_MANGROVE_LEAF, TREE_JUNGLE_LEAF, TREE_DARK_OAK_LEAF
 		, TREE_BIRCH_LEAF, TREE_ACACIA_LEAF, TREE_CHERRY_LEAF};
 
-	s32 len = sizeof(transparentBlock) / sizeof(s32);
+	// s32 len = sizeof(transparentBlock) / sizeof(s32);
 
-	for (u8 i = 0; i < len; ++i) {
+	for (s32 i = 0; i < TRANSPARENT_BLOCK_MAX; ++i) {
 		if (type == transparentBlock[i]) {
 			return (TRUE);
 		}

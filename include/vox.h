@@ -162,13 +162,15 @@ enum BlockType {
 };
 
 
+#define FLOWER_PLANT_MAX 16
+
 FT_INLINE s8 blockIsFlowerPlants(s8 type) {
 	s8 flowerArray[] = {
 		FLOWER_DANDELION, FLOWER_BLUE_ORCHID, FLOWER_AZURE, FLOWER_ALLIUM, FLOWER_CORNFLOWER,
 		FLOWER_CHERRY, FLOWER_WHITE_TULIP, FLOWER_RED_TULIP, FLOWER_PINK_TULIP, FLOWER_DAYSIE,
 		FLOWER_POPPY, FLOWER_LILY, PLANT_FERN, PLANT_GRASS, MUSHROOM_RED, MUSHROOM_BROWN
 	};
-	for (u8 i = 0; i < sizeof(flowerArray) / sizeof(s8); ++i) {
+	for (s32 i = 0; i < 16; ++i) {
 		if (type == flowerArray[i]) {
 			return (TRUE);
 		}

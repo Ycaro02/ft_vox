@@ -171,12 +171,11 @@ void chunksViewHandling(Context *c) {
     f32             current = 0;
 	f32 			radiusStart = (-CAM_FOV);
 	f32 			radiusEnd = (CAM_FOV);
-	// f32 			radiusStart = (-90.0f);
-	// f32 			radiusEnd = (90.0f);
-	s8 				inView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;
+	s8 				chunksIsInView = 0, chunksRenderIsload = 0, chunkInRenderMap = 0;
 	u8				neightborChunkLoaded = 0;
 	s8				renderVBOisLoaded = FALSE;
 
+	/* Get camera pos in local variable */
 	mtx_lock(&c->gameMtx);
     glm_vec3_copy(c->cam->position, start);
 	mtx_unlock(&c->gameMtx);
@@ -188,10 +187,12 @@ void chunksViewHandling(Context *c) {
 	/* Loop on the complete camera fov */
     for (f32 angle = radiusStart - ANGLE_INCREMENT; angle <= radiusEnd + ANGLE_INCREMENT; angle += ANGLE_INCREMENT) {
 		
+		/* Get camera view vector in local variable */
 		mtx_lock(&c->gameMtx);
 		glm_vec3_copy(c->cam->viewVector, camViewVector);
 		mtx_unlock(&c->gameMtx);
 
+		/* Rotate camera view vector for scan all fov */
         glm_vec3_copy(camViewVector, rayDir);
         glm_vec3_rotate(rayDir, glm_rad(angle), (vec3){0.0f, 1.0f, 0.0f});
 
@@ -210,10 +211,13 @@ void chunksViewHandling(Context *c) {
             chunk = hashmap_get(c->world->chunksMap, chunkID);
 			if (chunk) {
                 box = chunkBoundingBoxGet(chunk->x, chunk->z, 8.0f);
+
+				/* Set boolean for more readability */
 				chunksRenderIsload = chunksRenderIsLoaded(chunk);
-                inView = isChunkInFrustum(&c->gameMtx, &c->cam->frustum, &box);
+                chunksIsInView = isChunkInFrustum(&c->gameMtx, &c->cam->frustum, &box);
 				chunkInRenderMap = chunksIsRenderer(c->world->renderChunksMap, chunkID);
-				if (inView) { /* If chunk is in frustum */
+
+				if (chunksIsInView) { /* If chunk is in frustum */
 					chunkNeighborMaskUpdate(c, chunk);
 					neightborChunkLoaded = chunk->neighbors == CHUNKS_NEIGHBOR_LOADED;
 					/* If chunk->render is not load and all nearby chunk are loaded (to wait full ocllusion culling)*/
@@ -235,7 +239,7 @@ void chunksViewHandling(Context *c) {
 					mtx_unlock(&c->renderMtx);
 					mtx_unlock(&c->vboToCreateMtx);
 				}
-            } else { /* If chunk not event load and is in frustrum */
+            } else { /* If chunk not event load and he is in frustrum */
 				chunksToLoadPrioritySet(c, chunkID, LOAD_PRIORITY_HIGH);
 			}
 			mtx_unlock(&c->threadContext->chunkMtx);
