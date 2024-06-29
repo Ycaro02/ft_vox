@@ -20,6 +20,8 @@ FREETYPE_LIB	= -lfreetype
 
 PERLIN_LIB		=	-lperlin_noise
 
+PERLIN_RULE		=	rsc/lib_deps/libperlin_noise.a
+
 COMPILE_PERLIN_LIB = ./install/compile_perlin_lib.sh
 
 INSTALL_DEPS	=	./install/install_deps.sh
@@ -28,7 +30,7 @@ DEPS_RULE		=	rsc/deps
 
 all:		$(NAME)
 
-$(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_LIB) $(OBJ_DIR) $(OBJS)
+$(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_RULE) $(OBJ_DIR) $(OBJS)
 	@${INSTALL_DEPS}
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
@@ -37,10 +39,12 @@ $(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_LIB) $(OBJ_DIR) $(OBJS)
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
 
 $(DEPS_RULE):
+ifeq ($(shell [ -d rsc/deps ] && echo 0 || echo 1), 1)
 	@$(INSTALL_DEPS)
 	@printf "$(GREEN)Installing dependencies done$(RESET)\n"
+endif
 
-$(PERLIN_LIB):
+$(PERLIN_RULE):
 ifeq ($(shell [ -f rsc/lib_deps/libperlin_noise.a ] && echo 0 || echo 1), 1)
 	@printf "$(CYAN)Compiling perlin noise lib...$(RESET)\n"
 	@$(COMPILE_PERLIN_LIB) > /dev/null 2> /dev/null
@@ -97,6 +101,10 @@ clean_lib:
 
 test: $(NAME)
 	@./$(NAME)
+
+deps_clean:
+	@rm -rf rsc/deps rsc/lib_deps/
+	@printf "$(RED)Clean deps$(RESET)\n"
 
 # @ulimit -c unlimited
 leak thread debug: clean $(NAME)
