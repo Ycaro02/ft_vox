@@ -28,15 +28,23 @@ INSTALL_DEPS	=	./install/install_deps.sh
 
 DEPS_RULE		=	rsc/deps
 
+CHECK_DEPS_RULE = ./install/.deps_checked
+
 all:		$(NAME)
 
-$(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_RULE) $(OBJ_DIR) $(OBJS)
-	@${INSTALL_DEPS}
+$(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_RULE) $(OBJ_DIR) $(OBJS) $(CHECK_DEPS_RULE)
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
 	@$(CC) $(CFLAGS) $(FREETYPE_INC) -o $(NAME) $(OBJS) $(PERLIN_LIB) $(LIBFT) $(LIST) $(LIB_DEPS_DIR) $(OPENGL_LIB) $(FREETYPE_LIB) 
 	@printf "$(GREEN)Compiling $(NAME) done$(RESET)\n"
+
+$(CHECK_DEPS_RULE):
+ifeq ($(shell [ -f ./install/.deps_checked ] && echo 0 || echo 1), 1)
+	@${INSTALL_DEPS}
+	@printf "$(GREEN)Installing dependencies done$(RESET)\n"
+	@touch $(CHECK_DEPS_RULE)
+endif
 
 $(DEPS_RULE):
 ifeq ($(shell [ -d rsc/deps ] && echo 0 || echo 1), 1)
@@ -90,7 +98,7 @@ endif
 
 fclean:		clean_lib clean
 	@printf "$(RED)Clean $(NAME)/lib$(RESET)\n"
-	@$(RM) $(NAME)
+	@$(RM) $(NAME) install/.deps_checked
 
 clean_lib:
 	@$(MAKE_LIST) fclean

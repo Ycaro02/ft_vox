@@ -9,16 +9,6 @@ create_dir() {
 	fi
 }
 
-# if [ ! -d "rsc/deps" ]; then
-# 	mkdir rsc/deps
-# 	display_color_msg ${LIGHT_CYAN} "Installing dependencies"
-# fi
-
-# if [ ! -d "rsc/lib_deps" ]; then
-# 	mkdir rsc/lib_deps
-# fi
-
-
 install_cglm() {
 	display_color_msg ${MAGENTA} "Loading cglm ..."
 	./install/load_glm.sh >/dev/null 2>&1
@@ -72,32 +62,32 @@ install_deps() {
 # FREETYPE CHECK: rsc/lib_deps/libstaticfreetype.a
 
 check_deps() {
+	if [ ! -f "install/.deps_checked" ]; then
+		display_color_msg ${MAGENTA} "Dependencies not checked, checking ..."
+	fi
+
 	if [ ! -f "rsc/deps/cglm/.cglm_installed" ]; then
 		display_color_msg ${YELLOW} "cglm check fail, remove and reinstalling ..." 
 		rm -rf rsc/deps/cglm/
 		install_cglm
-		display_color_msg ${GREEN} "cglm installed"
 	fi
 
 	if [ ! -f "rsc/lib_deps/libglfw3.a" ]; then
 		display_color_msg ${YELLOW} "libglfw3 check fail, remove and reinstalling ..."
 		rm -rf rsc/deps/glfw
 		install_glfw3
-		display_color_msg ${GREEN} "libglfw3 installed"
 	fi
 
 	if [ ! -f "rsc/lib_deps/libstatic_tinycthread.a" ]; then
 		display_color_msg ${YELLOW} "tinycthread check fail, remove and reinstalling ..."
 		rm -rf rsc/deps/tinycthread
 		install_tinycthread
-		display_color_msg ${GREEN} "tinycthread installed"
 	fi
 
 	if [ ! -f "rsc/lib_deps/libstaticfreetype.a" ]; then
 		display_color_msg ${YELLOW} "freetype check fail, remove and reinstalling ..."
 		rm -rf rsc/deps/freetype
 		install_freetype
-		display_color_msg ${GREEN} "freetype installed"
 	fi
 }
 
