@@ -3,5 +3,5 @@
 *.so
 rsc/deps
 rsc/lib_deps
-src/tinycthread
+install/.deps_checked
 ft_vox
