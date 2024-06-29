@@ -16,9 +16,9 @@
 #define EIGHT_BLOCK_PER_SEC 0.066666f 	/* 8 block per sec, 066666f * 60 = 4.0f */
 
 /* base */
-// #define CAM_BASE_SPEED ONE_BLOCK_PER_SEC	/* Camera move speed */
+#define CAM_BASE_SPEED ONE_BLOCK_PER_SEC	/* Camera move speed */
 // #define CAM_BASE_SPEED TWO_BLOCK_PER_SEC	/* Camera move speed */
-#define CAM_BASE_SPEED THREE_BLOCK_PER_SEC	/* Camera move speed */
+// #define CAM_BASE_SPEED THREE_BLOCK_PER_SEC	/* Camera move speed */
 // #define CAM_BASE_SPEED ONE_CHUNK_PER_SEC	/* Camera move speed */
 
 /* Camera Hight move speed */
