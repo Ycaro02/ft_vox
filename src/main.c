@@ -297,6 +297,9 @@ int main(void) {
 		return (1);
 	}
 
+	while (firstRenderGet(context) == FALSE) {
+		usleep(1000);
+	}
 	mainLoopFpsUnlock(context, context->skyTexture);
 	// mainLoopFpsLock(context, context->skyTexture);
     vox_destroy(context);

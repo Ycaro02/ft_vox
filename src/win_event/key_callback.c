@@ -94,6 +94,7 @@ void act_reseCamera(Context *c) {
 
 
 #define OFFSET_THRESHOLD 0.8
+#define MAX_TOTAL_MOVE 0.20
 
 void mouse_callback(GLFWwindow* window, f64 xpos, f64 ypos) {
     Context	*c = glfwGetWindowUserPointer(window);
@@ -103,13 +104,29 @@ void mouse_callback(GLFWwindow* window, f64 xpos, f64 ypos) {
 	/* Compute offset */
     f64 xoffset = xpos - centerX;
     f64 yoffset = centerY - ypos;
+	f64 totalMoveX = xoffset * 0.05;
+	f64 totalMoveY = yoffset * 0.05;
+
+	// ft_printf_fd(1, YELLOW"Before { X:|%f| Y:|%f| }"RESET" -> ", totalMoveX, totalMoveY);
+	if (totalMoveX > MAX_TOTAL_MOVE) {
+		totalMoveX = MAX_TOTAL_MOVE;
+	} else if (totalMoveX < -MAX_TOTAL_MOVE) {
+		totalMoveX = -MAX_TOTAL_MOVE;
+	}
+
+	if (totalMoveY > MAX_TOTAL_MOVE) {
+		totalMoveY = MAX_TOTAL_MOVE;
+	} else if (totalMoveY < -MAX_TOTAL_MOVE) {
+		totalMoveY = -MAX_TOTAL_MOVE;
+	}
+	// ft_printf_fd(1, GREEN"After {X:|%f| Y:|%f| }\n"RESET, totalMoveX, totalMoveY);
 
 	/* If one offset is greater than threshold */
 	if (fabs(xoffset) > OFFSET_THRESHOLD) {
-		rotate_camera(c->cam, -(xoffset * 0.05), VEC3_ROTATEY);
+		rotate_camera(c->cam, -totalMoveX, VEC3_ROTATEY);
 	} 
 	if (fabs(yoffset) > OFFSET_THRESHOLD) {
-		rotateTopBot(c->cam, -(yoffset * 0.05));
+		rotateTopBot(c->cam, -totalMoveY);
 	}
     glfwSetCursorPos(window, centerX, centerY);
 }

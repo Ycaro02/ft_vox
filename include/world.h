@@ -84,11 +84,12 @@ struct s_context {
 	/* Data displayed */
 	DisplayData			displayData;		/* Display data */
 	/* Multiple bool can be in the same var and handle with power of 2 (flag )*/
-	s8					isPlaying;			/* Game is playing */
-	u8					renderDataNeeded; 	/* Render need data, bool to specify render want to lock data (chunkMtx) */
-	s8					autoMove;			/* Auto move camera */
-	s8					autoRotate;			/* Auto rotate camera */
-	s8					displayUndergroundBlock; /* Display underground block */
+	s8					firstRender;				/* First render, to let time for thread loading the first chunks arround cam */
+	s8					isPlaying;					/* Game is playing */
+	u8					renderDataNeeded; 			/* Render need data, bool to specify render want to lock data (chunkMtx) */
+	s8					autoMove;					/* Auto move camera */
+	s8					autoRotate;					/* Auto rotate camera */
+	s8					displayUndergroundBlock;	/* Display underground block boolean. triggers with a key */
 };
 
 
@@ -119,6 +120,21 @@ FT_INLINE s8 renderNeedDataGet(Context *c) {
 	value = c->renderDataNeeded;
 	mtx_unlock(&c->renderDataNeededMtx);
 	return (value);
+}
+
+FT_INLINE s8 firstRenderGet(Context *c) {
+	s8 value = FALSE;
+
+	mtx_lock(&c->isRunningMtx);
+	value = c->firstRender;
+	mtx_unlock(&c->isRunningMtx);
+	return (value);
+}
+
+FT_INLINE void firstRenderSet(Context *c, s8 value) {
+	mtx_lock(&c->isRunningMtx);
+	c->firstRender = value;
+	mtx_unlock(&c->isRunningMtx);
 }
 
 

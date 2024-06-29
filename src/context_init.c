@@ -232,6 +232,7 @@ Context *contextInit() {
 	}
 
 	mtx_lock(&context->isRunningMtx);
+	context->firstRender = FALSE;
 	context->isPlaying = TRUE;
 	mtx_unlock(&context->isRunningMtx);
 

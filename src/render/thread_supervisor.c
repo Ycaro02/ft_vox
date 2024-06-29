@@ -303,6 +303,14 @@ s32 supervisorThreadRoutine(void *context) {
 		unloadChunkHandler(c);
 		chunksViewHandling(c);
 		chunksQueueRemoveHandling(c, &c->threadContext->threadMtx, &c->gameMtx, c->threadContext->chunksMapToLoad);
+		
+		if (firstRenderGet(c) == FALSE) {
+			mtx_lock(&c->threadContext->threadMtx);
+			if (hashmap_size(c->threadContext->chunksMapToLoad) == 0) {
+				firstRenderSet(c, TRUE);
+			}
+			mtx_unlock(&c->threadContext->threadMtx);
+		}
 		// usleep(500);
 	}
 
