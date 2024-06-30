@@ -2,7 +2,7 @@
 
 This project is a small program designed to generate and display a large procedural 3D world made of textured cubes, inspired by Minecraft. The goal is to create a vast and natural terrain that users can explore smoothly.
 
-## Features
+## Technical Constraints
 
 - **Procedural World Generation**: Generate a world of 16384 * 256 * 16384 cubes (256 is the height).
 - **Cube Types**: Different types of cubes such as grass, ground, sand, etc.
@@ -36,3 +36,7 @@ To run the program, follow these steps:
 	make
 	./ft_vox
 	```
+
+## Demonstration
+
+![First generation](rsc/gif/first_gen.gif)
