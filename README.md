@@ -16,23 +16,15 @@ This project is a small program designed to generate and display a large procedu
 - **Camera Movement**: Control the camera with the mouse on at least 2 axes and use keys to move in all directions relative to the camera's rotation.
 - **Speed Control**: Adjust camera speed, with an option to increase speed by 20x for fast navigation.
 
-## Technical Constraints
-
-- Implemented using the C programming language.
-- Use OpenGL for graphics rendering.
-- GLFW3 for window management and event handling.
-- TinyCThread for multithreading support.
-- Freetype for font rendering.
-- External libraries (other than OpenGL) are only used for window and event management.
-- No libraries are allowed for loading 3D objects, creating matrices, or loading shaders.
-
 ## Technical Choices
 
-- **Language**: C
-- **Graphics Rendering**: OpenGL
-- **Window Management**: GLFW3
-- **Multithreading**: TinyCThread
-- **Font Rendering**: Freetype
+- **Language**: Implemented using the C programming language.
+- **Graphics Rendering**: Use OpenGL for graphics rendering.
+- **Window/Event Management**: GLFW3 for window management and event handling.
+- **Multithreading**: TinyCThread for multithreading support.
+- **Font Rendering**: Freetype for font rendering.
+- **Custom Hashmap**: Created a custom hashmap in C to handle blocks in the world.
+- **Perlin Noise**: Implemented a custom 2D Perlin noise algorithm for world generation.
 
 ## Usage
 
