@@ -43,4 +43,4 @@ To run the program, follow these steps:
 ![First generation](rsc/gif/first_gen.gif)
 
 2. **Advanced generation**:
-![Advanced generation](rsc/gif/testttt.gif)
+![Advanced generation](rsc/gif/test_1920.gif)
