@@ -32,7 +32,7 @@ CHECK_DEPS_RULE = ./install/.deps_checked
 
 all:		$(NAME)
 
-$(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_RULE) $(OBJ_DIR) $(OBJS) $(CHECK_DEPS_RULE)
+$(NAME): $(DEPS_RULE) $(CHECK_DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_RULE) $(OBJ_DIR) $(OBJS)
 	@$(MAKE_LIBFT)
 	@$(MAKE_LIST)
 	@printf "$(CYAN)Compiling ${NAME} ...$(RESET)\n"
@@ -41,14 +41,13 @@ $(NAME): $(DEPS_RULE) $(LIBFT) $(LIST) $(PERLIN_RULE) $(OBJ_DIR) $(OBJS) $(CHECK
 
 $(CHECK_DEPS_RULE):
 ifeq ($(shell [ -f ./install/.deps_checked ] && echo 0 || echo 1), 1)
-	@${INSTALL_DEPS}
-	@printf "$(GREEN)Installing dependencies done$(RESET)\n"
-	@touch $(CHECK_DEPS_RULE)
+	@${INSTALL_DEPS} check -s
+	@printf "$(GREEN)Dependencies checked$(RESET)\n"
 endif
 
 $(DEPS_RULE):
 ifeq ($(shell [ -d rsc/deps ] && echo 0 || echo 1), 1)
-	@$(INSTALL_DEPS)
+	@$(INSTALL_DEPS) install -s
 	@printf "$(GREEN)Installing dependencies done$(RESET)\n"
 endif
 
@@ -98,7 +97,7 @@ endif
 
 fclean:		clean_lib clean
 	@printf "$(RED)Clean $(NAME)/lib$(RESET)\n"
-	@$(RM) $(NAME) install/.deps_checked
+	@$(RM) $(NAME) $(CHECK_DEPS_RULE)
 
 clean_lib:
 	@$(MAKE_LIST) fclean
@@ -111,7 +110,7 @@ test: $(NAME)
 	@./$(NAME)
 
 deps_clean:
-	@rm -rf rsc/deps rsc/lib_deps/
+	@rm -rf rsc/deps rsc/lib_deps/ $(CHECK_DEPS_RULE)
 	@printf "$(RED)Clean deps$(RESET)\n"
 
 # @ulimit -c unlimited
