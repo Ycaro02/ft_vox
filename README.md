@@ -32,7 +32,7 @@ To run the program, follow these steps:
 
 1. **Clone the Repository**:
    ```bash
-	git clone https://github.com/Ycaro02/ft_vox.git
+	git clone https://github.com/Ycaro02/ft_vox.git --recursive
 	make
 	./ft_vox
 	```
