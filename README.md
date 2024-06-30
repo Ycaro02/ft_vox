@@ -39,8 +39,10 @@ To run the program, follow these steps:
 
 ## Demonstration
 
-1. **First generation without transparency/biome**:
+### First generation without transparency/biome
+
 ![First generation](rsc/gif/first_gen.gif)
 
-2. **Advanced generation**:
-![Advanced generation](rsc/gif/test_1920.gif)
+### Advanced generation
+
+![Advanced generation](rsc/gif/test_1000.gif)
