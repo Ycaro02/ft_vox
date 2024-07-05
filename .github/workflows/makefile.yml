@@ -7,6 +7,7 @@ on:
     branches: [ "main" ]
   schedule:
     - cron: '0 0 * * *'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,6 +22,9 @@ jobs:
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Get dependencies
+      run: sudo apt update && sudo apt install libwayland-dev libxkbcommon-dev xorg-dev make -y
 
     - name: Update submodules to latest
       run: |
