@@ -5,7 +5,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+  schedule:
+    - cron: '0 0 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: false
+        submodules: true
 
     # ssh setup
     - name: Setup SSH
@@ -21,13 +22,15 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Get dependencies
-      run: sudo apt update && sudo apt install libwayland-dev libxkbcommon-dev xorg-dev make -y
-    
-    - name: Init and update submodules
+    - name: Update submodules to latest
       run: |
-        git submodule init
-        git submodule update --recursive
+            git submodule update --remote --recursive
+            git config --local user.email "actions@github.com"
+            git config --local user.name "GitHub Actions"
+    
+    - name: Commit submodule changes
+      run: |
+            git diff --quiet || (git commit -am "Update submodules" && git push)
 
     - name: Run make
       run: make
